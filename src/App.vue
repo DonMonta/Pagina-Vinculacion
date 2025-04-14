@@ -1,4 +1,12 @@
 <template>
+  <!-- Spinner Start -->
+  <div
+      id="spinner"
+      class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center"
+    >
+      <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
   <div class="container-fluid sticky-top px-0">
     <div class="container-fluid topbar d-none d-lg-block">
       <div class="container-fluid">
@@ -14,11 +22,11 @@
           </div>
           <div class="col-lg-2">
             <div class="d-flex align-items-center justify-content-end">
-              <a href="#" class="btn btn-light btn-square border rounded-circle nav-fill me-3"><i
+              <a href="#" class="btn btn-light border rounded-circle nav-fill me-3"><i
                   class="fab fa-facebook-f"></i></a>
-              <a href="#" class="btn btn-light btn-square border rounded-circle nav-fill me-3"><i
+              <a href="#" class="btn btn-light border rounded-circle nav-fill me-3"><i
                   class="fab fa-twitter"></i></a>
-              <a href="#" class="btn btn-light btn-square border rounded-circle nav-fill me-3"><i
+              <a href="#" class="btn btn-light border rounded-circle nav-fill me-3"><i
                   class="fab fa-instagram"></i></a>
             </div>
           </div>
@@ -192,3 +200,14 @@
 <style>
 @import url('@/assets/styles/css/style.css');
 </style>
+<script>
+import 'owl.carousel';
+import script2 from '@/assets/scripts/js/main.js'
+import feather from 'feather-icons';
+export default {
+  mixins: [script2],
+  mounted() {
+    feather.replace();
+  }
+}
+</script>

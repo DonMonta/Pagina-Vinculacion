@@ -241,10 +241,10 @@
                         <p class="mb-0 text-white">Director de Vinculación con la Sociedad</p>
                     </div>
                     <div class="team-social">
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
+                        <a class="btn btn-light btn-light-outline-0 rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-light btn-light-outline-0 rounded-circle mb-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-light btn-light-outline-0 rounded-circle mb-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-light btn-light-outline-0 rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
@@ -258,10 +258,10 @@
                         <p class="mb-0 text-white">Secretaria Técnica de Vinculación con la Sociedad</p>
                     </div>
                     <div class="team-social">
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
@@ -275,10 +275,10 @@
                         <p class="mb-0 text-white">Analista de Proyectos de Vinculación</p>
                     </div>
                     <div class="team-social">
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
@@ -292,10 +292,10 @@
                         <p class="mb-0 text-white"> Analista de Servicio a la Sociedad</p>
                     </div>
                     <div class="team-social">
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle mb-2" href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a class="btn btn-light btn-light-outline-0 btn-square rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-light btn-light-outline-0  rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
@@ -351,10 +351,10 @@
                     <div class=" text-center p-4 rounded-bottom bg-white">
                         <h4 class="text-black fw-bold ">Síguenos</h4>
                         <div class="d-flex align-items-center justify-content-center">
-                            <a href="#" class="btn btn-light btn-light-outline-0 btn-square rounded-circle me-3"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="btn btn-light btn-light-outline-0 btn-square rounded-circle me-3"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="btn btn-light btn-light-outline-0 btn-square rounded-circle me-3"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="btn btn-light btn-light-outline-0 btn-square rounded-circle"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="btn btn-light btn-light-outline-0  rounded-circle me-3"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="btn btn-light btn-light-outline-0  rounded-circle me-3"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="btn btn-light btn-light-outline-0  rounded-circle me-3"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="btn btn-light btn-light-outline-0  rounded-circle"><i class="fab fa-linkedin-in"></i></a>
                         </div>   
                     </div>
                 </div>
@@ -365,28 +365,16 @@
 </template>
 
 <script>
+import 'owl.carousel';
+import script2 from '@/assets/scripts/js/main.js'
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+    mixins: [script2],
+  name: 'index',
+  
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+
 </style>
