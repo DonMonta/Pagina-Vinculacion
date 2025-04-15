@@ -825,7 +825,23 @@
 }
 /*** Youtube Video End ***/
 /*** About End ***/
+/*** Service ***/
+.service1 .nav .nav-link {
+    transition: .5s;
+}
 
+.service1 .nav .nav-link.active {
+    border-color: var(--bs-primary) !important;
+    background: var(--bs-secondary);
+}
+
+.service1 .nav .nav-link.active h5 {
+    color: #FFFFFF !important;
+}
+
+.service1 .nav .nav-link.active h5 i {
+    color: #FFFFFF !important;
+}
 
 /*** Appointment  Start ***/
 .appointment {

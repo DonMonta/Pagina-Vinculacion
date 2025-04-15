@@ -46,7 +46,8 @@
             @click.native="setActive('noticias')">Noticias</router-link>
             <router-link :to="{ path: '/equipo'}" class="nav-item nav-link equipo" :class="{ active: activeNav === 'equipo' }"
             @click.native="setActive('equipo')">Conoce Nuestro Equipo</router-link>
-            <a href="#" class="nav-item nav-link normativas">Normativas</a>
+            <router-link :to="{ path: '/normativas'}" class="nav-item nav-link normativas" :class="{ active: activeNav === 'normativas' }"
+            @click.native="setActive('normativas')">Normativas</router-link>
             <div class="nav-item dropdown">
               <a href="#" class="nav-link dropdown-toggle proyectos" data-bs-toggle="dropdown">Proyectos de
                 Vinculacion</a>
