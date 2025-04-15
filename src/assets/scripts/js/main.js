@@ -1,12 +1,6 @@
 import { WOW } from 'wowjs';
-// Importa los plugins jQuery para waypoints y counterUp
 import 'waypoints/lib/jquery.waypoints.min.js';
 import 'jquery.counterup/jquery.counterup.min.js';
-
-// Asegúrate de tener instalados y disponibles también plugins como owlCarousel
-// (si owlCarousel no está instalado vía npm, asegúrate de incluirlo en tu index.html o similar)
-
-// Importa jQuery y asegúrate de asignarlo globalmente (si aún no lo has hecho en main.js)
 import $ from 'jquery';
 window.$ = $;
 window.jQuery = $;
@@ -14,17 +8,17 @@ window.jQuery = $;
 export default {
   name: "App",
   mounted() {
-    // Spinner: Remueve la clase 'show' en #spinner
+    
     setTimeout(() => {
       if ($('#spinner').length > 0) {
         $('#spinner').removeClass('show');
       }
     }, 1);
 
-    // Iniciar WOW.js
+    
     new WOW().init();
 
-    // Fixed Navbar: Agrega o quita clases según el scroll
+    
     $(window).on('scroll', function () {
       if ($(this).scrollTop() > 300) {
         $('.sticky-top').addClass('shadow-sm').css('top', '0px');
@@ -33,7 +27,7 @@ export default {
       }
     });
 
-    // Back to top: Mostrar/Ocultar botón y animar scroll
+    
     $(window).on('scroll', function () {
       if ($(this).scrollTop() > 300) {
         $('.back-to-top').fadeIn('slow');
@@ -46,7 +40,7 @@ export default {
       return false;
     });
 
-    // Inicializar carouseles (ejemplo con owlCarousel)
+    
     if ($.fn.owlCarousel) {
       $(".pricing-carousel").owlCarousel({
         autoplay: true,
@@ -136,7 +130,7 @@ export default {
       console.warn("owlCarousel no está definido. Asegúrate de incluirlo correctamente.");
     }
 
-    // Animación de progresos: Usa waypoints para actualizar las barras
+    
     $('.progress').waypoint(function () {
       $('.progress-bar').each(function () {
         $(this).css("width", $(this).attr("aria-valuenow") + '%');

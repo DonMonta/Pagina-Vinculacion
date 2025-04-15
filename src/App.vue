@@ -1,11 +1,6 @@
 <template>
   <!-- Spinner Start -->
-  <div
-      id="spinner"
-      class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center"
-    >
-      <div class="spinner-grow text-primary" role="status"></div>
-    </div>
+  
     <!-- Spinner End -->
   <div class="container-fluid sticky-top px-0">
     <div class="container-fluid topbar d-none d-lg-block">
@@ -45,9 +40,12 @@
         </button>
         <div class="collapse navbar-collapse py-3" id="navbarCollapse">
           <div class="navbar-nav mx-auto border-top">
-            <a href="index.html" class="nav-item nav-link active inicio">Inicio</a>
-            <a href="noticias.html" class="nav-item nav-link noticias">Noticias</a>
-            <a href="equipo.html" class="nav-item nav-link equipo">Conoce Nuestro Equipo</a>
+            <router-link :to="{ path: '/'}" class="nav-item nav-link inicio" :class="{ active: activeNav === 'inicio' }"
+            @click.native="setActive('inicio')">Inicio</router-link>
+            <router-link :to="{ path: '/noticias'}" class="nav-item nav-link noticias" :class="{ active: activeNav === 'noticias' }"
+            @click.native="setActive('noticias')">Noticias</router-link>
+            <router-link :to="{ path: '/equipo'}" class="nav-item nav-link equipo" :class="{ active: activeNav === 'equipo' }"
+            @click.native="setActive('equipo')">Conoce Nuestro Equipo</router-link>
             <a href="#" class="nav-item nav-link normativas">Normativas</a>
             <div class="nav-item dropdown">
               <a href="#" class="nav-link dropdown-toggle proyectos" data-bs-toggle="dropdown">Proyectos de
@@ -94,6 +92,69 @@
       </nav>
     </div>
   </div>
+   <!-- Carousel Start -->
+   <div class="container-fluid carousel-header px-0">
+        <div id="carouselId" class="carousel slide" data-bs-ride="carousel">
+            <ol class="carousel-indicators">
+                <li data-bs-target="#carouselId" data-bs-slide-to="0" class="active"></li>
+                <li data-bs-target="#carouselId" data-bs-slide-to="1"></li>
+                <li data-bs-target="#carouselId" data-bs-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner" role="listbox">
+                <div class="carousel-item active">
+                    
+                  <img src="@/assets/img/img/fondo3.jpg" width="300" height="200" class="img-fluid">
+                  
+                    <div class="carousel-caption ">
+                        <div class="p-2" style="max-width: 900px;">
+                            <h4 class="text-primary text-uppercase mb-3 titulo">Dirección de Vinculación con la Sociedad</h4>
+                            <h1 class="display-1 text-capitalize text-dark mb-1 sub1">Sobre Nosotros</h1>
+                            <p class="mx-md-1 fs-4 px-1 mb-1 texto text-dark cont1">La Dirección de Vinculación con la Sociedad planifica y coordina las acciones de Vinculación de la Universidad 
+                              con los sectores productivos y sociales en los campos de investigación...</p>
+                            <div class="d-flex align-items-center justify-content-center">
+                                <a class="btn btn-light btn-light-outline-0 rounded-pill py-3 px-5 me-4 leer" href="#">Leer Más</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                  <img src="@/assets/img/img/fondo3.jpg" width="300" height="200" class="img-fluid w-100" alt="Image">
+                    <div class="carousel-caption">
+                        <div class="p-3" style="max-width: 900px;">
+                            <h4 class="text-primary text-uppercase mb-3 titulo">Dirección de Vinculación con la Sociedad</h4>
+                            <h1 class="display-1 text-capitalize text-dark mb-1 sub2">Visión</h1>
+                            <p class="mx-md-1 fs-4 px-1 mb-5 text-dark cont2">Propender a un desarrollo sostenible de la sociedad mediante programas de servicio a la colectividad; articulando a la docencia...</p>
+                            <div class="d-flex align-items-center justify-content-center">
+                                <a class="btn btn-light btn-light-outline-0 rounded-pill py-3 px-5 me-4 leer" href="#">Leer Más</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="@/assets/img/img/fondo3.jpg" width="300" height="200" class="img-fluid" alt="Image">
+                    <div class="carousel-caption">
+                        <div class="p-3" style="max-width: 900px;">
+                            <h4 class="text-primary text-uppercase mb-3 titulo">Dirección de Vinculación con la Sociedad</h4>
+                            <h1 class="display-1 text-capitalize text-dark sub3">Misión</h1>
+                            <p class="mx-md-1 fs-4 px-1 mb-1 text-dark cont3">Ser un referente a nivel nacional e internacional, por una efectiva vinculación con la sociedad, contribuyendo a la construcción...</p>
+                            <div class="d-flex align-items-center justify-content-center">
+                              <a class="btn btn-light btn-light-outline-0 rounded-pill py-3 px-5 me-4 leer" href="#">Leer Más</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselId" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+  <!-- Carousel End -->
   <div>
     <router-view />
   </div>
@@ -197,14 +258,34 @@
   </footer>
 </template>
 
-<style>
+<style scoped>
 @import url('@/assets/styles/css/style.css');
+.nav-link.active {
+  font-weight: bold;
+  color: #FC1700;            /* Color activo */
+  border-bottom: 2px solid #FC1700; /* Opcional: línea inferior en el mismo color */
+}
 </style>
 <script>
 import 'owl.carousel';
 import script2 from '@/assets/scripts/js/main.js'
 import feather from 'feather-icons';
 export default {
+  data() {
+    return {
+      activeNav: "" // Almacena el enlace actualmente activo
+    };
+  },
+  methods: {
+    setActive(item) {
+      // Si se hace clic en el mismo activo, se desactiva
+      if (this.activeNav === item) {
+        this.activeNav = "";
+      } else {
+        this.activeNav = item;
+      }
+    }
+  },
   mixins: [script2],
   mounted() {
     feather.replace();

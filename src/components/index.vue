@@ -1,67 +1,10 @@
 <template>
-  <!-- Carousel Start -->
-  <div class="container-fluid carousel-header px-0">
-        <div id="carouselId" class="carousel slide" data-bs-ride="carousel">
-            <ol class="carousel-indicators">
-                <li data-bs-target="#carouselId" data-bs-slide-to="0" class="active"></li>
-                <li data-bs-target="#carouselId" data-bs-slide-to="1"></li>
-                <li data-bs-target="#carouselId" data-bs-slide-to="2"></li>
-            </ol>
-            <div class="carousel-inner" role="listbox">
-                <div class="carousel-item active">
-                    
-                  <img src="@/assets/img/img/fondo3.jpg" width="300" height="200" class="img-fluid">
-                  
-                    <div class="carousel-caption ">
-                        <div class="p-2" style="max-width: 900px;">
-                            <h4 class="text-primary text-uppercase mb-3 titulo">Dirección de Vinculación con la Sociedad</h4>
-                            <h1 class="display-1 text-capitalize text-dark mb-1 sub1">Sobre Nosotros</h1>
-                            <p class="mx-md-1 fs-4 px-1 mb-1 texto text-dark cont1">La Dirección de Vinculación con la Sociedad planifica y coordina las acciones de Vinculación de la Universidad 
-                              con los sectores productivos y sociales en los campos de investigación...</p>
-                            <div class="d-flex align-items-center justify-content-center">
-                                <a class="btn btn-light btn-light-outline-0 rounded-pill py-3 px-5 me-4 leer" href="#">Leer Más</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                  <img src="@/assets/img/img/fondo3.jpg" width="300" height="200" class="img-fluid w-100" alt="Image">
-                    <div class="carousel-caption">
-                        <div class="p-3" style="max-width: 900px;">
-                            <h4 class="text-primary text-uppercase mb-3 titulo">Dirección de Vinculación con la Sociedad</h4>
-                            <h1 class="display-1 text-capitalize text-dark mb-1 sub2">Visión</h1>
-                            <p class="mx-md-1 fs-4 px-1 mb-5 text-dark cont2">Propender a un desarrollo sostenible de la sociedad mediante programas de servicio a la colectividad; articulando a la docencia...</p>
-                            <div class="d-flex align-items-center justify-content-center">
-                                <a class="btn btn-light btn-light-outline-0 rounded-pill py-3 px-5 me-4 leer" href="#">Leer Más</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <img src="@/assets/img/img/fondo3.jpg" width="300" height="200" class="img-fluid" alt="Image">
-                    <div class="carousel-caption">
-                        <div class="p-3" style="max-width: 900px;">
-                            <h4 class="text-primary text-uppercase mb-3 titulo">Dirección de Vinculación con la Sociedad</h4>
-                            <h1 class="display-1 text-capitalize text-dark sub3">Misión</h1>
-                            <p class="mx-md-1 fs-4 px-1 mb-1 text-dark cont3">Ser un referente a nivel nacional e internacional, por una efectiva vinculación con la sociedad, contribuyendo a la construcción...</p>
-                            <div class="d-flex align-items-center justify-content-center">
-                              <a class="btn btn-light btn-light-outline-0 rounded-pill py-3 px-5 me-4 leer" href="#">Leer Más</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselId" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
+  <div
+      id="spinner"
+      class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center"
+    >
+      <div class="spinner-grow text-primary" role="status"></div>
     </div>
-  <!-- Carousel End -->
   <!-- Services Start -->
   <div class="container-fluid services py-5">
       <div class="container py-5">
@@ -251,11 +194,11 @@
             <div class="col-md-6 col-lg-6 col-xl-3">
                 <div class="team-item">
                     <div class="team-img rounded-top">
-                        <img src="@/assets/img/img/avatar/miriam.png" class="img-fluid w-95 align-items-center rounded-top bg-light" alt="" width="230px">
+                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-95 align-items-center rounded-top bg-light" alt="" width="230px">
                     </div>
                     <div class="team-text rounded-bottom text-center p-4">
-                        <h3 class="text-white">Ing. Miriam Ivonne Solarte Sevillano</h3>
-                        <p class="mb-0 text-white">Secretaria Técnica de Vinculación con la Sociedad</p>
+                        <h3 class="text-white">Name</h3>
+                        <p class="mb-0 text-white">------------</p>
                     </div>
                     <div class="team-social">
                         <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
@@ -268,11 +211,11 @@
             <div class="col-md-6 col-lg-6 col-xl-3">
                 <div class="team-item">
                     <div class="team-img rounded-top">
-                        <img src="@/assets/img/img/avatar/benjamin.jpg" class="img-fluid w-96 rounded-top bg-light" alt="" width="250px">
+                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-96 rounded-top bg-light" alt="" width="250px">
                     </div>
                     <div class="team-text rounded-bottom text-center p-4">
-                        <h3 class="text-white">Lcdo. Benjamín Abata </h3>
-                        <p class="mb-0 text-white">Analista de Proyectos de Vinculación</p>
+                        <h3 class="text-white">Name </h3>
+                        <p class="mb-0 text-white">----------</p>
                     </div>
                     <div class="team-social">
                         <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
@@ -285,11 +228,11 @@
             <div class="col-md-6 col-lg-6 col-xl-3">
                 <div class="team-item">
                     <div class="team-img rounded-top">
-                        <img src="@/assets/img/img/avatar/lucia.jpg" class="img-fluid w-96 rounded-top bg-light" alt="" width="242px">
+                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-96 rounded-top bg-light" alt="" width="242px">
                     </div>
                     <div class="team-text rounded-bottom text-center p-4">
-                        <h3 class="text-white">Psi. Lucia Vernaza</h3>
-                        <p class="mb-0 text-white"> Analista de Servicio a la Sociedad</p>
+                        <h3 class="text-white">Name</h3>
+                        <p class="mb-0 text-white"> ----------------</p>
                     </div>
                     <div class="team-social">
                         <a class="btn btn-light btn-light-outline-0  rounded-circle mb-2" href="#"><i class="fab fa-twitter"></i></a>
