@@ -26,6 +26,6 @@ createApp(App).use(store).use(router).mount('#app')
 import 'bootstrap/dist/js/bootstrap'
 
 
-/*import $ from 'jquery';
+import $ from 'jquery';
 window.$ = $;
-window.jQuery = $;*/
+window.jQuery = $;
