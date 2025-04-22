@@ -21,112 +21,34 @@
             <div class="row g-4 wow fadeInUp" data-wow-delay="0.3s">
                 <div class="col-lg-4">
                     <div class="nav nav-pills d-flex justify-content-between w-100 h-100 me-4">
-                        <button class="nav-link w-100 d-flex align-items-center text-start border p-4 mb-4 active"
-                            data-bs-toggle="pill" data-bs-target="#tab-pane-1" type="button">
-                            <h5 class="m-0"><i class="fa fa-bars text-primary me-3"></i>Reglamento de Vinculación con la
-                                sociedad de UTLVTE 2024</h5>
-                        </button>
                         <button class="nav-link w-100 d-flex align-items-center text-start border p-4 mb-4"
-                            data-bs-toggle="pill" data-bs-target="#tab-pane-2" type="button">
-                            <h5 class="m-0"><i class="fa fa-bars text-primary me-3"></i>Formatos para la presentación de
-                                proyectos de vinculación con la sociedad</h5>
+                            v-for="(book, index) in books" :key="book.id" @click="activeTab = index"
+                            :class="['nav-link', { active: activeTab === index }]" type="button">
+                            <h5 class="m-0"><i class="fa fa-bars text-primary me-3"></i>
+                                {{ book.label }}</h5>
                         </button>
-                        <button class="nav-link w-100 d-flex align-items-center text-start border p-4 mb-4"
-                            data-bs-toggle="pill" data-bs-target="#tab-pane-3" type="button">
-                            <h5 class="m-0"><i class="fa fa-bars text-primary me-3"></i>Plan Institucional de
-                                Vinculación con la Sociedad UTLVTE 2020-2024</h5>
-                        </button>
-                        <button class="nav-link w-100 d-flex align-items-center text-start border p-4 mb-0"
-                            data-bs-toggle="pill" data-bs-target="#tab-pane-4" type="button">
-                            <h5 class="m-0"><i class="fa fa-bars text-primary me-3"></i>Reglamento de Prácticas Pre
-                                Profesionales</h5>
-                        </button>
-                        <button class="nav-link w-100 d-flex align-items-center text-start border p-4 mb-0"
-                            data-bs-toggle="pill" data-bs-target="#tab-pane-4" type="button">
-                            <h5 class="m-0"><i class="fa fa-bars text-primary me-3"></i>Reglamento de Seguimiento a
-                                graduados</h5>
-                        </button>
+
                     </div>
                 </div>
                 <div class="col-lg-8">
-                    <div class="tab-content w-100">
-                        <div class="tab-pane fade show active" id="tab-pane-1">
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="flipbook-wrapper">
-                                        <!-- contenedor dimensionado -->
-                                        <div id="flipbook1" class="flipbook-container"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h3 class="mb-4">Reglamento de Vinculación con la sociedad de UTLVTE 2024</h3>
-                                    <p class="mb-4">Reglamento reformado de vinculación con la Sociedad, fue aprobado en la sesión ordinaria del Consejo
-                                        Superior Universitario, el 10 de junio de 2024.</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Secured Loans</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Credit Facilities</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Cash Advanced</p>
-                                    <a href="" class="btn btn-primary text-white py-3 px-5 mt-3">Read More</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="tab-pane-2">
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="flipbook-wrapper">
-                                        <div id="flipbook2" class="flipbook-container"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h3 class="mb-4">25 Years Of Experience In Financial Support</h3>
-                                    <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu
-                                        diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit
-                                        clita duo justo erat amet.</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Secured Loans</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Credit Facilities</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Cash Advanced</p>
-                                    <a href="" class="btn btn-primary text-white py-3 px-5 mt-3">Read More</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="tab-pane-3">
+                    <div class="flipbook-wrapper w-100">
+                        <div v-for="(book, index) in books" :key="book.id" v-show="activeTab === index">
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <div class="position-relative h-100">
-                                        <div id="flipbook3" class="position-absolute rounded w-100 h-100"
-                                            style="object-fit: cover;"></div>
+                                        <div class="flipbook-container" ref="flipbookContainers"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <h3 class="mb-4">25 Years Of Experience In Financial Support</h3>
-                                    <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu
-                                        diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit
-                                        clita duo justo erat amet.</p>
+                                    <h3 class="mb-4"> {{ book.titulo }}</h3>
+                                    <p class="mb-4"> {{ book.descripcion }}</p>
                                     <p><i class="fa fa-check text-primary me-3"></i>Secured Loans</p>
                                     <p><i class="fa fa-check text-primary me-3"></i>Credit Facilities</p>
                                     <p><i class="fa fa-check text-primary me-3"></i>Cash Advanced</p>
-                                    <a href="" class="btn btn-primary text-white py-3 px-5 mt-3">Read More</a>
+                                    <a href="" class="btn btn-primary py-3 px-5 mt-3 text-white">Read More</a>
                                 </div>
                             </div>
-                        </div>
-                        <div class="tab-pane fade" id="tab-pane-4">
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="position-relative h-100">
-                                        <div id="flipbook4" class="position-absolute rounded w-100 h-100"
-                                            style="object-fit: cover;"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h3 class="mb-4">25 Years Of Experience In Financial Support</h3>
-                                    <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu
-                                        diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit
-                                        clita duo justo erat amet.</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Secured Loans</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Credit Facilities</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Cash Advanced</p>
-                                    <a href="" class="btn btn-primary text-white py-3 px-5 mt-3">Read More</a>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -140,12 +62,15 @@
 import 'owl.carousel';
 import script2 from '@/assets/scripts/js/main.js'
 import { PageFlip } from 'page-flip';
+import $ from 'jquery';
+window.$ = $;
+window.jQuery = $;
 
 export default {
-    mixins: [script2],
     name: 'normativas',
     data() {
         return {
+            activeTab: 0,
             config: {
                 width: 430,
                 height: 560,
@@ -161,98 +86,122 @@ export default {
             books: [
                 {
                     id: 'flipbook1',
-                    images: [
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0001.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0002.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0003.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0004.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0005.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0006.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0007.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0008.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0009.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0010.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0011.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0012.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0013.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0014.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0015.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0016.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0017.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0018.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0019.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0020.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0021.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0022.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0023.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0024.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0025.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0026.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0027.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0028.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0029.jpg'),
-                        require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0030.jpg'),
-                        /* ...hasta la imagen 0033 */
-                    ]
+                    label: 'Reglamento Vinculación 2024',
+                    titulo: 'Reglamento de Vinculación con la Sociedad 2024',
+                    descripcion: 'Reglamento reformado de vinculación con la Sociedad, fue aprobado en la sesión ordinaria del Consejo Superior Universitario, el 10 de junio de 2024.',
+                    images: [require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0001.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0002.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0003.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0004.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0005.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0006.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0007.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0008.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0009.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0010.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0011.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0012.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0013.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0014.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0015.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0016.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0017.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0018.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0019.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0020.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0021.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0022.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0023.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0024.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0025.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0026.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0027.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0028.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0029.jpg'),
+                    require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0030.jpg'),]
                 },
                 {
                     id: 'flipbook2',
-                    images: [
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0001.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0002.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0003.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0004.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0005.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0006.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0007.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0008.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0009.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0010.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0011.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0012.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0013.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0014.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0015.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0016.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0017.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0018.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0019.jpg'),
-                        require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0020.jpg'),
-                    ]
+                    label: 'Formatos Proyectos',
+                    images: [require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0001.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0002.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0003.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0004.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0005.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0006.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0007.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0008.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0009.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0010.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0011.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0012.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0013.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0014.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0015.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0016.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0017.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0018.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0019.jpg'),
+                    require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0020.jpg'),]
                 },
-
-            ]
+                {
+                    id: 'flipbook3',
+                    label: 'Plan Institucional 2020-2024',
+                    images: [ /* rutas de imágenes del plan */]
+                },
+                {
+                    id: 'flipbook4',
+                    label: 'Prácticas Pre Profesionales',
+                    images: [ /* rutas de imágenes de prácticas */]
+                }
+            ],
+            flipbookInstances: []
         };
     },
     mounted() {
-        // Inicializa todos los flipbooks sobre los contenedores ya dimensionados
-        this.books.forEach(book => {
-            const el = document.getElementById(book.id);
-            if (el) {
-                const pf = new PageFlip(el, this.config);
-                pf.loadFromImages(book.images);
-            }
+        // Vue sets $refs.flipbookContainers as an array due to v-for
+        this.$nextTick(() => {
+            // Initialize first flipbook
+            this.initOrUpdateFlipbook(this.activeTab);
+
+            // Watch for tab changes
+            this.$watch('activeTab', idx => {
+                this.$nextTick(() => {
+                    this.initOrUpdateFlipbook(idx);
+                });
+            });
         });
-    }
-
+    },
+    methods: {
+        initOrUpdateFlipbook(index) {
+            const containers = this.$refs.flipbookContainers;
+            if (!containers || !containers[index]) return;
+            const el = containers[index];
+            // If instance exists, update
+            if (this.flipbookInstances[index]) {
+                this.flipbookInstances[index].update();
+            } else {
+                // Create new instance
+                const pf = new PageFlip(el, this.config);
+                pf.loadFromImages(this.books[index].images);
+                this.flipbookInstances[index] = pf;
+            }
+        }
+    },
+    mixins: [script2]
 };
-
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* este wrapper centra y da espacio si quieres */
 .flipbook-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
+    width: 430px;
+    height: 560px;
+    margin: 0 auto;
+    position: relative;
 }
 
-/* tamaño fijo para todas las instancias */
 .flipbook-container {
-    width: 430px !important;
-    height: 560px !important;
-    /* opcional: borde o sombra */
-    /* border: 1px solid #ddd; */
+    width: 100%;
+    height: 100%;
 }
 </style>
