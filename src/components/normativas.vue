@@ -42,10 +42,10 @@
                                 <div class="col-md-6">
                                     <h3 class="mb-4"> {{ book.titulo }}</h3>
                                     <p class="mb-4"> {{ book.descripcion }}</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Secured Loans</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Credit Facilities</p>
-                                    <p><i class="fa fa-check text-primary me-3"></i>Cash Advanced</p>
-                                    <a href="" class="btn btn-primary py-3 px-5 mt-3 text-white">Read More</a>
+                                    <p><i class="fa fa-check text-primary me-3"></i>{{ book.elaborado }}</p>
+                                    <p><i class="fa fa-check text-primary me-3"></i>{{ book.revisado }}</p>
+                                    <p><i class="fa fa-check text-primary me-3"></i>{{ book.aprobado }}</p>
+                                    <a href="" class="btn btn-primary py-3 px-5 mt-3 text-white">Descargar Documento</a>
                                 </div>
                             </div>
 
@@ -89,6 +89,9 @@ export default {
                     label: 'Reglamento Vinculación 2024',
                     titulo: 'Reglamento de Vinculación con la Sociedad 2024',
                     descripcion: 'Reglamento reformado de vinculación con la Sociedad, fue aprobado en la sesión ordinaria del Consejo Superior Universitario, el 10 de junio de 2024.',
+                    elaborado: 'Elaborado por la MSc. Belen Amador Rodriguez. PhD',
+                    revisado: 'Revisado por el Ing. Manuel Quiñonez, Ph.D. ',
+                    aprobado: 'Aprobado por el Consejo Superior Universitario',
                     images: [require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0001.jpg'),
                     require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0002.jpg'),
                     require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0003.jpg'),
@@ -122,7 +125,12 @@ export default {
                 },
                 {
                     id: 'flipbook2',
-                    label: 'Formatos Proyectos',
+                    label: 'Reglamento de Prácticas Pre Profesionales',
+                    titulo: 'Reglamento de Prácticas Pre Profesionales 2020',
+                    descripcion: 'Reglamento reformado de Prácticas Pre Profesionales, fue aprobado en la sesión ordinaria del Consejo Superior Universitario, el 2 de octubre de 2020.',
+                    elaborado: 'Elaborado por el Ing. Alex Quis e Mera. M.Sc',
+                    revisado: 'Revisado por el Ing. Manuel Quiñonez, Ph.D. ',
+                    aprobado: 'Aprobado por el Consejo Superior Universitario',
                     images: [require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0001.jpg'),
                     require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0002.jpg'),
                     require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0003.jpg'),
@@ -146,13 +154,69 @@ export default {
                 },
                 {
                     id: 'flipbook3',
-                    label: 'Plan Institucional 2020-2024',
-                    images: [ /* rutas de imágenes del plan */]
+                    label: 'Plan Institucional de Vinculación con la Sociedad UTLVTE',
+                    titulo: 'Plan Institucional de Vinculación con la Sociedad UTLVTE 2020-2024',
+                    descripcion: 'El Plan Institucional de Vinculación con la Sociedad de la Universidad Técnica Luis Vargas Torres de Esmeraldas plantea la implementación de los componentes de Proyectos '+
+                    'de Vinculación, Prácticas Preprofesionales y de Servicio a la Sociedad; que beneficien a'+
+                    ' nuestros estudiantes, comunidades, asociaciones productivas, de participación ciudadana,'+
+                    'entre otras; para el mejoramiento y/o fortalecimiento de sus capacidades. Los beneficiarios'+
+                    'serán todos aquellos que participen en los diferentes proyectos basados en los programas antes mencionados.',
+                    elaborado: 'Elaborado por el Ing. Alex Quis e Mera. M.Sc',
+                    revisado: 'Revisado por el Ing. Manuel Quiñonez, Ph.D. ',
+                    aprobado: 'Aprobado por el Consejo Superior Universitario',
+                    images: [require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0001.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0002.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0003.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0004.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0005.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0006.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0007.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0008.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0009.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0010.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0011.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0012.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0013.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0014.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0015.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0016.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0017.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0018.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0019.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0020.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0021.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0022.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0023.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0024.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0025.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0026.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0027.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0028.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0029.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0030.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0031.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0032.jpg'),
+                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0033.jpg'),
+                    ]
                 },
                 {
                     id: 'flipbook4',
-                    label: 'Prácticas Pre Profesionales',
-                    images: [ /* rutas de imágenes de prácticas */]
+                    label: 'Reglamento del Sistema de Seguimiento a Graduados',
+                    titulo: 'Reglamento del Sistema de Seguimiento a Graduados 2016',
+                    descripcion: 'Reglamento del Sistema de Seguimiento a Graduados, fue aprobado en la sesión ordinaria del Consejo Superior Universitario, el 28 de julio de 2016.',
+                    elaborado: 'Elaborado por el Ing. Harold Oyarvide Raniirez',
+                    revisado: 'Revisado por el Ab. Félix Preciado Q. y la Ing. Norma Avovi Real ',
+                    aprobado: 'Aprobado por el Consejo Superior Universitario',
+                    images: [require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0001.jpg'),
+                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0002.jpg'),
+                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0003.jpg'),
+                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0004.jpg'),
+                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0005.jpg'),
+                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0006.jpg'),
+                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0007.jpg'),
+                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0008.jpg'),
+                       
+                    ]
                 }
             ],
             flipbookInstances: []
