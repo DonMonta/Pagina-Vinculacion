@@ -1,16 +1,14 @@
 <template>
-    <div
-      id="spinner"
-      class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center"
-    >
-      <div class="spinner-grow text-primary" role="status"></div>
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
     </div>
     <div class="container-fluid services py-5">
         <div class="container py-5">
             <div class="mx-auto text-center mb-5" style="max-width: 800px;">
                 <h1 class="display-3">Nuestro Equipo de Trabajo</h1>
             </div>
-            
+
         </div>
     </div>
     <!-- About Start -->
@@ -34,16 +32,7 @@
                                     <span class="text-dark" style="width: 150px;">Funciones</span>
                                 </a>
                             </li>
-                            <li class="nav-item mb-3">
-                                <a class="d-flex py-2 mx-3 text-center bg-white" data-bs-toggle="pill" href="#tab-2">
-                                    <span class="text-dark" style="width: 150px;">Mission</span>
-                                </a>
-                            </li>
-                            <li class="nav-item mb-3">
-                                <a class="d-flex py-2 text-center bg-white" data-bs-toggle="pill" href="#tab-3">
-                                    <span class="text-dark" style="width: 150px;">Vision</span>
-                                </a>
-                            </li>
+
                         </ul>
                         <div class="tab-content">
                             <div id="tab-1" class="tab-pane fade show p-0 active">
@@ -52,45 +41,107 @@
                                         <div class="d-flex">
                                             <div class="text-start my-auto">
                                                 <h5 class="text-uppercase mb-3">Funciones Que Realiza</h5>
-                                                <p class="mb-4">Proponer las políticas, planes y programas actualizados sobre la vinculación con la sociedad al Vicerrectorado de lnvestigación, innovación y posgrado para análisis y estudio en Consejo Superior Universitario;
+                                                <p class="mb-4">Proponer las políticas, planes y programas actualizados
+                                                    sobre la vinculación con la sociedad al Vicerrectorado de
+                                                    lnvestigación, innovación y posgrado para análisis y estudio en
+                                                    Consejo Superior Universitario;
                                                 </p>
                                                 <div class="d-flex align-items-center justify-content-start">
-                                                    <a class="btn-hover-bg btn btn-primary text-white py-2 px-4" href="#">Ver Todas las Funciones</a>
+                                                    <a class="btn-hover-bg btn btn-primary text-white py-2 px-4"
+                                                        href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#funcionesModal">Ver Todas las Funciones</a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div id="tab-2" class="tab-pane fade show p-0">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="d-flex">
-                                            <div class="text-start my-auto">
-                                                <h5 class="text-uppercase mb-3">Funciones Que Realiza</h5>
-                                                <p class="mb-4">Proponer las políticas, planes y programas actualizados sobre la vinculación con la sociedad al Vicerrectorado de lnvestigación, innovación y posgrado para análisis y estudio en Consejo Superior Universitario
-                                                </p>
-                                                <div class="d-flex align-items-center justify-content-start">
-                                                    <a class="btn-hover-bg btn btn-primary text-white py-2 px-4" href="#">Read More</a>
-                                                </div>
-                                            </div>
-                                        </div>
+
+                        </div>
+                        <!-- Modal -->
+                        <div class="modal fade" id="funcionesModal" tabindex="-1" aria-labelledby="funcionesModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="funcionesModalLabel">
+                                            Funciones del Director(a) de Vinculación con la Sociedad
+                                        </h5>
+
                                     </div>
-                                </div>
-                            </div>
-                            <div id="tab-3" class="tab-pane fade show p-0">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="d-flex">
-                                            <div class="text-start my-auto">
-                                                <h5 class="text-uppercase mb-3">Lorem Ipsum 3</h5>
-                                                <p class="mb-4">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has
-                                                </p>
-                                                <div class="d-flex align-items-center justify-content-start">
-                                                    <a class="btn-hover-bg btn btn-primary text-white py-2 px-4" href="#">Read More</a>
+                                    <div class="modal-body">
+                                        <div class="event-carousel owl-carousel"
+                                            data-wow-delay="0.3s">
+                                            <div class="testimonial-item1">
+                                                <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                                    <div class="btn-square bg-white border rounded-circle">
+                                                        <i class="fa fa-quote-right fa-2x text-primary"></i>        
+                                                    </div>
+                                                    a. Proponer las políticas, planes y programas actualizados sobre la Vinculación con la 
+                                                    Sociedad al Vicerrectorado de Investigación, Vinculación y Posgrado para análisis y
+                                                    estudio en Consejo Superior Universitario. 
                                                 </div>
+                                                <img class="rounded-circle novige mb-3" height="200" width="230"
+                                                    src="@/assets/img/img/icno/politica.png" alt="">
+                                               
+                                            </div>
+                                            <div class="testimonial-item1">
+                                                <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                                    <div class="btn-square bg-white border rounded-circle">
+                                                        <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                                    </div>
+                                                    b. Fortalecer los canales de comunicación con la sociedad para apoyar y afianzar las 
+                                                    relaciones de servicio y vinculación con sus sectores. 
+                                                </div>
+                                                <img class="rounded-circle novige mb-3"
+                                                    src="@/assets/img/img/icno/fortalecer.png" alt="">
+                                               
+                                            </div>
+                                            <div class="testimonial-item1">
+                                                <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                                    <div class="btn-square bg-white border rounded-circle">
+                                                        <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                                    </div>
+                                                    c. Ejecutar el Plan Institucional de Vinculación con la Sociedad debidamente articulado
+                                                    con la formación e investigación. 
+                                                </div>
+                                                <img class="rounded-circle novige mb-3"
+                                                    src="@/assets/img/img/icno/ejecutar.png" alt="">
+                                                
+                                            </div>
+                                            <div class="testimonial-item1">
+                                                <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                                    <div class="btn-square bg-white border rounded-circle">
+                                                        <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                                    </div>
+                                                    d. Coordinar la vinculación específica con la sociedad con Vicerrectorado de 
+                                                    Investigación, Vinculación y Posgrados, Vicerrectorado Académico, Decanatos,
+                                                    Direcciones de Carrera y Responsables de Vinculación de Facultades. 
+                                                </div>
+                                                <img class="rounded-circle novige mb-3"
+                                                    src="@/assets/img/img/icno/coordinar.png" alt="">
+                                                
+                                            </div>
+                                            <div class="testimonial-item1">
+                                                <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                                    <div class="btn-square bg-white border rounded-circle">
+                                                        <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                                    </div>
+                                                    e. Realizar programas y cursos de Vinculación con la Sociedad guiados por el personal
+                                                    académico de la institución.  
+                                                </div>
+                                                <img class="rounded-circle novige mb-3"
+                                                    src="@/assets/img/img/icno/cursos.png" alt="">
+                                                
                                             </div>
                                         </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary text-white"
+                                            data-bs-dismiss="modal">
+                                            Cerrar
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -171,10 +222,14 @@
             <div class="packages-carousel owl-carousel">
                 <div class="packages-item">
                     <div class="packages-img">
-                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top" alt="Image">
-                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute" style="width: 100%; bottom: 0; left: 0; z-index: 5;">
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-calendar-alt me-2"></i>3 days</small>
+                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top"
+                            alt="Image">
+                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                            style="width: 100%; bottom: 0; left: 0; z-index: 5;">
+                            <small class="flex-fill text-center border-end py-2"><i
+                                    class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
+                            <small class="flex-fill text-center border-end py-2"><i
+                                    class="fa fa-calendar-alt me-2"></i>3 days</small>
                             <small class="flex-fill text-center py-2"><i class="fa fa-user me-2"></i>2 Person</small>
                         </div>
                         <div class="packages-price py-2 px-4 text-center"><i class="fa fa-user me-2"></i></div>
@@ -196,16 +251,20 @@
                             <div class="col-6 text-start px-0">
                                 <a href="#" class="btn-hover btn text-white py-2 px-4">Read More</a>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
                 <div class="packages-item">
                     <div class="packages-img">
-                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top" alt="Image">
-                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute" style="width: 100%; bottom: 0; left: 0; z-index: 5;">
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-calendar-alt me-2"></i>3 days</small>
+                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top"
+                            alt="Image">
+                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                            style="width: 100%; bottom: 0; left: 0; z-index: 5;">
+                            <small class="flex-fill text-center border-end py-2"><i
+                                    class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
+                            <small class="flex-fill text-center border-end py-2"><i
+                                    class="fa fa-calendar-alt me-2"></i>3 days</small>
                             <small class="flex-fill text-center py-2"><i class="fa fa-user me-2"></i>2 Person</small>
                         </div>
                         <div class="packages-price py-2 px-4 text-center"><i class="fa fa-user me-2"></i></div>
@@ -227,16 +286,20 @@
                             <div class="col-6 text-start px-0">
                                 <a href="#" class="btn-hover btn text-white py-2 px-4">Read More</a>
                             </div>
-                           
+
                         </div>
                     </div>
                 </div>
                 <div class="packages-item">
                     <div class="packages-img">
-                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top" alt="Image">
-                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute" style="width: 100%; bottom: 0; left: 0; z-index: 5;">
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-calendar-alt me-2"></i>3 days</small>
+                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top"
+                            alt="Image">
+                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                            style="width: 100%; bottom: 0; left: 0; z-index: 5;">
+                            <small class="flex-fill text-center border-end py-2"><i
+                                    class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
+                            <small class="flex-fill text-center border-end py-2"><i
+                                    class="fa fa-calendar-alt me-2"></i>3 days</small>
                             <small class="flex-fill text-center py-2"><i class="fa fa-user me-2"></i>2 Person</small>
                         </div>
                         <div class="packages-price py-2 px-4 text-center"><i class="fa fa-user me-2"></i></div>
@@ -258,16 +321,20 @@
                             <div class="col-6 text-start px-0">
                                 <a href="#" class="btn-hover btn text-white py-2 px-4">Read More</a>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
                 <div class="packages-item">
                     <div class="packages-img">
-                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top" alt="Image">
-                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute" style="width: 100%; bottom: 0; left: 0; z-index: 5;">
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
-                            <small class="flex-fill text-center border-end py-2"><i class="fa fa-calendar-alt me-2"></i>3 days</small>
+                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top"
+                            alt="Image">
+                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                            style="width: 100%; bottom: 0; left: 0; z-index: 5;">
+                            <small class="flex-fill text-center border-end py-2"><i
+                                    class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
+                            <small class="flex-fill text-center border-end py-2"><i
+                                    class="fa fa-calendar-alt me-2"></i>3 days</small>
                             <small class="flex-fill text-center py-2"><i class="fa fa-user me-2"></i>2 Person</small>
                         </div>
                         <div class="packages-price py-2 px-4 text-center"><i class="fa fa-user me-2"></i></div>
@@ -289,7 +356,7 @@
                             <div class="col-6 text-start px-0">
                                 <a href="#" class="btn-hover btn text-white py-2 px-4">Read More</a>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -303,12 +370,10 @@ import 'owl.carousel';
 import script2 from '@/assets/scripts/js/main.js'
 export default {
     mixins: [script2],
-  name: 'equipo',
-  
+    name: 'equipo',
+
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>
+<style scoped></style>

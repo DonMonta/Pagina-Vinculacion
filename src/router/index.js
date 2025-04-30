@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import NoticiasView from '../views/NoticiasView.vue'
 import EquiposView from '../views/EquiposView.vue'
 import NormativasView from '../views/NormativasView.vue'
+import ProyectosNuevosView from '../views/ProyectosNuevosView.vue'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/normativas',
     name: 'normativas',
     component: NormativasView
+  },
+  {
+    path: '/proyectosnuevos',
+    name: 'proyectosnuevos',
+    component: ProyectosNuevosView
   },
   
 ]

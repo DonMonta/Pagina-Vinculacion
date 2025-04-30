@@ -49,11 +49,13 @@
             <router-link :to="{ path: '/normativas'}" class="nav-item nav-link normativas" :class="{ active: activeNav === 'normativas' }"
             @click.native="setActive('normativas')">Normativas</router-link>
             <div class="nav-item dropdown">
-              <a href="#" class="nav-link dropdown-toggle proyectos" data-bs-toggle="dropdown">Proyectos de
-                Vinculacion</a>
+              <router-link :to="{ path: '/proyectosnuevos'}" class="nav-link dropdown-toggle proyectos" :class="{ active: activeNav === '2025' }"
+              @click.native="setActive('proyectos')" data-bs-toggle="dropdown">Proyectos de
+                Vinculacion</router-link>
               <div class="dropdown-menu m-0 rounded-0">
-                <a href="2020-2025.html" class="dropdown-item 2020">2020-2025</a>
-                <a href="antiguos.html" class="dropdown-item antiguos">Antiguos</a>
+                <router-link :to="{ path: '/proyectosnuevos'}" class="dropdown-item 2025" :class="{ active: activeNav === '2025' }"
+                @click.native="setActive('2025')">2025-2029</router-link>
+                <router-link :to="{ path: '/'}" class="dropdown-item antiguos">Antiguos</router-link>
               </div>
             </div>
             <a href="contacto.html" class="nav-item nav-link contacto">Contacto</a>

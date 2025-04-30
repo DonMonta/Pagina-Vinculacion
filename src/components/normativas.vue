@@ -11,7 +11,7 @@
 
         </div>
     </div>
-    <!-- Service Start -->
+    <!-- Normativas Vigentes -->
     <div class="container-xxl service1 py-5">
         <div class="container">
             <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
@@ -45,7 +45,8 @@
                                     <p><i class="fa fa-check text-primary me-3"></i>{{ book.elaborado }}</p>
                                     <p><i class="fa fa-check text-primary me-3"></i>{{ book.revisado }}</p>
                                     <p><i class="fa fa-check text-primary me-3"></i>{{ book.aprobado }}</p>
-                                    <a href="" class="btn btn-primary py-3 px-5 mt-3 text-white">Descargar Documento</a>
+                                    <a :href="currentBook.downloadUrl" download
+                                        class="btn btn-primary py-3 px-5 mt-3 text-white">Descargar Documento</a>
                                 </div>
                             </div>
 
@@ -55,7 +56,67 @@
             </div>
         </div>
     </div>
-    <!-- Service End -->
+    <!-- Normativas Vigentes -->
+    <!-- Normativas Vigentes No Vigentes -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
+                <p class="d-inline-block border rounded text-primary fw-semi-bold py-1 px-3">Conoce</p>
+                <h1 class="display-5 mb-5">Normativas No Vigentes</h1>
+            </div>
+            <div class="owl-carousel testimonial-carousel wow fadeInUp" data-wow-delay="0.3s">
+                <div class="testimonial-item1">
+                    <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                        <div class="btn-square bg-white border rounded-circle">
+                            <i class="fa fa-quote-right fa-2x text-primary"></i>
+                        </div>
+                        Dolores sed duo clita tempor justo dolor et stet lorem kasd labore dolore lorem ipsum. At lorem
+                        lorem magna ut et, nonumy et labore et tempor diam tempor erat.
+                    </div>
+                    <img class="rounded-circle novige mb-3" src="@/assets/img/img/logovincusinfondo.png" alt="">
+                    <h4>Titulo de Normativa</h4>
+                    <span>Año de vigencia</span>
+                </div>
+                <div class="testimonial-item1">
+                    <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                        <div class="btn-square bg-white border rounded-circle">
+                            <i class="fa fa-quote-right fa-2x text-primary"></i>
+                        </div>
+                        Dolores sed duo clita tempor justo dolor et stet lorem kasd labore dolore lorem ipsum. At lorem
+                        lorem magna ut et, nonumy et labore et tempor diam tempor erat.
+                    </div>
+                    <img class="rounded-circle novige mb-3" src="@/assets/img/img/logovincusinfondo.png" alt="">
+                    <h4>Titulo de Normativa</h4>
+                    <span>Año de vigencia</span>
+                </div>
+                <div class="testimonial-item1">
+                    <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                        <div class="btn-square bg-white border rounded-circle">
+                            <i class="fa fa-quote-right fa-2x text-primary"></i>
+                        </div>
+                        Dolores sed duo clita tempor justo dolor et stet lorem kasd labore dolore lorem ipsum. At lorem
+                        lorem magna ut et, nonumy et labore et tempor diam tempor erat.
+                    </div>
+                    <img class="rounded-circle novige mb-3" src="@/assets/img/img/logovincusinfondo.png" alt="">
+                    <h4>Titulo de Normativa</h4>
+                    <span>Año de vigencia</span>
+                </div>
+                <div class="testimonial-item1">
+                    <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                        <div class="btn-square bg-white border rounded-circle">
+                            <i class="fa fa-quote-right fa-2x text-primary"></i>
+                        </div>
+                        Dolores sed duo clita tempor justo dolor et stet lorem kasd labore dolore lorem ipsum. At lorem
+                        lorem magna ut et, nonumy et labore et tempor diam tempor erat.
+                    </div>
+                    <img class="rounded-circle novige mb-3" src="@/assets/img/img/logovincusinfondo.png" alt="">
+                    <h4>Titulo de Normativa</h4>
+                    <span>Año de vigencia</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Normativas Vigentes No Vigentes -->
 </template>
 
 <script>
@@ -92,6 +153,7 @@ export default {
                     elaborado: 'Elaborado por la MSc. Belen Amador Rodriguez. PhD',
                     revisado: 'Revisado por el Ing. Manuel Quiñonez, Ph.D. ',
                     aprobado: 'Aprobado por el Consejo Superior Universitario',
+                    downloadUrl: '/Docs/reglamernto_vincul_reformado.pdf',
                     images: [require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0001.jpg'),
                     require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0002.jpg'),
                     require('@/assets/Pdf/Reforma/reglamernto_vincul_reformado_page-0003.jpg'),
@@ -131,6 +193,7 @@ export default {
                     elaborado: 'Elaborado por el Ing. Alex Quis e Mera. M.Sc',
                     revisado: 'Revisado por el Ing. Manuel Quiñonez, Ph.D. ',
                     aprobado: 'Aprobado por el Consejo Superior Universitario',
+                    downloadUrl: '/Docs/Reglamento de Prácticas Pre Profesionales Secretaría General.pdf',
                     images: [require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0001.jpg'),
                     require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0002.jpg'),
                     require('@/assets/Pdf/Reglamento/Reglamento de Prácticas Pre Profesionales Secretaría General_page-0003.jpg'),
@@ -156,47 +219,48 @@ export default {
                     id: 'flipbook3',
                     label: 'Plan Institucional de Vinculación con la Sociedad UTLVTE',
                     titulo: 'Plan Institucional de Vinculación con la Sociedad UTLVTE 2020-2024',
-                    descripcion: 'El Plan Institucional de Vinculación con la Sociedad de la Universidad Técnica Luis Vargas Torres de Esmeraldas plantea la implementación de los componentes de Proyectos '+
-                    'de Vinculación, Prácticas Preprofesionales y de Servicio a la Sociedad; que beneficien a'+
-                    ' nuestros estudiantes, comunidades, asociaciones productivas, de participación ciudadana,'+
-                    'entre otras; para el mejoramiento y/o fortalecimiento de sus capacidades. Los beneficiarios'+
-                    'serán todos aquellos que participen en los diferentes proyectos basados en los programas antes mencionados.',
+                    descripcion: 'El Plan Institucional de Vinculación con la Sociedad de la Universidad Técnica Luis Vargas Torres de Esmeraldas plantea la implementación de los componentes de Proyectos ' +
+                        'de Vinculación, Prácticas Preprofesionales y de Servicio a la Sociedad; que beneficien a' +
+                        ' nuestros estudiantes, comunidades, asociaciones productivas, de participación ciudadana,' +
+                        'entre otras; para el mejoramiento y/o fortalecimiento de sus capacidades. Los beneficiarios' +
+                        'serán todos aquellos que participen en los diferentes proyectos basados en los programas antes mencionados.',
                     elaborado: 'Elaborado por el Ing. Alex Quis e Mera. M.Sc',
                     revisado: 'Revisado por el Ing. Manuel Quiñonez, Ph.D. ',
                     aprobado: 'Aprobado por el Consejo Superior Universitario',
+                    downloadUrl: '/Docs/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024.pdf',
                     images: [require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0001.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0002.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0003.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0004.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0005.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0006.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0007.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0008.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0009.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0010.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0011.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0012.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0013.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0014.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0015.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0016.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0017.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0018.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0019.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0020.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0021.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0022.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0023.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0024.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0025.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0026.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0027.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0028.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0029.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0030.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0031.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0032.jpg'),
-                        require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0033.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0002.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0003.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0004.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0005.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0006.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0007.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0008.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0009.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0010.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0011.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0012.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0013.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0014.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0015.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0016.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0017.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0018.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0019.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0020.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0021.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0022.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0023.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0024.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0025.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0026.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0027.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0028.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0029.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0030.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0031.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0032.jpg'),
+                    require('@/assets/Pdf/Plan/Plan Institucional de vinculación con la sociedad UTLVTE 2020-2024_page-0033.jpg'),
                     ]
                 },
                 {
@@ -207,28 +271,37 @@ export default {
                     elaborado: 'Elaborado por el Ing. Harold Oyarvide Raniirez',
                     revisado: 'Revisado por el Ab. Félix Preciado Q. y la Ing. Norma Avovi Real ',
                     aprobado: 'Aprobado por el Consejo Superior Universitario',
+                    downloadUrl: '/Docs/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035.pdf',
                     images: [require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0001.jpg'),
-                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0002.jpg'),
-                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0003.jpg'),
-                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0004.jpg'),
-                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0005.jpg'),
-                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0006.jpg'),
-                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0007.jpg'),
-                            require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0008.jpg'),
-                       
+                    require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0002.jpg'),
+                    require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0003.jpg'),
+                    require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0004.jpg'),
+                    require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0005.jpg'),
+                    require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0006.jpg'),
+                    require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0007.jpg'),
+                    require('@/assets/Pdf/Seguimiento a Graduados/Reglamento del Sistema de Seguimiento a Graduados_29-09-2016-100035_page-0008.jpg'),
+
                     ]
+                }
+            ],
+            novigen: [
+                {
+                    id: 'id_no1',
+                    descripcion: 'Descripcion Breve',
+                    titulo: 'No Vigente 1',
+                    year: '00-00-0000',
+                    imagen: require('@/assets/img/img/logovincusinfondo.png'),
                 }
             ],
             flipbookInstances: []
         };
     },
     mounted() {
-        // Vue sets $refs.flipbookContainers as an array due to v-for
+
         this.$nextTick(() => {
-            // Initialize first flipbook
             this.initOrUpdateFlipbook(this.activeTab);
 
-            // Watch for tab changes
+
             this.$watch('activeTab', idx => {
                 this.$nextTick(() => {
                     this.initOrUpdateFlipbook(idx);
@@ -241,15 +314,20 @@ export default {
             const containers = this.$refs.flipbookContainers;
             if (!containers || !containers[index]) return;
             const el = containers[index];
-            // If instance exists, update
+
             if (this.flipbookInstances[index]) {
                 this.flipbookInstances[index].update();
             } else {
-                // Create new instance
+
                 const pf = new PageFlip(el, this.config);
                 pf.loadFromImages(this.books[index].images);
                 this.flipbookInstances[index] = pf;
             }
+        }
+    },
+    computed: {
+        currentBook() {
+            return this.books[this.activeTab];
         }
     },
     mixins: [script2]

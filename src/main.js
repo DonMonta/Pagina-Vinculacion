@@ -14,6 +14,7 @@ import '@/assets/styles/css/bootstrap.min.css'
 import 'waypoints/lib/jquery.waypoints.js';
 import '@/assets/lib/animate/animate.min.css'
 import '@/assets/lib/lightbox/css/lightbox.min.css'
+import '@/assets/lib/lightbox/js/lightbox.min.js'
 import '@/assets/lib/owlcarousel/assets/owl.carousel.min.css'
 import '@/assets/lib/owlcarousel/owl.carousel.min.js'
 import '@/assets/lib/wow/wow.min.js'
