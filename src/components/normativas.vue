@@ -70,12 +70,11 @@
                         <div class="btn-square bg-white border rounded-circle">
                             <i class="fa fa-quote-right fa-2x text-primary"></i>
                         </div>
-                        Dolores sed duo clita tempor justo dolor et stet lorem kasd labore dolore lorem ipsum. At lorem
-                        lorem magna ut et, nonumy et labore et tempor diam tempor erat.
+                        Reglamento de vinculación con la sociedad aprobado en sesión ordinaria por el Consejo Superior Universitario, el 2 de octubre de 2020.
                     </div>
                     <img class="rounded-circle novige mb-3" src="@/assets/img/img/logovincusinfondo.png" alt="">
-                    <h4>Titulo de Normativa</h4>
-                    <span>Año de vigencia</span>
+                    <h4>Reglamento de Vinculación con la sociedad 2020</h4>
+                    <span>Año de Vigencia: 2020-2024</span>
                 </div>
                 <div class="testimonial-item1">
                     <div class="testimonial-text border rounded p-4 pt-5 mb-5">

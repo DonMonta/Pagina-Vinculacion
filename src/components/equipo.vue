@@ -11,7 +11,7 @@
 
         </div>
     </div>
-    <!-- About Start -->
+    <!-- Directora Start -->
     <div class="container-fluid about  py-5">
         <div class="container py-5">
             <div class="row g-5">
@@ -32,6 +32,11 @@
                                     <span class="text-dark" style="width: 150px;">Funciones</span>
                                 </a>
                             </li>
+                            <li class="nav-item mb-3">
+                                <a class="d-flex py-2 mx-4 text-center bg-white" data-bs-toggle="pill" href="#tab-2">
+                                    <span class="text-dark" style="width: 200px;">Actividades Realizadas</span>
+                                </a>
+                            </li>
 
                         </ul>
                         <div class="tab-content">
@@ -40,7 +45,6 @@
                                     <div class="col-12">
                                         <div class="d-flex">
                                             <div class="text-start my-auto">
-                                                <h5 class="text-uppercase mb-3">Funciones Que Realiza</h5>
                                                 <p class="mb-4">Proponer las políticas, planes y programas actualizados
                                                     sobre la vinculación con la sociedad al Vicerrectorado de
                                                     lnvestigación, innovación y posgrado para análisis y estudio en
@@ -50,6 +54,32 @@
                                                     <a class="btn-hover-bg btn btn-primary text-white py-2 px-4"
                                                         href="#" data-bs-toggle="modal"
                                                         data-bs-target="#funcionesModal1">Ver Todas las Funciones</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="tab-2" class="tab-pane fade show p-0">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex">
+                                            <div class="text-start my-auto">
+                                                <p><i class="fa fa-check text-primary me-3"></i>
+                                                    Reforma al Reglamento Interno de Vinculación con la Sociedad.
+                                                </p>
+                                                <p><i class="fa fa-check text-primary me-3"></i>
+                                                    Ejecución presupuestaria Proyectos de Vinculación con la Sociedad
+                                                    2021-2024
+                                                </p>
+                                                <p><i class="fa fa-check text-primary me-3"></i>
+                                                    Cierre de Proyectos de Vinculación con la Sociedad 2021-2024
+                                                </p>
+
+                                                <div class="d-flex align-items-center justify-content-start">
+                                                    <a class="btn-hover-bg btn btn-primary text-white py-2 px-4"
+                                                        href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#funcionesModal1">Leer Más</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -317,19 +347,19 @@
     <!-- Directores Section -->
     <section id="doctors" class="doctors section container-fluid event py-5 wow fadeInUp" data-wow-delay="0.1s">
 
-        <!-- Section Title -->
+
         <div class="container section-title text-center" data-aos="fade-up">
             <h5 class="text-uppercase text-primary">Directores de Carreras</h5>
             <p class="mb-4">Tendrá como compromiso el seguimiento a las
                 actividades de Vinculación con la Sociedad que se realicen desde la Carrera que dirige. El o
                 la directora(a) de Carrera elaborará un informe semestral de las actividades de Vinculación
                 con la Sociedad que se desarrollen en la carrera..... <a class="text-secondary"
-                    @click="openPdfModal(20)">Leer Más</a>
+                    @click="openPdfModal(21)">Leer Más</a>
             </p>
             <h1 class="mb-0">Conoce a los Directores de Carreras de la UTLVTE</h1>
-        </div><!-- End Section Title -->
+        </div>
 
-        <div class="container-fluid event py-5  ">
+        <div class="container-fluid event py-5 ">
 
             <div class="row gy-4">
 
@@ -338,9 +368,9 @@
                         <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" alt="">
                         </div>
                         <div class="member-info">
-                            <h4>Walter White</h4>
-                            <span>Chief Medical Officer</span>
-                            <p>Explicabo voluptatem mollitia et repellat qui dolorum quasi</p>
+                            <h4>Mgs. Alex Paul Alencastro Guerrero</h4>
+                            <span>FACAE</span>
+                            <p>Director de la Carrera de Comercio Exterior</p>
 
                         </div>
                     </div>
@@ -351,9 +381,9 @@
                         <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" alt="">
                         </div>
                         <div class="member-info">
-                            <h4>Sarah Jhonson</h4>
-                            <span>Anesthesiologist</span>
-                            <p>Aut maiores voluptates amet et quis praesentium qui senda para</p>
+                            <h4>Ing. Jefferson Humberto Figueroa Moreno</h4>
+                            <span>FACAE</span>
+                            <p>Director de la Carrera de Contabilidad y Auditoría</p>
 
                         </div>
                     </div>
@@ -364,9 +394,9 @@
                         <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" alt="">
                         </div>
                         <div class="member-info">
-                            <h4>William Anderson</h4>
-                            <span>Cardiology</span>
-                            <p>Quisquam facilis cum velit laborum corrupti fuga rerum quia</p>
+                            <h4>Mgs. Mayra Alejandra Escandon Franco</h4>
+                            <span>FACAE</span>
+                            <p>Directora de la Carrera de Administración de Empresas</p>
 
                         </div>
                     </div>
@@ -377,19 +407,27 @@
                         <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" alt="">
                         </div>
                         <div class="member-info">
-                            <h4>Amanda Jepson</h4>
-                            <span>Neurosurgeon</span>
-                            <p>Dolorum tempora officiis odit laborum officiis et et accusamus</p>
+                            <h4>Mgs. Ana Carminia Bedoya Gutierrez</h4>
+                            <span>FACPED</span>
+                            <p>Directora de la Carrera de Educación Inicial y Parvularia y Estudios
+                                Sociales</p>
 
                         </div>
                     </div>
                 </div><!-- End Team Member -->
 
             </div>
+            <div class="col-12 py-5">
+                <div class="services-btn text-center">
+                    <a href="#" class="btn btn-primary btn-primary-outline-0 rounded-pill py-3 px-5"
+                        data-bs-toggle="modal" data-bs-target="#funcionesModal12">Ver
+                        Todos los Directores</a>
+                </div>
+            </div>
 
         </div>
 
-    </section><!-- /Directores Section -->
+    </section>
 
 
     <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true"
@@ -986,11 +1024,49 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="funcionesModal2Label">
-                        Funciones del Analista de proyectos de vinculación
+                        Analista de proyectos de vinculación
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="col-12 col-lg-12">
+                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
+                            <div class="row g-5">
+                                <div class="col-xl-6">
+                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
+                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
+                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h1 class="display-6 mb-4">Nombre:</h1>
+                                    <p class="mb-4">Es el o la profesional responsable del
+                                        monitoreo y evaluación de los proyectos de vinculación de la UTLVTE.
+                                    </p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-envelope text-primary me-3"></i>
+                                        <p class="text-dark mb-0">vinculacion@utelvt.edu.ec</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fa fa-phone-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-4">
+                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
+                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container section-title py-5">
+                        <h2>Funciones</h2>
+                    </div>
                     <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
                         <div class="testimonial-item1">
                             <div class="testimonial-text border rounded p-4 pt-5 mb-5">
@@ -1172,11 +1248,49 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="funcionesModal3Label">
-                        Funciones del Analista de prácticas preprofesionales
+                        Analista de prácticas preprofesionales
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="col-12 col-lg-12">
+                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
+                            <div class="row g-5">
+                                <div class="col-xl-6">
+                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
+                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
+                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h1 class="display-6 mb-4">Nombre:</h1>
+                                    <p class="mb-4">Es el (la) profesional encargado (a) de
+                                        coordinar acciones para el cumplimiento de las prácticas pre profesionales.
+                                    </p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-envelope text-primary me-3"></i>
+                                        <p class="text-dark mb-0">vinculacion@utelvt.edu.ec</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fa fa-phone-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-4">
+                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
+                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container section-title py-5">
+                        <h2>Funciones</h2>
+                    </div>
                     <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
                         <div class="testimonial-item1">
                             <div class="testimonial-text border rounded p-4 pt-5 mb-5">
@@ -1322,11 +1436,49 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="funcionesModal4Label">
-                        Funciones del Analista de servicio a la sociedad
+                        Analista de servicio a la sociedad
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="col-12 col-lg-12">
+                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
+                            <div class="row g-5">
+                                <div class="col-xl-6">
+                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
+                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
+                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h1 class="display-6 mb-4">Nombre:</h1>
+                                    <p class="mb-4">Es el o la profesional responsable de la
+                                        ejecución de las actividades de servicio a la sociedad.
+                                    </p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-envelope text-primary me-3"></i>
+                                        <p class="text-dark mb-0">vinculacion@utelvt.edu.ec</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fa fa-phone-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-4">
+                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
+                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container section-title py-5">
+                        <h2>Funciones</h2>
+                    </div>
                     <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
                         <div class="testimonial-item1">
                             <div class="testimonial-text border rounded p-4 pt-5 mb-5">
@@ -1493,11 +1645,49 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="funcionesModal5Label">
-                        Funciones de la Secretaría de Vinculación.
+                        Secretaría de Vinculación.
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="col-12 col-lg-12">
+                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
+                            <div class="row g-5">
+                                <div class="col-xl-6">
+                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
+                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
+                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h1 class="display-6 mb-4">Ing. Gabriel Estupiñán</h1>
+                                    <p class="mb-4">Es la o el responsable de de realizar todo el proceso que realiza un
+                                        secretario/a.
+                                    </p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-envelope text-primary me-3"></i>
+                                        <p class="text-dark mb-0">vinculacion@utelvt.edu.ec</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fa fa-phone-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-4">
+                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
+                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container section-title py-5">
+                        <h2>Funciones</h2>
+                    </div>
                     <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
                         <div class="testimonial-item1">
                             <div class="testimonial-text border rounded p-4 pt-5 mb-5">
@@ -2535,6 +2725,497 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 11 -->
+    <div class="modal fade" id="funcionesModal11" tabindex="-1" aria-labelledby="funcionesModal11Label"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="funcionesModal11Label">
+                        Responsable de Vinculación de la SEDE LA CONCORDIA.
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-12 col-lg-12">
+                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
+                            <div class="row g-5">
+                                <div class="col-xl-6">
+                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
+                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
+                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h1 class="display-6 mb-4">Ing. Félix Lenin Preciado, Magister, Magister</h1>
+                                    <p class="mb-4">Responsable de Vinculación actualmente de la SEDE, UTLVTE. Docente
+                                        titular de la UTLVTE, con
+                                        experiencia en el área de vinculación y docencia universitaria.
+                                    </p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-envelope text-primary me-3"></i>
+                                        <p class="text-dark mb-0">marco.navarrete@utelvt.edu.ec</p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fa fa-phone-alt text-primary me-3"></i>
+                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-4">
+                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
+                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container section-title py-5">
+                        <h2>Funciones</h2>
+                        <p>Estas son las funciones que realiza como responsable de vinculación de la Facultad</p>
+                    </div>
+                    <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                a. Proponer las políticas, planes y programas actualizados sobre la Vinculación con la
+                                Sociedad a la Dirección de Vinculación con la Sociedad de la UTLVTE.
+                            </div>
+
+
+                        </div>
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                b. Coordinar, junto al Decano (a) y directores (as) de Carrera los proyectos de
+                                vinculación de su unidad académica, para la revisión y aprobación por parte de la
+                                Comisión de Vinculación con la Sociedad.
+                            </div>
+
+
+                        </div>
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                c. Coordinar la vinculación específica con la sociedad con los Decanatos y Direcciones
+                                de Carrera
+                            </div>
+
+
+                        </div>
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                d. Presentar y ejecutar proyectos de cursos de capacitación guiados por el personal
+                                académico de la institución, dirigido a los sectores más vulnerabilizados de la
+                                sociedad
+                            </div>
+
+
+                        </div>
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                e. Proponer a la Dirección de Vinculación con la Sociedad, políticas para fortalecer y
+                                diversificar la vinculación con los y las diferentes agentes de la producción, con
+                                Organismos No Gubernamentales y con prestigiosas Universidades o Escuelas
+                                Politécnicas Nacionales o Internacionales.
+                            </div>
+
+
+                        </div>
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                f. Coordinar con la Dirección de Vinculación con la Sociedad, el diseño y ejecución de
+                                los diferentes programas de prácticas y pasantías en los ámbitos urbano y rural,
+                                según las propias características de las carreras y las necesidades de la sociedad.
+                            </div>
+
+
+                        </div>
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                g. Velar por la adecuada difusión de las actividades de vinculación, conjuntamente con
+                                la Dirección de Vinculación con la Sociedad.
+
+                            </div>
+
+
+                        </div>
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                h. Elaborar el informe anual de actividades y ponerlo a consideración de la Dirección
+                                de Vinculación con la Sociedad.
+                            </div>
+
+
+                        </div>
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                i. Realizar reuniones mensuales con los y las responsables de los proyectos de
+                                Vinculación con la Sociedad de su facultad.
+                            </div>
+
+
+                        </div>
+                        <div class="testimonial-item1">
+                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
+                                <div class="btn-square bg-white border rounded-circle">
+                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
+                                </div>
+                                j. Las demás actividades que les sean asignadas.
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 12 -->
+    <div class="modal fade" id="funcionesModal12" tabindex="-1" aria-labelledby="funcionesModal12Label"
+        aria-hidden="true">
+        <div class="modal-dialog custom-modal modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="funcionesModal12Label">
+                        Directores de Carreras de la UTLVTE
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <section id="doctors" class="doctors section container-fluid event py-5">
+                        <div class="container section-title text-center" data-aos="fade-up">
+                            <h5 class="text-uppercase text-primary">Directores de Carreras</h5>
+                            <p class="mb-4">Tendrá como compromiso el seguimiento a las
+                                actividades de Vinculación con la Sociedad que se realicen desde la Carrera que dirige.
+                                El o
+                                la directora(a) de Carrera elaborará un informe semestral de las actividades de
+                                Vinculación
+                                con la Sociedad que se desarrollen en la carrera, el cual lo entregará al responsable de
+                                Vinculación de la Facultad, con copia al director(a) de Vinculación con la Sociedad de
+                                la
+                                UTLVTE.
+                            </p>
+                            <h1 class="mb-0">Estos son todos los Directores de las 19 Carreras de la UTLVTE</h1>
+                        </div>
+                        <div class="container-fluid event py-5 ">
+
+                            <div class="row gy-4">
+
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Alex Paul Alencastro Guerrero</h4>
+                                            <span>FACAE</span>
+                                            <p>Director de la Carrera de Comercio Exterior</p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Ing. Jefferson Humberto Figueroa Moreno</h4>
+                                            <span>FACAE</span>
+                                            <p>Director de la Carrera de Contabilidad y Auditoría</p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Mayra Alejandra Escandon Franco</h4>
+                                            <span>FACAE</span>
+                                            <p>Directora de la Carrera de Administración de Empresas</p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Ana Carminia Bedoya Gutierrez</h4>
+                                            <span>FACPED</span>
+                                            <p>Directora de la Carrera de Educación Inicial y Parvularia y Estudios
+                                                Sociales</p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Cecilia Mariana Ulloa Espinoza</h4>
+                                            <span>FACPED</span>
+                                            <p>Directora de Carrera de Pedagogía de la Lengua y Literatura
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Lucia Germania Chavez Ruano</h4>
+                                            <span>FACPED</span>
+                                            <p>Directora de Carrera de Pedagogía de las Ciencias Experimentales de
+                                                las Matemáticas y Física
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Lcda. Ludy Yoconda Gomez Pinillo</h4>
+                                            <span>FACPED</span>
+                                            <p>Directora de la Carrera de Ciencias Experimentales de la Química y
+                                                Biología
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Miryan Veronica Vera Mera</h4>
+                                            <span>FACPED</span>
+                                            <p>Directora de la Carrera de Educación Básica
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Tunin Gilmar Murillo Andrade</h4>
+                                            <span>FACPED</span>
+                                            <p>Director de Carrera de Pedagogía de la Actividad Física y Deporte
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Lcdo. Francisco Washington Pazmiño Mendez</h4>
+                                            <span>FACSOS</span>
+                                            <p>Director de la Carrera de Sociología
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Abg. Jerson Ante Valdez Verduga</h4>
+                                            <span>FACSOS</span>
+                                            <p>Director de la Carrera de Trabajo Social
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Nelly del Rocío Panchano Valencia</h4>
+                                            <span>FACSOS</span>
+                                            <p>Directora de la Carrera de Turismo
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Vlucher Santiago Quintero Samaniego</h4>
+                                            <span>FACI</span>
+                                            <p>Director de la Carrera de Ingeniería Mecánica
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Romulo Sandino Jurado Calero</h4>
+                                            <span>FACI</span>
+                                            <p>Director de la Carrera de Tecnología de la Información
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Raul Clemente Ulloa de Souza</h4>
+                                            <span>FACI</span>
+                                            <p>Director de la Carrera de Ingeniería Eléctrica
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Mirna Geraldine Cevallos Mina</h4>
+                                            <span>FACI</span>
+                                            <p>Director de la Carrera de Ingeniería Eléctrica
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Joel Darvin Velasco Quiñonez</h4>
+                                            <span>FACAP</span>
+                                            <p>Director de la Carrera de Ingeniería Forestal
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Mgs. Milton Jose Bolaños Ortega</h4>
+                                            <span>FACAP</span>
+                                            <p>Director de la Carrera de Ingeniería Zootécnica
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                                    <div class="team-member d-flex align-items-start">
+                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
+                                                class="img-fluid" alt="">
+                                        </div>
+                                        <div class="member-info">
+                                            <h4>Ing. Tito Eric Arce Olivo</h4>
+                                            <span>FACAP</span>
+                                            <p>Director de la Carrera de Ingeniería Agronómica -
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div><!-- End Team Member -->
+
+                            </div>
+
+
+                        </div>
+                    </section>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">

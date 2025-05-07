@@ -58,7 +58,8 @@
                                                 </p>
                                                 <div class="d-flex align-items-center justify-content-start">
                                                     <a class="btn-hover-bg btn btn-primary text-white py-2 px-4"
-                                                        href='/Docs/16_Agosto_Convocatoria_Proyectos_Vinculación_2024-signed.pdf' download>Descargar la Convocatoria</a>
+                                                        href='/Docs/16_Agosto_Convocatoria_Proyectos_Vinculación_2024-signed.pdf'
+                                                        download>Descargar la Convocatoria</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -96,30 +97,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel"
-                                aria-hidden="true" ref="pdfModal">
-                                <div class="modal-dialog modal-xl modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="pdfModalLabel">Convocatoria de Proyectos</h5>
-                                            <button type="button" class="btn-close" @click="closePdfModal()"></button>
-                                        </div>
-                                        <div class="modal-body p-0">
-                                            <!-- Iframe con el PDF -->
-                                            <object :data="`${pdfUrl}#page=${pdfPage}`" type="application/pdf"
-                                                width="100%" height="600">
-                                                <p>
-                                                    Tu navegador no soporta PDFs embebidos.
-                                                    <a :href="`${pdfUrl}#page=${pdfPage}`" target="_blank"
-                                                        rel="noopener">
-                                                        Ábrelo aquí
-                                                    </a>.
-                                                </p>
-                                            </object>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
 
                         </div>
                     </div>
@@ -127,6 +105,63 @@
             </div>
         </div>
     </div>
+    <!-- Features Start -->
+    <div class="container-xxl feature py-5">
+        <div class="container">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <p class="d-inline-block border rounded text-primary fw-semi-bold py-1 px-3">Equipo de los proyectos
+                        de Vinculación</p>
+                    <h1 class="display-5 mb-4">Conformación de los proyectos de Vinculacioón con la Sociedad</h1>
+                    <p class="mb-4">Los proyectos de vinculación con la sociedad estarán conformados por un
+                        equipo de trabajo integrado por docentes, estudiantes y personal administrativo. Con los roles
+                        de:
+                    </p>
+
+                </div>
+                <div class="col-lg-6">
+                    <div class="row g-4 align-items-center">
+                        <div class="col-md-6">
+                            <div class="row g-4">
+                                <div class="col-12 wow fadeIn" data-wow-delay="0.3s">
+                                    <div class="feature-box border rounded p-4">
+                                        <i class="fa fa-check fa-3x text-primary mb-3"></i>
+                                        <h4 class="mb-3">Director (a) y/o Subdirector(a)</h4>
+                                        <p class="mb-3">Son los
+                                            profesores(as) Titulares u Ocasionales que lideran la formulación, ejecución
+                                            y evaluación......</p>
+                                        <a class="fw-semi-bold" href="">Leer Más <i
+                                                class="fa fa-arrow-right ms-1"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-12 wow fadeIn" data-wow-delay="0.5s">
+                                    <div class="feature-box border rounded p-4">
+                                        <i class="fa fa-check fa-3x text-primary mb-3"></i>
+                                        <h4 class="mb-3">Profesores(as) participantes</h4>
+                                        <p class="mb-3">Son los y las
+                                            profesores(as) Titulares u Ocasionales que participan activamente en la
+                                            formulación...</p>
+                                        <a class="fw-semi-bold" href="">Leer Más <i
+                                                class="fa fa-arrow-right ms-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 wow fadeIn" data-wow-delay="0.7s">
+                            <div class="feature-box border rounded p-4">
+                                <i class="fa fa-check fa-3x text-primary mb-3"></i>
+                                <h4 class="mb-3">Estudiantado participante</h4>
+                                <p class="mb-3">Son los y las
+                                    estudiantes que participan activamente en la formulación...</p>
+                                <a class="fw-semi-bold" href="">Leer Más <i class="fa fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Features End -->
     <!-- Testimonial Start -->
     <div class="container-fluid testimonial py-5">
         <div class="container py-5">
@@ -286,6 +321,51 @@
         </div>
     </div>
     <!-- Testimonial End -->
+    <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true"
+        ref="pdfModal">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdfModalLabel">Convocatoria de Proyectos</h5>
+                    <button type="button" class="btn-close" @click="closePdfModal()"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Iframe con el PDF -->
+                    <object :data="`${pdfUrl}#page=${pdfPage}`" type="application/pdf" width="100%" height="600">
+                        <p>
+                            Tu navegador no soporta PDFs embebidos.
+                            <a :href="`${pdfUrl}#page=${pdfPage}`" target="_blank" rel="noopener">
+                                Ábrelo aquí
+                            </a>.
+                        </p>
+                    </object>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 2 -->
+    <div class="modal fade" id="funcionesModal2" tabindex="-1" aria-labelledby="funcionesModal2Label"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="funcionesModal2Label">
+                        Director (a) y/o Subdirector(a) de Proyectos de Vinculación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                   
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>

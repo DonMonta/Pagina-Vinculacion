@@ -180,10 +180,14 @@
           <div class="col-md-6 col-lg-6 col-xl-3">
             <div class="footer-item d-flex flex-column">
 
-              <a href="index.html"><i class="fas fa-angle-right me-2"></i> Inicio</a>
-              <a href="noticias.html"><i class="fas fa-angle-right me-2"></i> Noticias</a>
-              <a href="equipo.html"><i class="fas fa-angle-right me-2"></i> Conoce Nuestro Equipo</a>
-              <a href=""><i class="fas fa-angle-right me-2"></i> Normativas</a>
+              <router-link :to="{ path: '/'}" class="inicio" :class="{ active: activeNav === 'inicio' }"
+              @click.native="setActive('inicio')"><i class="fas fa-angle-right me-2"></i> Inicio</router-link >
+              <router-link :to="{ path: '/noticias'}" class="noticias" :class="{ active: activeNav === 'noticias' }"
+              @click.native="setActive('noticias')"><i class="fas fa-angle-right me-2"></i> Noticias</router-link>
+              <router-link :to="{ path: '/equipo'}" class="equipo" :class="{ active: activeNav === 'equipo' }"
+              @click.native="setActive('equipo')"><i class="fas fa-angle-right me-2"></i> Conoce Nuestro Equipo</router-link>
+              <router-link :to="{ path: '/normativas'}" class="normativas" :class="{ active: activeNav === 'normativas' }"
+              @click.native="setActive('normativas')"><i class="fas fa-angle-right me-2"></i> Normativas</router-link>
               <a href="2020-2025.html"><i class="fas fa-angle-right me-2"></i> Proyectos de Vinculacion</a>
               <a href="contacto.html"><i class="fas fa-angle-right me-2"></i> Contacto</a>
             </div>
