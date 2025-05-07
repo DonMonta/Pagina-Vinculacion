@@ -121,6 +121,34 @@ export default {
           1200: { items: 3 },
         },
       });
+      $(".project-carousel").owlCarousel({
+        autoplay: true,
+        smartSpeed: 1000,
+        margin: 25,
+        loop: true,
+        center: true,
+        dots: false,
+        nav: true,
+        navText: [
+          '<i class="bi bi-chevron-left"></i>',
+          '<i class="bi bi-chevron-right"></i>',
+        ],
+        responsiveClass: true,
+        responsive: {
+          0: {
+            items: 1,
+          },
+          576: {
+            items: 1,
+          },
+          768: {
+            items: 2,
+          },
+          992: {
+            items: 3,
+          },
+        },
+      });
     } else {
       console.warn(
         "owlCarousel no está definido. Asegúrate de incluirlo correctamente."
@@ -159,6 +187,5 @@ export default {
       delay: 5,
       time: 2000,
     });
-    
   },
 };

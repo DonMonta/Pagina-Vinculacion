@@ -130,7 +130,8 @@
                                         <p class="mb-3">Son los
                                             profesores(as) Titulares u Ocasionales que lideran la formulación, ejecución
                                             y evaluación......</p>
-                                        <a class="fw-semi-bold" href="">Leer Más <i
+                                        <a class="fw-semi-bold" href="" data-bs-toggle="modal"
+                                            data-bs-target="#funcionesModal2">Leer Más <i
                                                 class="fa fa-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
@@ -346,7 +347,7 @@
     <!-- Modal 2 -->
     <div class="modal fade" id="funcionesModal2" tabindex="-1" aria-labelledby="funcionesModal2Label"
         aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-lg custom-modal modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="funcionesModal2Label">
@@ -355,8 +356,75 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                   
 
+                    <!-- Projects Start -->
+                    <div class="container-xxl py-3">
+                        <div class="container">
+                            <div class="text-center mx-auto" style="max-width: 600px;">
+                                <p class="d-inline-block border rounded text-primary fw-semi-bold py-1 px-3">Son los
+                                    profesores(as) Titulares u Ocasionales que lideran la formulación, ejecución y
+                                    evaluación
+                                    del proyecto de vinculación presentado y aprobados por el Consejo Superior
+                                    Universitario</p>
+                                <h3 class="display-5 mb-5">
+                                </h3>
+                            </div>
+                            <div class="container section-title py-3">
+                                <h2>Directores de los Proyectos de Vinculación con la Sociedad</h2>
+                                <p>Estas son los directores de los proyectos de vinculación con la sociedad de cada
+                                    carrera
+                                </p>
+                            </div>
+                            <div class="project-carousel owl-carousel">
+                                <div class="project-item pe-5 pb-5">
+                                    <div class="position-relative overflow-hidden">
+                                        <img class="img-fluid" src="@/assets/img/img/logovincu.jpeg" alt="">
+                                    </div>
+                                    <div class="project-title">
+                                        <div class="bg-light">
+                                            <h5 class="fw-bold mb-0">Full Name</h5>
+                                            <small>Designation</small>
+                                        </div>
+                                        <div class="bg-primary">
+                                            <a class="btn btn-square mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                                            <a class="btn btn-square mx-1" href=""><i class="fab fa-twitter"></i></a>
+                                            <a class="btn btn-square mx-1" href=""><i class="fab fa-instagram"></i></a>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="project-item pe-5 pb-5">
+                                    <div class="project-img mb-3">
+                                        <img class="img-fluid rounded" src="@/assets/img/img/logovincu.jpeg" alt="">
+                                        <a href=""><i class="fa fa-link fa-3x text-primary"></i></a>
+                                    </div>
+                                    <div class="project-title">
+                                        <h4 class="mb-0">Cash Investment</h4>
+                                    </div>
+                                </div>
+                                <div class="project-item pe-5 pb-5">
+                                    <div class="project-img mb-3">
+                                        <img class="img-fluid rounded" src="@/assets/img/img/logovincu.jpeg" alt="">
+                                        <a href=""><i class="fa fa-link fa-3x text-primary"></i></a>
+                                    </div>
+                                    <div class="project-title">
+                                        <h4 class="mb-0">Financial Consultancy</h4>
+                                    </div>
+                                </div>
+                                <div class="project-item pe-5 pb-5">
+                                    <div class="project-img mb-3">
+                                        <img class="img-fluid rounded" src="@/assets/img/img/logovincu.jpeg" alt="">
+                                        <a href=""><i class="fa fa-link fa-3x text-primary"></i></a>
+                                    </div>
+                                    <div class="project-title">
+                                        <h4 class="mb-0">Business Loans</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Projects End -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
@@ -407,7 +475,15 @@ export default {
 </script>
 
 <style scoped>
+@import url('@/assets/styles/css/style.css');
+
 .modal-xl {
     max-width: 90%;
+}
+
+.custom-modal {
+    max-width: 1200px;
+    /* o el valor que prefieras */
+    width: 100%;
 }
 </style>

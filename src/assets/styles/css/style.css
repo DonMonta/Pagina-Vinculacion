@@ -1462,5 +1462,77 @@
     margin-bottom: 0;
    
   }
-  
+  /*** Project ***/
+
+.project-item img {
+  transition: .5s;
+}
+
+.project-item:hover img {
+  transform: scale(1.1);
+}
+
+
+
+.project-item .project-title {
+  height: 90px;
+  overflow: hidden;
+}
+
+.project-item .project-title .bg-light,
+.project-item .project-title .bg-primary {
+    position: relative;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: .5s;
+}
+
+.project-item .project-title .bg-primary {
+    flex-direction: row;
+}
+
+.project-item .project-title .bg-light {
+    margin-top: -90px;
+}
+
+.project-item .project-title .bg-primary .btn {
+    color: var(--primary);
+    background: #FFFFFF;
+}
+
+.project-item .project-title .bg-primary .btn:hover {
+    color: #FFFFFF;
+    background: var(--secondary)
+}
+
+.project-carousel .owl-nav {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+}
+
+.project-carousel .owl-nav .owl-prev,
+.project-carousel .owl-nav .owl-next {
+    margin: 0 12px;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bs-secondary);
+    background: var(--bs-white);
+    border-radius: 45px;
+    font-size: 22px;
+    transition: .5s;
+}
+
+.project-carousel .owl-nav .owl-prev:hover,
+.project-carousel .owl-nav .owl-next:hover {
+    background: var(--bs-secondary);
+    color: var(--light);
+}
+
   
