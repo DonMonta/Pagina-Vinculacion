@@ -1,6 +1,7 @@
 import { WOW } from "wowjs";
 import "waypoints/lib/jquery.waypoints.min.js";
 import "jquery.counterup/jquery.counterup.min.js";
+
 import $ from "jquery";
 window.$ = $;
 window.jQuery = $;
@@ -187,13 +188,31 @@ export default {
       delay: 5,
       time: 2000,
     });
+    const animation = anime.timeline({
+      targets: 'svg #XMLID5',
+      easing: 'easeInOutSine',
+      duration: 6000, // más corta por paso
+      loop: true,
+      direction: 'alternate', // fluye ida y vuelta sin reiniciar
+      autoplay: true
+    });
+
+    animation
+      .add({ translateX: -500 })
+      .add({ rotateY: 180 })
+      .add({ translateX: 920 })
+      .add({ rotateY: 0 })
+      .add({ translateX: -500 })
+      .add({ rotateY: 180 })
+      .add({ translateX: -500 });
+  
   },
-  computed: { 
+  computed: {
     showNavbar() {
-      return this.$route.name !== 'error404' && this.$route.name !== 'login';
+      return this.$route.name !== "error404" && this.$route.name !== "login";
     },
-    showNavbar() {
-      return this.$route.name !== 'login';
+    showNavbar2() {
+      return this.$route.name !== "login";
     },
-  }
+  },
 };
