@@ -4,6 +4,9 @@ import NoticiasView from '../views/NoticiasView.vue'
 import EquiposView from '../views/EquiposView.vue'
 import NormativasView from '../views/NormativasView.vue'
 import ProyectosNuevosView from '../views/ProyectosNuevosView.vue'
+import LoginView from '../views/LoginView.vue'
+import Error404View from '../views/Erro404View.vue'
+
 
 const routes = [
   {
@@ -31,6 +34,17 @@ const routes = [
     name: 'proyectosnuevos',
     component: ProyectosNuevosView
   },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginView
+  },
+  {
+    path: '/error404',
+    name: 'error404',
+    component: Error404View
+  },
+
   
 ]
 

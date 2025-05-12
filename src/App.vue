@@ -2,7 +2,7 @@
   <!-- Spinner Start -->
   
     <!-- Spinner End -->
-  <div class="container-fluid sticky-top px-0">
+  <div class="container-fluid sticky-top px-0" v-if="showNavbar2">
     <div class="container-fluid topbar d-none d-lg-block">
       <div class="container-fluid">
         <div class="row align-items-center">
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="container-fluid">
+    <div class="container-fluid" v-if="showNavbar">
       <nav class="navbar navbar-light navbar-expand-xl">
         <a href="index.html" class="navbar-brand">
           <img src="@/assets/img/img/log2.gif" class="img-fluid" height="350px" width="350px" alt="UTELVT" />
@@ -96,7 +96,7 @@
     </div>
   </div>
    <!-- Carousel Start -->
-   <div class="container-fluid carousel-header px-0">
+   <div class="container-fluid carousel-header px-0" v-if="showNavbar">
         <div id="carouselId" class="carousel slide" data-bs-ride="carousel">
             <ol class="carousel-indicators">
                 <li data-bs-target="#carouselId" data-bs-slide-to="0" class="active"></li>
@@ -163,7 +163,7 @@
   </div>
   <footer>
     <!-- Footer Start -->
-    <div class="container-fluid footer border-1 py-5">
+    <div class="container-fluid footer border-1 py-5" v-if="showNavbar">
       <div class="container py-5">
         <div class="row g-5">
           <div class="col-md-6 col-lg-6 col-xl-3">
@@ -171,9 +171,9 @@
               <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" height="350px" width="350px" alt="UTELVT" />
               <div class="position-relative mx-auto rounded-pill">
                 <input class="form-control rounded-pill border-1 w-100 py-3 ps-4 pe-5" type="text"
-                  placeholder="Enter your email">
-                <button type="button"
-                  class="btn btn-primary btn-primary-outline-0 rounded-pill position-absolute top-0 end-0 py-2 mt-2 me-2">SignUp</button>
+                  placeholder="-">
+                <router-link :to="{path:'/login'}" type="button"
+                  class="btn btn-primary btn-primary-outline-0 rounded-pill position-absolute top-0 end-0 py-2 mt-2 me-2">Inicia Sesión</router-link>
               </div>
             </div>
           </div>
@@ -225,7 +225,7 @@
 
 
     <!-- Copyright Start -->
-    <div class="container-fluid copyright py-4">
+    <div class="container-fluid copyright py-4" v-if="showNavbar2">
       <div class="container">
         <div class="row g-4 align-items-center">
           <div class="col-md-4 text-center text-md-start mb-md-0">
@@ -263,6 +263,7 @@
         class="fa fa-arrow-up"></i></a>
 
   </footer>
+  
 </template>
 
 <style scoped>

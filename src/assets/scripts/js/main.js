@@ -188,4 +188,12 @@ export default {
       time: 2000,
     });
   },
+  computed: { 
+    showNavbar() {
+      return this.$route.name !== 'error404' && this.$route.name !== 'login';
+    },
+    showNavbar() {
+      return this.$route.name !== 'login';
+    },
+  }
 };
