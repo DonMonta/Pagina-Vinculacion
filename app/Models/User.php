@@ -18,8 +18,10 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
+    public $table = "vin_users";
+    protected $primaryKey = 'user_id';
+    protected $keyType = 'int';
     protected $fillable = [
-        'user_id',
         'name',
         'email',
         'password', 
@@ -47,7 +49,7 @@ class User extends Authenticatable implements JWTSubject
         'password' => 'hashed',
     ];
     public function getJWTIdentifier(){
-        return $this->getKey();
+        return $this->user_id;
     }
 
     public function getJWTCustomClaims(){
