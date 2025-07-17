@@ -466,6 +466,14 @@
 .services .causes-item .causes-img {
   position: relative;
   transition: 0.5s;
+  object-fit: cover;
+  object-position: center;
+}
+.img-post {
+  height: 250px; /* Puedes ajustar la altura como desees */
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .services .causes-item .causes-img .causes-link {
