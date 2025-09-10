@@ -24,7 +24,7 @@ export default {
             noticiaSeleccionada: null,
             activeNav: "",
             pageId: '708979342294904',
-            accessToken: 'EAAUbvwr8S4UBOxxdDKzn7ZBlqvSBh6GDYHPCbsGGdUgk8BBiQGXAl84QKYFhUbfah1n0Dvqm8s5jpTM5cDiLccvdYo45r3QTubkb7KcROTumqMAdOD3hkmvchk3zt7a3SWa7WmmAfsv2rtVwHF0OxmfZAnff735ZBZCtxY9ChfzZAmqwKUUCsuWbLn3sFzzkWVk474485',
+            accessToken: 'EAAUbvwr8S4UBPQOlAZAZA3VYZCuHhnnaN7PZAzvbcKVxcI7cxOZBePwNuQxVxyCbG57CFMZC2LBZAidBzZAOUvy3yFG6lhEdP6yX2sBrxFZCIYxLZAzXaiLqZCcMfIBk2zumZA4PmFPkkbvd7z7a1nljxrbw80ZBWgMnBQZBsjNmIhX7hCWw275GRCAmmhJrIF55EOoanVxZA76',
         };
     },
     async mounted() {
