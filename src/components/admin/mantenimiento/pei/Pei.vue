@@ -217,7 +217,7 @@
               </div>
 
               <button @click="guardarObjetivo"
-                class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg">
+                class="w-full btn-primary text-white font-bold py-2 rounded-lg">
                 {{ isEditingObjetivo ? 'Actualizar Objetivo' : 'Guardar Objetivo' }}
               </button>
               <button v-if="isEditingObjetivo" @click="cancelarEdicionObj"
