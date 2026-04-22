@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DirectorCarrerasController;
 use App\Http\Controllers\PeiController;
+use App\Http\Controllers\Subsistemas_peiController;
+use App\Http\Controllers\Objetivos_peiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,8 +31,12 @@ Route::prefix('vin')->group(function () {
     Route::post('subir_archivo', [PeiController::class, 'uploadArchivo']);
     //Definición de la ruta endpoint para eliminar un archivo
     Route::post('eliminar_archivo', [PeiController::class, 'deleteArchivo']);
+    //Definición de la ruta endpoint para el recurso Subsistemas_pei, perimitiendo operaciones CRUD
+    Route::apiResource("subsistemas_pei", Subsistemas_peiController::class);
+    //Definición de la ruta endpoint para el recurso Objetivos_pei, perimitiendo operaciones CRUD
+    Route::apiResource("objetivos_pei", Objetivos_peiController::class);
+    Route::get('objetivos_por_pei/{id_pei}', [Objetivos_peiController::class, 'listarPorPei']);
 
-    Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api')->group(function () {
         Route::get('me', [AuthController::class, 'me']);

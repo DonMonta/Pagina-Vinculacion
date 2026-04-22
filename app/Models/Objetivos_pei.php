@@ -5,23 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pei extends Model
+class Objetivos_pei extends Model
 {
-    protected $table = 'pei';
-    protected $primaryKey = 'id_pei';
+    protected $table = 'objetivos_pei';
+    protected $primaryKey = 'id_obj_pei';
     public $incrementing = false;
     protected $keyType = 'int';
     public $timestamps = false;
 
     protected $fillable = [
-        'nombre_pei',
-        'anios_pei',
-        'estado_pei',
-        'archivo_pei'
+        'id_sub_sistema_pei',
+        'cod_obj',
+        'detalle_obj',
     ];
     public function subsistemas_pei()
     {
-        return $this->hasMany(Subsistemas_pei::class , 'id_pei');
+        return $this->belongsTo(Subsistemas_pei::class , 'id_sub_sistema_pei');
     }
 
 }
