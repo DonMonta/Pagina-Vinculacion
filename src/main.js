@@ -6,7 +6,9 @@ import store from './store'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import "owl.carousel/dist/assets/owl.carousel.css"; 
 import "owl.carousel/dist/assets/owl.theme.default.css";
-import '@/assets/styles/css/bootstrap.min.css'
+
+import VueApexCharts from 'vue3-apexcharts'
+import './assets/styles/admin/main.css' //estilos del admin
 
 
 
@@ -21,9 +23,10 @@ import '@/assets/lib/easing/easing.min.js'
 import '@/assets/plugins/chart.min.js'
 import '@/assets/lib/counterup/counterup.min.js'
 import '@/assets/plugins/feather.min.js'
-createApp(App).use(store).use(router).mount('#app')
 
-import 'bootstrap/dist/js/bootstrap'
+createApp(App).use(store).use(router).use(VueApexCharts).mount('#app')
+
+
 
 
 import $ from 'jquery';

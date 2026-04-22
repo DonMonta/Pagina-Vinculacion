@@ -1,17 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import HomeView from '../views/Home/HomeView.vue'
 import NoticiasView from '../views/NoticiasView.vue'
 import EquiposView from '../views/EquiposView.vue'
 import NormativasView from '../views/NormativasView.vue'
 import ProyectosNuevosView from '../views/ProyectosNuevosView.vue'
 import LoginView from '../views/LoginView.vue'
 import Error404View from '../views/Erro404View.vue'
+import DashUiView from '../views/DashUiView.vue'
+import PeiAllView from '../views/Admin/Mantenimiento/Op_Pei/PeiAllView.vue'
 
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
+    path: '/site',
+    name: 'site',
     component: HomeView
   },
   {
@@ -43,6 +45,16 @@ const routes = [
     path: '/error404',
     name: 'error404',
     component: Error404View
+  },
+   {
+    path: '/site-admin',
+    name: 'site-admin',
+    component: DashUiView
+  },
+  {
+    path: '/site-admin/pei',
+    name: 'site-admin-pei',
+    component: PeiAllView
   },
 
   
