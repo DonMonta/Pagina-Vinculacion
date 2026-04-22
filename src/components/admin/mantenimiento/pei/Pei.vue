@@ -114,6 +114,21 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
+                <button v-if="post.estado_pei === 1" @click="abrirModalObjetivos(post)"
+                  class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors" title="Gestionar Objetivos">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8l4 4-4 4M8 12h7" />
+                  </svg>
+                </button>
+                <button v-if="post.estado_pei === 1" @click="abrirModalSubsistemas(post)"
+                  class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                  title="Gestionar Subsistemas">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 3v18m9-9H3" />
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                  </svg>
+                </button>
                 <button @click="eliminar(post.id_pei, post.nombre_pei)" v-if="post.estado_pei === 1"
                   class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -154,6 +169,175 @@
       <button class="btn btn-primary text-white" @click="actualizar">
         Actualizar
       </button>
+    </div>
+    <div v-if="isObjetivoModalOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div
+        class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+
+        <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+          <div>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Objetivos Estratégicos</h3>
+            <p class="text-sm text-success-600 font-medium">{{ selectedPei?.nombre_pei }}</p>
+          </div>
+          <button @click="isObjetivoModalOpen = false" class="text-gray-400 hover:text-gray-600">✕</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8">
+
+          <div class="md:col-span-4 border-r border-gray-100 dark:border-gray-800 pr-8">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Subsistema</label>
+                <select v-model="objetivoForm.id_sub_sistema_pei"
+                  class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                  <option value="" disabled>Seleccione un subsistema</option>
+                  <option v-for="sub in listaSubsistemas" :key="sub.id_sub_sistema_pei" :value="sub.id_sub_sistema_pei">
+                    {{ sub.nombre_subsistema }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Código</label>
+                <div class="flex">
+                  <span
+                    class="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg text-gray-500">OE</span>
+                  <input type="number" v-model="codNumero"
+                    class="w-full px-4 py-2 border border-gray-200 rounded-r-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
+                    placeholder="1">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Detalle del Objetivo</label>
+                <textarea v-model="objetivoForm.detalle_obj" rows="4"
+                  class="w-full px-4 py-2 border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
+                  placeholder="Escriba el objetivo estratégico..."></textarea>
+              </div>
+
+              <button @click="guardarObjetivo"
+                class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg">
+                {{ isEditingObjetivo ? 'Actualizar Objetivo' : 'Guardar Objetivo' }}
+              </button>
+              <button v-if="isEditingObjetivo" @click="cancelarEdicionObj"
+                class="w-full text-danger-500 text-sm">Cancelar</button>
+            </div>
+          </div>
+
+          <div class="md:col-span-8">
+            <div class="overflow-x-auto border rounded-xl dark:border-gray-800">
+              <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                <thead class="bg-gray-50 dark:bg-gray-800/50">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">COD</th>
+                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">Subsistema / Detalle</th>
+                    <th class="px-4 py-3 text-right text-xs font-bold text-gray-500">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                  <tr v-for="obj in listaObjetivos" :key="obj.id_obj_pei">
+                    <td class="px-4 py-3 text-sm font-bold text-cyan-600">{{ obj.cod_obj }}</td>
+                    <td class="px-4 py-3">
+                      <p class="text-xs font-semibold text-purple-600 mb-1">{{ obj.subsistema?.nombre_subsistema }}</p>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ obj.detalle_obj }}</p>
+                    </td>
+                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                      <button @click="prepararEdicionObj(obj)"
+                        class="text-blue-600 hover:underline text-xs">Editar</button>
+                      <button @click="eliminarObjetivo(obj.id_obj_pei)"
+                        class="text-red-600 hover:underline text-xs">Eliminar</button>
+                    </td>
+                  </tr>
+                  <tr v-if="listaObjetivos.length === 0">
+                    <td colspan="2" class="px-4 py-8 text-center text-gray-400 text-sm italic">No hay objetivos
+                      registrados</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="isSubsistemaModalOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div
+        class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+
+        <div
+          class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-white/[0.02]">
+          <div>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Subsistemas del</h3>
+            <p class="text-sm text-success-600 font-medium">{{ selectedPei?.nombre_pei }}</p>
+          </div>
+          <button @click="isSubsistemaModalOpen = false"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8">
+
+          <div class="md:col-span-4 border-r border-gray-100 dark:border-gray-800 pr-0 md:pr-8">
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">
+              {{ isEditingSubsistema ? 'Editar Subsistema' : 'Nuevo Subsistema' }}
+            </h4>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">Nombre</label>
+                <input type="text" v-model="subsistemaForm.nombre_subsistema"
+                  class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                  placeholder="Ej: Subsistema Académico">
+              </div>
+              <div class="flex gap-2">
+                <button @click="guardarSubsistema"
+                  class="flex-1 btn-primary text-white font-bold py-2 rounded-lg transition-colors">
+                  {{ isEditingSubsistema ? 'Actualizar' : 'Guardar' }}
+                </button>
+                <button v-if="isEditingSubsistema" @click="cancelarEdicionSubsistema"
+                  class="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg">
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:col-span-8">
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Registrados
+            </h4>
+            <div class="overflow-x-auto border rounded-xl dark:border-gray-800">
+              <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                <thead class="bg-gray-50 dark:bg-gray-800/50">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Nombre</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                  <tr v-for="sub in listaSubsistemas" :key="sub.id_sub_sistema_pei"
+                    class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                    <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ sub.nombre_subsistema }}</td>
+                    <td class="px-4 py-3 text-right space-x-2">
+                      <button @click="prepararEdicionSub(sub)"
+                        class="text-blue-600 hover:text-blue-800 font-medium text-xs">Editar</button>
+                      <button @click="eliminarSub(sub.id_sub_sistema_pei)"
+                        class="text-red-600 hover:text-red-800 font-medium text-xs">Eliminar</button>
+                    </td>
+                  </tr>
+                  <tr v-if="listaSubsistemas.length === 0">
+                    <td colspan="2" class="px-4 py-8 text-center text-gray-400 text-sm italic">No hay subsistemas
+                      registrados</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
     <!-- Modal de Registro-->
     <Modal v-if="isProfileAddressModal" @close="isProfileAddressModal = false">
@@ -394,7 +578,7 @@ import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
 import debounce from 'lodash.debounce';
 import Modal from '@/components/Modal/Modal.vue'
-import { mostraralertas2, enviarsolig, eliminacion, confimarhabi } from '@/assets/js/function/funciones';
+import { mostraralertas2, enviarsolig, eliminacion, confimarhabi, elimnarpermanente } from '@/assets/js/function/funciones';
 
 export default {
   data() {
@@ -429,7 +613,25 @@ export default {
       archivoSeleccionado: null,
       archivoPreviewName: '',
       uploading: false,
-
+      isSubsistemaModalOpen: false,
+      selectedPei: null,
+      listaSubsistemas: [],
+      isEditingSubsistema: false,
+      subsistemaForm: {
+        id_sub_sistema_pei: null,
+        id_pei: null,
+        nombre_subsistema: ''
+      },
+      isObjetivoModalOpen: false,
+      listaObjetivos: [],
+      codNumero: '', // Solo el número (ej: 1)
+      isEditingObjetivo: false,
+      objetivoForm: {
+        id_obj_pei: null,
+        id_sub_sistema_pei: '',
+        cod_obj: '', // Se armará como OE + codNumero
+        detalle_obj: ''
+      }
     };
   },
   created() {
@@ -469,6 +671,142 @@ export default {
 
   },
   methods: {
+    async abrirModalObjetivos(pei) {
+      this.selectedPei = pei;
+      this.cancelarEdicionObj();
+
+      // 1. Cargar subsistemas del PEI seleccionado para el Select
+      const respSub = await API.get(`${this.baseUrl}/subsistemas_pei/${pei.id_pei}`);
+      this.listaSubsistemas = respSub.data.data || [];
+
+      // 2. Cargar objetivos (Tu backend debería filtrar objetivos por PEI a través de los subsistemas)
+      await this.getObjetivos();
+      this.isObjetivoModalOpen = true;
+    },
+
+    async guardarObjetivo() {
+      // Validaciones
+      if (!this.objetivoForm.id_sub_sistema_pei || !this.codNumero || !this.objetivoForm.detalle_obj) {
+        mostraralertas2("Todos los campos son obligatorios", "warning");
+        return;
+      }
+
+      // Armar el código final: OE + numero
+      this.objetivoForm.cod_obj = 'OE' + this.codNumero;
+
+      const metodo = this.isEditingObjetivo ? 'PUT' : 'POST';
+      const url = this.isEditingObjetivo
+        ? `${this.baseUrl}/objetivos_pei/${this.objetivoForm.id_obj_pei}`
+        : `${this.baseUrl}/objetivos_pei`;
+
+      const exito = await enviarsolig(metodo, this.objetivoForm, url, 'Objetivo guardado');
+      if (exito) {
+        this.cancelarEdicionObj();
+        this.getObjetivos();
+      }
+    },
+
+    prepararEdicionObj(obj) {
+      this.isEditingObjetivo = true;
+      this.objetivoForm.id_obj_pei = obj.id_obj_pei;
+      this.objetivoForm.id_sub_sistema_pei = obj.id_sub_sistema_pei;
+      this.objetivoForm.detalle_obj = obj.detalle_obj;
+      // Extraer solo el número del código (quita las letras OE)
+      this.codNumero = obj.cod_obj.replace('OE', '');
+    },
+
+    cancelarEdicionObj() {
+      this.isEditingObjetivo = false;
+      this.codNumero = '';
+      this.objetivoForm = { id_obj_pei: null, id_sub_sistema_pei: '', cod_obj: '', detalle_obj: '' };
+    },
+
+    async eliminarObjetivo(id) {
+      const res = await elimnarpermanente(`${this.baseUrl}/objetivos_pei/`, id, '¿Eliminar?', 'Esta acción no se puede deshacer');
+      if (res && res.status === 200) {
+        this.listaObjetivos = this.listaObjetivos.filter(o => o.id_obj_pei !== id);
+      }
+    },
+    async abrirModalSubsistemas(pei) {
+      this.selectedPei = pei;
+      this.subsistemaForm.id_pei = pei.id_pei;
+      this.cancelarEdicionSubsistema(); // Limpia el form
+      await this.getSubsistemas();
+      this.isSubsistemaModalOpen = true;
+    },
+    async getObjetivos() {
+      try {
+        this.cargandoObjetivos = true; // Opcional: para un spinner interno
+
+        // Enviamos el ID del PEI para que el backend sepa qué objetivos buscar
+        // a través de sus subsistemas relacionados.
+        const resp = await API.get(`${this.baseUrl}/objetivos_por_pei/${this.selectedPei.id_pei}`);
+
+        if (resp && resp.data) {
+          this.listaObjetivos = resp.data;
+        }
+      } catch (error) {
+        console.error("Error al obtener objetivos:", error);
+        mostraralertas2("No se pudieron cargar los objetivos", "error");
+      } finally {
+        this.cargandoObjetivos = false;
+      }
+    },
+
+    async getSubsistemas() {
+      try {
+        const resp = await API.get(`${this.baseUrl}/subsistemas_pei/${this.selectedPei.id_pei}`);
+        this.listaSubsistemas = resp.data.data || [];
+      } catch (error) {
+        console.error("Error al obtener subsistemas:", error);
+      }
+    },
+
+    async guardarSubsistema() {
+      if (!this.subsistemaForm.nombre_subsistema.trim()) {
+        mostraralertas2("El nombre es obligatorio", "warning");
+        return;
+      }
+
+      try {
+        const metodo = this.isEditingSubsistema ? 'PUT' : 'POST';
+        const url = this.isEditingSubsistema
+          ? `${this.baseUrl}/subsistemas_pei/${this.subsistemaForm.id_sub_sistema_pei}`
+          : `${this.baseUrl}/subsistemas_pei`;
+
+        const exito = await enviarsolig(metodo, this.subsistemaForm, url, 'Operación exitosa');
+        if (exito) {
+          this.cancelarEdicionSubsistema();
+          this.getSubsistemas();
+        }
+      } catch (error) {
+        console.error("Error al guardar subsistema:", error);
+      }
+    },
+
+    prepararEdicionSub(sub) {
+      this.isEditingSubsistema = true;
+      this.subsistemaForm.id_sub_sistema_pei = sub.id_sub_sistema_pei;
+      this.subsistemaForm.nombre_subsistema = sub.nombre_subsistema;
+    },
+
+    cancelarEdicionSubsistema() {
+      this.isEditingSubsistema = false;
+      this.subsistemaForm.id_sub_sistema_pei = null;
+      this.subsistemaForm.nombre_subsistema = '';
+    },
+
+    async eliminarSub(id) {
+      const response = await elimnarpermanente(
+        `${this.baseUrl}/subsistemas_pei/`,
+        id,
+        'Eliminar Subsistemas',
+        '¿Realmente desea eliminar el subsistema?'
+      );
+      if (response && response.status === 200) {
+        this.listaSubsistemas = this.listaSubsistemas.filter(sub => sub.id_sub_sistema_pei !== id);
+      }
+    },
     handleFileChange(event) {
       //Obtener el archivo seleccionado por el usuario
       const file = event.target.files[0];

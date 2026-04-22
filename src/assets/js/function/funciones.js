@@ -120,7 +120,7 @@ export function eliminacion(urlconslash, id, titulo, mensaje, actualizarTabla) {
         if (res.isConfirmed) {
             return API.delete(url)   // 👈 Ya NO mandamos { data: { id } }
                 .then((response) => {
-                    mostraralertas(response.data.mensaje ?? 'Habilitado con éxito', 'success');
+                    mostraralertas(response.data.mensaje ?? 'Eliminado con éxito', 'success');
                     if (typeof actualizarTabla === "function") {
                         actualizarTabla(); // 🔄 refrescar tabla
                     }
@@ -199,7 +199,7 @@ export function confimar2(urlconslash, id, titulo, mensaje) {
         cancelButtonText: '<i class="fa-solid fa-ban"></i> Cancelar'
     }).then((res) => {
         if (res.isConfirmed) {
-            enviarsolig('PUT', { id: id }, url, 'Deshabilitado con éxito');
+            enviarsolig('DELETE', { id: id }, url, 'Eliminado con éxito');
         } else {
             mostraralertas('Operacion cancelada', 'info');
         }
@@ -353,4 +353,50 @@ export async function enviarsoliedit(metodo, parametros, url, mensaje) {
         mostraralertas('Servidor no Disponible', 'error');
         throw error;
     }
+}
+export function elimnarpermanente(urlconslash,id,titulo,mensaje){
+    var url = urlconslash+id;
+    const swalwithboostrapbutton = Swal.mixin({
+        customClass:{confirmButton:'btn btn-success me-3',cancelButton:'btn btn-danger'},
+    });
+    return swalwithboostrapbutton.fire({
+        title:titulo,
+        text:mensaje,
+        icon:'question',
+        showCancelButton:true,
+        confirmButtonText:'<i class="fa-solid fa-check"></i> Si, Eliminar',
+        cancelButtonText:'<i class="fa-solid fa-ban"></i> Cancelar'}).then((res)=>{
+        if(res.isConfirmed){
+            return solicitud('DELETE',{id:id},url,'Eliminado con exito').then(response => {
+                return response; 
+            });
+        }else{
+            mostraralertas('Operacion cancelada','info');
+            return null;
+        }
+    });
+   
+}
+export function solicitud(metodo,parametros,url,mensaje){
+    return API({
+        method:metodo,
+        url:url,
+        data:parametros
+    }).then(function(res){
+        var estado = res.status;
+        if(estado==200){
+            mostraralertas(mensaje,'success');
+            return res;   
+        }else{
+            mostraralertas('No se pudo recuperar la respuesta','error');
+
+        }
+    }).catch(function(error){
+        if(error.response.status===409){
+            mostraralertas(error.response.data.mensaje,'warning');
+            
+        }else{
+            mostraralertas('Servidor no Disponible', 'error');
+        } 
+    });
 }
