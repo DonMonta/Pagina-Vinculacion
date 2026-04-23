@@ -8,6 +8,7 @@ import LoginView from '../views/LoginView.vue'
 import Error404View from '../views/Erro404View.vue'
 import DashUiView from '../views/DashUiView.vue'
 import PeiAllView from '../views/Admin/Mantenimiento/Op_Pei/PeiAllView.vue'
+import PlandneAllView from '../views/Admin/Mantenimiento/Op_PLANDE/PlandneAllView.vue'
 
 
 const routes = [
@@ -55,6 +56,11 @@ const routes = [
     path: '/site-admin/pei',
     name: 'site-admin-pei',
     component: PeiAllView
+  },
+  {
+    path: '/site-admin/plandne',
+    name: 'site-admin-plandne',
+    component: PlandneAllView
   },
 
   

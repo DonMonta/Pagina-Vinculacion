@@ -232,21 +232,31 @@ export function enviarsolig(metodo, parametros, url, mensaje) {
         url: url,
         data: parametros
     }).then(function (res) {
-        if (res.status == 200) {
+        // Laravel devuelve 200 o 201 para éxito
+        if (res.status === 200 || res.status === 201) {
             mostraralertas(mensaje, 'success');
-            return true; // Retornamos éxito
+            return true; 
         } else {
-            mostraralertas('No se pudo recuperar la respuesta', 'error');
+            mostraralertas('No se pudo procesar la solicitud', 'error');
             return false;
         }
     }).catch(function (error) {
-        if (error.response.status == 409) {
-            mostraralertas(error.response.data.mensaje, 'warning');
-
+        // Si el servidor responde con un error (409, 404, 500, etc.)
+        if (error.response) {
+            if (error.response.status === 409) {
+                // Aquí se muestra el mensaje: "El código OE1 ya está registrado..."
+                mostraralertas(error.response.data.mensaje, 'warning');
+            } else if (error.response.status === 422) {
+                // Errores de validación de Laravel
+                mostraralertas("Datos inválidos o faltantes", 'warning');
+            } else {
+                mostraralertas('Error interno del servidor', 'error');
+            }
         } else {
-            mostraralertas('Servidor no Disponible', 'error');
+            // Error de red o servidor apagado
+            mostraralertas('Servidor no disponible', 'error');
         }
-        return false;
+        return false; // Retornamos false para que el componente no limpie el form
     });
 }
 export function enviarsoligtiempo(metodo, parametros, url) {

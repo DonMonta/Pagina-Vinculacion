@@ -190,9 +190,7 @@ const menuGroups = [
         name: "Matenimiento",
         subItems: [
           { name: "PEI", path: "/site-admin/pei", pro: false },
-          /*{ name: "Usuarios", path: "/mantenimiento/usuarios", pro: false },
-          { name: "Categorías", path: "/mantenimiento/categorias", pro: false },
-          { name: "Platos", path: "/mantenimiento/platos", pro: false },*/
+          { name: "PLANDNE", path: "/site-admin/plandne", pro: false },
         ],
       },
       {

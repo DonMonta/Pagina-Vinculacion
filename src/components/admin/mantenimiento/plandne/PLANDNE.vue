@@ -15,7 +15,7 @@
               </svg>
             </button>
             <!-- @input llama al debouncedFilter, que inicia la nueva consulta al backend -->
-            <input type="text" placeholder="Ingresa el nombre del pei a buscar..." v-model="searchQuery"
+            <input type="text" placeholder="Ingresa el nombre del PLANDNE a buscar..." v-model="searchQuery"
               @input="debouncedFilter"
               class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]" />
           </div>
@@ -39,10 +39,10 @@
               <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">ID</p>
             </th>
             <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">PEI</p>
+              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">PLANDNE</p>
             </th>
             <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Subsistemas/Objetivos</p>
+              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Objetivos/Políticas</p>
             </th>
             <th class="py-5 px-4 text-left">
               <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Estado</p>
@@ -64,44 +64,44 @@
               </div>
             </td>
           </tr>
-          <tr v-else v-for="post in filteredarray" :key="post.id_pei"
+          <tr v-else v-for="post in filteredarray" :key="post.id_pladne"
             class="border-t border-gray-100 hover:bg-gray-50/50 dark:border-gray-800 dark:hover:bg-white/[0.02] transition-colors">
 
             <td class="py-5 px-4 whitespace-nowrap">
-              <p class="text-gray-600 text-sm font-medium dark:text-gray-400">{{ post.id_pei }}</p>
+              <p class="text-gray-600 text-sm font-medium dark:text-gray-400">{{ post.id_pladne }}</p>
             </td>
 
             <td class="py-5 px-4 whitespace-nowrap">
               <div>
                 <p class="font-bold text-gray-800 text-base dark:text-white/90">
-                  {{ post.nombre_pei }}
+                  {{ post.nombre_plandne }}
                 </p>
-                <p class="text-xs text-gray-500 mt-0.5 italic">Periodo: {{ post.anios_pei }}</p>
+                <p class="text-xs text-gray-500 mt-0.5 italic">Periodo: {{ post.anio_plandne }}</p>
               </div>
             </td>
             <td class="py-5 px-4">
               <div class="flex flex-col gap-1">
                 <span class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full w-fit">
-                  {{ post.subsistemas_pei_count }} Subsistemas
+                   Objetivos
                 </span>
                 <span class="text-xs font-medium text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-full w-fit">
-                  {{ post.objetivos_count }} Objetivos
+                   Políticas
                 </span>
               </div>
             </td>
             <td class="py-5 px-4 whitespace-nowrap">
               <span :class="{
                 'rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-wider': true,
-                'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_pei === 1,
-                'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_pei === 0
+                'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_plandne === 1,
+                'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_plandne === 0
               }">
-                {{ post.estado_pei === 1 ? 'Activo' : 'Inactivo' }}
+                {{ post.estado_plandne === 1 ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
 
             <td class="py-5 px-4">
-              <div v-if="post.archivo_pei">
-                <a :href="post.ad_archivo_url" target="_blank"
+              <div v-if="post.link_plandne">
+                <a :href="post.link_plandne" target="_blank"
                   class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors dark:bg-red-500/10 dark:text-red-400">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -126,14 +126,14 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button v-if="post.estado_pei === 1" @click="abrirModalObjetivos(post)"
+                <button v-if="post.estado_plandne === 1" @click="abrirModalObjetivos(post)"
                   class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors" title="Gestionar Objetivos">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10" />
                     <path d="M12 8l4 4-4 4M8 12h7" />
                   </svg>
                 </button>
-                <button v-if="post.estado_pei === 1" @click="abrirModalSubsistemas(post)"
+                <button v-if="post.estado_plandne === 1" @click="abrirModalSubsistemas(post)"
                   class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                   title="Gestionar Subsistemas">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -141,14 +141,14 @@
                     <rect x="3" y="3" width="18" height="18" rx="2" />
                   </svg>
                 </button>
-                <button @click="eliminar(post.id_pei, post.nombre_pei)" v-if="post.estado_pei === 1"
+                <button @click="eliminar(post.id_plandne, post.nombre_plandne)" v-if="post.estado_plandne === 1"
                   class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
                 </button>
-                <button @click="habilitar(post.id_pei, post.nombre_pei)" v-if="post.estado_pei === 0"
+                <button @click="habilitar(post.id_plandne, post.nombre_plandne)" v-if="post.estado_plandne === 0"
                   class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:bg-white/10"
                   title="Refrescar lista">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -390,10 +390,10 @@
           </button>
           <div class="px-2 pr-14">
             <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Agregar PEI
+              Agregar PLANDNE
             </h4>
             <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Llene todos los campos para agregar un nuevo pei.
+              Llene todos los campos para agregar un nuevo PLANDNE.
             </p>
           </div>
           <form class="flex flex-col">
@@ -401,10 +401,10 @@
               <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Nombre del PEI
+                    Nombre del PLANDNE
                   </label>
-                  <input type="text" v-model="objetoguardar.nombre_pei"
-                    placeholder="Ej: Plan Estratégico Institucional 2026"
+                  <input type="text" v-model="objetoguardar.nombre_plandne"
+                    placeholder="Ej: Plan de Desarrollo para el Nuevo Ecuador 2026"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
                   <p class="mt-1.5 text-xs text-gray-500">Use un nombre descriptivo y el año actual.</p>
                 </div>
@@ -413,55 +413,34 @@
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                     Periodo de vigencia
                   </label>
-                  <input type="text" v-model="objetoguardar.anios_pei" placeholder="Ej: 2024-2028"
+                  <input type="text" v-model="objetoguardar.anio_plandne" placeholder="Ej: 2024-2028"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
                   <p class="mt-1.5 text-xs text-gray-500">Rango de años del plan (Ej: 2024-2030).</p>
-                  <p v-if="objetoguardar.anios_pei && !/^\d{4}-\d{4}$/.test(objetoguardar.anios_pei)"
+                  <p v-if="objetoguardar.anio_plandne && !/^\d{4}-\d{4}$/.test(objetoguardar.anio_plandne)"
                     class="mt-1 text-xs text-red-500 font-medium">
                     ⚠️ Formato inválido. Use el formato AAAA-AAAA (ej: 2024-2030).
                   </p>
                 </div>
               </div>
-
               <div class="mt-5">
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del PEI</label>
-                <select v-model="objetoguardar.estado_pei"
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Link del Plan de Desarrollo
+                </label>
+                <input type="text" v-model="objetoguardar.link_plandne"
+                  placeholder="Ej: https://www.google.com"
+                  class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
+                  <p v-if="objetoguardar.link_plandne && !/^https?:\/\/.+/.test(objetoguardar.link_plandne)"
+                    class="mt-1 text-xs text-red-500 font-medium">
+                    ⚠️ Formato inválido. Use el formato https://www.google.com.
+                  </p>
+              </div>
+              <div class="mt-5">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del PLANDNE</label>
+                <select v-model="objetoguardar.estado_plandne"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 dark:border-gray-700 dark:text-white/90">
                   <option value="1">Activo</option>
                   <option value="0">Inactivo</option>
                 </select>
-              </div>
-
-              <div class="mt-5">
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Documento PEI (PDF)
-                </label>
-
-                <div @click="$refs.fileFoto.click()"
-                  class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
-                  :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
-                  <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                    <svg v-if="!archivoPreviewName" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                    <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
-                      <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
-                    </svg>
-
-                    <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                      <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para cargar</span>
-                      <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName }}</span>
-                    </p>
-                    <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
-                  </div>
-
-                  <input type="file" ref="fileFoto" class="hidden" accept="application/pdf"
-                    @change="handleFileChange" />
-                </div>
               </div>
             </div>
 
@@ -472,7 +451,7 @@
               </button>
               <button v-if="formIsValid" @click="registrar" type="button"
                 class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Guardar PEI
+              Guardar PLANDNE
               </button>
             </div>
           </form>
@@ -496,10 +475,10 @@
           </button>
           <div class="px-2 pr-14">
             <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Editar Pei
+              Editar PLANDNE
             </h4>
             <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Los datos mostrados son los actuales del pei. Realice los cambios necesarios y guarde.
+              Los datos mostrados son los actuales del PLANDNE. Realice los cambios necesarios y guarde.
             </p>
           </div>
           <form class="flex flex-col">
@@ -507,10 +486,10 @@
               <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Nombre del PEI
+                    Nombre del PLANDNE
                   </label>
-                  <input type="text" v-model="objetoeditar.nombre_pei"
-                    placeholder="Ej: Plan Estratégico Institucional 2026"
+                  <input type="text" v-model="objetoeditar.nombre_plandne"
+                    placeholder="Ej: Plan de Desarrollo para el Nuevo Ecuador 2026"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
                   <p class="mt-1.5 text-xs text-gray-500">Use un nombre descriptivo y el año actual.</p>
                 </div>
@@ -519,60 +498,41 @@
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                     Periodo de vigencia
                   </label>
-                  <input type="text" v-model="objetoeditar.anios_pei" placeholder="Ej: 2024-2028"
+                  <input type="text" v-model="objetoeditar.anio_plandne" placeholder="Ej: 2024-2028"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
                   <p class="mt-1.5 text-xs text-gray-500">Rango de años del plan (Ej: 2024-2030).</p>
-                  <p v-if="objetoeditar.anios_pei && !/^\d{4}-\d{4}$/.test(objetoeditar.anios_pei)"
+                  <p v-if="objetoeditar.anio_plandne && !/^\d{4}-\d{4}$/.test(objetoeditar.anio_plandne)"
                     class="mt-1 text-xs text-red-500 font-medium">
                     ⚠️ Formato inválido. Use el formato AAAA-AAAA (ej: 2024-2030).
                   </p>
                 </div>
               </div>
+              <div class="mt-5">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Link del Plan de Desarrollo
+                </label>
+                <input type="text" v-model="objetoeditar.link_plandne"
+                  placeholder="Ej: https://www.google.com"
+                  class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
+                  <p v-if="objetoeditar.link_plandne && !/^https?:\/\/.+/.test(objetoeditar.link_plandne)"
+                    class="mt-1 text-xs text-red-500 font-medium">
+                    ⚠️ Formato inválido. Use el formato https://www.google.com.
+                  </p>
+              </div>
 
               <div class="mt-5">
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del PEI</label>
-                <select v-model="objetoeditar.estado_pei"
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del PLANDNE</label>
+                <select v-model="objetoeditar.estado_plandne"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 dark:border-gray-700 dark:text-white/90">
                   <option value="1">Activo</option>
                   <option value="0">Inactivo</option>
                 </select>
               </div>
 
-              <div class="mt-5">
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Documento PEI (PDF)
-                </label>
-
-                <div @click="$refs.fileFoto.click()"
-                  class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
-                  :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
-                  <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                    <svg v-if="!archivoPreviewName" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                    <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
-                      <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
-                    </svg>
-
-                    <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                      <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para cargar</span>
-                      <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName }}</span>
-                    </p>
-                    <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
-                  </div>
-
-                  <input type="file" ref="fileFoto" class="hidden" accept="application/pdf"
-                    @change="handleFileChange" />
-                </div>
-              </div>
             </div>
 
             <div class="flex items-center gap-3 mt-6 lg:justify-end">
-              <button @click="isProfileAddressModal = false" type="button"
+              <button @click="isEditModalOpen = false" type="button"
                 class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cerrar
               </button>
@@ -594,7 +554,6 @@ import Modal from '@/components/Modal/Modal.vue'
 
 const isProfileAddressModal = ref(false)
 const isEditModalOpen = ref(false)
-const showPassword = ref(false)
 // Creamos una función para que el bloque de abajo pueda cerrar el modal
 const cerrarModalDesdeAfuera = () => {
   isProfileAddressModal.value = false
@@ -622,16 +581,17 @@ export default {
 
       usersarray: [],
       objetoguardar: {
-        nombre_pei: "",
-        anios_pei: "",
-        estado_pei: 0,
-
+        nombre_plandne: "",
+        anio_plandne: "",
+        estado_plandne: 0,
+        link_plandne: ""
       },
       objetoeditar: {
-        id_pei: 0,
-        nombre_pei: "",
-        anios_pei: "",
-        estado_pei: 0,
+        id_pladne: 0,
+        nombre_plandne: "",
+        anio_plandne: "",
+        estado_plandne: 0,
+        link_plandne: ""
       },
       filteredarray: [],
       searchQuery: "",
@@ -639,7 +599,6 @@ export default {
       isFilterDropdownOpen: false, // Nuevo: control del menu
       isProfileAddressModal: false,
       cargando: false,
-      password: '',
       currentPage: 1,
       lastPage: 1,
       buscando: false, // Mantenido, pero no se usa en la lógica de paginación actual
@@ -683,22 +642,23 @@ export default {
 
     formIsValid() {
       const regexAnio = /^\d{4}-\d{4}$/;
+      const regexLink = /^https?:\/\/.+/; // Validación básica para URLs
 
       return (
-        this.objetoguardar.nombre_pei.trim() !== '' &&
-        regexAnio.test(this.objetoguardar.anios_pei) && // <--- Validación aquí
-        this.objetoguardar.estado_pei !== null &&
-        this.archivoSeleccionado !== null // Si es obligatorio
+        this.objetoguardar.nombre_plandne.trim() !== '' &&
+        regexAnio.test(this.objetoguardar.anio_plandne) && // <--- Validación aquí
+        this.objetoguardar.estado_plandne !== null &&
+        regexLink.test(this.objetoguardar.link_plandne) // Si es obligatorio
       );
     },
     formIsValidEdit() {
       const regexAnio = /^\d{4}-\d{4}$/;
-
+      const regexLink = /^https?:\/\/.+/; // Validación básica para URLs
       return (
-        this.objetoeditar.nombre_pei.trim() !== '' &&
-        regexAnio.test(this.objetoeditar.anios_pei) && // <--- Validación aquí
-        this.objetoeditar.estado_pei !== null
-        // En edición, el archivo no es obligatorio, así que no lo validamos aquí
+        this.objetoeditar.nombre_plandne.trim() !== '' &&
+        regexAnio.test(this.objetoeditar.anio_plandne) && // <--- Validación aquí
+        this.objetoeditar.estado_plandne !== null &&
+        regexLink.test(this.objetoeditar.link_plandne)
       );
     },
 
@@ -843,79 +803,16 @@ export default {
         this.listaSubsistemas = this.listaSubsistemas.filter(sub => sub.id_sub_sistema_pei !== id);
       }
     },
-    handleFileChange(event) {
-      //Obtener el archivo seleccionado por el usuario
-      const file = event.target.files[0];
-      //Validar que el archivo seleccionado sea un archivo PDF, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
-      if (!file) return;
-      // validación básica: pdf y tamaño si quieres
-      if (file.type !== 'application/pdf') {
-        //Mostrar una alerta de advertencia si el archivo seleccionado no es un archivo PDF, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
-        mostraralertas2('Solo se permiten archivos PDF', 'warning');
-        //Limpiar el archivo seleccionado
-        this.$refs.fileFoto.value = null;
-        //Devolver sin hacer nada más
-        return;
-      }
-      //Validar que el tamaño del archivo no exceda el límite de 10 MB, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
-      const maxMB = 10;
-      //Si el tamaño del archivo es mayor que el límite de 10 MB, se muestra una alerta y se limpia el archivo seleccionado
-      if (file.size > maxMB * 1024 * 1024) {
-        //Mostrar una alerta de advertencia si el tamaño del archivo es mayor que el límite de 10 MB, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
-        mostraralertas2(`Archivo muy grande. Máx ${maxMB} MB`, 'warning');
-        //Limpiar el archivo seleccionado
-        this.$refs.fileFoto.value = null;
-        //Devolver sin hacer nada más
-        return;
-      }
-      //Asignar el archivo seleccionado a la variable archivoSeleccionado
-      this.archivoSeleccionado = file;
-      //Asignar el nombre del archivo seleccionado a la variable archivoPreviewName
-      this.archivoPreviewName = file.name;
-    },
     abrirModalEdicion(user) {
       // Clonamos el objeto para no modificar la tabla directamente antes de guardar
       this.objetoeditar = {
-        id_pei: user.id_pei,
-        nombre_pei: user.nombre_pei,
-        anios_pei: user.anios_pei,
-        estado_pei: user.estado_pei
+        id_pladne: user.id_pladne,
+        nombre_plandne: user.nombre_plandne,
+        anio_plandne: user.anio_plandne,
+        estado_plandne: user.estado_plandne,
+        link_plandne: user.link_plandne
       };
       this.$.setupState.isEditModalOpen = true;
-    },
-    async uploadArchivo(anio_pei, oldFilename = null, oldAnio = null) {
-      if (!this.archivoSeleccionado) return null; // nada que subir
-
-      try {
-        this.uploading = true;
-        const form = new FormData();
-        form.append('file', this.archivoSeleccionado);
-        form.append('anio_pei', anio_pei); // El año actual (nueva carpeta)
-
-        if (oldFilename) {
-          form.append('old_filename', oldFilename);
-          form.append('old_anio', oldAnio || anio_pei); // Carpeta donde buscar el viejo
-        }
-
-        // Si tu backend exige otros campos (ej: tipo), añade aquí
-        const resp = await API.post(`${this.baseUrl}/subir_archivo`, form, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        if (resp && resp.data && resp.data.filename) {
-          this.archivoSeleccionado = null;
-          this.archivoPreviewName = '';
-          this.$refs.fileFoto.value = null;
-          return resp.data; // { filename, url }
-        } else {
-          mostraralertas2('Error subiendo archivo', 'danger');
-          return null;
-        }
-      } catch (error) {
-        mostraralertas2('Error subiendo archivo', 'danger');
-        return null;
-      } finally {
-        this.uploading = false;
-      }
     },
     async GetData(page = 1, searchQuery = "") {
       this.cargando = true;
@@ -925,19 +822,10 @@ export default {
           page: page,
           search_query: searchQuery // Parámetro para búsqueda
         };
-        const response = await API.get(`${this.baseUrl}/pei`, { params });
+        const response = await API.get(`${this.baseUrl}/plandne`, { params });
 
         const data = response.data?.data || [];
-        this.filteredarray = data.map(item => {
-          // Limpiamos el año igual que en el backend para la URL
-          const folderName = item.anios_pei.replace(/[/\\ ]/g, '_');
-          return {
-            ...item,
-            ad_archivo_url: item.archivo_pei
-              ? `http://vinculacion.test/Documentos/Pei/${folderName}/${item.archivo_pei}`
-              : null
-          };
-        });
+        this.filteredarray = data;
         const pagination = response.data?.pagination || {};
         this.currentPage = pagination.current_page || 1;
         this.lastPage = pagination.last_page || 1;
@@ -977,60 +865,33 @@ export default {
 
       try {
         const params = {
-          nombre_pei: this.objetoguardar.nombre_pei,
-          anios_pei: this.objetoguardar.anios_pei,
-          estado_pei: this.objetoguardar.estado_pei
+          nombre_plandne: this.objetoguardar.nombre_plandne,
+          anio_plandne: this.objetoguardar.anio_plandne,
+          estado_plandne: this.objetoguardar.estado_plandne,
+          link_plandne: this.objetoguardar.link_plandne
         };
-        let uploadResp = null;
-        if (this.archivoSeleccionado) {
-          uploadResp = await this.uploadArchivo(this.objetoguardar.anios_pei);
-          if (uploadResp && uploadResp.filename) {
-            params.archivo_pei = uploadResp.filename; // Guardar archivo nuevo
-          }
-        }
-        const exito = await enviarsolig('POST', params, `${this.baseUrl}/pei`, 'PEI registrado con éxito');
+        const exito = await enviarsolig('POST', params, `${this.baseUrl}/plandne`, 'PLANDNE registrado con éxito');
         if (exito) {
           this.$.setupState.isProfileAddressModal = false;
 
           this.limpiarFormulario();
           this.actualizar();
         } else {
-          mostraralertas2("No se pudo registrar el PEI", "error");
+          mostraralertas2("No se pudo registrar el PLANDNE", "error");
         }
       } catch (error) {
-        console.error("❌ Error al registrar PEI:", error.response?.data || error);
+        console.error("❌ Error al registrar PLANDNE:", error.response?.data || error);
       }
     },
     async Update() {
       try {
         const params = {
-          nombre_pei: this.objetoeditar.nombre_pei,
-          anios_pei: this.objetoeditar.anios_pei,
-          estado_pei: this.objetoeditar.estado_pei
+          nombre_plandne: this.objetoeditar.nombre_plandne,
+          anio_plandne: this.objetoeditar.anio_plandne,
+          estado_plandne: this.objetoeditar.estado_plandne,
+          link_plandne: this.objetoeditar.link_plandne
         };
-        if (this.archivoSeleccionado) {
-          // 1. Obtenemos el nombre del archivo y el año QUE YA ESTÁN en la DB (antes del cambio)
-          // Buscamos el registro original en el array para obtener el año previo real
-          const original = this.filteredarray.find(i => i.id_pei === this.objetoeditar.id_pei);
-          const anioAnterior = original ? original.anios_pei : this.objetoeditar.anios_pei;
-          const nombreArchivoAnterior = original ? original.archivo_pei : null;
-
-          // 2. Enviamos el año nuevo para la carpeta nueva, 
-          // y el nombre/año viejo para que el backend limpie la carpeta vieja
-          const uploadResp = await this.uploadArchivo(
-            this.objetoeditar.anios_pei,
-            nombreArchivoAnterior,
-            anioAnterior // <-- Nuevo parámetro
-          );
-
-          if (uploadResp && uploadResp.filename) {
-            params.archivo_pei = uploadResp.filename;
-          }
-        } else {
-          // Si no subió archivo nuevo, mantenemos el nombre del archivo actual
-          params.archivo_pei = this.objetoeditar.archivo_pei;
-        }
-        const exito = await enviarsolig('PUT', params, `${this.baseUrl}/pei/${this.objetoeditar.id_pei}`, 'PEI actualizado con éxito');
+        const exito = await enviarsolig('PUT', params, `${this.baseUrl}/plandne/${this.objetoeditar.id_pladne}`, 'PLANDNE actualizado con éxito');
         if (exito) {
           this.$.setupState.isEditModalOpen = false;
 
@@ -1038,36 +899,38 @@ export default {
           this.actualizar();
         } else {
           this.$.setupState.isEditModalOpen = false;
-          mostraralertas2("No se pudo editar el PEI", "error");
+          mostraralertas2("No se pudo editar el PLANDNE", "error");
         }
       } catch (error) {
-        console.error("❌ Error al registrar pei:", error.response?.data || error);
+        console.error("❌ Error al registrar plandne:", error.response?.data || error);
       }
     },
     limpiarFormulario() {
       this.objetoguardar = {
-        nombre_pei: "",
-        anios_pei: "",
-        estado_pei: 0
+        nombre_plandne: "",
+        anio_plandne: "",
+        estado_plandne: 0,
+        link_plandne: ""
       };
       this.objetoeditar = {
-        id_pei: 0,
-        nombre_pei: "",
-        anios_pei: "",
-        estado_pei: 0
+        id_plandne: 0,
+        nombre_plandne: "",
+        anio_plandne: "",
+        estado_plandne: 0,
+        link_plandne: ""
       };
     },
     eliminar(id, nombre) {
       try {
         eliminacion(
-          `${this.baseUrl}/inhabilitar_pei/`,
+          `${this.baseUrl}/inhabilitar_plandne/`,
           id,
           'Deshabilitar registro',
-          '¿Realmente desea deshabilitar el pei  ' + nombre + '?',
+          '¿Realmente desea deshabilitar el PLANDNE  ' + nombre + '?',
           this.actualizar   // 👈 callback para refrescar la tabla al confirmar
         );
       } catch (error) {
-        console.error("Error al eliminar el pei:", error);
+        console.error("Error al eliminar el PLANDNE:", error);
         this.cargando = false;
       }
     },
@@ -1076,10 +939,10 @@ export default {
         // No hace falta poner this.cargando = true aquí si confimarhabi maneja la alerta,
         // pero si lo haces, asegúrate de cerrarlo.
         await confimarhabi(
-          `${this.baseUrl}/habilitar_pei/`,
+          `${this.baseUrl}/habilitar_plandne/`,
           id,
           'Habilitar registro',
-          `¿Desea habilitar el PEI "${nombre}"?`,
+          `¿Desea habilitar el PLANDNE "${nombre}"?`,
           this.actualizar
         );
       } catch (error) {
@@ -1087,10 +950,6 @@ export default {
         console.error("Error en el componente habilitar:", error);
       }
     },
-    generarUrl(aniopei, filename) {
-      const cacheBuster = new Date().getTime();
-      return `http://vinculacion.test/Documentos/Pei/${aniopei}/${filename}?t=${cacheBuster}`;
-    }
 
   },
 };
