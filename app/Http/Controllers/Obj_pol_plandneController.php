@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Obj_pol_plandne;
+use App\Models\Plandne;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 
@@ -70,15 +71,28 @@ class Obj_pol_plandneController extends Controller
      */
     public function store(Request $request)
     {
-        $inputs = $request->input();
+        // Validar si el PLADNE existe
+        $plan = Plandne::find($request->id_pladne);
+        if (!$plan) {
+            return response()->json(['error' => true, 'mensaje' => 'PLADNE no válido'], 404);
+        }
 
-        $res = Obj_pol_plandne::create($inputs);
+        // Verificar duplicado en el mismo plan
+        $existe = Obj_pol_plandne::where('cod_obj_pol', $request->cod_obj_pol)
+            ->where('id_pladne', $request->id_pladne)
+            ->exists();
 
-        return response()->json([
-            'data' => $res,
-            'mensaje' => 'Agregado con Éxito!!',
-        ]);
+        if ($existe) {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El código {$request->cod_obj_pol} ya está registrado en este PLADNE."
+            ], 409);
+        }
+
+        $res = Obj_pol_plandne::create($request->all());
+        return response()->json(['data' => $res, 'mensaje' => 'Agregado con Éxito!!']);
     }
+
 
     /**
      * Display the specified resource.
@@ -110,7 +124,24 @@ class Obj_pol_plandneController extends Controller
         $res = Obj_pol_plandne::find($id);
 
         if (isset($res)) {
-            $res->id_pladne = $request->id_pladne;
+            // 1. Obtener el id_pladne del request (o del registro actual si no viene en el request)
+            $id_pladne = $request->id_pladne ?? $res->id_pladne;
+
+            // 2. Validar código duplicado dentro del mismo PLADNE, excluyendo el ID actual
+            $existe = Obj_pol_plandne::where('cod_obj_pol', $request->cod_obj_pol)
+                ->where('id_obj_pol_pladne', '!=', $id) // Excluir el registro actual
+                ->where('id_pladne', $id_pladne)        // Filtrar por el mismo PLADNE
+                ->exists();
+
+            if ($existe) {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "El código {$request->cod_obj_pol} ya está registrado en este PLADNE."
+                ], 409);
+            }
+
+            // 3. Asignar valores
+            $res->id_pladne = $id_pladne;
             $res->cod_obj_pol = $request->cod_obj_pol;
             $res->detalle_obj_pol = $request->detalle_obj_pol;
 

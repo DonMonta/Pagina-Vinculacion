@@ -50,7 +50,7 @@ Route::prefix('vin')->group(function () {
     //Definición de ruta endpoint para el recurso Politicas_plandne, perimitiendo operaciones CRUD
     Route::apiResource("politicas_plandne", Politicas_plandneController::class);
     //Definición de ruta endpoint para listar las politicas de un plandne
-    Route::get('politicas_plandne/{id_pladne}', [Politicas_plandneController::class, 'listarPorPlandne']);
+    Route::get('politicas_por_plandne/{id_pladne}', [Politicas_plandneController::class, 'listarPorPlandne']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api')->group(function () {

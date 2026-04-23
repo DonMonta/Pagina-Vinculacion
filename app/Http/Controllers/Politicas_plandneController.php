@@ -131,7 +131,7 @@ class Politicas_plandneController extends Controller
 
             // 2. Validar código duplicado en el mismo PEI, excluyendo el registro actual
             $existe = Politicas_plandne::where('cod_pol', $request->cod_pol)
-                ->where('id', '!=', $id) // Excluir el actual
+                ->where('id_pol_pladne', '!=', $id) // Excluir el actual
                 ->whereHas('objetivos_plandne', function ($query) use ($id_pladne) {
                     $query->where('id_pladne', $id_pladne);
                 })->exists();
