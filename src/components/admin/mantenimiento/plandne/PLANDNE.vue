@@ -82,10 +82,10 @@
             <td class="py-5 px-4">
               <div class="flex flex-col gap-1">
                 <span class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full w-fit">
-                   Objetivos
+                  {{ post.objetivos_plandne_count }} Objetivos
                 </span>
                 <span class="text-xs font-medium text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-full w-fit">
-                   Políticas
+                  {{ post.politicas_plandne_count }} Políticas
                 </span>
               </div>
             </td>
@@ -126,16 +126,17 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button v-if="post.estado_plandne === 1" @click="abrirModalObjetivos(post)"
+                <button v-if="post.estado_plandne === 1 && post.objetivos_plandne_count > 0"
+                  @click="abrirModalPoliticas(post)"
                   class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors" title="Gestionar Objetivos">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10" />
                     <path d="M12 8l4 4-4 4M8 12h7" />
                   </svg>
                 </button>
-                <button v-if="post.estado_plandne === 1" @click="abrirModalSubsistemas(post)"
+                <button v-if="post.estado_plandne === 1" @click="abrirModalObjPol(post)"
                   class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                  title="Gestionar Subsistemas">
+                  title="Gestionar Objetivos">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 3v18m9-9H3" />
                     <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -182,25 +183,29 @@
         Actualizar
       </button>
     </div>
-    <div v-if="isObjetivoModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div v-if="isPoliticasModalOpen"
+      class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
       <div
         class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
 
         <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
           <div>
             <h3 class="text-xl font-bold text-gray-800 dark:text-white">Objetivos Estratégicos</h3>
-            <p class="text-sm text-success-600 font-medium">{{ selectedPei?.nombre_pei }}</p>
+            <p class="text-sm text-success-600 font-medium">{{ selectedPLANDNE?.nombre_plandne }}</p>
           </div>
-          <button @click="isObjetivoModalOpen = false" class="text-gray-400 hover:text-gray-600">✕</button>
+          <button @click="isPoliticasModalOpen = false" class="text-gray-400 hover:text-gray-600">✕</button>
         </div>
         <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20">
           <div class="flex gap-3">
-            <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+            <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
             <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-              <strong>Nota importante:</strong> Los objetivos que añada aquí deben ser únicamente los que se encuentran registrados en el documento oficial del <strong>PEI</strong> seleccionado.
+              <strong>Nota importante:</strong> Las políticas que añada aquí deben ser únicamente las que se encuentran
+              registradas en el documento oficial del <strong>PLANDNE</strong> seleccionado.
             </p>
           </div>
         </div>
@@ -210,70 +215,91 @@
           <div class="md:col-span-4 border-r border-gray-100 dark:border-gray-800 pr-8">
             <div class="space-y-4">
               <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Subsistema</label>
-                <select v-model="objetivoForm.id_sub_sistema_pei"
-                  class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                  <option value="" disabled>Seleccione un subsistema</option>
-                  <option v-for="sub in listaSubsistemas" :key="sub.id_sub_sistema_pei" :value="sub.id_sub_sistema_pei">
-                    {{ sub.nombre_subsistema }}
-                  </option>
-                </select>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Objetivo Estratégico</label>
+
+                <div class="relative group">
+                  <div
+                    class="max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 custom-scrollbar">
+                    <div v-for="sub in ListaObjetivosPol" :key="sub.id_obj_pol_pladne"
+                      @click="PoliticasForm.id_obj_pol_pladne = sub.id_obj_pol_pladne" :class="[
+                        'p-3 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-0 transition-all hover:bg-blue-50 dark:hover:bg-blue-900/20',
+                        PoliticasForm.id_obj_pol_pladne === sub.id_obj_pol_pladne ? 'bg-blue-100 dark:bg-blue-900/40 border-l-4 border-l-blue-600' : ''
+                      ]">
+                      <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold text-purple-600 uppercase">{{ sub.cod_obj_pol }}</span>
+                        <span v-if="PoliticasForm.id_obj_pol_pladne === sub.id_obj_pol_pladne" class="text-blue-600">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3">
+                            <path d="M20 6L9 17l-5-5" />
+                          </svg>
+                        </span>
+                      </div>
+                      <p class="text-xs text-gray-600 dark:text-gray-400 leading-tight italic">
+                        {{ sub.detalle_obj_pol }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <p v-if="!PoliticasForm.id_obj_pol_pladne" class="mt-2 text-[10px] text-amber-600 font-medium italic">
+                  * Debe seleccionar un objetivo de la lista superior
+                </p>
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Código</label>
                 <div class="flex">
                   <span
-                    class="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg text-gray-500">OE</span>
-                  <input type="number" v-model="codNumero"
+                    class="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg text-gray-500">POLÍTICA</span>
+                  <input type="text" v-model="codNumero"
                     class="w-full px-4 py-2 border border-gray-200 rounded-r-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
-                    placeholder="1">
+                    placeholder="1.1 o 2-A">
                 </div>
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Detalle del Objetivo</label>
-                <textarea v-model="objetivoForm.detalle_obj" rows="4"
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Detalle de la Política</label>
+                <textarea v-model="PoliticasForm.detalle_pol" rows="4"
                   class="w-full px-4 py-2 border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
-                  placeholder="Escriba el objetivo estratégico..."></textarea>
+                  placeholder="Escriba la política..."></textarea>
               </div>
 
-              <button @click="guardarObjetivo" class="w-full btn-primary text-white font-bold py-2 rounded-lg">
-                {{ isEditingObjetivo ? 'Actualizar Objetivo' : 'Guardar Objetivo' }}
+              <button @click="guardarPoliticas" class="w-full btn-primary text-white font-bold py-2 rounded-lg">
+                {{ isEditingPoliticas ? 'Actualizar Política' : 'Guardar Política' }}
               </button>
-              <button v-if="isEditingObjetivo" @click="cancelarEdicionObj"
+              <button v-if="isEditingPoliticas" @click="cancelarEdicionPoliticas"
                 class="w-full text-danger-500 text-sm">Cancelar</button>
             </div>
           </div>
 
-          <div class="md:col-span-8">
-            <div class="overflow-x-auto border rounded-xl dark:border-gray-800">
+          <div class="md:col-span-8 flex flex-col min-h-0">
+            <div class="overflow-y-auto border rounded-xl dark:border-gray-800 custom-scrollbar" style="max-height: 400px;">
               <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                 <thead class="bg-gray-50 dark:bg-gray-800/50">
                   <tr>
                     <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">COD</th>
-                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">Subsistema / Detalle</th>
+                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">Objetivo / Detalle</th>
                     <th class="px-4 py-3 text-right text-xs font-bold text-gray-500">Acciones</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                  <tr v-for="obj in listaObjetivos" :key="obj.id_obj_pei">
-                    <td class="px-4 py-3 text-sm font-bold text-cyan-600">{{ obj.cod_obj }}</td>
+                  <tr v-for="obj in listaPoliticas" :key="obj.id_pol_pladne">
+                    <td class="px-4 py-3 text-sm font-bold text-cyan-600">{{ obj.cod_pol }}</td>
                     <td class="px-4 py-3">
-                      <p class="text-xs font-semibold text-purple-600 mb-1">{{ obj.subsistemas_pei?.nombre_subsistema }}
+                      <p class="text-xs font-semibold text-purple-600 mb-1">{{ obj.objetivos_plandne?.cod_obj_pol }}
                       </p>
-                      <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ obj.detalle_obj }}</p>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ obj.detalle_pol }}</p>
                     </td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
-                      <button @click="prepararEdicionObj(obj)"
+                      <button @click="prepararEdicionPol(obj)"
                         class="text-blue-600 hover:underline text-xs">Editar</button>
-                      <button @click="eliminarObjetivo(obj.id_obj_pei)"
+                      <button @click="eliminarPol(obj.id_pol_pladne)"
                         class="text-red-600 hover:underline text-xs">Eliminar</button>
                     </td>
                   </tr>
-                  <tr v-if="listaObjetivos.length === 0">
-                    <td colspan="2" class="px-4 py-8 text-center text-gray-400 text-sm italic">No hay objetivos
-                      registrados</td>
+                  <tr v-if="listaPoliticas.length === 0">
+                    <td colspan="2" class="px-4 py-8 text-center text-gray-400 text-sm italic">No hay políticas
+                      registradas</td>
                   </tr>
                 </tbody>
               </table>
@@ -282,19 +308,20 @@
         </div>
       </div>
     </div>
-    <div v-if="isSubsistemaModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div v-if="isObjetivosPolModalOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
+
       <div
         class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
 
         <div
           class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-white/[0.02]">
           <div>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Subsistemas del</h3>
-            <p class="text-sm text-success-600 font-medium">{{ selectedPei?.nombre_pei }}</p>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Objetivos del</h3>
+            <p class="text-sm text-success-600 font-medium">{{ selectedPLANDNE?.nombre_plandne }}</p>
           </div>
-          
-          <button @click="isSubsistemaModalOpen = false"
+
+          <button @click="isObjetivosPolModalOpen = false"
             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 6L6 18M6 6l12 12" />
@@ -303,11 +330,15 @@
         </div>
         <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20">
           <div class="flex gap-3">
-            <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+            <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
             <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-              <strong>Nota importante:</strong> Los subsistemas que añada aquí deben ser únicamente los que se encuentran registrados en el documento oficial del <strong>PEI</strong> seleccionado.
+              <strong>Nota importante:</strong> Los objetivos que añada aquí deben ser únicamente los que se encuentran
+              registrados en el documento oficial del <strong>PLANDNE</strong> seleccionado.
             </p>
           </div>
         </div>
@@ -315,61 +346,82 @@
         <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8">
 
           <div class="md:col-span-4 border-r border-gray-100 dark:border-gray-800 pr-0 md:pr-8">
-            
+
             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">
-              {{ isEditingSubsistema ? 'Editar Subsistema' : 'Nuevo Subsistema' }}
+              {{ isEditingObjetivosPol ? 'Editar Objetivo' : 'Nuevo Objetivo' }}
             </h4>
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">Nombre</label>
-                <input type="text" v-model="subsistemaForm.nombre_subsistema"
-                  class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
-                  placeholder="Ej: Subsistema Académico">
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Código</label>
+                <div class="flex">
+                  <span
+                    class="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg text-gray-500">OBJETIVO</span>
+                  <input type="number" v-model="codNumero"
+                    class="w-full px-4 py-2 border border-gray-200 rounded-r-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
+                    placeholder="1">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Detalle del Objetivo</label>
+                <textarea v-model="ObjetivosPolForm.detalle_obj_pol" rows="4"
+                  class="w-full px-4 py-2 border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
+                  placeholder="Escriba el objetivo del PLANDNE..."></textarea>
               </div>
               <div class="flex gap-2">
-                <button @click="guardarSubsistema"
+                <button @click="guardarObjetivosPol"
                   class="flex-1 btn-primary text-white font-bold py-2 rounded-lg transition-colors">
-                  {{ isEditingSubsistema ? 'Actualizar' : 'Guardar' }}
+                  {{ isEditingObjetivosPol ? 'Actualizar' : 'Guardar' }}
                 </button>
-                <button v-if="isEditingSubsistema" @click="cancelarEdicionSubsistema"
+                <button v-if="isEditingObjetivosPol" @click="cancelarEdicionObjetivosPol"
                   class="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg">
                   ✕
                 </button>
               </div>
             </div>
           </div>
-
-          <div class="md:col-span-8">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Registrados
+          <div class="md:col-span-8 flex flex-col min-h-0">
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">
+              Registrados
             </h4>
-            <div class="overflow-x-auto border rounded-xl dark:border-gray-800">
+            <div class="overflow-y-auto border rounded-xl dark:border-gray-800 custom-scrollbar"
+              style="max-height: 400px;">
               <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
-                <thead class="bg-gray-50 dark:bg-gray-800/50">
+                <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
                   <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Nombre</th>
-                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">Acciones</th>
+                    <th
+                      class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800">
+                      Código / Detalle
+                    </th>
+                    <th
+                      class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800">
+                      Acciones
+                    </th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                  <tr v-for="sub in listaSubsistemas" :key="sub.id_sub_sistema_pei"
-                    class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                    <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ sub.nombre_subsistema }}</td>
-                    <td class="px-4 py-3 text-right space-x-2">
-                      <button @click="prepararEdicionSub(sub)"
-                        class="text-blue-600 hover:text-blue-800 font-medium text-xs">Editar</button>
-                      <button @click="eliminarSub(sub.id_sub_sistema_pei)"
-                        class="text-red-600 hover:text-red-800 font-medium text-xs">Eliminar</button>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-transparent">
+                  <tr v-for="sub in ListaObjetivosPol" :key="sub.id_obj_pol_pladne"
+                    class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                    <td class="px-4 py-3">
+                      <p class="text-xs font-semibold text-purple-600 mb-1">{{ sub.cod_obj_pol }}</p>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ sub.detalle_obj_pol }}</p>
+                    </td>
+                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                      <button @click="prepararEdicionObjetivosPol(sub)"
+                        class="text-blue-600 hover:text-blue-800 font-medium text-xs transition-colors">Editar</button>
+                      <button @click="eliminarObjetivosPol(sub.id_obj_pol_pladne)"
+                        class="text-red-600 hover:text-red-800 font-medium text-xs transition-colors">Eliminar</button>
                     </td>
                   </tr>
-                  <tr v-if="listaSubsistemas.length === 0">
-                    <td colspan="2" class="px-4 py-8 text-center text-gray-400 text-sm italic">No hay subsistemas
-                      registrados</td>
+
+                  <tr v-if="ListaObjetivosPol.length === 0">
+                    <td colspan="2" class="px-4 py-12 text-center text-gray-400 text-sm italic">
+                      No hay objetivos registrados
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -426,16 +478,16 @@
                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Link del Plan de Desarrollo
                 </label>
-                <input type="text" v-model="objetoguardar.link_plandne"
-                  placeholder="Ej: https://www.google.com"
+                <input type="text" v-model="objetoguardar.link_plandne" placeholder="Ej: https://www.google.com"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
-                  <p v-if="objetoguardar.link_plandne && !/^https?:\/\/.+/.test(objetoguardar.link_plandne)"
-                    class="mt-1 text-xs text-red-500 font-medium">
-                    ⚠️ Formato inválido. Use el formato https://www.google.com.
-                  </p>
+                <p v-if="objetoguardar.link_plandne && !/^https?:\/\/.+/.test(objetoguardar.link_plandne)"
+                  class="mt-1 text-xs text-red-500 font-medium">
+                  ⚠️ Formato inválido. Use el formato https://www.google.com.
+                </p>
               </div>
               <div class="mt-5">
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del PLANDNE</label>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del
+                  PLANDNE</label>
                 <select v-model="objetoguardar.estado_plandne"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 dark:border-gray-700 dark:text-white/90">
                   <option value="1">Activo</option>
@@ -451,7 +503,7 @@
               </button>
               <button v-if="formIsValid" @click="registrar" type="button"
                 class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-              Guardar PLANDNE
+                Guardar PLANDNE
               </button>
             </div>
           </form>
@@ -511,17 +563,17 @@
                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Link del Plan de Desarrollo
                 </label>
-                <input type="text" v-model="objetoeditar.link_plandne"
-                  placeholder="Ej: https://www.google.com"
+                <input type="text" v-model="objetoeditar.link_plandne" placeholder="Ej: https://www.google.com"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
-                  <p v-if="objetoeditar.link_plandne && !/^https?:\/\/.+/.test(objetoeditar.link_plandne)"
-                    class="mt-1 text-xs text-red-500 font-medium">
-                    ⚠️ Formato inválido. Use el formato https://www.google.com.
-                  </p>
+                <p v-if="objetoeditar.link_plandne && !/^https?:\/\/.+/.test(objetoeditar.link_plandne)"
+                  class="mt-1 text-xs text-red-500 font-medium">
+                  ⚠️ Formato inválido. Use el formato https://www.google.com.
+                </p>
               </div>
 
               <div class="mt-5">
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del PLANDNE</label>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del
+                  PLANDNE</label>
                 <select v-model="objetoeditar.estado_plandne"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 dark:border-gray-700 dark:text-white/90">
                   <option value="1">Activo</option>
@@ -606,24 +658,25 @@ export default {
       archivoSeleccionado: null,
       archivoPreviewName: '',
       uploading: false,
-      isSubsistemaModalOpen: false,
-      selectedPei: null,
-      listaSubsistemas: [],
-      isEditingSubsistema: false,
-      subsistemaForm: {
-        id_sub_sistema_pei: null,
-        id_pei: null,
-        nombre_subsistema: ''
+      isObjetivosPolModalOpen: false,
+      selectedPLANDNE: null,
+      ListaObjetivosPol: [],
+      isEditingObjetivosPol: false,
+      ObjetivosPolForm: {
+        id_obj_pol_pladne: null,
+        id_pladne: null,
+        cod_obj_pol: '',
+        detalle_obj_pol: ''
       },
-      isObjetivoModalOpen: false,
-      listaObjetivos: [],
+      isPoliticasModalOpen: false,
+      listaPoliticas: [],
       codNumero: '', // Solo el número (ej: 1)
-      isEditingObjetivo: false,
-      objetivoForm: {
-        id_obj_pei: null,
-        id_sub_sistema_pei: '',
-        cod_obj: '', // Se armará como OE + codNumero
-        detalle_obj: ''
+      isEditingPoliticas: false,
+      PoliticasForm: {
+        id_pol_pladne: null,
+        id_obj_pol_pladne: '',
+        cod_pol: '', // Se armará como OE + codNumero
+        detalle_pol: ''
       }
     };
   },
@@ -665,142 +718,146 @@ export default {
 
   },
   methods: {
-    async abrirModalObjetivos(pei) {
-      this.selectedPei = pei;
-      this.cancelarEdicionObj();
+    async abrirModalPoliticas(pei) {
+      this.selectedPLANDNE = pei;
+      this.cancelarEdicionPoliticas();
 
       // 1. Cargar subsistemas del PEI seleccionado para el Select
-      const respSub = await API.get(`${this.baseUrl}/subsistemas_pei/${pei.id_pei}`);
-      this.listaSubsistemas = respSub.data.data || [];
+      const respSub = await API.get(`${this.baseUrl}/obj_pol_plandne/${pei.id_pladne}`);
+      this.ListaObjetivosPol = respSub.data.data || [];
 
       // 2. Cargar objetivos (Tu backend debería filtrar objetivos por PEI a través de los subsistemas)
-      await this.getObjetivos();
-      this.isObjetivoModalOpen = true;
+      await this.getPoliticas();
+      this.isPoliticasModalOpen = true;
     },
 
-    async guardarObjetivo() {
+    async guardarPoliticas() {
       // Validaciones
-      if (!this.objetivoForm.id_sub_sistema_pei || !this.codNumero || !this.objetivoForm.detalle_obj) {
+      if (!this.PoliticasForm.id_obj_pol_pladne || !this.codNumero || !this.PoliticasForm.detalle_pol) {
         mostraralertas2("Todos los campos son obligatorios", "warning");
         return;
       }
 
       // Armar el código final: OE + numero
-      this.objetivoForm.cod_obj = 'OE' + this.codNumero;
+      this.PoliticasForm.cod_pol = 'POLÍTICAS ' + this.codNumero;
 
-      const metodo = this.isEditingObjetivo ? 'PUT' : 'POST';
-      const url = this.isEditingObjetivo
-        ? `${this.baseUrl}/objetivos_pei/${this.objetivoForm.id_obj_pei}`
-        : `${this.baseUrl}/objetivos_pei`;
+      const metodo = this.isEditingPoliticas ? 'PUT' : 'POST';
+      const url = this.isEditingPoliticas
+        ? `${this.baseUrl}/politicas_plandne/${this.PoliticasForm.id_pol_pladne}`
+        : `${this.baseUrl}/politicas_plandne`;
 
       // 2. Llamada al servidor
-      const exito = await enviarsolig(metodo, this.objetivoForm, url, 'Objetivo guardado con éxito');
+      const exito = await enviarsolig(metodo, this.PoliticasForm, url, 'Objetivo guardado con éxito');
 
       // 3. Solo si fue exitoso (status 200), limpiamos y refrescamos
       if (exito) {
-        this.cancelarEdicionObj();
-        this.getObjetivos();
+        this.cancelarEdicionPoliticas();
+        this.getPoliticas();
       }
     },
 
-    prepararEdicionObj(obj) {
-      this.isEditingObjetivo = true;
-      this.objetivoForm.id_obj_pei = obj.id_obj_pei;
-      this.objetivoForm.id_sub_sistema_pei = obj.id_sub_sistema_pei;
-      this.objetivoForm.detalle_obj = obj.detalle_obj;
+    prepararEdicionPol(obj) {
+      this.isEditingPoliticas = true;
+      this.PoliticasForm.id_pol_pladne = obj.id_pol_pladne;
+      this.PoliticasForm.id_obj_pol_pladne = obj.id_obj_pol_pladne;
+      this.PoliticasForm.detalle_pol = obj.detalle_pol;
       // Extraer solo el número del código (quita las letras OE)
-      this.codNumero = obj.cod_obj.replace('OE', '');
+      this.codNumero = obj.cod_pol.replace('POLÍTICAS', '');
     },
 
-    cancelarEdicionObj() {
-      this.isEditingObjetivo = false;
+    cancelarEdicionPoliticas() {
+      this.isEditingPoliticas = false;
       this.codNumero = '';
-      this.objetivoForm = { id_obj_pei: null, id_sub_sistema_pei: '', cod_obj: '', detalle_obj: '' };
+      this.PoliticasForm = { id_pol_pladne: null, id_obj_pol_pladne: '', cod_pol: '', detalle_pol: '' };
     },
 
-    async eliminarObjetivo(id) {
-      const res = await elimnarpermanente(`${this.baseUrl}/objetivos_pei/`, id, '¿Eliminar?', 'Esta acción no se puede deshacer');
+    async eliminarPol(id) {
+      const res = await elimnarpermanente(`${this.baseUrl}/politicas_plandne/`, id, '¿Eliminar?', 'Esta acción no se puede deshacer');
       if (res && res.status === 200) {
-        this.listaObjetivos = this.listaObjetivos.filter(o => o.id_obj_pei !== id);
+        this.listaPoliticas = this.listaPoliticas.filter(o => o.id_pol_pladne !== id);
       }
     },
-    async abrirModalSubsistemas(pei) {
-      this.selectedPei = pei;
-      this.subsistemaForm.id_pei = pei.id_pei;
-      this.cancelarEdicionSubsistema(); // Limpia el form
-      await this.getSubsistemas();
-      this.isSubsistemaModalOpen = true;
+    async abrirModalObjPol(obj) {
+      this.selectedPLANDNE = obj;
+      this.ObjetivosPolForm.id_pladne = obj.id_pladne;
+      this.cancelarEdicionObjetivosPol(); // Limpia el form
+      await this.getObjPol();
+      this.isObjetivosPolModalOpen = true;
     },
-    async getObjetivos() {
+    async getPoliticas() {
       try {
         this.cargandoObjetivos = true; // Opcional: para un spinner interno
 
         // Enviamos el ID del PEI para que el backend sepa qué objetivos buscar
         // a través de sus subsistemas relacionados.
-        const resp = await API.get(`${this.baseUrl}/objetivos_por_pei/${this.selectedPei.id_pei}`);
+        const resp = await API.get(`${this.baseUrl}/politicas_por_plandne/${this.selectedPLANDNE.id_pladne}`);
         if (resp && resp.data) {
-          this.listaObjetivos = resp.data;
+          this.listaPoliticas = resp.data;
         }
       } catch (error) {
-        console.error("Error al obtener objetivos:", error);
-        mostraralertas2("No se pudieron cargar los objetivos", "error");
+        console.error("Error al obtener politicas:", error);
+        mostraralertas2("No se pudieron cargar las politicas", "error");
       } finally {
         this.cargandoObjetivos = false;
       }
     },
 
-    async getSubsistemas() {
+    async getObjPol() {
       try {
-        const resp = await API.get(`${this.baseUrl}/subsistemas_pei/${this.selectedPei.id_pei}`);
-        this.listaSubsistemas = resp.data.data || [];
+        const resp = await API.get(`${this.baseUrl}/obj_pol_plandne/${this.selectedPLANDNE.id_pladne}`);
+        this.ListaObjetivosPol = resp.data.data || [];
       } catch (error) {
-        console.error("Error al obtener subsistemas:", error);
+        console.error("Error al obtener objetivos políticos:", error);
       }
     },
 
-    async guardarSubsistema() {
-      if (!this.subsistemaForm.nombre_subsistema.trim()) {
-        mostraralertas2("El nombre es obligatorio", "warning");
+    async guardarObjetivosPol() {
+      if (!this.codNumero || !this.ObjetivosPolForm.detalle_obj_pol) {
+        mostraralertas2("Todos lo campos son obligatorios", "warning");
         return;
       }
 
       try {
-        const metodo = this.isEditingSubsistema ? 'PUT' : 'POST';
-        const url = this.isEditingSubsistema
-          ? `${this.baseUrl}/subsistemas_pei/${this.subsistemaForm.id_sub_sistema_pei}`
-          : `${this.baseUrl}/subsistemas_pei`;
+        this.ObjetivosPolForm.cod_obj_pol = 'OBJETIVO ' + this.codNumero;
+        const metodo = this.isEditingObjetivosPol ? 'PUT' : 'POST';
+        const url = this.isEditingObjetivosPol
+          ? `${this.baseUrl}/obj_pol_plandne/${this.ObjetivosPolForm.id_obj_pol_pladne}`
+          : `${this.baseUrl}/obj_pol_plandne`;
 
-        const exito = await enviarsolig(metodo, this.subsistemaForm, url, 'Operación exitosa');
+        const exito = await enviarsolig(metodo, this.ObjetivosPolForm, url, 'Operación exitosa');
         if (exito) {
-          this.cancelarEdicionSubsistema();
-          this.getSubsistemas();
+          this.cancelarEdicionObjetivosPol();
+          this.getObjPol();
         }
       } catch (error) {
         console.error("Error al guardar subsistema:", error);
       }
     },
 
-    prepararEdicionSub(sub) {
-      this.isEditingSubsistema = true;
-      this.subsistemaForm.id_sub_sistema_pei = sub.id_sub_sistema_pei;
-      this.subsistemaForm.nombre_subsistema = sub.nombre_subsistema;
+    prepararEdicionObjetivosPol(obj) {
+      this.isEditingObjetivosPol = true;
+      this.ObjetivosPolForm.id_obj_pol_pladne = obj.id_obj_pol_pladne;
+      this.ObjetivosPolForm.detalle_obj_pol = obj.detalle_obj_pol;
+      this.codNumero = obj.cod_obj_pol.replace('OBJETIVO', '');
     },
 
-    cancelarEdicionSubsistema() {
-      this.isEditingSubsistema = false;
-      this.subsistemaForm.id_sub_sistema_pei = null;
-      this.subsistemaForm.nombre_subsistema = '';
+    cancelarEdicionObjetivosPol() {
+      this.isEditingObjetivosPol = false;
+      this.ObjetivosPolForm.id_obj_pol_pladne = null;
+      this.ObjetivosPolForm.cod_obj_pol = '';
+      this.codNumero = '';
+      this.ObjetivosPolForm.detalle_obj_pol = '';
     },
 
-    async eliminarSub(id) {
+    async eliminarObjetivosPol(id) {
       const response = await elimnarpermanente(
-        `${this.baseUrl}/subsistemas_pei/`,
+        `${this.baseUrl}/obj_pol_plandne/`,
         id,
-        'Eliminar Subsistemas',
-        '¿Realmente desea eliminar el subsistema?'
+        'Eliminar Objetivo',
+        '¿Realmente desea eliminar el objetivo?'
       );
       if (response && response.status === 200) {
-        this.listaSubsistemas = this.listaSubsistemas.filter(sub => sub.id_sub_sistema_pei !== id);
+        this.ListaObjetivosPol = this.ListaObjetivosPol.filter(sub => sub.id_obj_pol_pladne !== id);
       }
     },
     abrirModalEdicion(user) {

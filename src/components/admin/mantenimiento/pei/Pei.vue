@@ -126,7 +126,7 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button v-if="post.estado_pei === 1" @click="abrirModalObjetivos(post)"
+                <button v-if="post.estado_pei === 1 && post.subsistemas_pei_count > 0" @click="abrirModalObjetivos(post)"
                   class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors" title="Gestionar Objetivos">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10" />
@@ -183,7 +183,7 @@
       </button>
     </div>
     <div v-if="isObjetivoModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
       <div
         class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
 
@@ -246,17 +246,17 @@
             </div>
           </div>
 
-          <div class="md:col-span-8">
-            <div class="overflow-x-auto border rounded-xl dark:border-gray-800">
+          <div class="md:col-span-8 flex flex-col min-h-0">
+            <div class="overflow-x-auto border rounded-xl dark:border-gray-800 custom-scrollbar" style="max-height: 400px;">
               <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
-                <thead class="bg-gray-50 dark:bg-gray-800/50">
+                <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
                   <tr>
                     <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">COD</th>
                     <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">Subsistema / Detalle</th>
                     <th class="px-4 py-3 text-right text-xs font-bold text-gray-500">Acciones</th>
                   </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                </thead> 
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-transparent">
                   <tr v-for="obj in listaObjetivos" :key="obj.id_obj_pei">
                     <td class="px-4 py-3 text-sm font-bold text-cyan-600">{{ obj.cod_obj }}</td>
                     <td class="px-4 py-3">
@@ -283,7 +283,7 @@
       </div>
     </div>
     <div v-if="isSubsistemaModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
       <div
         class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
 
@@ -339,12 +339,12 @@
             </div>
           </div>
 
-          <div class="md:col-span-8">
+          <div class="md:col-span-8 flex flex-col min-h-0">
             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Registrados
             </h4>
-            <div class="overflow-x-auto border rounded-xl dark:border-gray-800">
+            <div class="overflow-y-auto border rounded-xl dark:border-gray-800 custom-scrollbar" style="max-height: 400px;">
               <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
-                <thead class="bg-gray-50 dark:bg-gray-800/50">
+                <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
                   <tr>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Nombre</th>
                     <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">Acciones</th>
