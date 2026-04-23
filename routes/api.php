@@ -7,6 +7,9 @@ use App\Http\Controllers\DirectorCarrerasController;
 use App\Http\Controllers\PeiController;
 use App\Http\Controllers\Subsistemas_peiController;
 use App\Http\Controllers\Objetivos_peiController;
+use App\Http\Controllers\PlandneController;
+use App\Http\Controllers\Obj_pol_plandneController;
+use App\Http\Controllers\Politicas_plandneController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +39,18 @@ Route::prefix('vin')->group(function () {
     //Definición de la ruta endpoint para el recurso Objetivos_pei, perimitiendo operaciones CRUD
     Route::apiResource("objetivos_pei", Objetivos_peiController::class);
     Route::get('objetivos_por_pei/{id_pei}', [Objetivos_peiController::class, 'listarPorPei']);
+    //Definición de la ruta endpoint para el recurso Plandne, perimitiendo operaciones CRUD
+    Route::apiResource("plandne", PlandneController::class);
+    //Definicio de endpoint para habilitar un plandne
+    Route::delete('habilitar_plandne/{id}', [PlandneController::class, 'habilitar']);
+    //Definición de endpoint para deshabilitar un plandne
+    Route::delete('inhabilitar_plandne/{id}', [PlandneController::class, 'destroy']);
+    //Definición de ruta endpoint para el recurso Obj_pol_plandne, perimitiendo operaciones CRUD
+    Route::apiResource("obj_pol_plandne", Obj_pol_plandneController::class);
+    //Definición de ruta endpoint para el recurso Politicas_plandne, perimitiendo operaciones CRUD
+    Route::apiResource("politicas_plandne", Politicas_plandneController::class);
+    //Definición de ruta endpoint para listar las politicas de un plandne
+    Route::get('politicas_plandne/{id_pladne}', [Politicas_plandneController::class, 'listarPorPlandne']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api')->group(function () {

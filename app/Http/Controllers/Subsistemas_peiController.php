@@ -110,6 +110,7 @@ class Subsistemas_peiController extends Controller
         $res = Subsistemas_pei::find($id);
 
         if (isset($res)) {
+            $res->id_pei = $request->id_pei;
             $res->nombre_subsistema = $request->nombre_subsistema;
 
             if ($res->save()) {

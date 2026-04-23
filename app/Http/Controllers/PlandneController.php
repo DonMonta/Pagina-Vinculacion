@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pei;
+use App\Models\Plandne;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 
-class PeiController extends Controller
+class PlandneController extends Controller
 {
     /**
      * Display a listing of the resource.
-     */ 
+     */
     public function index(Request $request)
     {
         try {
             // Usamos withCount para obtener los totales de las relaciones
-            $query = Pei::withCount(['subsistemas_pei', 'objetivos']);
+            $query = Plandne::withCount(['objetivos_plandne', 'politicas_plandne']);
 
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
@@ -74,21 +74,21 @@ class PeiController extends Controller
         $inputs = $request->all();
 
         // Si el usuario intenta enviar el PEI como ACTIVO (1)
-        if ($request->estado_pei == 1) {
+        if ($request->estado_plandne == 1) {
             // Verificamos si ya existe AL MENOS UNO activo en la base de datos
-            $existeActivo = Pei::where('estado_pei', 1)->exists();
+            $existeActivo = Plandne::where('estado_plandne', 1)->exists();
 
             if ($existeActivo) {
                 // Si ya hay uno, forzamos este nuevo a ser INACTIVO (0)
-                $inputs['estado_pei'] = 0;
+                $inputs['estado_plandne'] = 0;
             }
         }
 
-        $res = Pei::create($inputs);
+        $res = Plandne::create($inputs);
 
         return response()->json([
             'data' => $res,
-            'mensaje' => $res->estado_pei == 0 && $request->estado_pei == 1
+            'mensaje' => $res->estado_plandne == 0 && $request->estado_plandne == 1
                 ? "Agregado, pero se guardó como Inactivo porque ya existe un PEI activo."
                 : "Agregado con Éxito!!",
         ]);
@@ -99,7 +99,7 @@ class PeiController extends Controller
      */
     public function show(string $id)
     {
-        $res = Pei::find($id);
+        $res = Plandne::find($id);
         if (isset($res)) {
             return response()->json([
                 'data' => $res,
@@ -108,7 +108,7 @@ class PeiController extends Controller
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El PEI con id: $id no Existe",
+                'mensaje' => "El PlANDE con id: $id no Existe",
             ]);
         }
     }
@@ -118,33 +118,30 @@ class PeiController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = Pei::find($id);
+        $res = Plandne::find($id);
 
         if (isset($res)) {
-            $res->nombre_pei = $request->nombre_pei;
-            $res->anios_pei = $request->anios_pei;
+            $res->nombre_plandne = $request->nombre_plandne;
+            $res->anio_plandne = $request->anio_plandne;
+            $res->link_plandne = $request->link_plandne;
 
             // Lógica de validación de estado
-            if ($request->estado_pei == 1) {
+            if ($request->estado_plandne == 1) {
                 // Buscamos si hay otro PEI activo que NO SEA el que estamos editando
-                $otroActivo = Pei::where('estado_pei', 1)
-                    ->where('id_pei', '!=', $id)
+                $otroActivo = Plandne::where('estado_plandne', 1)
+                    ->where('id_pladne', '!=', $id)
                     ->exists();
 
                 if ($otroActivo) {
-                    $res->estado_pei = 0;
-                    $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque ya existe otro PEI activo.";
+                    $res->estado_plandne = 0;
+                    $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque ya existe otro PlANDE activo.";
                 } else {
-                    $res->estado_pei = 1;
+                    $res->estado_plandne = 1;
                     $mensajeFinal = "Actualizado con Éxito!!";
                 }
             } else {
-                $res->estado_pei = 0;
+                $res->estado_plandne = 0;
                 $mensajeFinal = "Actualizado con Éxito!!";
-            }
-
-            if ($request->has('archivo_pei')) {
-                $res->archivo_pei = $request->archivo_pei;
             }
 
             if ($res->save()) {
@@ -165,9 +162,9 @@ class PeiController extends Controller
      */
     public function destroy(string $id)
     {
-        $res = Pei::find($id);
+        $res = Plandne::find($id);
         if (isset($res)) {
-            $res->estado_pei = 0;
+            $res->estado_plandne = 0;
             $res->save();
             $data = $res->toArray();
             if ($data) {
@@ -179,39 +176,39 @@ class PeiController extends Controller
             } else {
                 return response()->json([
                     'data' => $data,
-                    'mensaje' => "El pei no existe (puede que ya la haya eliminado)",
+                    'mensaje' => "El plandne no existe (puede que ya la haya eliminado)",
                 ]);
             }
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El pei con id: $id no Existe",
+                'mensaje' => "El plandne con id: $id no Existe",
             ]);
         }
     }
     public function habilitar(string $id)
     {
-        // 1. Verificar si ya existe algún PEI activo
-        $existeActivo = Pei::where('estado_pei', 1)->exists();
+        // 1. Verificar si ya existe algún PlANDE activo
+        $existeActivo = Plandne::where('estado_plandne', 1)->exists();
 
         if ($existeActivo) {
             return response()->json([
                 'status' => false,
-                'mensaje' => "No se puede habilitar: Ya existe un PEI activo actualmente. Por favor, desactive el anterior primero."
+                'mensaje' => "No se puede habilitar: Ya existe un PlANDE activo actualmente. Por favor, desactive el anterior primero."
             ], 422); // Código 422: Entidad no procesable (error de validación de negocio)
         }
 
         // 2. Si no hay activos, procedemos a buscar y habilitar
-        $res = Pei::find($id);
+        $res = Plandne::find($id);
 
         if (isset($res)) {
-            $res->estado_pei = 1;
+            $res->estado_plandne = 1;
 
             if ($res->save()) {
                 return response()->json([
                     'status' => true,
                     'data' => $res,
-                    'mensaje' => "¡PEI Habilitado con Éxito!",
+                    'mensaje' => "¡PlANDE Habilitado con Éxito!",
                 ]);
             } else {
                 return response()->json([
@@ -222,93 +219,8 @@ class PeiController extends Controller
         } else {
             return response()->json([
                 'status' => false,
-                'mensaje' => "El PEI con id: $id no existe o fue eliminado.",
+                'mensaje' => "El PlANDE con id: $id no existe o fue eliminado.",
             ], 404);
         }
-    }
-    public function uploadArchivo(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:10240',
-            'anio_pei' => 'required|string', // Quitamos alpha_dash por si usas guiones como "2024-2030"
-            'old_filename' => 'nullable|string',
-            'old_anio' => 'nullable|string',
-        ]);
-
-        try {
-            $anio_folder = str_replace(['/', '\\', ' '], '_', $request->anio_pei);
-            $file = $request->file('file');
-            if (!$file->isValid()) {
-                throw new \Exception("Archivo inválido o corrupto.");
-            }
-
-            // --- LÓGICA DE ELIMINACIÓN Y LIMPIEZA ---
-            if ($request->filled('old_filename')) {
-                $folder_to_clean = $request->filled('old_anio')
-                    ? str_replace(['/', '\\', ' '], '_', $request->old_anio)
-                    : $anio_folder;
-
-                $oldDirectory = public_path("Documentos/Pei/{$folder_to_clean}");
-                $oldPath = $oldDirectory . '/' . basename($request->old_filename);
-
-                // 1. Borrar el archivo
-                if (File::exists($oldPath)) {
-                    File::delete($oldPath);
-                }
-
-                // 2. Limpiar carpeta si quedó vacía (y no es la misma carpeta donde vamos a guardar ahora)
-                // Solo intentamos borrarla si la carpeta existe y es distinta a la nueva o si queremos limpieza total
-                if (File::exists($oldDirectory) && count(File::files($oldDirectory)) === 0 && count(File::directories($oldDirectory)) === 0) {
-                    File::deleteDirectory($oldDirectory);
-                }
-            }
-
-            // --- LÓGICA DE GUARDADO ---
-            $basePath = "Documentos/Pei/{$anio_folder}";
-            $directory = public_path($basePath);
-
-            if (!File::exists($directory)) {
-                File::makeDirectory($directory, 0755, true);
-            }
-
-            // 5. Generar nombre único
-            $aleatorio = bin2hex(random_bytes(4));
-            $fechaHora = date("Ymd_His");
-            $extension = $file->getClientOriginalExtension();
-            // Nombre: pei_2024-2028_a1b2c3d4_20260422.pdf
-            $filename = "pei_{$anio_folder}_{$aleatorio}_{$fechaHora}.{$extension}";
-
-            // 6. Mover archivo
-            $file->move($directory, $filename);
-
-            return response()->json([
-                'status'   => true,
-                'filename' => $filename,
-                'url'      => url($basePath . '/' . $filename)
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Error al procesar el archivo.',
-                'error'   => $e->getMessage()
-            ], 500);
-        }
-    }
-    public function deleteArchivo(Request $request)
-    {
-        $request->validate([
-            'filename' => 'required',
-            'anio_pei' => 'required',
-        ]);
-
-        $filePath = public_path('Documentos/Pei/' . $request->anio_pei . '/' . $request->filename);
-
-        if (File::exists($filePath)) {
-            File::delete($filePath);
-
-            return response()->json(['status' => true, 'message' => 'Archivo eliminado']);
-        }
-
-        return response()->json(['status' => false, 'message' => 'Archivo no encontrado'], 404);
     }
 }

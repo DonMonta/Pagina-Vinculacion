@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Objetivos_pei;
-use App\Models\Subsistemas_pei;
+use App\Models\Obj_pol_plandne;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 
-class Objetivos_peiController extends Controller
+class Obj_pol_plandneController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +14,8 @@ class Objetivos_peiController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Objetivos_pei::select(
-                'objetivos_pei.*'
+            $query = Obj_pol_plandne::select(
+                'obj_pol_plandne.*'
             );
 
             if ($request->has('all') && $request->all === 'true') {
@@ -71,29 +70,9 @@ class Objetivos_peiController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Obtener el id_pei al que pertenece el subsistema seleccionado
-        $subsistema = Subsistemas_pei::find($request->id_sub_sistema_pei);
+        $inputs = $request->input();
 
-        if (!$subsistema) {
-            return response()->json(['error' => true, 'mensaje' => 'Subsistema no válido'], 404);
-        }
-
-        $id_pei = $subsistema->id_pei;
-
-        // 2. Verificar si el código ya existe en objetivos que pertenecen al MISMO PEI
-        $existe = Objetivos_pei::where('cod_obj', $request->cod_obj)
-            ->whereHas('subsistemas_pei', function ($query) use ($id_pei) {
-                $query->where('id_pei', $id_pei);
-            })->exists();
-
-        if ($existe) {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El código {$request->cod_obj} ya está registrado en este PEI."
-            ], 409);
-        }
-
-        $res = Objetivos_pei::create($request->all());
+        $res = Obj_pol_plandne::create($inputs);
 
         return response()->json([
             'data' => $res,
@@ -104,18 +83,23 @@ class Objetivos_peiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id) {}
-    public function listarPorPei($id_pei)
+    public function show(string $id)
     {
-        // Buscamos los objetivos cuyo subsistema pertenezca al PEI enviado
-        $objetivos = Objetivos_pei::whereHas('subsistemas_pei', function ($query) use ($id_pei) {
-            $query->where('id_pei', $id_pei);
-        })
-            ->with('subsistemas_pei') // Cargamos el nombre del subsistema para mostrarlo en la tabla
-            ->orderBy('cod_obj', 'asc')
+        $res = Obj_pol_plandne::select(
+            'obj_pol_plandne.*'
+        )->where('id_pladne', $id)
             ->get();
-
-        return response()->json($objetivos);
+        if ($res->isEmpty()) {
+            return response()->json([
+                'data' => [],
+                'mensaje' => "El objeto de política con id: $id no Existe",
+            ], 404);
+        } else {
+            return response()->json([
+                'data' => $res,
+                'mensaje' => "Objeto de política encontrado con id: $id",
+            ], 200);
+        }
     }
 
     /**
@@ -123,30 +107,12 @@ class Objetivos_peiController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = Objetivos_pei::find($id);
+        $res = Obj_pol_plandne::find($id);
 
         if (isset($res)) {
-            // 1. Obtener el PEI a través del subsistema (por si cambiaron de subsistema en el edit)
-            $subsistema = Subsistemas_pei::find($request->id_sub_sistema_pei);
-            $id_pei = $subsistema->id_pei;
-
-            // 2. Validar código duplicado en el mismo PEI, excluyendo el registro actual
-            $existe = Objetivos_pei::where('cod_obj', $request->cod_obj)
-                ->where('id_obj_pei', '!=', $id) // Excluir el actual
-                ->whereHas('subsistemas_pei', function ($query) use ($id_pei) {
-                    $query->where('id_pei', $id_pei);
-                })->exists();
-
-            if ($existe) {
-                return response()->json([
-                    'error' => true,
-                    'mensaje' => "El código {$request->cod_obj} ya pertenece a otro objetivo de este PEI."
-                ], 409);
-            }
-
-            $res->id_sub_sistema_pei = $request->id_sub_sistema_pei;
-            $res->cod_obj = $request->cod_obj;
-            $res->detalle_obj = $request->detalle_obj;
+            $res->id_pladne = $request->id_pladne;
+            $res->cod_obj_pol = $request->cod_obj_pol;
+            $res->detalle_obj_pol = $request->detalle_obj_pol;
 
             if ($res->save()) {
                 return response()->json([
@@ -158,7 +124,7 @@ class Objetivos_peiController extends Controller
             return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
         }
 
-        return response()->json(['error' => true, 'mensaje' => "El objetivo con id: $id no Existe"], 404);
+        return response()->json(['error' => true, 'mensaje' => "El objeto de política con id: $id no Existe"], 404);
     }
 
 
@@ -167,7 +133,7 @@ class Objetivos_peiController extends Controller
      */
     public function destroy(string $id)
     {
-        $res = Objetivos_pei::find($id);
+        $res = Obj_pol_plandne::find($id);
         if (isset($res)) {
             $res->delete();
             $data = $res->toArray();
@@ -180,13 +146,13 @@ class Objetivos_peiController extends Controller
             } else {
                 return response()->json([
                     'data' => $data,
-                    'mensaje' => "El objetivo no existe (puede que ya la haya eliminado)",
+                    'mensaje' => "El objeto de política no existe (puede que ya la haya eliminado)",
                 ]);
             }
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El objetivo con id: $id no Existe",
+                'mensaje' => "El objeto de política con id: $id no Existe",
             ]);
         }
     }
