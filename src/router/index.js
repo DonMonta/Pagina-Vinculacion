@@ -9,6 +9,7 @@ import Error404View from '../views/Erro404View.vue'
 import DashUiView from '../views/DashUiView.vue'
 import PeiAllView from '../views/Admin/Mantenimiento/Op_Pei/PeiAllView.vue'
 import PlandneAllView from '../views/Admin/Mantenimiento/Op_PLANDE/PlandneAllView.vue'
+import ProyectosView from '../views/Admin/Proyectos/Lista_Proyectos/ProyectosView.vue'
 
 
 const routes = [
@@ -61,6 +62,11 @@ const routes = [
     path: '/site-admin/plandne',
     name: 'site-admin-plandne',
     component: PlandneAllView
+  },
+  {
+    path: '/site-admin/proyectos',
+    name: 'site-admin-proyectos',
+    component: ProyectosView
   },
 
   

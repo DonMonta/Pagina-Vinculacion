@@ -195,9 +195,9 @@ const menuGroups = [
       },
       {
         icon: PlateIcon,
-        name: "Platos",
+        name: "Proyectos",
         subItems: [
-          //{ name: "Stok de Platos", path: "/stock/platos", pro: false },
+          { name: "Lista de Proyectos", path: "/site-admin/proyectos", pro: false },
         ],
       },
       {

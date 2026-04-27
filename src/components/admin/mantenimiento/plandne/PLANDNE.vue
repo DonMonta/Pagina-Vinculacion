@@ -739,7 +739,7 @@ export default {
       }
 
       // Armar el código final: OE + numero
-      this.PoliticasForm.cod_pol = 'POLÍTICAS ' + this.codNumero;
+      this.PoliticasForm.cod_pol = 'POLÍTICA ' + this.codNumero;
 
       const metodo = this.isEditingPoliticas ? 'PUT' : 'POST';
       const url = this.isEditingPoliticas
