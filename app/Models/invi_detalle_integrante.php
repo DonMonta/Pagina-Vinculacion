@@ -21,6 +21,7 @@ class invi_detalle_integrante extends Model
         'reemplazado',
         'id_funcion',
         'idCarr',
+        'anexo_integrante',
     ];
     public function invi_proyectos()
     {

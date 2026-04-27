@@ -10,6 +10,7 @@ use App\Models\Carreras;
 use App\Models\Invi_funcion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class Invi_proyectosController extends Controller
 {
@@ -177,74 +178,149 @@ class Invi_proyectosController extends Controller
     public function buscarIntegrante(Request $request)
     {
         $cedula = $request->cedula;
+        $proyect_id_actual = $request->proyect_id;
+        // Nueva variable para saber si estamos en modo reemplazo
+        $es_reemplazo = $request->es_reemplazo;
 
-        // Buscar en ambas tablas de información personal
+        // 1. Buscar Datos Personales
         $docente = InformacionPersonalD::where('CIInfPer', $cedula)->first();
         $estudiante = InformacionPersonal::where('CIInfPer', $cedula)->first();
 
         if (!$docente && !$estudiante) {
-            return response()->json(['message' => 'No encontrado'], 404);
+            return response()->json(['message' => 'Integrante no encontrado en la base de datos institucional.'], 404);
         }
 
         $persona = $docente ?: $estudiante;
+        $tipo = $docente ? 'doc' : 'est';
+
+        // 2. Validar estado en proyectos de VINCULACIÓN
+        $proyectoActivo = Invi_detalle_integrante::where(function ($q) use ($cedula) {
+            $q->where('ciinfper_doc', $cedula)->orWhere('ciinfper_est', $cedula);
+        })
+            ->where('reemplazado', 0)
+            ->whereHas('invi_proyectos', function ($query) {
+                $query->where('proyect_tipo', 'VINCULACIÓN');
+            })
+            ->with('invi_proyectos')
+            ->first();
+
+        if ($proyectoActivo) {
+            // CASO A: Está en OTRO proyecto (Bloqueo total)
+            if ($proyectoActivo->proyect_id != $proyect_id_actual) {
+                return response()->json([
+                    'message' => "El integrante ya está activo en otro proyecto: " . $proyectoActivo->invi_proyectos->proyect_nombre
+                ], 422);
+            }
+
+            // CASO B: Está en el MISMO proyecto
+            // Si NO es un reemplazo (o sea, es un 'Añadir Nuevo'), lanzamos error.
+            if (!$es_reemplazo) {
+                return response()->json([
+                    'message' => "Este integrante ya forma parte de los miembros activos de este proyecto."
+                ], 422);
+            }
+        }
+
         return response()->json([
             'cedula' => $persona->CIInfPer,
             'nombre_completo' => "{$persona->NombInfPer} {$persona->ApellInfPer} {$persona->ApellMatInfPer}",
-            'tipo' => $docente ? 'doc' : 'est'
+            'tipo' => $tipo
         ]);
     }
-    public function reemplazarIntegrante(Request $request)
+    public function guardarCambios(Request $request)
     {
-        return DB::transaction(function () use ($request) {
-            // 1. Actualizar integrante actual
-            $actual = Invi_detalle_integrante::findOrFail($request->id_detalle_actual);
-            $actual->update([
-                'reemplazado' => 1,
-                'id_funcion' => null,
-                'horas' => 0
-            ]);
+        try {
+            DB::beginTransaction();
 
-            // 2. Crear nuevo integrante
-            $nuevo = new Invi_detalle_integrante();
-            $nuevo->proyect_id = $actual->proyect_id;
-            if ($request->tipo === 'doc') {
-                $nuevo->ciinfper_doc = $request->cedula;
+            $modo = $request->modo; // 'nuevo' o 'editar'
+            $form = $request->form;
+            $reemplazoConfig = $request->reemplazo_config;
+
+            if ($modo === 'nuevo') {
+                // Validar que no se agregue Director/Subdirector si ya existen
+                if (in_array($form['id_funcion'], [1, 2])) {
+                    $existe = Invi_detalle_integrante::where('proyect_id', $request->proyect_id)
+                        ->where('id_funcion', $form['id_funcion'])
+                        ->where('reemplazado', 0)
+                        ->exists();
+                    if ($existe) return response()->json(['message' => 'Ya existe un directivo activo.'], 422);
+                }
+
+                Invi_detalle_integrante::create([
+                    'proyect_id'    => $request->proyect_id,
+                    'ciinfper_doc'  => $form['tipo_nuevo'] == 'doc' ? $form['cedula_nueva'] : null,
+                    'ciinfper_est'  => $form['tipo_nuevo'] == 'est' ? $form['cedula_nueva'] : null,
+                    'horas'         => $form['horas'],
+                    'reemplazado'   => 0,
+                    'id_funcion'    => $form['id_funcion'],
+                    'idCarr'        => $form['idCarr'],
+                    'anexo_integrante' => $form['anexo_integrante'],
+                ]);
             } else {
-                $nuevo->ciinfper_est = $request->cedula;
-            }
-            $nuevo->horas = $request->horas;
-            $nuevo->id_funcion = $request->id_funcion;
-            $nuevo->idCarr = $request->idCarr;
-            $nuevo->reemplazado = 0;
-            $nuevo->save();
+                // MODO EDICIÓN
+                $registroOriginal = Invi_detalle_integrante::findOrFail($request->id_deta_invi_proyect);
 
-            return response()->json(['message' => 'Reemplazo exitoso']);
-        });
+                if ($form['reemplazado'] == 1) {
+                    // 1. El registro actual se marca como reemplazado
+                    if ($reemplazoConfig['mantener_docente']) {
+                        // Se queda: Actualizamos su función a la nueva elegida
+                        $registroOriginal->update([
+                            'reemplazado' => 1,
+                            'id_funcion'  => $reemplazoConfig['nueva_funcion_reemplazado'],
+                            'horas'       => $reemplazoConfig['nuevas_horas_reemplazado'] ?? 0
+                        ]);
+                    } else {
+                        // No se queda: Función null, horas 0
+                        $registroOriginal->update([
+                            'reemplazado' => 1,
+                            'id_funcion'  => null,
+                            'horas'       => 0
+                        ]);
+                    }
+
+                    // 2. Crear el NUEVO integrante que entra
+                    Invi_detalle_integrante::create([
+                        'proyect_id'    => $request->proyect_id,
+                        'ciinfper_doc'  => $form['tipo_nuevo'] == 'doc' ? $form['cedula_nueva'] : null,
+                        'ciinfper_est'  => $form['tipo_nuevo'] == 'est' ? $form['cedula_nueva'] : null,
+                        'horas'         => $form['horas'],
+                        'reemplazado'   => 0,
+                        'id_funcion'    => $form['id_funcion'],
+                        'idCarr'        => $form['idCarr'],
+                        'anexo_integrante' => $form['anexo_integrante'],
+                    ]);
+                } else {
+                    // Edición simple sin reemplazo
+                    $registroOriginal->update([
+                        'id_funcion' => $form['id_funcion'],
+                        'idCarr'     => $form['idCarr'],
+                        'horas'      => $form['horas']
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json(['status' => true]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
     public function catalogos()
     {
+        $facultad = ['1', '2', '3', '4', '5', '11'];
+
         return response()->json([
             'funciones' => Invi_funcion::where('estado', 1)
                 ->where('tipo_funcion', '=', 'VINCULACIÓN')
                 ->get(),
-            'carreras' => Carreras::where('StatusCarr', 1)
+            'carreras' => Carreras::where('StatusCarr', '=', 1)
+                ->wherein('idfacultad', $facultad)
                 ->where('NombCarr', 'NOT LIKE', '%TRABAJO DE INTEGRACIÓN CURRICULAR%')
                 ->get(),
         ]);
     }
-    public function actualizarIntegrante(Request $request, $id)
-    {
-        $integrante = Invi_detalle_integrante::findOrFail($id);
 
-        $integrante->update([
-            'horas' => $request->horas,
-            'id_funcion' => $request->id_funcion,
-            'idCarr' => $request->idCarr,
-            'reemplazado' => $request->reemplazado ?? 0
-        ]);
-
-        return response()->json(['message' => 'Información actualizada con éxito']);
-    }
     public function inhabilitar(Request $request)
     {
         $integrante = Invi_detalle_integrante::findOrFail($request->id);
@@ -257,40 +333,60 @@ class Invi_proyectosController extends Controller
 
         return response()->json(['message' => 'Integrante inhabilitado correctamente']);
     }
-    public function reemplazar(Request $request)
+    public function uploadArchivo(Request $request)
     {
-        return DB::transaction(function () use ($request) {
-            // 1. Procesar al integrante que sale (el actual)
-            $actual = Invi_detalle_integrante::findOrFail($request->id_detalle_actual);
-            $actual->update([
-                'reemplazado' => 1,
-                'id_funcion' => null,
-                'horas' => 0
-            ]);
+        $request->validate([
+            'file' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:10240', // 10MB
+            'ci' => 'required|alpha_dash',
+            'old_filename' => 'nullable|string',
+        ]);
 
-            // 2. Crear al nuevo integrante (el reemplazo)
-            // Validamos si es docente o estudiante según el 'tipo' enviado desde Vue
-            $nuevo = new Invi_detalle_integrante();
-            $nuevo->proyect_id = $actual->proyect_id;
-
-            if ($request->nuevo['tipo'] === 'doc') {
-                $nuevo->ciinfper_doc = $request->nuevo['cedula'];
-                $nuevo->ciinfper_est = null;
-            } else {
-                $nuevo->ciinfper_est = $request->nuevo['cedula'];
-                $nuevo->ciinfper_doc = null;
+        try {
+            $ci = basename($request->ci);
+            $file = $request->file('file');
+            if (!$file->isValid()) {
+                throw new \Exception("Archivo inválido o corrupto.");
+            }
+            if ($request->filled('old_filename')) {
+                $oldFilename = basename($request->old_filename); // Seguridad extra
+                $oldPath = public_path("Documentos/Vinculación/AnexoIntegrante/{$ci}/{$oldFilename}");
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
             }
 
-            $nuevo->horas = $request->nuevo['horas'];
-            $nuevo->id_funcion = $request->nuevo['id_funcion'];
-            $nuevo->idCarr = $request->nuevo['idCarr'];
-            $nuevo->reemplazado = 0; // El nuevo entra activo
-            $nuevo->save();
+            // Crear carpeta si no existe
+            $directory = public_path("Documentos/Vinculación/AnexoIntegrante/{$ci}");
+
+            if (!File::exists($directory)) {
+                File::makeDirectory($directory, 0755, true, true);
+            }
+
+            // Generar nombre: CI + _ + aleatorio + _ + fecha (Ymd_His)
+            $aleatorio = bin2hex(random_bytes(8)); // 16 caracteres hex
+            $fechaHora = date("Ymd_His");          // Ej: 20251112_1741
+            $extension = $file->getClientOriginalExtension(); // pdf
+
+            $filename = "{$ci}_{$aleatorio}_{$fechaHora}.{$extension}";
+
+            // Guardar archivo
+            $file->move($directory, $filename);
+
+            // URL pública
+            $url = url('Documentos/Vinculación/AnexoIntegrante/' . $ci . '/' . $filename);
 
             return response()->json([
-                'message' => 'Reemplazo procesado correctamente',
-                'nuevo_id' => $nuevo->id_deta_invi_proyect
+                'status'   => true,
+                'filename' => $filename,
+                'url'      => $url
             ]);
-        });
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status'  => false,
+                'message' => 'Seguridad: El archivo no pudo ser procesado.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 }

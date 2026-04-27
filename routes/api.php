@@ -57,16 +57,20 @@ Route::prefix('vin')->group(function () {
     Route::apiResource("invi_proyectos", Invi_proyectosController::class);
     //definción de ruta para el catalogo de integrantes
     Route::get('catalogos-integrantes', [Invi_proyectosController::class, 'catalogos']);
+    Route::put('actualizar-integrante/{id}', [Invi_proyectosController::class, 'actualizarIntegrante']);
     //Definición de la ruta para buscar integrantes
-    Route::get('buscar-integrantes/{cedula}', [Invi_proyectosController::class, 'buscarIntegrante']);
+    Route::get('buscar-integrantes', [Invi_proyectosController::class, 'buscarIntegrante']);
     //Definición de la ruta para inhabilitar un integrante
-    Route::post('inhabilitar-integrante/{id}', [Invi_proyectosController::class, 'habilitar']);
+    Route::post('inhabilitar-integrante', [Invi_proyectosController::class, 'inhabilitar']);
     //Definición de la ruta para reemplazar un integrante
     Route::post('reemplazar-integrante', [Invi_proyectosController::class, 'reemplazarIntegrante']);
     //Definicion para obtener foto del estudiante
     Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFoto']);
     //Definicion para obtener la foto del docente
     Route::get('getFotoDocente/{ci}', [InformacionPersonalController::class, 'getFotoDocente']);
+    //Definición de ruta para subir un archivo
+    Route::post('subir_archivo_anexo', [Invi_proyectosController::class, 'uploadArchivo']);
+    Route::post('integrantes/guardar', [Invi_proyectosController::class, 'guardarCambios']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api')->group(function () {
