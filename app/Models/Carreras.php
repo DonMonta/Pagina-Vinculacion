@@ -62,9 +62,18 @@ class Carreras extends Model
         'fechaaprobacion' => 'datetime',
         'duracion' => 'integer'
     ];
-
-    public function facultad()
+    public function invi_detalle_integrante()
     {
-        return $this->belongsTo('App\Models\Facultad', 'idfacultad', 'idFacultad');
+        return $this->hasMany(Invi_detalle_integrante::class, 'idCarr');
     }
+    public function sede()
+    {
+        return $this->belongsTo(Sede::class, 'idsede', 'idsede');
+    }
+    public function facultades()
+    {
+        return $this->hasMany(Facultad::class, 'idfacultad', 'idfacultad');
+    }
+
+   
 }

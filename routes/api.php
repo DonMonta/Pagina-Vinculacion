@@ -10,6 +10,8 @@ use App\Http\Controllers\Objetivos_peiController;
 use App\Http\Controllers\PlandneController;
 use App\Http\Controllers\Obj_pol_plandneController;
 use App\Http\Controllers\Politicas_plandneController;
+use App\Http\Controllers\Invi_proyectosController;
+use App\Http\Controllers\InformacionPersonalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +53,20 @@ Route::prefix('vin')->group(function () {
     Route::apiResource("politicas_plandne", Politicas_plandneController::class);
     //Definición de ruta endpoint para listar las politicas de un plandne
     Route::get('politicas_por_plandne/{id_pladne}', [Politicas_plandneController::class, 'listarPorPlandne']);
+    //Definición de ruta endpoint para el recurso Invi_proyectos, perimitiendo operaciones CRUD
+    Route::apiResource("invi_proyectos", Invi_proyectosController::class);
+    //definción de ruta para el catalogo de integrantes
+    Route::get('catalogos-integrantes', [Invi_proyectosController::class, 'catalogos']);
+    //Definición de la ruta para buscar integrantes
+    Route::get('buscar-integrantes/{cedula}', [Invi_proyectosController::class, 'buscarIntegrante']);
+    //Definición de la ruta para inhabilitar un integrante
+    Route::post('inhabilitar-integrante/{id}', [Invi_proyectosController::class, 'habilitar']);
+    //Definición de la ruta para reemplazar un integrante
+    Route::post('reemplazar-integrante', [Invi_proyectosController::class, 'reemplazarIntegrante']);
+    //Definicion para obtener foto del estudiante
+    Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFoto']);
+    //Definicion para obtener la foto del docente
+    Route::get('getFotoDocente/{ci}', [InformacionPersonalController::class, 'getFotoDocente']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api')->group(function () {

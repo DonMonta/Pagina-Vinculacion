@@ -29,12 +29,20 @@ class Facultad extends Model
         'idfacultad' => 'integer',
         'idsede' => 'integer',
     ];
-    public function carreras()
+    public function facultades_priori()
     {
-        return $this->hasMany('App\Models\Carreras', 'idfacultad', 'idfacultad');
+        return $this->hasMany(Invi_detalle_fac_proy::class, 'id_facultad_priori');
+    }
+    public function facultades()
+    {
+        return $this->hasMany(Invi_detalle_fac_proy::class, 'idfacultad');
+    }
+    public function carreras(){
+        return $this->hasMany(Carreras::class, 'idfacultad', 'idfacultad');
     }
     public function sede()
     {
-        return $this->belongsTo('App\Models\Sede', 'idsede', 'idsede');
+        return $this->belongsTo(Sede::class, 'idsede', 'idsede');
     }
+    
 }
