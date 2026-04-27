@@ -108,7 +108,35 @@ class Invi_proyectosController extends Controller
             'invi_detalle_integrante.informacionpersonal'
         ])->findOrFail($id);
 
-        return response()->json($proyecto);
+        // 1. Extraer la facultad prioritaria (solo la primera que encuentre, ya que es la misma para el proyecto)
+        // Usamos optional() por si por alguna razón no hay registros aún.
+        $facultadPrincipal = $proyecto->invi_detalle_fac_proy
+            ->whereNotNull('id_facultad_priori')
+            ->first()?->facultades_priori;
+
+        // 2. Extraer todas las facultades participantes de forma única
+        // Mapeamos para obtener solo el objeto de la facultad y eliminamos duplicados por su ID
+        $facultadesParticipantes = $proyecto->invi_detalle_fac_proy
+            ->map(function ($detalle) {
+                return $detalle->facultades;
+            })
+            ->filter() // Elimina nulos si los hubiera
+            ->unique('idfacultad')
+            ->values(); // Reindexa el array
+
+        // 3. Formatear la respuesta JSON
+        return response()->json([
+            'proyect_id' => $proyecto->proyect_id,
+            'proyect_nombre' => $proyecto->proyect_nombre,
+            'proyect_titulo' => $proyecto->proyect_titulo,
+            'fechainicio' => $proyecto->fechainicio,
+            'fechafin' => $proyecto->fechafin,
+            // Agregamos los campos limpios
+            'facultades_priori' => $facultadPrincipal,
+            'facultades' => $facultadesParticipantes,
+            // Los integrantes los pasamos tal cual
+            'invi_detalle_integrante' => $proyecto->invi_detalle_integrante
+        ]);
     }
 
     /**
@@ -149,7 +177,7 @@ class Invi_proyectosController extends Controller
     public function buscarIntegrante(Request $request)
     {
         $cedula = $request->cedula;
-        
+
         // Buscar en ambas tablas de información personal
         $docente = InformacionPersonalD::where('CIInfPer', $cedula)->first();
         $estudiante = InformacionPersonal::where('CIInfPer', $cedula)->first();
@@ -197,17 +225,17 @@ class Invi_proyectosController extends Controller
     {
         return response()->json([
             'funciones' => Invi_funcion::where('estado', 1)
-            ->where('tipo_funcion', '=', 'VINCULACIÓN')
-            ->get(),
+                ->where('tipo_funcion', '=', 'VINCULACIÓN')
+                ->get(),
             'carreras' => Carreras::where('StatusCarr', 1)
-            ->where('NombCarr', 'NOT LIKE', '%TRABAJO DE INTEGRACIÓN CURRICULAR%')
-            ->get(),
+                ->where('NombCarr', 'NOT LIKE', '%TRABAJO DE INTEGRACIÓN CURRICULAR%')
+                ->get(),
         ]);
     }
     public function actualizarIntegrante(Request $request, $id)
     {
         $integrante = Invi_detalle_integrante::findOrFail($id);
-        
+
         $integrante->update([
             'horas' => $request->horas,
             'id_funcion' => $request->id_funcion,
@@ -244,7 +272,7 @@ class Invi_proyectosController extends Controller
             // Validamos si es docente o estudiante según el 'tipo' enviado desde Vue
             $nuevo = new Invi_detalle_integrante();
             $nuevo->proyect_id = $actual->proyect_id;
-            
+
             if ($request->nuevo['tipo'] === 'doc') {
                 $nuevo->ciinfper_doc = $request->nuevo['cedula'];
                 $nuevo->ciinfper_est = null;
@@ -265,5 +293,4 @@ class Invi_proyectosController extends Controller
             ]);
         });
     }
-
 }
