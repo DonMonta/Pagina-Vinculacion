@@ -142,18 +142,17 @@
                         <div class="p-4 rounded-xl bg-brand-50 border border-brand-100 dark:bg-brand-500/5">
                             <h4 class="text-xs font-bold uppercase text-brand-600 mb-2">Facultad Principal (Prioritaria)
                             </h4>
-                            <p class="text-sm font-medium"
-                                v-for="fac in proyectoSeleccionado.invi_detalle_fac_proy.filter(f => f.facultades_priori)"
-                                :key="fac.id_det_fac">
-                                {{ fac.facultades_priori?.siglas }}
+                            <p class="text-sm font-medium text-gray-800 dark:text-white">
+                                {{ proyectoSeleccionado.facultades_priori?.siglas || 'No asignada' }}
                             </p>
                         </div>
+
                         <div class="p-4 rounded-xl bg-gray-50 border border-gray-100 dark:bg-gray-800">
                             <h4 class="text-xs font-bold uppercase text-gray-500 mb-2">Facultades Participantes</h4>
                             <div class="flex flex-wrap gap-2">
-                                <span v-for="fac in proyectoSeleccionado.invi_detalle_fac_proy" :key="fac.id_det_fac"
-                                    class="px-2 py-1 bg-white dark:bg-gray-700 rounded border text-xs">
-                                    {{ fac.facultades.siglas }}
+                                <span v-for="fac in proyectoSeleccionado.facultades" :key="fac.idfacultad"
+                                    class="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 text-xs font-semibold text-gray-600 dark:text-gray-300">
+                                    {{ fac.siglas }}
                                 </span>
                             </div>
                         </div>
@@ -245,7 +244,7 @@
                                         {{ int.informacion_personal_d?.NombInfPer || int.informacionpersonal?.NombInfPer
                                         }}
                                         {{ int.informacion_personal_d?.ApellInfPer ||
-                                        int.informacionpersonal?.ApellInfPer }}
+                                            int.informacionpersonal?.ApellInfPer }}
                                     </td>
                                     <td class="p-3 text-center">{{ int.horas }}</td>
                                     <td class="p-3 text-center">
@@ -265,7 +264,7 @@
                         </table>
                     </div>
 
-                    
+
                 </div>
             </div>
         </div>
@@ -352,8 +351,6 @@ export default {
                 ]);
                 this.proyectoSeleccionado = resProj.data;
                 console.log(resProj);
-                const facultades = resProj.data.invi_detalle_fac_proy.map(f => f.facultades_priori.siglas);
-                console.log('Facultades:', facultades);
                 this.funciones = resCat.data.funciones;
                 this.carreras = resCat.data.carreras;
                 this.showModalDetalles = true;
