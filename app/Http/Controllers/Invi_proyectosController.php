@@ -232,9 +232,10 @@ class Invi_proyectosController extends Controller
         try {
             DB::beginTransaction();
 
-            $modo = $request->modo; // 'nuevo' o 'editar'
+            $modo = $request->modo;
             $form = $request->form;
             $reemplazoConfig = $request->reemplazo_config;
+            $proyect_id = $request->proyect_id;
 
             if ($modo === 'nuevo') {
                 // Validar que no se agregue Director/Subdirector si ya existen
@@ -247,7 +248,7 @@ class Invi_proyectosController extends Controller
                 }
 
                 Invi_detalle_integrante::create([
-                    'proyect_id'    => $request->proyect_id,
+                    'proyect_id'    => $proyect_id,
                     'ciinfper_doc'  => $form['tipo_nuevo'] == 'doc' ? $form['cedula_nueva'] : null,
                     'ciinfper_est'  => $form['tipo_nuevo'] == 'est' ? $form['cedula_nueva'] : null,
                     'horas'         => $form['horas'],
@@ -261,16 +262,14 @@ class Invi_proyectosController extends Controller
                 $registroOriginal = Invi_detalle_integrante::findOrFail($request->id_deta_invi_proyect);
 
                 if ($form['reemplazado'] == 1) {
-                    // 1. El registro actual se marca como reemplazado
+                    // 1. Procesar al que SALE (Registro Original)
                     if ($reemplazoConfig['mantener_docente']) {
-                        // Se queda: Actualizamos su función a la nueva elegida
                         $registroOriginal->update([
                             'reemplazado' => 1,
                             'id_funcion'  => $reemplazoConfig['nueva_funcion_reemplazado'],
                             'horas'       => $reemplazoConfig['nuevas_horas_reemplazado'] ?? 0
                         ]);
                     } else {
-                        // No se queda: Función null, horas 0
                         $registroOriginal->update([
                             'reemplazado' => 1,
                             'id_funcion'  => null,
@@ -278,23 +277,43 @@ class Invi_proyectosController extends Controller
                         ]);
                     }
 
-                    // 2. Crear el NUEVO integrante que entra
-                    Invi_detalle_integrante::create([
-                        'proyect_id'    => $request->proyect_id,
-                        'ciinfper_doc'  => $form['tipo_nuevo'] == 'doc' ? $form['cedula_nueva'] : null,
-                        'ciinfper_est'  => $form['tipo_nuevo'] == 'est' ? $form['cedula_nueva'] : null,
+                    // 2. Procesar al que ENTRA (El reemplazo)
+                    $cedulaNueva = $form['cedula_nueva'];
+
+                    // BUSCAMOS si esta persona ya estaba en el proyecto (aunque sea con otro rol)
+                    $integranteExistente = Invi_detalle_integrante::where('proyect_id', $proyect_id)
+                        ->where(function ($q) use ($cedulaNueva) {
+                            $q->where('ciinfper_doc', $cedulaNueva)
+                                ->orWhere('ciinfper_est', $cedulaNueva);
+                        })
+                        ->first();
+
+                    $datosNuevoRol = [
+                        'proyect_id'    => $proyect_id,
+                        'ciinfper_doc'  => $form['tipo_nuevo'] == 'doc' ? $cedulaNueva : null,
+                        'ciinfper_est'  => $form['tipo_nuevo'] == 'est' ? $cedulaNueva : null,
                         'horas'         => $form['horas'],
-                        'reemplazado'   => 0,
+                        'reemplazado'   => 0, // El nuevo rol siempre entra como activo
                         'id_funcion'    => $form['id_funcion'],
                         'idCarr'        => $form['idCarr'],
                         'anexo_integrante' => $form['anexo_integrante'],
-                    ]);
+                    ];
+
+                    if ($integranteExistente) {
+                        // SI YA EXISTÍA: Lo actualizamos en lugar de crear uno nuevo
+                        $integranteExistente->update($datosNuevoRol);
+                    } else {
+                        // SI NO EXISTÍA: Lo creamos
+                        Invi_detalle_integrante::create($datosNuevoRol);
+                    }
                 } else {
                     // Edición simple sin reemplazo
                     $registroOriginal->update([
                         'id_funcion' => $form['id_funcion'],
                         'idCarr'     => $form['idCarr'],
-                        'horas'      => $form['horas']
+                        'horas'      => $form['horas'],
+                        'anexo_integrante' => $form['anexo_integrante'],
+                        'reemplazado' => 0
                     ]);
                 }
             }
