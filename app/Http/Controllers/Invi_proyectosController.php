@@ -109,34 +109,44 @@ class Invi_proyectosController extends Controller
             'invi_detalle_integrante.informacionpersonal'
         ])->findOrFail($id);
 
-        // 1. Extraer la facultad prioritaria (solo la primera que encuentre, ya que es la misma para el proyecto)
-        // Usamos optional() por si por alguna razón no hay registros aún.
+        // 1. Extraer la facultad prioritaria
         $facultadPrincipal = $proyecto->invi_detalle_fac_proy
             ->whereNotNull('id_facultad_priori')
             ->first()?->facultades_priori;
 
-        // 2. Extraer todas las facultades participantes de forma única
-        // Mapeamos para obtener solo el objeto de la facultad y eliminamos duplicados por su ID
+        // 2. Extraer todas las facultades participantes
         $facultadesParticipantes = $proyecto->invi_detalle_fac_proy
-            ->map(function ($detalle) {
-                return $detalle->facultades;
-            })
-            ->filter() // Elimina nulos si los hubiera
+            ->map(fn($detalle) => $detalle->facultades)
+            ->filter()
             ->unique('idfacultad')
-            ->values(); // Reindexa el array
+            ->values();
 
-        // 3. Formatear la respuesta JSON
+        // 3. Ordenar integrantes por nombre de la función
+        $integrantesOrdenados = $proyecto->invi_detalle_integrante->sortBy(function ($integrante) {
+            // Obtenemos el nombre de la función en mayúsculas para evitar problemas de case-sensitivity
+            $nombreFuncion = strtoupper($integrante->funciones?->nombre_funcion ?? '');
+
+            // Retornamos un peso numérico basado en el texto
+            return match (true) {
+                str_contains($nombreFuncion, 'DIRECTOR') && !str_contains($nombreFuncion, 'SUB') => 10,
+                str_contains($nombreFuncion, 'SUBDIRECTOR') => 20,
+                str_contains($nombreFuncion, 'DOCENTE') => 30,
+                str_contains($nombreFuncion, 'ESTUDIANTE') => 100,
+                empty($nombreFuncion) => 999, // Integrantes sin función (reemplazados)
+                default => 50, // Cualquier otra función intermedia
+            };
+        })->values();
+
+        // 4. Formatear la respuesta JSON
         return response()->json([
-            'proyect_id' => $proyecto->proyect_id,
-            'proyect_nombre' => $proyecto->proyect_nombre,
-            'proyect_titulo' => $proyecto->proyect_titulo,
-            'fechainicio' => $proyecto->fechainicio,
-            'fechafin' => $proyecto->fechafin,
-            // Agregamos los campos limpios
+            'proyect_id'      => $proyecto->proyect_id,
+            'proyect_nombre'  => $proyecto->proyect_nombre,
+            'proyect_titulo'  => $proyecto->proyect_titulo,
+            'fechainicio'     => $proyecto->fechainicio,
+            'fechafin'        => $proyecto->fechafin,
             'facultades_priori' => $facultadPrincipal,
-            'facultades' => $facultadesParticipantes,
-            // Los integrantes los pasamos tal cual
-            'invi_detalle_integrante' => $proyecto->invi_detalle_integrante
+            'facultades'      => $facultadesParticipantes,
+            'invi_detalle_integrante' => $integrantesOrdenados
         ]);
     }
 
