@@ -608,7 +608,7 @@ export default {
                 horas: int.horas,
                 id_funcion: int.id_funcion,
                 idCarr: int.idCarr,
-                reemplazado: int.reemplazado,
+                reemplazado: 0,
                 anexo_integrante: int.anexo_integrante,
                 // Campos para el que se queda:
                 id_funcion_reemplazado: null,
@@ -724,7 +724,7 @@ export default {
 
                 if (res.data.status) {
                     mostraralertas2("Cambios guardados correctamente", "success");
-                    //this.cerraModal(); // O recargar la lista
+                    this.cancelarEdicion() // O recargar la lista
                     this.abrirDetallesProyecto(this.proyectoSeleccionado.proyect_id);
                     // Aquí deberías refrescar la lista de integrantes del proyecto
                 }
