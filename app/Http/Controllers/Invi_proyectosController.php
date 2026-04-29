@@ -19,7 +19,7 @@ class Invi_proyectosController extends Controller
      */
     public function index(Request $request)
     {
-        try {
+        try {// 1. Obtener parámetros de búsqueda y paginación
             $searchQuery = $request->input('search_query');
             $query = Invi_proyectos::select(
                 'invi_proyectos.*'
