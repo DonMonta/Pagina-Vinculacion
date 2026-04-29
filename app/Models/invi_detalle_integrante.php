@@ -11,7 +11,6 @@ class invi_detalle_integrante extends Model
     protected $primaryKey = 'id_deta_invi_proyect';
     public $incrementing = false;
     protected $keyType = 'int';
-    public $timestamps = false;
 
     protected $fillable = [
         'proyect_id',

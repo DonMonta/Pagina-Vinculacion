@@ -79,6 +79,43 @@ class Invi_proyectosController extends Controller
             return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
+    public function getStats()
+    {
+        try {
+            // 1. Total de proyectos de Vinculación
+            $totalProyectos = Invi_proyectos::where('proyect_tipo', 'VINCULACIÓN')->count();
+
+            // Query base para integrantes activos en proyectos de vinculación
+            $baseIntegrantes = invi_detalle_integrante::where('reemplazado', 0)
+                ->whereHas('invi_proyectos', function ($query) {
+                    $query->where('proyect_tipo', 'VINCULACIÓN');
+                });
+
+            // 2. Contamos por nombre de función (usando tu lógica semántica)
+            $statsIntegrantes = $baseIntegrantes->with('funciones')
+                ->get()
+                ->groupBy(function ($item) {
+                    $nombre = strtoupper($item->funciones->nombre_funcion ?? '');
+                    if (str_contains($nombre, 'DIRECTOR') && !str_contains($nombre, 'SUB')) return 'director';
+                    if (str_contains($nombre, 'SUBDIRECTOR')) return 'subdirector';
+                    if (str_contains($nombre, 'DOCENTE PARTICIPANTE')) return 'docente';
+                    return 'otros';
+                });
+
+            return response()->json([
+                'status' => true,
+                'stats' => [
+                    'total_proyectos' => $totalProyectos,
+                    'total_directores' => $statsIntegrantes->get('director', collect())->count(),
+                    'total_subdirectores' => $statsIntegrantes->get('subdirector', collect())->count(),
+                    'total_docentes' => $statsIntegrantes->get('docente', collect())->count(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -246,15 +283,21 @@ class Invi_proyectosController extends Controller
             $form = $request->form;
             $reemplazoConfig = $request->reemplazo_config;
             $proyect_id = $request->proyect_id;
+            // Buscamos la función que se intenta asignar
+            $funcionSolicitada = Invi_funcion::find($form['id_funcion']);
+            $nombreUpper = strtoupper($funcionSolicitada?->nombre_funcion ?? '');
+
+            // Verificamos si es Director o Subdirector por texto
+            $esDirectivo = str_contains($nombreUpper, 'DIRECTOR');
 
             if ($modo === 'nuevo') {
                 // Validar que no se agregue Director/Subdirector si ya existen
-                if (in_array($form['id_funcion'], [1, 2])) {
+                if ($esDirectivo) {
                     $existe = Invi_detalle_integrante::where('proyect_id', $request->proyect_id)
                         ->where('id_funcion', $form['id_funcion'])
                         ->where('reemplazado', 0)
                         ->exists();
-                    if ($existe) return response()->json(['message' => 'Ya existe un directivo activo.'], 422);
+                    if ($existe) return response()->json(['message' => "Ya existe un {$funcionSolicitada->nombre_funcion} activo."], 422);
                 }
 
                 Invi_detalle_integrante::create([

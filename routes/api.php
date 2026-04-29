@@ -70,7 +70,10 @@ Route::prefix('vin')->group(function () {
     Route::get('getFotoDocente/{ci}', [InformacionPersonalController::class, 'getFotoDocente']);
     //Definición de ruta para subir un archivo
     Route::post('subir_archivo_anexo', [Invi_proyectosController::class, 'uploadArchivo']);
+    //Definición de endpoint para guardar/reemplazar un integrante (modo nuevo o reemplazo)
     Route::post('integrantes/guardar', [Invi_proyectosController::class, 'guardarCambios']);
+    //Definición de endpoint para obtener las estadísticas de proyectos y integrantes
+    Route::get('dashboard/stats', [Invi_proyectosController::class, 'getStats']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api')->group(function () {
