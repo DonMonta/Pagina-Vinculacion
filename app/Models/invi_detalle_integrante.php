@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class invi_detalle_integrante extends Model
+class Invi_detalle_integrante extends Model
 {
     protected $table = 'invi_detalle_integrante';
     protected $primaryKey = 'id_deta_invi_proyect';
