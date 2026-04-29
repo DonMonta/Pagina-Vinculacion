@@ -18,15 +18,32 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    public $table = "vin_users";
-    protected $primaryKey = 'user_id';
-    protected $keyType = 'int';
+    public $table = "usuario";
+    protected $primaryKey = 'LoginUsu';
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
-        'name',
+        'LoginUsu',
+        'StatusUsu',
+        'NombUsu',
         'email',
-        'password', 
-        'role', 
-        'estado', 
+        'movil',
+        'idperfil',
+        'ciinfper',
+        'idcarr',
+        'id_actdist',
+        'usa_biometrico',
+        'fecha_reg',
+        'fecha_ultimo_acceso',
+        'titulo',
+        'homologar',
+        'crearnota',
+        'posgrado',
+        'idcampus',
+        'inscribir',
+        'equivalencia',
+        'id_grupo',
+        'usuarioreg',
     ];
 
     /**
@@ -44,15 +61,14 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<string, string>
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
-    public function getJWTIdentifier(){
-        return $this->user_id;
+     public function getJWTIdentifier()
+    {
+        return $this->getKey();
     }
 
-    public function getJWTCustomClaims(){
+    public function getJWTCustomClaims()
+    {
         return [];
     }
+
 }
