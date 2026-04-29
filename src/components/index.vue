@@ -184,11 +184,11 @@
                 <div class="col-md-6 col-lg-6 col-xl-3">
                     <div class="team-item">
                         <div class="team-img rounded-top">
-                            <img src="@/assets/img/img/avatar/belen.png" class="img-fluid w-100 rounded-top bg-light"
+                            <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top bg-light"
                                 alt="">
                         </div>
                         <div class="team-text rounded-bottom text-center p-4">
-                            <h3 class="text-white">Dra. Belén Amador Rodríguez, PhD</h3>
+                            <h3 class="text-white">--</h3>
                             <p class="mb-0 text-white">Director de Vinculación con la Sociedad</p>
                         </div>
                         <div class="team-social">

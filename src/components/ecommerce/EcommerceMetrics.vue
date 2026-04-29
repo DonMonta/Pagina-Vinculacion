@@ -1,88 +1,128 @@
 <template>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-      <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-        <svg class="fill-gray-800 dark:fill-white/90" width="24" height="24" viewBox="0 0 24 24">
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.39 2.1-1.39 1.47 0 2.01.59 2.06 1.47h1.73c-.05-1.55-1.01-2.67-2.61-3.03V5h-2.13v1.51c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.47H8.33c.08 1.63 1.22 2.71 2.85 3.09V19h2.13v-1.51c1.55-.32 2.81-1.21 2.81-2.81 0-2.18-1.89-2.69-3.82-3.21z" />
-        </svg>
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 w-full">
+    
+    <div v-for="card in statCards" :key="card.title" 
+      class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-white/[0.03]">
+      
+      <div :class="`absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-10 transition-transform duration-500 group-hover:scale-150 ${card.iconBg}`"></div>
+
+      <div class="relative flex items-center justify-between">
+        <div :class="`flex h-14 w-14 items-center justify-center rounded-2xl shadow-inner transition-colors duration-300 ${card.bgColor} ${card.iconColor}`">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide">
+            <path :d="card.svgPath" />
+            <circle v-if="card.svgCircle" :cx="card.svgCircle.cx" :cy="card.svgCircle.cy" :r="card.svgCircle.r" />
+          </svg>
+        </div>
+
+        <div class="flex flex-col items-end">
+          <span class="flex h-3 w-3">
+            <span :class="`absolute inline-flex h-3 w-3 animate-ping rounded-full opacity-75 ${card.dotColor}`"></span>
+            <span :class="`relative inline-flex h-3 w-3 rounded-full ${card.dotColor}`"></span>
+          </span>
+        </div>
       </div>
 
-      <div class="flex items-end justify-between mt-5">
+      <div class="relative mt-6 flex items-baseline justify-between">
         <div>
-          <span class="text-sm text-gray-500 dark:text-gray-400">Total Ventas</span>
-          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-            ${{ stats.total_ventas.toLocaleString('en-US', { minimumFractionDigits: 2 }) }}
+          <p class="text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+            {{ card.title }}
+          </p>
+          <h4 class="mt-2 text-3xl font-black text-gray-900 dark:text-white">
+            <span v-if="loading" class="inline-block h-8 w-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></span>
+            <span v-else>{{ card.value }}</span>
           </h4>
         </div>
-        <span class="text-xs font-medium text-success-600 bg-success-50 rounded-full px-2 py-0.5">Hoy</span>
+      </div>
+
+      <div class="mt-4 h-1 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+        <div :class="`h-full transition-all duration-1000 ${card.barColor}`" :style="{ width: loading ? '0%' : '100%' }"></div>
       </div>
     </div>
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-      <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-        <svg class="fill-gray-800 dark:fill-white/90" width="24" height="24" viewBox="0 0 24 24">
-          <path
-            d="M13.0066 2.41456C12.3732 2.09786 11.6277 2.09786 10.9942 2.41456L4.03676 5.89319C3.27449 6.27432 2.79297 7.05342 2.79297 7.90566V16.0946C2.79297 16.9469 3.27448 17.726 4.03676 18.1071L10.9942 21.5857C11.6277 21.9024 12.3732 21.9024 13.0066 21.5857L19.9641 18.1071C20.7264 17.726 21.2079 16.9469 21.2079 16.0946V7.90566C21.2079 7.05342 20.7264 6.27432 19.9641 5.89319L13.0066 2.41456Z" />
-        </svg>
-      </div>
-
-      <div class="flex items-end justify-between mt-5">
-        <div>
-          <span class="text-sm text-gray-500 dark:text-gray-400">Pedidos Totales</span>
-          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-            {{ stats.total_pedidos }}
-          </h4>
-        </div>
-        <span class="text-xs font-medium text-gray-600 bg-gray-50 rounded-full px-2 py-0.5">Global</span>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
 import API from "@/assets/js/services/axios";
+
 export default {
   name: 'DashboardStats',
   data() {
     return {
       stats: {
-        total_ventas: 0,
-        total_pedidos: 0
+        total_proyectos: 0,
+        total_directores: 0,
+        total_subdirectores: 0,
+        total_docentes: 0
       },
-      baseUrl: "/restrik",
-      pollingInterval: null,
+      baseUrl: "/vin",
       loading: true
     };
   },
-  unmounted() {
-    if (this.pollingInterval) clearInterval(this.pollingInterval);
-  },
-  mounted() {
-    this.pollingInterval = setInterval(() => {
-      this.actualizarSilenciosamente();
-    }, 10000);
-    this.fetchStats();
+  computed: {
+    statCards() {
+      return [
+        {
+          title: 'Proyectos',
+          value: this.stats.total_proyectos,
+          bgColor: 'bg-blue-100 dark:bg-blue-500/20',
+          iconBg: 'bg-blue-400',
+          iconColor: 'text-blue-600 dark:text-blue-400',
+          dotColor: 'bg-blue-500',
+          barColor: 'bg-blue-500',
+          svgPath: 'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zm18 0h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z' // Icono: Book/Project
+        },
+        {
+          title: 'Directores',
+          value: this.stats.total_directores,
+          bgColor: 'bg-emerald-100 dark:bg-emerald-500/20',
+          iconBg: 'bg-emerald-400',
+          iconColor: 'text-emerald-600 dark:text-emerald-400',
+          dotColor: 'bg-emerald-500',
+          barColor: 'bg-emerald-500',
+          svgPath: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2',
+          svgCircle: { cx: 9, cy: 7, r: 4 } // Icono: User
+        },
+        {
+          title: 'Subdirectores',
+          value: this.stats.total_subdirectores,
+          bgColor: 'bg-orange-100 dark:bg-orange-500/20',
+          iconBg: 'bg-orange-400',
+          iconColor: 'text-orange-600 dark:text-orange-400',
+          dotColor: 'bg-orange-500',
+          barColor: 'bg-orange-500',
+          svgPath: 'M17 21v-2a4 4 0 0 0-3-3.87M9 21v-2a4 4 0 0 1 3-3.87',
+          svgCircle: { cx: 12, cy: 7, r: 4 } // Icono: Users
+        },
+        {
+          title: 'Docentes',
+          value: this.stats.total_docentes,
+          bgColor: 'bg-purple-100 dark:bg-purple-500/20',
+          iconBg: 'bg-purple-400',
+          iconColor: 'text-purple-600 dark:text-purple-400',
+          dotColor: 'bg-purple-500',
+          barColor: 'bg-purple-500',
+          svgPath: 'M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20' // Icono: Teacher/Education
+        }
+      ];
+    }
   },
   methods: {
-    async actualizarSilenciosamente() {
-      try {
-        const response = await API.get(`${this.baseUrl}/dashboard/stats`);
-        this.stats = response.data;
-      } catch (error) {
-        console.warn("Error en actualización silenciosa", error);
-      }
-    },
     async fetchStats() {
       try {
         const response = await API.get(`${this.baseUrl}/dashboard/stats`);
-        this.stats = response.data;
+        if (response.data.status) {
+          this.stats = response.data.stats;
+        }
       } catch (error) {
-        console.error("Error al obtener estadísticas:", error);
+        console.error("Error stats:", error);
       } finally {
         this.loading = false;
       }
     }
+  },
+  mounted() {
+    this.fetchStats();
   }
 };
 </script>

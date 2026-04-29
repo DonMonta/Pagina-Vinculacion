@@ -17,13 +17,6 @@
                     </div>
                 </form>
             </div>
-
-            <div class="flex items-center gap-3">
-                <button @click="isProfileAddressModal = true"
-                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                    Añadir PEI
-                </button>
-            </div>
         </div>
 
         <div class="max-w-full overflow-x-auto custom-scrollbar">
@@ -237,7 +230,7 @@
                                             <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para
                                                 cargar</span>
                                             <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName
-                                            }}</span>
+                                                }}</span>
                                         </p>
                                         <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
                                     </div>
@@ -271,7 +264,8 @@
                                     <div>
                                         <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
                                             Función para el integrante saliente</label>
-                                        <select v-model="formInt.id_funcion_reemplazado" @change="calcularHorasReemplazo"
+                                        <select v-model="formInt.id_funcion_reemplazado"
+                                            @change="calcularHorasReemplazo"
                                             class="w-full border rounded-lg p-2 text-sm bg-white">
                                             <option :value="null">Seleccione nueva función</option>
                                             <option v-for="f in funcionesFiltradasSinDireccion" :key="f.id_funcion"
@@ -333,22 +327,32 @@
                                         <th class="p-3 text-center">Horas</th>
                                         <th class="p-3 text-center">Estado</th>
                                         <th class="p-3 text-left">Función / Carrera</th>
+                                        <th class="p-3 text-left">Registro / Act.</th>
+                                        <th class="p-3 text-center">Anexo</th>
                                         <th class="p-3 text-right">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm divide-y divide-gray-100 dark:divide-gray-800">
                                     <tr v-for="int in integrantesFiltrados" :key="int.id_deta_invi_proyect"
-                                        class="hover:bg-gray-50/50">
-                                        <td class="p-3 font-mono text-xs">{{ int.ciinfper_doc || int.ciinfper_est }}
+                                        class="hover:bg-gray-50/50 transition-colors">
+
+                                        <td class="p-3 font-mono text-xs text-gray-500">
+                                            {{ int.ciinfper_doc || int.ciinfper_est }}
                                         </td>
+
                                         <td class="p-3">
                                             <p class="font-bold text-gray-700 dark:text-gray-200">
                                                 {{ (int.informacion_personal_d || int.informacionpersonal)?.NombInfPer
-                                                }} {{ (int.informacion_personal_d ||
-                                                    int.informacionpersonal)?.ApellInfPer }}
+                                                }}
+                                                {{ (int.informacion_personal_d || int.informacionpersonal)?.ApellInfPer
+                                                }}
                                             </p>
                                         </td>
-                                        <td class="p-3 text-center font-bold text-blue-600">{{ int.horas }}h</td>
+
+                                        <td class="p-3 text-center font-bold text-blue-600">
+                                            {{ int.horas }}h
+                                        </td>
+
                                         <td class="p-3 text-center">
                                             <span
                                                 :class="int.reemplazado ? 'text-red-500 bg-red-50' : 'text-green-600 bg-green-50'"
@@ -356,16 +360,50 @@
                                                 {{ int.reemplazado ? 'Reemplazado' : 'Activo' }}
                                             </span>
                                         </td>
+
                                         <td class="p-3">
-                                            <p class="text-xs font-medium">{{ int.funciones?.nombre_funcion || '---' }}
+                                            <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                                {{ int.funciones?.nombre_funcion || '---' }}
                                             </p>
-                                            <p class="text-[10px] text-gray-400 truncate max-w-[150px]">{{
-                                                int.carreras?.NombCarr }}</p>
+                                            <p class="text-[10px] text-gray-400 truncate max-w-[150px]">
+                                                {{ int.carreras?.NombCarr }}
+                                            </p>
                                         </td>
+
+                                        <td class="p-3 whitespace-nowrap">
+                                            <div class="flex flex-col gap-1">
+                                                <div class="flex items-center gap-1 text-[10px] text-gray-500">
+                                                    <span class="font-bold text-blue-500">CRE:</span>
+                                                    {{ formatDate(int.created_at) }}
+                                                </div>
+                                                <div class="flex items-center gap-1 text-[10px] text-gray-400">
+                                                    <span class="font-bold text-orange-400">ACT:</span>
+                                                    {{ formatDate(int.updated_at) }}
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td class="p-3 text-center">
+                                            <div v-if="int.anexo_integrante" class="flex justify-center">
+                                                <a :href="`http://vinculacion.test/Documentos/Vinculación/AnexoIntegrante/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante}`"
+                                                    target="_blank"
+                                                    class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                                    title="Ver documento PDF">
+                                                    <svg width="18" height="18" fill="none" stroke="currentColor"
+                                                        stroke-width="2" viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                        <path d="M9 15h6M9 11h6" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                            <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
+                                        </td>
+
                                         <td class="p-3 text-right">
                                             <div class="flex justify-end gap-2">
                                                 <button @click="seleccionarIntegrante(int)"
-                                                    class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg">
+                                                    class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                                     <svg width="16" height="16" fill="none" stroke="currentColor"
                                                         stroke-width="2" viewBox="0 0 24 24">
                                                         <path
@@ -373,7 +411,7 @@
                                                     </svg>
                                                 </button>
                                                 <button @click="inhabilitarIntegrante(int)"
-                                                    class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg">
+                                                    class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                                                     <svg width="16" height="16" fill="none" stroke="currentColor"
                                                         stroke-width="2" viewBox="0 0 24 24">
                                                         <path
@@ -480,12 +518,34 @@ export default {
             });
         },
         funcionesFiltradasSinDireccion() {
-            // Asumiendo que 1 es Director y 2 es Subdirector (ajusta según tus IDs)
-            const idsDirectivos = [1, 2];
-            return this.funciones.filter(f => !idsDirectivos.includes(f.id_funcion));
+            return this.funciones.filter(f => {
+                const nombre = f.nombre_funcion.toUpperCase();
+                return !nombre.includes('DIRECTOR');
+            });
         },
     },
     methods: {
+        formatDate(date) {
+            if (!date) return '---';
+
+            const fecha = new Date(date);
+
+            // Formatear la fecha: "29 abr 2026"
+            const fechaLegible = fecha.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+
+            // Formatear la hora: "09:44 AM"
+            const horaLegible = fecha.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            return `${fechaLegible} - ${horaLegible}`;
+        },
         handleFileChange(event) {
             //Obtener el archivo seleccionado por el usuario
             const file = event.target.files[0];
@@ -677,9 +737,11 @@ export default {
                 return mostraralertas2("El documento de respaldo PDF es obligatorio.", "warning");
             }
 
-            // 2. Validación de Director/Subdirector (IDs 1=Director, 2=Subdirector - Ajustar según tu BD)
-            const funcionesBloqueadas = [1, 2];
-            if (funcionesBloqueadas.includes(this.formInt.id_funcion)) {
+            // 2. Validación de Director/Subdirector 
+            const funcionSeleccionada = this.funciones.find(f => f.id_funcion === this.formInt.id_funcion);
+            const nombreFun = funcionSeleccionada?.nombre_funcion.toUpperCase() || '';
+
+            if (nombreFun.includes('DIRECTOR')) {
                 const existeYa = this.integrantesFiltrados.find(i =>
                     i.id_funcion === this.formInt.id_funcion &&
                     i.reemplazado == 0 &&
@@ -687,7 +749,7 @@ export default {
                 );
 
                 if (existeYa) {
-                    return mostraralertas2(`Ya existe un ${existeYa.funciones.nombre_funcion} activo en este proyecto.`, "warning");
+                    return mostraralertas2(`Ya existe un ${funcionSeleccionada.nombre_funcion} activo en este proyecto.`, "warning");
                 }
             }
 

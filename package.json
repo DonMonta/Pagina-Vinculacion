@@ -33,6 +33,7 @@
     "vue-flipbook": "^1.0.0",
     "vue-pdf-flipbook": "^2.1.0",
     "vue-router": "^4.0.3",
+    "vue-shadow-dom": "^4.2.0",
     "vue3-apexcharts": "^1.11.1",
     "vue3-flipbook": "^1.0.4",
     "vuetify": "^3.8.4",

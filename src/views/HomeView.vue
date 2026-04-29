@@ -1,8 +1,5 @@
 <template>
-  
-   
     <index/>
- 
 </template>
 
 <script>

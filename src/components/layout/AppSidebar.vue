@@ -13,10 +13,10 @@
       'py-8 flex',
       !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start',
     ]">
-      <router-link to="/">
+      <router-link to="/site-admin">
         <img v-if="isExpanded || isHovered || isMobileOpen" class="dark:hidden" src="@/assets/img/logos.svg" alt="Logo"
           width="150" height="40" />
-        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block" src="/images/logo/logo-dark.svg"
+        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block" src="@/assets/img/logos.svg"
           alt="Logo" width="150" height="40" />
         <img v-else src="@/assets/img/logo-icon.svg" alt="Logo" width="32" height="32" />
       </router-link>
@@ -200,13 +200,13 @@ const menuGroups = [
           { name: "Lista de Proyectos", path: "/site-admin/proyectos", pro: false },
         ],
       },
-      {
+      /*{
         icon: MesaIcon,
         name: "Mesas",
         subItems: [
           //{ name: "Mesas Disponibles", path: "/mesas", pro: false },
         ],
-      },
+      },*/
      
       
     ],
