@@ -37,7 +37,7 @@ const { isExpanded, isHovered } = useSidebar()
 import { getMe } from '@/store/auth';
 export default {
   async mounted() {
-
+    await getMe();
     //const usuario = await getMe();
   },
 }

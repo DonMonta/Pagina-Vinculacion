@@ -11,8 +11,6 @@ export async function enviarsolilogin(method, parametros, url, mensaje) {
   //console.log(response);
 
     if (response.data && response.data.token) {
-      store.commit("setToken_vinc", response.data.token);
-      store.commit("setTokenType_vinc", response.data.token_type || "Bearer");
       if (response.data.error) {
         return {
           error: response.data.error,
@@ -20,34 +18,22 @@ export async function enviarsolilogin(method, parametros, url, mensaje) {
           mensaje: response.data.mensaje,
         };
       }
-      
-      else if(response.data.rol) {
-        store.commit("setRol_vinc", response.data.rol);
+      else if(response.data.Role === "sotics" || response.data.Role === "atics" || response.data.Role === "sa" || response.data.Role === "vinc" || response.data.Role === "avinc") {
+        store.commit("setRol_vinc", response.data.Role);
         store.commit("setemail_vinc", response.data.email);
-        //store.commit("setid_bio", response.data.id);
+        //store.commit("setid_vinc", response.data.id);
 
-        store.commit("setname_vinc", response.data.nombre);
-        
+        store.commit("setname_vinc", response.data.name);
+        store.commit("setToken_vinc", response.data.token);
+        store.commit("setTokenType_vinc", response.data.token_type || "Bearer");
         return {
           token: response.data.token,
-          RolUs: response.data.rol,
+          Rol: response.data.Role,
           //id: response.data.id,
-          name: response.data.nombre,
+          name: response.data.name,
           email: response.data.email,
         };
-      }else if(response.data.rolme) {
-        store.commit("setRol_vinc", response.data.rolme);
-        store.commit("setemail_vinc", 'mesa@mesa.com');
-        //store.commit("setid_bio", response.data.id);
-        store.commit("setname_vinc", response.data.codigo_mesa);
-        return {
-          token: response.data.token,
-          Rolme: response.data.rolme,
-          //id: response.data.id,
-          name: response.data.codigo_mesa,
-          email: 'mesa@mesa.com',
-        };
-      }  
+      }
     } else {
       console.error("Respuesta inesperada:", response);
       return null;

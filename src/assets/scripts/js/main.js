@@ -188,33 +188,24 @@ export default {
       delay: 5,
       time: 2000,
     });
-   this.initCarAnimation();
+    const animation = anime.timeline({
+      targets: 'svg #XMLID5',
+      easing: 'easeInOutSine',
+      duration: 6000, // más corta por paso
+      loop: true,
+      direction: 'alternate', // fluye ida y vuelta sin reiniciar
+      autoplay: true
+    });
+
+    animation
+      .add({ translateX: -500 })
+      .add({ rotateY: 180 })
+      .add({ translateX: 920 })
+      .add({ rotateY: 0 })
+      .add({ translateX: -500 })
+      .add({ rotateY: 180 })
+      .add({ translateX: -500 });
   
-  },
-  methods: {
-    initCarAnimation() {
-      const car = document.querySelector('.car-sprite');
-      const carImage = document.querySelector('.car-image');
-      const carWidth = carImage.offsetWidth;
-      let carLeft = 0;
-      let carTop = 0;
-      let carSpeed = 0;
-
-      function animateCar() {
-        carLeft += carSpeed;
-        car.style.left = `${carLeft}px`;
-        if (carLeft > carWidth) {
-          carLeft = -carWidth;
-          carSpeed = -carSpeed;
-        } else if (carLeft < -carWidth) {
-          carLeft = carWidth;
-          carSpeed = -carSpeed;
-        }
-        requestAnimationFrame(animateCar);
-      }
-
-      animateCar();
-    },
   },
   computed: {
     showNavbar() {

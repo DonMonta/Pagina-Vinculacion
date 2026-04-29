@@ -13,11 +13,11 @@ import ProyectosView from '../views/Admin/Proyectos/Lista_Proyectos/ProyectosVie
 
 
 const routes = [
-  {
+  /*{
     path: '/site',
     name: 'site',
     component: HomeView
-  },
+  },*/
   {
     path: '/noticias',
     name: 'noticias',
@@ -39,7 +39,7 @@ const routes = [
     component: ProyectosNuevosView
   },
   {
-    path: '/login',
+    path: '/site/login',
     name: 'login',
     component: LoginView
   },

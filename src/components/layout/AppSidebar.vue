@@ -171,12 +171,14 @@ import {
 import SidebarWidget from "./SidebarWidget.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
 import { useSidebar } from "@/composables/useSidebar";
+import { useUsuario } from "@/composables/useUsuario";
 
 const route = useRoute();
 
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar();
+const { rolUsuario } = useUsuario();
 
-const menuGroups = [
+const menuData = [
   {
     title: "Menu",
     items: [
@@ -230,6 +232,26 @@ const menuGroups = [
   },
 ];
 
+const menuGroups = computed(() => {
+  const rol = rolUsuario.value;
+
+  // Si es administrador (sa) o técnico (atics), devolvemos todo sin filtrar
+  if (rol === 'sa' || rol === 'atics' || rol === 'avinc') {
+    return menuData;
+  }
+
+  // Si es sotics, filtramos los items dentro de cada grupo
+  return menuData.map(group => ({
+    ...group,
+    items: group.items.filter(item => {
+      if (rol === 'vinc') {
+        // Solo permitimos "Proyectos" y "Principal"
+        return item.name === "Proyectos" || item.name === "Principal";
+      }
+      return true;
+    })
+  })).filter(group => group.items.length > 0); // Opcional: oculta grupos que queden vacíos
+});
 const isActive = (path) => route.path === path;
 
 const toggleSubmenu = (groupIndex, itemIndex) => {
@@ -238,7 +260,7 @@ const toggleSubmenu = (groupIndex, itemIndex) => {
 };
 
 const isAnySubmenuRouteActive = computed(() => {
-  return menuGroups.some((group) =>
+  return menuData.some((group) =>
     group.items.some(
       (item) =>
         item.subItems && item.subItems.some((subItem) => isActive(subItem.path))
@@ -251,7 +273,7 @@ const isSubmenuOpen = (groupIndex, itemIndex) => {
   return (
     openSubmenu.value === key ||
     (isAnySubmenuRouteActive.value &&
-      menuGroups[groupIndex].items[itemIndex].subItems?.some((subItem) =>
+      menuData[groupIndex].items[itemIndex].subItems?.some((subItem) =>
         isActive(subItem.path)
       ))
   );

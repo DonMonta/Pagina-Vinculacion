@@ -75,17 +75,17 @@ const handleClickOutside = (event) => {
 // Lógica de Sesión
 const cerrarsesion = async () => {
   try {
-    const token = localStorage.getItem("token_rest")
+    const token = localStorage.getItem("token_vinc")
 
     if (!token) {
       console.warn("⚠️ No hay token, cerrando sesión localmente...")
       localStorage.clear()
-      window.location.href = "/login"
+      window.location.href = "/site/login"
       return
     }
 
     const response = await API.get(
-      "/restrik/logout",
+      "/vin/logout",
       {},
       {
         headers: { Authorization: `Bearer ${token}` }
@@ -94,11 +94,11 @@ const cerrarsesion = async () => {
 
     console.log("✅ Sesión cerrada:", response.data)
     localStorage.clear()
-    window.location.href = "/login"
+    window.location.href = "/site/login"
   } catch (error) {
     console.error("❌ Error al cerrar sesión:", error.response?.data || error)
     localStorage.clear()
-    window.location.href = "/login"
+    window.location.href = "/site/login"
   }
 }
 

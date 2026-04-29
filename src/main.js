@@ -8,7 +8,7 @@ import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 
 import VueApexCharts from 'vue3-apexcharts'
-import './assets/styles/admin/main.css' //estilos del admin
+import './assets/styles/admin/main.css' 
 
 
 
