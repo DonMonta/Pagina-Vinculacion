@@ -430,7 +430,7 @@ class Invi_proyectosController extends Controller
             // Crear carpeta si no existe
             $directory = public_path("Documentos/Vinculación/AnexoIntegrante/{$ci}");
 
-            if (!File::exists($directory)) {
+            if (!File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0755, true, true);
             }
 
