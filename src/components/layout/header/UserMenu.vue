@@ -80,7 +80,7 @@ const cerrarsesion = async () => {
     if (!token) {
       console.warn("⚠️ No hay token, cerrando sesión localmente...")
       localStorage.clear()
-      window.location.href = "/site/login"
+      window.location.href = "/site/site-login"
       return
     }
 
@@ -94,11 +94,11 @@ const cerrarsesion = async () => {
 
     console.log("✅ Sesión cerrada:", response.data)
     localStorage.clear()
-    window.location.href = "/site/login"
+    window.location.href = "/site/site-login"
   } catch (error) {
     console.error("❌ Error al cerrar sesión:", error.response?.data || error)
     localStorage.clear()
-    window.location.href = "/site/login"
+    window.location.href = "/site/site-login"
   }
 }
 

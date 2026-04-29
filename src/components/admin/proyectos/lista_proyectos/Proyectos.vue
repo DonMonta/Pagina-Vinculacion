@@ -385,7 +385,7 @@
 
                                         <td class="p-3 text-center">
                                             <div v-if="int.anexo_integrante" class="flex justify-center">
-                                                <a :href="`http://vinculacion.test/Documentos/Vinculación/AnexoIntegrante/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante}`"
+                                                <a :href="`http://vinculacionconlasociedad.utelvt.edu.ec/vinbackend/Documentos/Vinculación/AnexoIntegrante/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante}`"
                                                     target="_blank"
                                                     class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
                                                     title="Ver documento PDF">
@@ -645,7 +645,6 @@ export default {
                     API.get(`${this.baseUrl}/catalogos-integrantes`)
                 ]);
                 this.proyectoSeleccionado = resProj.data;
-                console.log(resProj);
                 this.funciones = resCat.data.funciones;
                 this.carreras = resCat.data.carreras;
                 this.showModalDetalles = true;

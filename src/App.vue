@@ -4,8 +4,9 @@
       <RouterView />
     </SidebarProvider>
   </ThemeProvider>
-  <footer v-if="this.$route.name === 'site'">
-    <!-- Footer Start -->
+  <!-- Footer Start 
+  <footer v-if="this.$route.name === 'home'">
+    
     <div class="container-fluid footer border-1 py-5">
       <div class="container py-5">
         <div class="row g-5">
@@ -67,7 +68,7 @@
 
 
 
-    <!-- Copyright Start -->
+    <!-- Copyright Start 
     <div class="container-fluid copyright py-4">
       <div class="container">
         <div class="row g-4 align-items-center">
@@ -89,23 +90,20 @@
             </div>
           </div>
           <div class="col-md-4 text-center text-md-end text-white">
-            <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
-            <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
-            <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
 
           </div>
         </div>
       </div>
     </div>
-    <!-- Copyright End -->
+    <!-- Copyright End 
 
 
 
-    <!-- Back to Top -->
+    <!-- Back to Top 
     <a href="#" class="btn btn-primary btn-primary-outline-0 btn-md-square rounded-circle back-to-top"><i
         class="fa fa-arrow-up"></i></a>
 
-  </footer>
+  </footer>-->
 </template>
 
 <script setup>
