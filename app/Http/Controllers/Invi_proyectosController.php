@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Invi_proyectos;
 use App\Models\Invi_detalle_integrante;
 use App\Models\InformacionPersonalD;
-use App\Models\InformacionPersonal;
+use App\Models\informacionpersonal;
 use App\Models\Carreras;
 use App\Models\Invi_funcion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class Invi_proyectosController extends Controller
 {
@@ -19,7 +20,7 @@ class Invi_proyectosController extends Controller
      */
     public function index(Request $request)
     {
-        try {// 1. Obtener parámetros de búsqueda y paginación
+        try { // 1. Obtener parámetros de búsqueda y paginación
             $searchQuery = $request->input('search_query');
             $query = Invi_proyectos::select(
                 'invi_proyectos.*'
@@ -231,7 +232,7 @@ class Invi_proyectosController extends Controller
 
         // 1. Buscar Datos Personales
         $docente = InformacionPersonalD::where('CIInfPer', $cedula)->first();
-        $estudiante = InformacionPersonal::where('CIInfPer', $cedula)->first();
+        $estudiante = informacionpersonal::where('CIInfPer', $cedula)->first();
 
         if (!$docente && !$estudiante) {
             return response()->json(['message' => 'Integrante no encontrado en la base de datos institucional.'], 404);
@@ -407,8 +408,15 @@ class Invi_proyectosController extends Controller
     }
     public function uploadArchivo(Request $request)
     {
+        if ($request->hasFile('file')) {
+            Log::info("Archivo detectado: " . $request->file('file')->getClientOriginalName());
+            Log::info("Error de subida PHP: " . $request->file('file')->getError());
+            Log::info("Tamaño recibido: " . $request->file('file')->getSize());
+        } else {
+            Log::warning("No se detectó ningún archivo en la petición.");
+        }
         $request->validate([
-            'file' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:10240', // 10MB
+            'file' => 'required|max:10240', // 10MB
             'ci' => 'required|alpha_dash',
             'old_filename' => 'nullable|string',
         ]);

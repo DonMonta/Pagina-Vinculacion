@@ -267,7 +267,7 @@ class PeiController extends Controller
             $basePath = "Documentos/Pei/{$anio_folder}";
             $directory = public_path($basePath);
 
-            if (!File::exists($directory)) {
+            if (!File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0755, true);
             }
 
