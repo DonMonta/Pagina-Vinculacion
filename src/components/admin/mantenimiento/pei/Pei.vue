@@ -934,7 +934,7 @@ export default {
           return {
             ...item,
             ad_archivo_url: item.archivo_pei
-              ? `http://vinculacionconlasociedad.utelvt.edu.ec/vinbackend/Documentos/Pei/${folderName}/${item.archivo_pei}`
+              ? `http://vinculacion.test/Documentos/Pei/${folderName}/${item.archivo_pei}`
               : null
           };
         });

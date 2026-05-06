@@ -119,7 +119,7 @@
         <div v-if="showModalDetalles"
             class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
             <div
-                class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+                class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
 
                 <div
                     class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50">
@@ -230,7 +230,7 @@
                                             <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para
                                                 cargar</span>
                                             <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName
-                                                }}</span>
+                                            }}</span>
                                         </p>
                                         <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
                                     </div>
@@ -325,10 +325,12 @@
                                         <th class="p-3 text-left">Cédula</th>
                                         <th class="p-3 text-left">Integrante</th>
                                         <th class="p-3 text-center">Horas</th>
-                                        <th class="p-3 text-center">Estado</th>
+                                        <th class="p-3 text-center">Reemplazado</th>
                                         <th class="p-3 text-left">Función / Carrera</th>
                                         <th class="p-3 text-left">Registro / Act.</th>
-                                        <th class="p-3 text-center">Anexo</th>
+                                        <th class="p-3 text-center">Anexo Reemplazo</th>
+                                        <th class="p-3 text-center">Anexo Original</th>
+                                        <th class="p-3 text-center">Estado</th>
                                         <th class="p-3 text-right">Acciones</th>
                                     </tr>
                                 </thead>
@@ -357,7 +359,7 @@
                                             <span
                                                 :class="int.reemplazado ? 'text-red-500 bg-red-50' : 'text-green-600 bg-green-50'"
                                                 class="px-2 py-1 rounded-full text-[10px] font-bold uppercase">
-                                                {{ int.reemplazado ? 'Reemplazado' : 'Activo' }}
+                                                {{ int.reemplazado ? 'Si' : 'No' }}
                                             </span>
                                         </td>
 
@@ -383,9 +385,9 @@
                                             </div>
                                         </td>
 
-                                        <td class="p-3 text-center">
+                                        <td class="p-3 text-center" v-if="int.estado === 0">
                                             <div v-if="int.anexo_integrante" class="flex justify-center">
-                                                <a :href="`http://vinculacionconlasociedad.utelvt.edu.ec/vinbackend/Documentos/Vinculación/AnexoIntegrante/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante}`"
+                                                <a :href="`http://vinculacion.test/Documentos/Vinculación/Bajas_Docentes/Anexo/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante}`"
                                                     target="_blank"
                                                     class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
                                                     title="Ver documento PDF">
@@ -399,9 +401,48 @@
                                             </div>
                                             <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
                                         </td>
+                                        <td class="p-3 text-center" v-else>
+                                             <div v-if="int.anexo_integrante" class="flex justify-center">
+                                                <a :href="`http://vinculacion.test/Documentos/Vinculación/AnexoIntegrante/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante}`"
+                                                    target="_blank"
+                                                    class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                                    title="Ver documento PDF">
+                                                    <svg width="18" height="18" fill="none" stroke="currentColor"
+                                                        stroke-width="2" viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                        <path d="M9 15h6M9 11h6" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                            <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
+                                        </td>
+                                        <td class="p-3 text-center">
+                                            <div v-if="int.anexo_integrante2" class="flex justify-center">
+                                                <a :href="`http://vinculacion.test/Documentos/Vinculación/AnexoIntegrante/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante2}`"
+                                                    target="_blank"
+                                                    class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                                    title="Ver documento PDF">
+                                                    <svg width="18" height="18" fill="none" stroke="currentColor"
+                                                        stroke-width="2" viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                        <path d="M9 15h6M9 11h6" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                            <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
+                                        </td>
+                                        <td class="p-3 text-center">
+                                            <span
+                                                :class="int.estado === 0 ? 'text-red-500 bg-red-50' : 'text-green-600 bg-green-50'"
+                                                class="px-2 py-1 rounded-full text-[10px] font-bold uppercase">
+                                                {{ int.estado === 0 ? 'Inac' : 'Act' }}
+                                            </span>
+                                        </td>
 
                                         <td class="p-3 text-right">
-                                            <div class="flex justify-end gap-2">
+                                            <div class="flex justify-end gap-2" v-if="int.estado === 1">
                                                 <button @click="seleccionarIntegrante(int)"
                                                     class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                                     <svg width="16" height="16" fill="none" stroke="currentColor"
@@ -410,7 +451,7 @@
                                                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
                                                 </button>
-                                                <button @click="inhabilitarIntegrante(int)"
+                                                <button @click="inhabilitarIntegrante(int)" v-if="int.estado === 1"
                                                     class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                                                     <svg width="16" height="16" fill="none" stroke="currentColor"
                                                         stroke-width="2" viewBox="0 0 24 24">
@@ -425,6 +466,72 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="showModalBaja"
+            class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
+            <div
+                class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+                <div class="p-6 border-b dark:border-gray-800 flex justify-between items-center bg-red-50/50">
+                    <h3 class="text-lg font-bold text-red-700">Confirmar Baja de Integrante</h3>
+                    <button @click="showModalBaja = false" class="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100">
+                        <p class="text-xs text-gray-500 uppercase font-bold">Integrante seleccionado:</p>
+                        <p class="text-sm font-bold text-gray-800 dark:text-white">
+                            {{ (integranteBaja.informacion_personal_d || integranteBaja.informacionpersonal)?.NombInfPer
+                            }}
+                            {{ (integranteBaja.informacion_personal_d ||
+                                integranteBaja.informacionpersonal)?.ApellInfPer }}
+                        </p>
+                        <p class="text-[10px] text-gray-400 font-mono">{{ integranteBaja.ciinfper_doc ||
+                            integranteBaja.ciinfper_est }}</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold mb-1">Documento Respaldo (PDF)</label>
+                        <div @click="$refs.fileInputBaja.click()"
+                            class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
+                            :class="archivoBajaName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <svg v-if="!archivoBajaName" class="w-8 h-8 mb-3 text-gray-400" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                                    <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                                </svg>
+
+                                <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                                    <span class="font-semibold" v-if="!archivoBajaName">Haga clic para
+                                        cargar</span>
+                                    <span class="font-semibold text-brand-600" v-else>{{ archivoBajaName
+                                        }}</span>
+                                </p>
+                                <p class="text-xs text-gray-400" v-if="!archivoBajaName">PDF (Máx. 10MB)</p>
+                            </div>
+
+                            <input type="file" ref="fileInputBaja" class="hidden" accept="application/pdf"
+                                @change="handleFileBajaChange" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gray-50 dark:bg-gray-800 flex gap-2">
+                    <button @click="showModalBaja = false"
+                        class="flex-1 px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition-colors">
+                        Cancelar
+                    </button>
+                    <button @click="confirmarInhabilitar" :disabled="!archivoBaja || cargandoBaja"
+                        class="flex-1 px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg disabled:opacity-50 transition-all">
+                        {{ cargandoBaja ? 'Procesando...' : 'Confirmar Baja' }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -495,6 +602,11 @@ export default {
             archivoPreviewName: '',
             uploading: false,
             continuarEnProyecto: true,
+            showModalBaja: false,
+            integranteBaja: null,
+            archivoBaja: null,
+            archivoBajaName: '',
+            cargandoBaja: false,
 
         };
     },
@@ -576,9 +688,28 @@ export default {
             //Asignar el nombre del archivo seleccionado a la variable archivoPreviewName
             this.archivoPreviewName = file.name;
         },
+        handleFileBajaChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.type !== 'application/pdf') {
+                mostraralertas2('Solo se permiten archivos PDF', 'warning');
+                this.$refs.fileInputBaja.value = null; // Ref corregido
+                return;
+            }
+
+            const maxMB = 10;
+            if (file.size > maxMB * 1024 * 1024) {
+                mostraralertas2(`Archivo muy grande. Máx ${maxMB} MB`, 'warning');
+                this.$refs.fileInputBaja.value = null; // Ref corregido
+                return;
+            }
+
+            this.archivoBaja = file;
+            this.archivoBajaName = file.name;
+        },
         async uploadarchivo(ci, oldFilename = null) {
             if (!this.archivoSeleccionado) return null; // nada que subir
-
             try {
                 this.uploading = true;
                 const form = new FormData();
@@ -606,6 +737,74 @@ export default {
                 return null;
             } finally {
                 this.uploading = false;
+            }
+        },
+        async uploadarchivoBaja(ci, oldFilename = null) {
+            if (!this.archivoBaja) return null;
+            try {
+                this.cargandoBaja = true;
+                const form = new FormData();
+                form.append('file', this.archivoBaja);
+                form.append('ci', ci);
+
+                // Verifica que la URL del backend sea la correcta (que ya creaste en PHP)
+                const resp = await API.post(`${this.baseUrl}/subir_archivo_anexo_darbaja`, form, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+
+                // IMPORTANTE: Verifica qué devuelve exactamente tu backend. 
+                // Si el backend devuelve { status: true, filename: "..." }, úsalo así:
+                if (resp && resp.data && resp.data.filename) {
+                    const dataRetornada = resp.data;
+
+                    // Limpiamos DESPUÉS de guardar el nombre en una constante
+                    this.archivoBaja = null;
+                    this.archivoBajaName = '';
+                    if (this.$refs.fileInputBaja) this.$refs.fileInputBaja.value = null;
+
+                    return dataRetornada;
+                } else {
+                    console.error("Respuesta inesperada del servidor:", resp.data);
+                    return null;
+                }
+            } catch (error) {
+                console.error("Error en petición Axios:", error);
+                return null;
+            } finally {
+                this.cargandoBaja = false;
+            }
+        },
+        async confirmarInhabilitar() {
+            if (!this.archivoBaja || this.cargandoBaja) return;
+
+            try {
+                const ciarchvi = this.integranteBaja.ciinfper_doc || this.integranteBaja.ciinfper_est;
+
+                // Esperamos la subida del archivo
+                const anexoData = await this.uploadarchivoBaja(ciarchvi);
+
+                if (!anexoData || !anexoData.filename) {
+                    mostraralertas2("Error al subir el archivo de respaldo", "error");
+                    return;
+                }
+
+                // 1. Preparar Payload según lo que espera tu función inhabilitar(Request $request)
+                const payload = {
+                    id: this.integranteBaja.id_deta_invi_proyect, // Tu controlador usa $request->id
+                    anexo_integrante: anexoData.filename
+                };
+
+                const resp = await API.post(`${this.baseUrl}/inhabilitar-integrante`, payload);
+
+                if (resp && resp.status === 200) {
+                    this.showModalBaja = false;
+                    await this.abrirDetallesProyecto(this.proyectoSeleccionado.proyect_id);
+                    mostraralertas2("Integrante inhabilitado con éxito", "success");
+                }
+
+            } catch (error) {
+                console.error("❌ Error completo:", error.response?.data || error);
+                mostraralertas2("Error al procesar la baja", "danger");
             }
         },
         async cerraModal() {
@@ -718,11 +917,10 @@ export default {
         },
 
         async inhabilitarIntegrante(int) {
-            if (!confirm("¿Desea dar de baja a este integrante?")) return;
-            try {
-                await API.post(`${this.baseUrl}/inhabilitar-integrante`, { id: int.id_deta_invi_proyect });
-                this.abrirDetallesProyecto(this.proyectoSeleccionado.proyect_id); // Recargar
-            } catch (e) { console.error(e); }
+            this.integranteBaja = int;
+            this.archivoBaja = null;
+            this.archivoBajaName = '';
+            this.showModalBaja = true;
         },
 
         async guardarCambios() {

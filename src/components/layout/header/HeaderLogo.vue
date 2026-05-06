@@ -1,7 +1,7 @@
 <template>
   <router-link to="/site-admin" class="lg:hidden">
-    <img class="dark:hidden" src="/images/logo/logo.svg" alt="Logo" />
-    <img class="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" />
+    <img class="dark:hidden" src="@/assets/img/logo-icon.svg" alt="Logo" />
+    <img class="hidden dark:block" src="@/assets/img/logo-icon.svg" alt="Logo" />
   </router-link>
 </template>
 
