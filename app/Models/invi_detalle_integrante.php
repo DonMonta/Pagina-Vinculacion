@@ -21,6 +21,8 @@ class Invi_detalle_integrante extends Model
         'id_funcion',
         'idCarr',
         'anexo_integrante',
+        'anexo_integrante2',
+        'estado'
     ];
     public function invi_proyectos()
     {
@@ -42,5 +44,4 @@ class Invi_detalle_integrante extends Model
     {
         return $this->belongsTo(informacionpersonal::class, 'ciinfper_est', 'CIInfPer');
     }
-
 }

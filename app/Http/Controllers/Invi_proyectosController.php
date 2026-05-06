@@ -297,6 +297,7 @@ class Invi_proyectosController extends Controller
                     $existe = Invi_detalle_integrante::where('proyect_id', $request->proyect_id)
                         ->where('id_funcion', $form['id_funcion'])
                         ->where('reemplazado', 0)
+                        ->where('estado', 1)
                         ->exists();
                     if ($existe) return response()->json(['message' => "Ya existe un {$funcionSolicitada->nombre_funcion} activo."], 422);
                 }
@@ -309,7 +310,8 @@ class Invi_proyectosController extends Controller
                     'reemplazado'   => 0,
                     'id_funcion'    => $form['id_funcion'],
                     'idCarr'        => $form['idCarr'],
-                    'anexo_integrante' => $form['anexo_integrante'],
+                    'anexo_integrante2' => $form['anexo_integrante2'],
+                    'estado' => 1
                 ]);
             } else {
                 // MODO EDICIÓN
@@ -321,13 +323,15 @@ class Invi_proyectosController extends Controller
                         $registroOriginal->update([
                             'reemplazado' => 1,
                             'id_funcion'  => $reemplazoConfig['nueva_funcion_reemplazado'],
-                            'horas'       => $reemplazoConfig['nuevas_horas_reemplazado'] ?? 0
+                            'horas'       => $reemplazoConfig['nuevas_horas_reemplazado'] ?? 0,
+                            'estado' => 1
                         ]);
                     } else {
                         $registroOriginal->update([
                             'reemplazado' => 1,
                             'id_funcion'  => null,
-                            'horas'       => 0
+                            'horas'       => 0,
+                            'estado' => 0
                         ]);
                     }
 
@@ -351,6 +355,7 @@ class Invi_proyectosController extends Controller
                         'id_funcion'    => $form['id_funcion'],
                         'idCarr'        => $form['idCarr'],
                         'anexo_integrante' => $form['anexo_integrante'],
+                        'estado' => 1
                     ];
 
                     if ($integranteExistente) {
@@ -366,8 +371,9 @@ class Invi_proyectosController extends Controller
                         'id_funcion' => $form['id_funcion'],
                         'idCarr'     => $form['idCarr'],
                         'horas'      => $form['horas'],
-                        'anexo_integrante' => $form['anexo_integrante'],
-                        'reemplazado' => 0
+                        'anexo_integrante2' => $form['anexo_integrante2'],
+                        'reemplazado' => 0,
+                        'estado' => 1
                     ]);
                 }
             }
@@ -396,12 +402,17 @@ class Invi_proyectosController extends Controller
 
     public function inhabilitar(Request $request)
     {
+        $request->validate([
+            'id' => 'required',
+            'anexo_integrante' => 'required|string'
+        ]);
         $integrante = Invi_detalle_integrante::findOrFail($request->id);
 
         $integrante->update([
             'horas' => 0,
-            'reemplazado' => 1,
-            'id_funcion' => null
+            'estado' => 0,
+            'id_funcion' => null,
+            'anexo_integrante' => $request->anexo_integrante
         ]);
 
         return response()->json(['message' => 'Integrante inhabilitado correctamente']);
@@ -454,6 +465,69 @@ class Invi_proyectosController extends Controller
 
             // URL pública
             $url = url('Documentos/Vinculación/AnexoIntegrante/' . $ci . '/' . $filename);
+
+            return response()->json([
+                'status'   => true,
+                'filename' => $filename,
+                'url'      => $url
+            ]);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status'  => false,
+                'message' => 'Seguridad: El archivo no pudo ser procesado.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function uploadArchivoDarBaja(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            Log::info("Archivo detectado: " . $request->file('file')->getClientOriginalName());
+            Log::info("Error de subida PHP: " . $request->file('file')->getError());
+            Log::info("Tamaño recibido: " . $request->file('file')->getSize());
+        } else {
+            Log::warning("No se detectó ningún archivo en la petición.");
+        }
+        $request->validate([
+            'file' => 'required|max:10240', // 10MB
+            'ci' => 'required|alpha_dash',
+            'old_filename' => 'nullable|string',
+        ]);
+
+        try {
+            $ci = basename($request->ci);
+            $file = $request->file('file');
+            if (!$file->isValid()) {
+                throw new \Exception("Archivo inválido o corrupto.");
+            }
+            if ($request->filled('old_filename')) {
+                $oldFilename = basename($request->old_filename); // Seguridad extra
+                $oldPath = public_path("Documentos/Vinculación/Bajas_Docentes/Anexo/{$ci}/{$oldFilename}");
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
+            }
+
+            // Crear carpeta si no existe
+            $directory = public_path("Documentos/Vinculación/Bajas_Docentes/Anexo/{$ci}");
+
+            if (!File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true, true);
+            }
+
+            // Generar nombre: CI + _ + aleatorio + _ + fecha (Ymd_His)
+            $aleatorio = bin2hex(random_bytes(8)); // 16 caracteres hex
+            $fechaHora = date("Ymd_His");          // Ej: 20251112_1741
+            $extension = $file->getClientOriginalExtension(); // pdf
+
+            $filename = "{$ci}_{$aleatorio}_{$fechaHora}.{$extension}";
+
+            // Guardar archivo
+            $file->move($directory, $filename);
+
+            // URL pública
+            $url = url('Documentos/Vinculación/Bajas_Docentes/Anexo/' . $ci . '/' . $filename);
 
             return response()->json([
                 'status'   => true,
