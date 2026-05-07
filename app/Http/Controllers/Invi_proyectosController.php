@@ -290,7 +290,20 @@ class Invi_proyectosController extends Controller
 
             // Verificamos si es Director o Subdirector por texto
             $esDirectivo = str_contains($nombreUpper, 'DIRECTOR');
+            if ($modo === 'nuevo') {
+                $cedula = $form['cedula_nueva'];
+                $existe = Invi_detalle_integrante::where('proyect_id', $proyect_id)
+                    ->where(function ($q) use ($cedula) {
+                        $q->where('ciinfper_doc', $cedula)->orWhere('ciinfper_est', $cedula);
+                    })
+                    ->where('estado', 1)
+                    ->exists();
 
+                if ($existe) {
+                    DB::rollBack();
+                    return response()->json(['message' => "Esta persona ya figura como integrante activo en este proyecto."], 422);
+                }
+            }
             if ($modo === 'nuevo') {
                 // Validar que no se agregue Director/Subdirector si ya existen
                 if ($esDirectivo) {
@@ -371,7 +384,7 @@ class Invi_proyectosController extends Controller
                         'id_funcion' => $form['id_funcion'],
                         'idCarr'     => $form['idCarr'],
                         'horas'      => $form['horas'],
-                        'anexo_integrante2' => $form['anexo_integrante2'],
+                        //'anexo_integrante2' => $form['anexo_integrante2'],
                         'reemplazado' => 0,
                         'estado' => 1
                     ]);
