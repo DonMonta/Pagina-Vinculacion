@@ -8,10 +8,13 @@ use App\Models\InformacionPersonalD;
 use App\Models\informacionpersonal;
 use App\Models\Carreras;
 use App\Models\Invi_funcion;
+use App\Models\Bitacora;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class Invi_proyectosController extends Controller
 {
@@ -284,6 +287,9 @@ class Invi_proyectosController extends Controller
             $form = $request->form;
             $reemplazoConfig = $request->reemplazo_config;
             $proyect_id = $request->proyect_id;
+            // --- OBTENER CÓDIGO DEL PROYECTO ---
+            $proyecto = Invi_proyectos::find($proyect_id);
+            $codigoProyect = $proyecto?->proyect_cod ?? 'S/N';
             // Buscamos la función que se intenta asignar
             $funcionSolicitada = Invi_funcion::find($form['id_funcion']);
             $nombreUpper = strtoupper($funcionSolicitada?->nombre_funcion ?? '');
@@ -326,6 +332,8 @@ class Invi_proyectosController extends Controller
                     'anexo_integrante2' => $form['anexo_integrante2'],
                     'estado' => 1
                 ]);
+                $accionBitacora = "REGISTRO DE NUEVO INTEGRANTE";
+                $obsBitacora = "Se agregó a la cédula {$form['cedula_nueva']} al proyecto: {$codigoProyect} con función {$nombreUpper}";
             } else {
                 // MODO EDICIÓN
                 $registroOriginal = Invi_detalle_integrante::findOrFail($request->id_deta_invi_proyect);
@@ -374,9 +382,13 @@ class Invi_proyectosController extends Controller
                     if ($integranteExistente) {
                         // SI YA EXISTÍA: Lo actualizamos en lugar de crear uno nuevo
                         $integranteExistente->update($datosNuevoRol);
+                        $accionBitacora = "REEMPLAZO DE INTEGRANTE EXISTENTE";
+                        $obsBitacora = "Reemplazo en proyecto: {$codigoProyect}. Reemplazo del integrante ID: {$request->id_deta_invi_proyect}, por un docente del mismo proyecto con cédula: {$form['cedula_nueva']}";
                     } else {
                         // SI NO EXISTÍA: Lo creamos
                         Invi_detalle_integrante::create($datosNuevoRol);
+                        $accionBitacora = "REEMPLAZO DE INTEGRANTE POR UN DOCENTE NUEVO";
+                        $obsBitacora = "Reemplazo en proyecto: {$codigoProyect}. Reemplazo del integrante ID: {$request->id_deta_invi_proyect}, por un docente nuevo con cédula: {$form['cedula_nueva']}";
                     }
                 } else {
                     // Edición simple sin reemplazo
@@ -388,10 +400,25 @@ class Invi_proyectosController extends Controller
                         'reemplazado' => 0,
                         'estado' => 1
                     ]);
+                    $accionBitacora = "EDICIÓN DE INTEGRANTE";
+                    $obsBitacora = "Se editaron datos del integrante ID: {$request->id_deta_invi_proyect} en proyecto: {$codigoProyect}";
                 }
             }
 
             DB::commit();
+            // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario'     => $user->ciinfper,
+                    'bt_fechahora'   => Carbon::now(),
+                    'bt_accion'      => $accionBitacora . " - VINCULACIÓN",
+                    'bt_ippc'        => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: {$obsBitacora}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error("Error bitácora en guardarCambios: " . $ex->getMessage());
+            }
             return response()->json(['status' => true]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -420,6 +447,9 @@ class Invi_proyectosController extends Controller
             'anexo_integrante' => 'required|string'
         ]);
         $integrante = Invi_detalle_integrante::findOrFail($request->id);
+        // Guardamos los datos necesarios para la bitácora antes de limpiar los campos
+        $cedulaAfectada = $integrante->ciinfper_doc ?? $integrante->ciinfper_est;
+        $codigoProyect = $integrante->invi_proyectos?->proyect_cod ?? 'S/N';
 
         $integrante->update([
             'horas' => 0,
@@ -427,6 +457,20 @@ class Invi_proyectosController extends Controller
             'id_funcion' => null,
             'anexo_integrante' => $request->anexo_integrante
         ]);
+        // --- REGISTRO EN BITÁCORA ---
+        try {
+            $user = Auth::user();
+            Bitacora::create([
+                'bt_usuario'     => $user->ciinfper,
+                'bt_fechahora'   => Carbon::now(),
+                'bt_accion'      => 'INHABILITAR INTEGRANTE - VINCULACIÓN',
+                'bt_ippc'        => $request->ip(),
+                'bt_observacion' => "USUARIO: {$user->NombUsu} INHABILITÓ AL INTEGRANTE CÉDULA: {$cedulaAfectada} DEL PROYECTO: {$codigoProyect}. MOTIVO/ANEXO: {$request->anexo_integrante}",
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error al registrar bitácora en inhabilitar: " . $e->getMessage());
+        }
+        // --- FIN REGISTRO EN BITÁCORA ---
 
         return response()->json(['message' => 'Integrante inhabilitado correctamente']);
     }
