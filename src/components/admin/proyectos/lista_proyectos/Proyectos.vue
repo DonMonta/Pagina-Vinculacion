@@ -294,9 +294,14 @@
                         </div>
 
                         <div class="mt-6 flex justify-end gap-3">
-                            <button @click="guardarCambios"
-                                class="bg-blue-700 text-white px-8 py-2 rounded-xl font-bold text-sm shadow-lg shadow-blue-100">
-                                {{ modoNuevo ? 'Registrar Integrante' : 'Guardar Cambios' }}
+                            <button @click="guardarCambios" :disabled="enviando"
+                                class="bg-blue-700 text-white px-8 py-2 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                <span v-if="enviando">
+                                    Procesando...
+                                </span>
+                                <span v-else>
+                                    {{ modoNuevo ? 'Registrar Integrante' : 'Guardar Cambios' }}
+                                </span>
                             </button>
                         </div>
                     </div>
@@ -402,7 +407,7 @@
                                             <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
                                         </td>
                                         <td class="p-3 text-center" v-else>
-                                             <div v-if="int.anexo_integrante" class="flex justify-center">
+                                            <div v-if="int.anexo_integrante" class="flex justify-center">
                                                 <a :href="`http://vinculacion.test/Documentos/Vinculación/AnexoIntegrante/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante}`"
                                                     target="_blank"
                                                     class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
@@ -607,6 +612,7 @@ export default {
             archivoBaja: null,
             archivoBajaName: '',
             cargandoBaja: false,
+            enviando: false,
 
         };
     },
@@ -933,6 +939,8 @@ export default {
             if ((this.modoNuevo || this.formInt.reemplazado == 1) && !this.archivoSeleccionado && !this.formInt.anexo_integrante) {
                 return mostraralertas2("El documento de respaldo PDF es obligatorio.", "warning");
             }
+            // 2. Bloqueo de doble clic
+            if (this.enviando) return;
 
             // 2. Validación de Director/Subdirector 
             const funcionSeleccionada = this.funciones.find(f => f.id_funcion === this.formInt.id_funcion);
@@ -951,13 +959,17 @@ export default {
             }
 
             try {
+                this.enviando = true;
                 let anexoData = null;
                 const ciABuscar = this.modoNuevo ? this.nuevoIntegranteData.cedula : (this.formInt.reemplazado == 1 ? this.nuevoIntegranteData.cedula : (this.integranteEdit.ciinfper_doc || this.integranteEdit.ciinfper_est));
 
                 // 3. Subir archivo si hay uno nuevo seleccionado
                 if (this.archivoSeleccionado) {
                     anexoData = await this.uploadarchivo(ciABuscar);
-                    if (!anexoData) return; // Error ya mostrado en uploadarchivo
+                    if (!anexoData) {
+                        this.enviando = false;
+                        return;
+                    }
                 }
 
                 // 4. Preparar Payload
@@ -969,7 +981,10 @@ export default {
                         ...this.formInt,
                         cedula_nueva: this.nuevoIntegranteData?.cedula,
                         tipo_nuevo: this.nuevoIntegranteData?.tipo,
-                        anexo_integrante: anexoData ? anexoData.filename : null
+                        // Si es reemplazo, el archivo va a 'anexo_integrante' (el que entra)
+                        anexo_integrante: (this.formInt.reemplazado == 1 && anexoData) ? anexoData.filename : this.formInt.anexo_integrante,
+                        // Si es nuevo o edición simple, va a 'anexo_integrante2'
+                        anexo_integrante2: (this.formInt.reemplazado == 0 && anexoData) ? anexoData.filename : this.formInt.anexo_integrante2
                     },
                     reemplazo_config: {
                         mantener_docente: this.continuarEnProyecto,
@@ -984,11 +999,13 @@ export default {
                 if (res.data.status) {
                     mostraralertas2("Cambios guardados correctamente", "success");
                     this.cancelarEdicion() // O recargar la lista
-                    this.abrirDetallesProyecto(this.proyectoSeleccionado.proyect_id);
+                    await this.abrirDetallesProyecto(this.proyectoSeleccionado.proyect_id);
                     // Aquí deberías refrescar la lista de integrantes del proyecto
                 }
             } catch (error) {
                 mostraralertas2(error.response?.data?.message || "Error al procesar la solicitud", "danger");
+            } finally {
+                this.enviando = false; // Liberamos el botón siempre, sea éxito o error
             }
         },
 

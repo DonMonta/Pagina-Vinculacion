@@ -7,12 +7,15 @@ export default {
     return {
       email: "",
       password: "",
+      isLoggingIn: false,
       url2: `${__API_VINCULACION__}/vin/login`,
     };
   },
   methods: {
     async login() {
+      if (this.isLoggingIn) return;
       try {
+        this.isLoggingIn = true;
         var parametros = {
           LoginUsu: this.email.trim(),
           ClaveUsu: this.password.trim(),
@@ -21,6 +24,7 @@ export default {
         const response = await enviarsolilogin('POST', parametros, this.url2, 'Logueado');
         if (response.error) {
           mostraralertas(response.mensaje, 'warning');
+          this.isLoggingIn = false;
         } else if (response) {
           const role = response.Rol;
           const tok = response.token;
@@ -30,6 +34,7 @@ export default {
           } 
         }
       } catch (error) {
+        this.isLoggingIn = false;
         console.error("Error en login:", error);
         if (error.response?.data?.mensaje) {
           mostraralertas(error.response.data.mensaje, 'warning');
