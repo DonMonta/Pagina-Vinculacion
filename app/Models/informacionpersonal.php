@@ -89,6 +89,6 @@ class informacionpersonal extends Model
     protected $hidden = ['huella_dactilar', 'fotografia']; 
     public function invi_detalle_integrante()
     {
-        return $this->hasMany(Invi_detalle_integrante::class, 'CIInfPer', 'ciinfper_est');
+        return $this->hasMany(Invi_deta_inte::class, 'CIInfPer', 'ciinfper_est');
     }
 }

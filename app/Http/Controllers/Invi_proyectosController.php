@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invi_proyectos;
-use App\Models\Invi_detalle_integrante;
+use App\Models\Invi_deta_inte;
 use App\Models\InformacionPersonalD;
 use App\Models\informacionpersonal;
 use App\Models\Carreras;
@@ -90,7 +90,7 @@ class Invi_proyectosController extends Controller
             $totalProyectos = Invi_proyectos::where('proyect_tipo', 'VINCULACIÓN')->count();
 
             // Query base para integrantes activos en proyectos de vinculación
-            $baseIntegrantes = invi_detalle_integrante::where('reemplazado', 0)
+            $baseIntegrantes = Invi_deta_inte::where('reemplazado', 0)
                 ->whereHas('invi_proyectos', function ($query) {
                     $query->where('proyect_tipo', 'VINCULACIÓN');
                 });
@@ -245,7 +245,7 @@ class Invi_proyectosController extends Controller
         $tipo = $docente ? 'doc' : 'est';
 
         // 2. Validar estado en proyectos de VINCULACIÓN
-        $proyectoActivo = Invi_detalle_integrante::where(function ($q) use ($cedula) {
+        $proyectoActivo = Invi_deta_inte::where(function ($q) use ($cedula) {
             $q->where('ciinfper_doc', $cedula)->orWhere('ciinfper_est', $cedula);
         })
             ->where('reemplazado', 0)
@@ -298,7 +298,7 @@ class Invi_proyectosController extends Controller
             $esDirectivo = str_contains($nombreUpper, 'DIRECTOR');
             if ($modo === 'nuevo') {
                 $cedula = $form['cedula_nueva'];
-                $existe = Invi_detalle_integrante::where('proyect_id', $proyect_id)
+                $existe = Invi_deta_inte::where('proyect_id', $proyect_id)
                     ->where(function ($q) use ($cedula) {
                         $q->where('ciinfper_doc', $cedula)->orWhere('ciinfper_est', $cedula);
                     })
@@ -313,7 +313,7 @@ class Invi_proyectosController extends Controller
             if ($modo === 'nuevo') {
                 // Validar que no se agregue Director/Subdirector si ya existen
                 if ($esDirectivo) {
-                    $existe = Invi_detalle_integrante::where('proyect_id', $request->proyect_id)
+                    $existe = Invi_deta_inte::where('proyect_id', $request->proyect_id)
                         ->where('id_funcion', $form['id_funcion'])
                         ->where('reemplazado', 0)
                         ->where('estado', 1)
@@ -321,7 +321,7 @@ class Invi_proyectosController extends Controller
                     if ($existe) return response()->json(['message' => "Ya existe un {$funcionSolicitada->nombre_funcion} activo."], 422);
                 }
 
-                Invi_detalle_integrante::create([
+                Invi_deta_inte::create([
                     'proyect_id'    => $proyect_id,
                     'ciinfper_doc'  => $form['tipo_nuevo'] == 'doc' ? $form['cedula_nueva'] : null,
                     'ciinfper_est'  => $form['tipo_nuevo'] == 'est' ? $form['cedula_nueva'] : null,
@@ -336,7 +336,7 @@ class Invi_proyectosController extends Controller
                 $obsBitacora = "Se agregó a la cédula {$form['cedula_nueva']} al proyecto: {$codigoProyect} con función {$nombreUpper}";
             } else {
                 // MODO EDICIÓN
-                $registroOriginal = Invi_detalle_integrante::findOrFail($request->id_deta_invi_proyect);
+                $registroOriginal = Invi_deta_inte::findOrFail($request->id_deta_invi_proyect);
 
                 if ($form['reemplazado'] == 1) {
                     // 1. Procesar al que SALE (Registro Original)
@@ -360,7 +360,7 @@ class Invi_proyectosController extends Controller
                     $cedulaNueva = $form['cedula_nueva'];
 
                     // BUSCAMOS si esta persona ya estaba en el proyecto (aunque sea con otro rol)
-                    $integranteExistente = Invi_detalle_integrante::where('proyect_id', $proyect_id)
+                    $integranteExistente = Invi_deta_inte::where('proyect_id', $proyect_id)
                         ->where(function ($q) use ($cedulaNueva) {
                             $q->where('ciinfper_doc', $cedulaNueva)
                                 ->orWhere('ciinfper_est', $cedulaNueva);
@@ -386,7 +386,7 @@ class Invi_proyectosController extends Controller
                         $obsBitacora = "Reemplazo en proyecto: {$codigoProyect}. Reemplazo del integrante ID: {$request->id_deta_invi_proyect}, por un docente del mismo proyecto con cédula: {$form['cedula_nueva']}";
                     } else {
                         // SI NO EXISTÍA: Lo creamos
-                        Invi_detalle_integrante::create($datosNuevoRol);
+                        Invi_deta_inte::create($datosNuevoRol);
                         $accionBitacora = "REEMPLAZO DE INTEGRANTE POR UN DOCENTE NUEVO";
                         $obsBitacora = "Reemplazo en proyecto: {$codigoProyect}. Reemplazo del integrante ID: {$request->id_deta_invi_proyect}, por un docente nuevo con cédula: {$form['cedula_nueva']}";
                     }
@@ -446,7 +446,7 @@ class Invi_proyectosController extends Controller
             'id' => 'required',
             'anexo_integrante' => 'required|string'
         ]);
-        $integrante = Invi_detalle_integrante::findOrFail($request->id);
+        $integrante = Invi_deta_inte::findOrFail($request->id);
         // Guardamos los datos necesarios para la bitácora antes de limpiar los campos
         $cedulaAfectada = $integrante->ciinfper_doc ?? $integrante->ciinfper_est;
         $codigoProyect = $integrante->invi_proyectos?->proyect_cod ?? 'S/N';

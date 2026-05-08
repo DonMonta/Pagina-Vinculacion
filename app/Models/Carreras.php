@@ -64,7 +64,7 @@ class Carreras extends Model
     ];
     public function invi_detalle_integrante()
     {
-        return $this->hasMany(Invi_detalle_integrante::class, 'idCarr');
+        return $this->hasMany(Invi_deta_inte::class, 'idCarr');
     }
     public function sede()
     {

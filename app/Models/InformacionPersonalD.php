@@ -33,6 +33,6 @@ class InformacionPersonalD extends Model
     }
     public function invi_detalle_integrante()
     {
-        return $this->hasMany(Invi_detalle_integrante::class, 'CIInfPer', 'ciinfper_doc');
+        return $this->hasMany(Invi_deta_inte::class, 'CIInfPer', 'ciinfper_doc');
     }
 }

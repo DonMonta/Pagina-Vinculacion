@@ -20,7 +20,7 @@ class Invi_funcion extends Model
     ];
     public function invi_detalle_integrante()
     {
-        return $this->hasMany(Invi_detalle_integrante::class, 'id_funcion');
+        return $this->hasMany(Invi_deta_inte::class, 'id_funcion');
     }
 
 }

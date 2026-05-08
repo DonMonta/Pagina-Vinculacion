@@ -23,7 +23,7 @@ class Invi_proyectos extends Model
     ];
     public function invi_detalle_integrante()
     {
-        return $this->hasMany(Invi_detalle_integrante::class, 'proyect_id');
+        return $this->hasMany(Invi_deta_inte::class, 'proyect_id');
     }
     public function invi_detalle_fac_proy()
     {

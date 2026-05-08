@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class invi_detalle_integrante extends Model
+class Invi_deta_inte extends Model
 {
     protected $table = 'invi_detalle_integrante';
     protected $primaryKey = 'id_deta_invi_proyect';
@@ -21,6 +21,8 @@ class invi_detalle_integrante extends Model
         'id_funcion',
         'idCarr',
         'anexo_integrante',
+        'anexo_integrante2',
+        'estado'
     ];
     public function invi_proyectos()
     {
@@ -42,5 +44,4 @@ class invi_detalle_integrante extends Model
     {
         return $this->belongsTo(informacionpersonal::class, 'ciinfper_est', 'CIInfPer');
     }
-
 }
