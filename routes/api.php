@@ -12,6 +12,7 @@ use App\Http\Controllers\Obj_pol_plandneController;
 use App\Http\Controllers\Politicas_plandneController;
 use App\Http\Controllers\Invi_proyectosController;
 use App\Http\Controllers\InformacionPersonalController;
+use App\Http\Controllers\InformacionPersonal_DController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +26,7 @@ use App\Http\Controllers\InformacionPersonalController;
 */
 
 Route::prefix('vin')->group(function () {
-
+    Route::get('getFotoDocente/{ci}', [InformacionPersonal_DController::class, 'getFotografia']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api')->group(function () {
@@ -74,7 +75,6 @@ Route::prefix('vin')->group(function () {
         //Definicion para obtener foto del estudiante
         Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFoto']);
         //Definicion para obtener la foto del docente
-        Route::get('getFotoDocente/{ci}', [InformacionPersonalController::class, 'getFotoDocente']);
         //Definición de ruta para subir un archivo
         Route::post('subir_archivo_anexo', [Invi_proyectosController::class, 'uploadArchivo']);
         //Definición de ruta para subir un archivo
