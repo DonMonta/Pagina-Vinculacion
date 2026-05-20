@@ -106,15 +106,30 @@ class Politicas_plandneController extends Controller
     public function show(string $id) {}
     public function listarPorPlandne($id_pladne)
     {
-        // Buscamos los objetivos cuyo subsistema pertenezca al PEI enviado
-        $objetivos = Politicas_plandne::whereHas('objetivos_plandne', function ($query) use ($id_pladne) {
+        // 1. Ejecutamos la consulta y obtenemos los datos (usamos get() al final)
+        $politicas = Politicas_plandne::whereHas('objetivos_plandne', function ($query) use ($id_pladne) {
             $query->where('id_pladne', $id_pladne);
         })
-            ->with('objetivos_plandne') // Cargamos el nombre del subsistema para mostrarlo en la tabla
-            ->orderBy('cod_pol', 'asc')
+            ->with('objetivos_plandne')
             ->get();
 
-        return response()->json($objetivos);
+        // 2. Ordenamos la colección resultante usando PHP
+        $politicasOrdenadas = $politicas->sort(function ($a, $b) {
+
+            // Primero: Ordenamos por el Objetivo. 
+            // Si quieres ordenar alfabéticamente por el nombre del objetivo, cambia 
+            // 'id_obj_pol_pladne' por 'objetivos_plandne->nombre_objetivo' (o el campo que uses).
+            if ($a->id_obj_pol_pladne !== $b->id_obj_pol_pladne) {
+                return $a->id_obj_pol_pladne <=> $b->id_obj_pol_pladne;
+            }
+
+            // Segundo: Si pertenecen al mismo objetivo, aplicamos el "Natural Sort" al código.
+            // strnatcmp es una función nativa de PHP que entiende que "1.10" es mayor que "1.2"
+            return strnatcmp($a->cod_pol, $b->cod_pol);
+        })->values(); // values() es crucial para resetear los índices numéricos del array resultante
+
+        // 3. Retornamos la respuesta
+        return response()->json($politicasOrdenadas);
     }
 
     /**

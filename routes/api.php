@@ -13,6 +13,10 @@ use App\Http\Controllers\Politicas_plandneController;
 use App\Http\Controllers\Invi_proyectosController;
 use App\Http\Controllers\InformacionPersonalController;
 use App\Http\Controllers\InformacionPersonal_DController;
+use App\Http\Controllers\Agenda_ODSController;
+use App\Http\Controllers\ODSController;
+use App\Http\Controllers\SeguiFormularioController;
+use App\Http\Controllers\SeguiPreguntasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +87,20 @@ Route::prefix('vin')->group(function () {
         Route::post('integrantes/guardar', [Invi_proyectosController::class, 'guardarCambios']);
         //Definición de endpoint para obtener las estadísticas de proyectos y integrantes
         Route::get('dashboard/stats', [Invi_proyectosController::class, 'getStats']);
+        //Definición de endpoint para el recurso Agenda_ODS, perimitiendo operaciones CRUD
+        Route::apiResource("agenda_ods", Agenda_ODSController::class);
+        //Definición de endpoint para el recurso ODS, perimitiendo operaciones CRUD
+        Route::apiResource("ods", ODSController::class);
+        //Denificion de endpoint para habilitar e inhabilitar un Agenda ODS
+        Route::delete('habilitar_agenda_ods/{id}', [Agenda_ODSController::class, 'habilitar']);
+        Route::delete('inhabilitar_agenda_ods/{id}', [Agenda_ODSController::class, 'destroy']);
+        //Definición de endpoint para el recurso SeguiFormulario, perimitiendo operaciones CRUD
+        Route::apiResource("seguiformulario", SeguiFormularioController::class);
+        //Definición de endpoint para habilitar e inhabilitar un formulario
+        Route::delete('habilitar_formulario/{id}', [SeguiFormularioController::class, 'habilitar']);
+        Route::delete('inhabilitar_formulario/{id}', [SeguiFormularioController::class, 'destroy']);
+        //Definición de endpoint para el recurso SeguiPreguntas, perimitiendo operaciones CRUD
+        Route::apiResource("seguipreguntas", SeguiPreguntasController::class);
     });
 }); 
 
