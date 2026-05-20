@@ -19,15 +19,20 @@ class SeguiPreguntasController extends Controller
     public function index(Request $request)
     {
         try {
-            // Usamos withCount para obtener los totales de las relaciones
-            $query = SeguiPreguntas::withCount(['seguitiporespuesta']);
+            // 🔹 Capturamos el ID del formulario desde la URL (?idFormulario=...)
+            $idFormulario = $request->query('idFormulario');
 
-            if ($request->has('all') && $request->all === 'true') {
+            // Usamos withCount para obtener los totales de las relaciones
+            $query = SeguiPreguntas::withCount(['seguitiporespuesta'])
+                ->where('seguipreguntas.IDFORMULARIO', $idFormulario) // 🔹 Usamos la variable capturada
+                ->orderBy('seguipreguntas.ID', 'asc');
+
+            // Si el usuario pide todos los datos (all=true)
+            if ($request->has('all') && $request->query('all') === 'true') {
                 $data = $query->get();
 
-                // Transformación para UTF-8 y manejo de atributos
                 $data->transform(function ($item) {
-                    $attributes = $item->toArray(); // Usamos toArray para incluir los campos _count
+                    $attributes = $item->toArray();
                     foreach ($attributes as $key => $value) {
                         if (is_string($value)) {
                             $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
@@ -39,7 +44,7 @@ class SeguiPreguntasController extends Controller
                 return response()->json(['data' => $data]);
             }
 
-            // Paginación por defecto
+            // Paginación por defecto (si no se envía all=true)
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
@@ -50,7 +55,7 @@ class SeguiPreguntasController extends Controller
             }
 
             $data->getCollection()->transform(function ($item) {
-                $attributes = $item->toArray(); 
+                $attributes = $item->toArray();
                 foreach ($attributes as $key => $value) {
                     if (is_string($value)) {
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
@@ -76,7 +81,7 @@ class SeguiPreguntasController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+        try {
             DB::beginTransaction();
             $user = Auth::user();
             $res = SeguiPreguntas::create([
@@ -100,11 +105,9 @@ class SeguiPreguntasController extends Controller
                 'data' => $res,
                 'mensaje' => "Agregado con Éxito!!",
             ]);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-
     }
 
     /**
@@ -202,7 +205,5 @@ class SeguiPreguntasController extends Controller
                 'mensaje' => "El ods con id: $request->id no Existe",
             ]);
         }
-        
     }
-   
 }
