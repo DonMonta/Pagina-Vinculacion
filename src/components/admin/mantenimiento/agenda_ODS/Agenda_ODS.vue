@@ -15,7 +15,7 @@
               </svg>
             </button>
             <!-- @input llama al debouncedFilter, que inicia la nueva consulta al backend -->
-            <input type="text" placeholder="Ingresa el nombre del PLANDNE a buscar..." v-model="searchQuery"
+            <input type="text" placeholder="Ingresa el nombre de la agenda ODS a buscar..." v-model="searchQuery"
               @input="debouncedFilter"
               class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]" />
           </div>
@@ -27,7 +27,7 @@
 
         <button @click="isProfileAddressModal = true"
           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
-          Añadir PLANDNE
+          Añadir Agenda ODS
         </button>
       </div>
     </div>
@@ -39,10 +39,10 @@
               <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">ID</p>
             </th>
             <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">PLANDNE</p>
+              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Agenda ODS</p>
             </th>
             <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Objetivos/Políticas</p>
+              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">ODS</p>
             </th>
             <th class="py-5 px-4 text-left">
               <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Estado</p>
@@ -64,44 +64,41 @@
               </div>
             </td>
           </tr>
-          <tr v-else v-for="post in filteredarray" :key="post.id_pladne"
+          <tr v-else v-for="post in filteredarray" :key="post.id_ag_ods"
             class="border-t border-gray-100 hover:bg-gray-50/50 dark:border-gray-800 dark:hover:bg-white/[0.02] transition-colors">
 
             <td class="py-5 px-4 whitespace-nowrap">
-              <p class="text-gray-600 text-sm font-medium dark:text-gray-400">{{ post.id_pladne }}</p>
+              <p class="text-gray-600 text-sm font-medium dark:text-gray-400">{{ post.id_ag_ods }}</p>
             </td>
 
             <td class="py-5 px-4 whitespace-nowrap">
               <div>
                 <p class="font-bold text-gray-800 text-base dark:text-white/90">
-                  {{ post.nombre_plandne }}
+                  {{ post.nombre_ag_ods }}
                 </p>
-                <p class="text-xs text-gray-500 mt-0.5 italic">Periodo: {{ post.anio_plandne }}</p>
+                <p class="text-xs text-gray-500 mt-0.5 italic">Periodo: {{ post.anio_ag_ods }}</p>
               </div>
             </td>
             <td class="py-5 px-4">
               <div class="flex flex-col gap-1">
                 <span class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full w-fit">
-                  {{ post.objetivos_plandne_count }} Objetivos
-                </span>
-                <span class="text-xs font-medium text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-full w-fit">
-                  {{ post.politicas_plandne_count }} Políticas
+                  {{ post.ods_count }} ODS
                 </span>
               </div>
             </td>
             <td class="py-5 px-4 whitespace-nowrap">
               <span :class="{
                 'rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-wider': true,
-                'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_plandne === 1,
-                'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_plandne === 0
+                'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_ag_ods === 1,
+                'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_ag_ods === 0
               }">
-                {{ post.estado_plandne === 1 ? 'Activo' : 'Inactivo' }}
+                {{ post.estado_ag_ods === 1 ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
 
             <td class="py-5 px-4">
-              <div v-if="post.link_plandne">
-                <a :href="post.link_plandne" target="_blank"
+              <div v-if="post.link_ag_ods">
+                <a :href="post.link_ag_ods" target="_blank"
                   class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors dark:bg-red-500/10 dark:text-red-400">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -126,15 +123,7 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button v-if="post.estado_plandne === 1 && post.objetivos_plandne_count > 0"
-                  @click="abrirModalPoliticas(post)"
-                  class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors" title="Gestionar Objetivos">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 8l4 4-4 4M8 12h7" />
-                  </svg>
-                </button>
-                <button v-if="post.estado_plandne === 1" @click="abrirModalObjPol(post)"
+                <button v-if="post.estado_ag_ods === 1" @click="abriModalODS(post)"
                   class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                   title="Gestionar Objetivos">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -142,14 +131,14 @@
                     <rect x="3" y="3" width="18" height="18" rx="2" />
                   </svg>
                 </button>
-                <button @click="eliminar(post.id_plandne, post.nombre_plandne)" v-if="post.estado_plandne === 1"
+                <button @click="eliminar(post.id_ag_ods, post.nombre_ag_ods)" v-if="post.estado_ag_ods === 1"
                   class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
                 </button>
-                <button @click="habilitar(post.id_plandne, post.nombre_plandne)" v-if="post.estado_plandne === 0"
+                <button @click="habilitar(post.id_ag_ods, post.nombre_ag_ods)" v-if="post.estado_ag_ods === 0"
                   class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:bg-white/10"
                   title="Refrescar lista">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -183,132 +172,7 @@
         Actualizar
       </button>
     </div>
-    <div v-if="isPoliticasModalOpen"
-      class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
-      <div
-        class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
-
-        <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-          <div>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Objetivos Estratégicos</h3>
-            <p class="text-sm text-success-600 font-medium">{{ selectedPLANDNE?.nombre_plandne }}</p>
-          </div>
-          <button @click="isPoliticasModalOpen = false" class="text-gray-400 hover:text-gray-600">✕</button>
-        </div>
-        <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20">
-          <div class="flex gap-3">
-            <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="16" x2="12" y2="12" />
-              <line x1="12" y1="8" x2="12.01" y2="8" />
-            </svg>
-            <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-              <strong>Nota importante:</strong> Las políticas que añada aquí deben ser únicamente las que se encuentran
-              registradas en el documento oficial del <strong>PLANDNE</strong> seleccionado.
-            </p>
-          </div>
-        </div>
-
-        <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8">
-
-          <div class="md:col-span-4 border-r border-gray-100 dark:border-gray-800 pr-8">
-            <div class="space-y-4">
-              <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Objetivo Estratégico</label>
-
-                <div class="relative group">
-                  <div
-                    class="max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 custom-scrollbar">
-                    <div v-for="sub in ListaObjetivosPol" :key="sub.id_obj_pol_pladne"
-                      @click="PoliticasForm.id_obj_pol_pladne = sub.id_obj_pol_pladne" :class="[
-                        'p-3 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-0 transition-all hover:bg-blue-50 dark:hover:bg-blue-900/20',
-                        PoliticasForm.id_obj_pol_pladne === sub.id_obj_pol_pladne ? 'bg-blue-100 dark:bg-blue-900/40 border-l-4 border-l-blue-600' : ''
-                      ]">
-                      <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-bold text-purple-600 uppercase">{{ sub.cod_obj_pol }}</span>
-                        <span v-if="PoliticasForm.id_obj_pol_pladne === sub.id_obj_pol_pladne" class="text-blue-600">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="3">
-                            <path d="M20 6L9 17l-5-5" />
-                          </svg>
-                        </span>
-                      </div>
-                      <p class="text-xs text-gray-600 dark:text-gray-400 leading-tight italic">
-                        {{ sub.detalle_obj_pol }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <p v-if="!PoliticasForm.id_obj_pol_pladne" class="mt-2 text-[10px] text-amber-600 font-medium italic">
-                  * Debe seleccionar un objetivo de la lista superior
-                </p>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Código</label>
-                <div class="flex">
-                  <span
-                    class="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg text-gray-500">POLÍTICA</span>
-                  <input type="text" v-model="codNumero"
-                    class="w-full px-4 py-2 border border-gray-200 rounded-r-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
-                    placeholder="1.1 o 2-A">
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Detalle de la Política</label>
-                <textarea v-model="PoliticasForm.detalle_pol" rows="4"
-                  class="w-full px-4 py-2 border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
-                  placeholder="Escriba la política..."></textarea>
-              </div>
-
-              <button @click="guardarPoliticas" class="w-full btn-primary text-white font-bold py-2 rounded-lg">
-                {{ isEditingPoliticas ? 'Actualizar Política' : 'Guardar Política' }}
-              </button>
-              <button v-if="isEditingPoliticas" @click="cancelarEdicionPoliticas"
-                class="w-full text-danger-500 text-sm">Cancelar</button>
-            </div>
-          </div>
-
-          <div class="md:col-span-8 flex flex-col min-h-0">
-            <div class="overflow-y-auto border rounded-xl dark:border-gray-800 custom-scrollbar" style="max-height: 400px;">
-              <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
-                <thead class="bg-gray-50 dark:bg-gray-800/50">
-                  <tr>
-                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">COD</th>
-                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">Objetivo / Detalle</th>
-                    <th class="px-4 py-3 text-right text-xs font-bold text-gray-500">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                  <tr v-for="obj in listaPoliticas" :key="obj.id_pol_pladne">
-                    <td class="px-4 py-3 text-sm font-bold text-cyan-600">{{ obj.cod_pol }}</td>
-                    <td class="px-4 py-3">
-                      <p class="text-xs font-semibold text-purple-600 mb-1">{{ obj.objetivos_plandne?.cod_obj_pol }}
-                      </p>
-                      <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ obj.detalle_pol }}</p>
-                    </td>
-                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
-                      <button @click="prepararEdicionPol(obj)"
-                        class="text-blue-600 hover:underline text-xs">Editar</button>
-                      <button @click="eliminarPol(obj.id_pol_pladne)"
-                        class="text-red-600 hover:underline text-xs">Eliminar</button>
-                    </td>
-                  </tr>
-                  <tr v-if="listaPoliticas.length === 0">
-                    <td colspan="2" class="px-4 py-8 text-center text-gray-400 text-sm italic">No hay políticas
-                      registradas</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div v-if="isObjetivosPolModalOpen"
+    <div v-if="isODSModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
 
       <div
@@ -317,11 +181,11 @@
         <div
           class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-white/[0.02]">
           <div>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Objetivos del</h3>
-            <p class="text-sm text-success-600 font-medium">{{ selectedPLANDNE?.nombre_plandne }}</p>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Objetivos de Desarrollo Sostenible de la</h3>
+            <p class="text-sm text-success-600 font-medium">{{ selectedAgendaODS?.nombre_ag_ods }}</p>
           </div>
 
-          <button @click="isObjetivosPolModalOpen = false"
+          <button @click="isODSModalOpen = false"
             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 6L6 18M6 6l12 12" />
@@ -338,7 +202,7 @@
             </svg>
             <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
               <strong>Nota importante:</strong> Los objetivos que añada aquí deben ser únicamente los que se encuentran
-              registrados en el documento oficial del <strong>PLANDNE</strong> seleccionado.
+              registrados en el documento oficial del <strong>Agenda ODS</strong> seleccionado.
             </p>
           </div>
         </div>
@@ -348,14 +212,14 @@
           <div class="md:col-span-4 border-r border-gray-100 dark:border-gray-800 pr-0 md:pr-8">
 
             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">
-              {{ isEditingObjetivosPol ? 'Editar Objetivo' : 'Nuevo Objetivo' }}
+              {{ isEditingODS ? 'Editar Objetivo' : 'Nuevo Objetivo' }}
             </h4>
             <div class="space-y-4">
               <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Código</label>
                 <div class="flex">
                   <span
-                    class="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg text-gray-500">OBJETIVO</span>
+                    class="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-lg text-gray-500">ODS</span>
                   <input type="number" v-model="codNumero"
                     class="w-full px-4 py-2 border border-gray-200 rounded-r-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
                     placeholder="1">
@@ -363,16 +227,16 @@
               </div>
               <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Detalle del Objetivo</label>
-                <textarea v-model="ObjetivosPolForm.detalle_obj_pol" rows="4"
+                <textarea v-model="ObjetivosODSForm.detalle_ods" rows="4"
                   class="w-full px-4 py-2 border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 outline-none"
-                  placeholder="Escriba el objetivo del PLANDNE..."></textarea>
+                  placeholder="Escriba el objetivo de la Agenda ODS..."></textarea>
               </div>
               <div class="flex gap-2">
-                <button @click="guardarObjetivosPol"
+                <button @click="guardarODS"
                   class="flex-1 btn-primary text-white font-bold py-2 rounded-lg transition-colors">
-                  {{ isEditingObjetivosPol ? 'Actualizar' : 'Guardar' }}
+                  {{ isEditingODS ? 'Actualizar' : 'Guardar' }}
                 </button>
-                <button v-if="isEditingObjetivosPol" @click="cancelarEdicionObjetivosPol"
+                <button v-if="isEditingODS" @click="cancelarEdicionODS"
                   class="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg">
                   ✕
                 </button>
@@ -399,21 +263,21 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-transparent">
-                  <tr v-for="sub in ListaObjetivosPol" :key="sub.id_obj_pol_pladne"
+                  <tr v-for="sub in ListaODS" :key="sub.id_ods"
                     class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
                     <td class="px-4 py-3">
-                      <p class="text-xs font-semibold text-purple-600 mb-1">{{ sub.cod_obj_pol }}</p>
-                      <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ sub.detalle_obj_pol }}</p>
+                      <p class="text-xs font-semibold text-purple-600 mb-1">{{ sub.cod_ods }}</p>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ sub.detalle_ods }}</p>
                     </td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
-                      <button @click="prepararEdicionObjetivosPol(sub)"
+                      <button @click="prepararEdicionODS(sub)"
                         class="text-blue-600 hover:text-blue-800 font-medium text-xs transition-colors">Editar</button>
-                      <button @click="eliminarObjetivosPol(sub.id_obj_pol_pladne)"
+                      <button @click="eliminarODS(sub.id_ods)"
                         class="text-red-600 hover:text-red-800 font-medium text-xs transition-colors">Eliminar</button>
                     </td>
                   </tr>
 
-                  <tr v-if="ListaObjetivosPol.length === 0">
+                  <tr v-if="ListaODS.length === 0">
                     <td colspan="2" class="px-4 py-12 text-center text-gray-400 text-sm italic">
                       No hay objetivos registrados
                     </td>
@@ -442,10 +306,10 @@
           </button>
           <div class="px-2 pr-14">
             <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Agregar PLANDNE
+              Agregar Agenda ODS
             </h4>
             <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Llene todos los campos para agregar un nuevo PLANDNE.
+              Llene todos los campos para agregar una nueva Agenda ODS.
             </p>
           </div>
           <form class="flex flex-col">
@@ -453,10 +317,10 @@
               <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Nombre del PLANDNE
+                    Nombre de la Agenda ODS
                   </label>
-                  <input type="text" v-model="objetoguardar.nombre_plandne"
-                    placeholder="Ej: Plan de Desarrollo para el Nuevo Ecuador 2026"
+                  <input type="text" v-model="objetoguardar.nombre_ag_ods"
+                    placeholder="Ej: Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
                   <p class="mt-1.5 text-xs text-gray-500">Use un nombre descriptivo y el año actual.</p>
                 </div>
@@ -465,10 +329,10 @@
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                     Periodo de vigencia
                   </label>
-                  <input type="text" v-model="objetoguardar.anio_plandne" placeholder="Ej: 2024-2028"
+                  <input type="text" v-model="objetoguardar.anio_ag_ods" placeholder="Ej: 2024-2028"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
-                  <p class="mt-1.5 text-xs text-gray-500">Rango de años del plan (Ej: 2024-2030).</p>
-                  <p v-if="objetoguardar.anio_plandne && !/^\d{4}-\d{4}$/.test(objetoguardar.anio_plandne)"
+                  <p class="mt-1.5 text-xs text-gray-500">Rango de años de la agenda (Ej: 2024-2030).</p>
+                  <p v-if="objetoguardar.anio_ag_ods && !/^\d{4}-\d{4}$/.test(objetoguardar.anio_ag_ods)"
                     class="mt-1 text-xs text-red-500 font-medium">
                     ⚠️ Formato inválido. Use el formato AAAA-AAAA (ej: 2024-2030).
                   </p>
@@ -476,19 +340,19 @@
               </div>
               <div class="mt-5">
                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Link del Plan de Desarrollo
+                  Link de la Agenda ODS
                 </label>
-                <input type="text" v-model="objetoguardar.link_plandne" placeholder="Ej: https://www.google.com"
+                <input type="text" v-model="objetoguardar.link_ag_ods" placeholder="Ej: https://www.google.com"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
-                <p v-if="objetoguardar.link_plandne && !/^https?:\/\/.+/.test(objetoguardar.link_plandne)"
+                <p v-if="objetoguardar.link_ag_ods && !/^https?:\/\/.+/.test(objetoguardar.link_ag_ods)"
                   class="mt-1 text-xs text-red-500 font-medium">
                   ⚠️ Formato inválido. Use el formato https://www.google.com.
                 </p>
               </div>
               <div class="mt-5">
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del
-                  PLANDNE</label>
-                <select v-model="objetoguardar.estado_plandne"
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado de la
+                  Agenda ODS</label>
+                <select v-model="objetoguardar.estado_ag_ods"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 dark:border-gray-700 dark:text-white/90">
                   <option value="1">Activo</option>
                   <option value="0">Inactivo</option>
@@ -503,7 +367,7 @@
               </button>
               <button v-if="formIsValid" @click="registrar" type="button"
                 class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Guardar PLANDNE
+                Guardar Agenda ODS
               </button>
             </div>
           </form>
@@ -527,10 +391,10 @@
           </button>
           <div class="px-2 pr-14">
             <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Editar PLANDNE
+              Editar Agenda ODS
             </h4>
             <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Los datos mostrados son los actuales del PLANDNE. Realice los cambios necesarios y guarde.
+              Los datos mostrados son los actuales de la Agenda ODS. Realice los cambios necesarios y guarde.
             </p>
           </div>
           <form class="flex flex-col">
@@ -538,10 +402,10 @@
               <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Nombre del PLANDNE
+                    Nombre de la Agenda ODS
                   </label>
-                  <input type="text" v-model="objetoeditar.nombre_plandne"
-                    placeholder="Ej: Plan de Desarrollo para el Nuevo Ecuador 2026"
+                  <input type="text" v-model="objetoeditar.nombre_ag_ods"
+                    placeholder="Ej: Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
                   <p class="mt-1.5 text-xs text-gray-500">Use un nombre descriptivo y el año actual.</p>
                 </div>
@@ -550,10 +414,10 @@
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                     Periodo de vigencia
                   </label>
-                  <input type="text" v-model="objetoeditar.anio_plandne" placeholder="Ej: 2024-2028"
+                  <input type="text" v-model="objetoeditar.anio_ag_ods" placeholder="Ej: 2024-2028"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
-                  <p class="mt-1.5 text-xs text-gray-500">Rango de años del plan (Ej: 2024-2030).</p>
-                  <p v-if="objetoeditar.anio_plandne && !/^\d{4}-\d{4}$/.test(objetoeditar.anio_plandne)"
+                  <p class="mt-1.5 text-xs text-gray-500">Rango de años de la agenda (Ej: 2024-2030).</p>
+                  <p v-if="objetoeditar.anio_ag_ods && !/^\d{4}-\d{4}$/.test(objetoeditar.anio_ag_ods)"
                     class="mt-1 text-xs text-red-500 font-medium">
                     ⚠️ Formato inválido. Use el formato AAAA-AAAA (ej: 2024-2030).
                   </p>
@@ -561,20 +425,20 @@
               </div>
               <div class="mt-5">
                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Link del Plan de Desarrollo
+                  Link de la Agenda ODS
                 </label>
-                <input type="text" v-model="objetoeditar.link_plandne" placeholder="Ej: https://www.google.com"
+                <input type="text" v-model="objetoeditar.link_ag_ods" placeholder="Ej: https://www.google.com"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
-                <p v-if="objetoeditar.link_plandne && !/^https?:\/\/.+/.test(objetoeditar.link_plandne)"
+                <p v-if="objetoeditar.link_ag_ods && !/^https?:\/\/.+/.test(objetoeditar.link_ag_ods)"
                   class="mt-1 text-xs text-red-500 font-medium">
                   ⚠️ Formato inválido. Use el formato https://www.google.com.
                 </p>
               </div>
 
               <div class="mt-5">
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado del
-                  PLANDNE</label>
-                <select v-model="objetoeditar.estado_plandne"
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado de la
+                  Agenda ODS</label>
+                <select v-model="objetoeditar.estado_ag_ods"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 dark:border-gray-700 dark:text-white/90">
                   <option value="1">Activo</option>
                   <option value="0">Inactivo</option>
@@ -630,20 +494,18 @@ export default {
     return {
       idus: 0,
       baseUrl: "/vin",
-
-      usersarray: [],
       objetoguardar: {
-        nombre_plandne: "",
-        anio_plandne: "",
-        estado_plandne: 0,
-        link_plandne: ""
+        nombre_ag_ods: "",
+        anio_ag_ods: "",
+        estado_ag_ods: 0,
+        link_ag_ods: ""
       },
       objetoeditar: {
-        id_pladne: 0,
-        nombre_plandne: "",
-        anio_plandne: "",
-        estado_plandne: 0,
-        link_plandne: ""
+        id_ag_ods: 0,
+        nombre_ag_ods: "",
+        anio_ag_ods: "",
+        estado_ag_ods: 0,
+        link_ag_ods: ""
       },
       filteredarray: [],
       searchQuery: "",
@@ -655,29 +517,17 @@ export default {
       lastPage: 1,
       buscando: false, // Mantenido, pero no se usa en la lógica de paginación actual
       debouncedFilter: null,
-      archivoSeleccionado: null,
-      archivoPreviewName: '',
-      uploading: false,
-      isObjetivosPolModalOpen: false,
-      selectedPLANDNE: null,
-      ListaObjetivosPol: [],
-      isEditingObjetivosPol: false,
-      ObjetivosPolForm: {
-        id_obj_pol_pladne: null,
-        id_pladne: null,
-        cod_obj_pol: '',
-        detalle_obj_pol: ''
+      isODSModalOpen: false,
+      selectedAgendaODS: null,
+      ListaODS: [],
+      isEditingODS: false,
+      ObjetivosODSForm: {
+        id_ods: null,
+        id_ag_ods: null,
+        cod_ods: '',
+        detalle_ods: ''
       },
-      isPoliticasModalOpen: false,
-      listaPoliticas: [],
       codNumero: '', // Solo el número (ej: 1)
-      isEditingPoliticas: false,
-      PoliticasForm: {
-        id_pol_pladne: null,
-        id_obj_pol_pladne: '',
-        cod_pol: '', // Se armará como OE + codNumero
-        detalle_pol: ''
-      }
     };
   },
   created() {
@@ -698,176 +548,102 @@ export default {
       const regexLink = /^https?:\/\/.+/; // Validación básica para URLs
 
       return (
-        this.objetoguardar.nombre_plandne.trim() !== '' &&
-        regexAnio.test(this.objetoguardar.anio_plandne) && // <--- Validación aquí
-        this.objetoguardar.estado_plandne !== null &&
-        regexLink.test(this.objetoguardar.link_plandne) // Si es obligatorio
+        this.objetoguardar.nombre_ag_ods.trim() !== '' &&
+        regexAnio.test(this.objetoguardar.anio_ag_ods) && // <--- Validación aquí
+        this.objetoguardar.estado_ag_ods !== null &&
+        regexLink.test(this.objetoguardar.link_ag_ods) // Si es obligatorio
       );
     },
     formIsValidEdit() {
       const regexAnio = /^\d{4}-\d{4}$/;
       const regexLink = /^https?:\/\/.+/; // Validación básica para URLs
       return (
-        this.objetoeditar.nombre_plandne.trim() !== '' &&
-        regexAnio.test(this.objetoeditar.anio_plandne) && // <--- Validación aquí
-        this.objetoeditar.estado_plandne !== null &&
-        regexLink.test(this.objetoeditar.link_plandne)
+        this.objetoeditar.nombre_ag_ods.trim() !== '' &&
+        regexAnio.test(this.objetoeditar.anio_ag_ods) && // <--- Validación aquí
+        this.objetoeditar.estado_ag_ods !== null &&
+        regexLink.test(this.objetoeditar.link_ag_ods)
       );
     },
 
 
   },
   methods: {
-    async abrirModalPoliticas(pei) {
-      this.selectedPLANDNE = pei;
-      this.cancelarEdicionPoliticas();
 
-      // 1. Cargar subsistemas del PEI seleccionado para el Select
-      const respSub = await API.get(`${this.baseUrl}/obj_pol_plandne/${pei.id_pladne}`);
-      this.ListaObjetivosPol = respSub.data.data || [];
 
-      // 2. Cargar objetivos (Tu backend debería filtrar objetivos por PEI a través de los subsistemas)
-      await this.getPoliticas();
-      this.isPoliticasModalOpen = true;
+    async abriModalODS(obj) {
+      this.selectedAgendaODS = obj;
+      this.ObjetivosODSForm.id_ag_ods = obj.id_ag_ods;
+      this.cancelarEdicionODS(); // Limpia el form
+      await this.getODS();
+      this.isODSModalOpen = true;
     },
 
-    async guardarPoliticas() {
-      // Validaciones
-      if (!this.PoliticasForm.id_obj_pol_pladne || !this.codNumero || !this.PoliticasForm.detalle_pol) {
-        mostraralertas2("Todos los campos son obligatorios", "warning");
-        return;
-      }
-
-      // Armar el código final: OE + numero
-      this.PoliticasForm.cod_pol = 'POLÍTICA ' + this.codNumero;
-
-      const metodo = this.isEditingPoliticas ? 'PUT' : 'POST';
-      const url = this.isEditingPoliticas
-        ? `${this.baseUrl}/politicas_plandne/${this.PoliticasForm.id_pol_pladne}`
-        : `${this.baseUrl}/politicas_plandne`;
-
-      // 2. Llamada al servidor
-      const exito = await enviarsolig(metodo, this.PoliticasForm, url, 'Objetivo guardado con éxito');
-
-      // 3. Solo si fue exitoso (status 200), limpiamos y refrescamos
-      if (exito) {
-        this.cancelarEdicionPoliticas();
-        this.getPoliticas();
-      }
-    },
-
-    prepararEdicionPol(obj) {
-      this.isEditingPoliticas = true;
-      this.PoliticasForm.id_pol_pladne = obj.id_pol_pladne;
-      this.PoliticasForm.id_obj_pol_pladne = obj.id_obj_pol_pladne;
-      this.PoliticasForm.detalle_pol = obj.detalle_pol;
-      // Extraer solo el número del código (quita las letras OE)
-      this.codNumero = obj.cod_pol.replace('POLÍTICAS', '');
-    },
-
-    cancelarEdicionPoliticas() {
-      this.isEditingPoliticas = false;
-      this.codNumero = '';
-      this.PoliticasForm = { id_pol_pladne: null, id_obj_pol_pladne: '', cod_pol: '', detalle_pol: '' };
-    },
-
-    async eliminarPol(id) {
-      const res = await elimnarpermanente(`${this.baseUrl}/politicas_plandne/`, id, '¿Eliminar?', 'Esta acción no se puede deshacer');
-      if (res && res.status === 200) {
-        this.listaPoliticas = this.listaPoliticas.filter(o => o.id_pol_pladne !== id);
-      }
-    },
-    async abrirModalObjPol(obj) {
-      this.selectedPLANDNE = obj;
-      this.ObjetivosPolForm.id_pladne = obj.id_pladne;
-      this.cancelarEdicionObjetivosPol(); // Limpia el form
-      await this.getObjPol();
-      this.isObjetivosPolModalOpen = true;
-    },
-    async getPoliticas() {
+    async getODS() {
       try {
-        this.cargandoObjetivos = true; // Opcional: para un spinner interno
-
-        // Enviamos el ID del PEI para que el backend sepa qué objetivos buscar
-        // a través de sus subsistemas relacionados.
-        const resp = await API.get(`${this.baseUrl}/politicas_por_plandne/${this.selectedPLANDNE.id_pladne}`);
-        if (resp && resp.data) {
-          this.listaPoliticas = resp.data;
-        }
+        const resp = await API.get(`${this.baseUrl}/ods/${this.selectedAgendaODS.id_ag_ods}`);
+        this.ListaODS = resp.data.data || [];
       } catch (error) {
-        console.error("Error al obtener politicas:", error);
-        mostraralertas2("No se pudieron cargar las politicas", "error");
-      } finally {
-        this.cargandoObjetivos = false;
+        console.error("Error al obtener ODS:", error);
       }
     },
 
-    async getObjPol() {
-      try {
-        const resp = await API.get(`${this.baseUrl}/obj_pol_plandne/${this.selectedPLANDNE.id_pladne}`);
-        this.ListaObjetivosPol = resp.data.data || [];
-      } catch (error) {
-        console.error("Error al obtener objetivos políticos:", error);
-      }
-    },
-
-    async guardarObjetivosPol() {
-      if (!this.codNumero || !this.ObjetivosPolForm.detalle_obj_pol) {
+    async guardarODS() {
+      if (!this.codNumero || !this.ObjetivosODSForm.detalle_ods) {
         mostraralertas2("Todos lo campos son obligatorios", "warning");
         return;
       }
 
       try {
-        this.ObjetivosPolForm.cod_obj_pol = 'OBJETIVO ' + this.codNumero;
-        const metodo = this.isEditingObjetivosPol ? 'PUT' : 'POST';
-        const url = this.isEditingObjetivosPol
-          ? `${this.baseUrl}/obj_pol_plandne/${this.ObjetivosPolForm.id_obj_pol_pladne}`
-          : `${this.baseUrl}/obj_pol_plandne`;
+        this.ObjetivosODSForm.cod_ods = 'ODS ' + this.codNumero;
+        const metodo = this.isEditingODS ? 'PUT' : 'POST';
+        const url = this.isEditingODS
+          ? `${this.baseUrl}/ods/${this.ObjetivosODSForm.id_ods}`
+          : `${this.baseUrl}/ods`;
 
-        const exito = await enviarsolig(metodo, this.ObjetivosPolForm, url, 'Operación exitosa');
+        const exito = await enviarsolig(metodo, this.ObjetivosODSForm, url, 'Operación exitosa');
         if (exito) {
-          this.cancelarEdicionObjetivosPol();
-          this.getObjPol();
+          this.cancelarEdicionODS();
+          this.getODS();
         }
       } catch (error) {
         console.error("Error al guardar subsistema:", error);
       }
     },
 
-    prepararEdicionObjetivosPol(obj) {
-      this.isEditingObjetivosPol = true;
-      this.ObjetivosPolForm.id_obj_pol_pladne = obj.id_obj_pol_pladne;
-      this.ObjetivosPolForm.detalle_obj_pol = obj.detalle_obj_pol;
-      this.codNumero = obj.cod_obj_pol.replace('OBJETIVO', '');
+    prepararEdicionODS(obj) {
+      this.isEditingODS = true;
+      this.ObjetivosODSForm.id_ods = obj.id_ods;
+      this.ObjetivosODSForm.detalle_ods = obj.detalle_ods;
+      this.codNumero = obj.cod_ods.replace('ODS', '');
     },
 
-    cancelarEdicionObjetivosPol() {
-      this.isEditingObjetivosPol = false;
-      this.ObjetivosPolForm.id_obj_pol_pladne = null;
-      this.ObjetivosPolForm.cod_obj_pol = '';
+    cancelarEdicionODS() {
+      this.isEditingODS = false;
+      this.ObjetivosODSForm.id_ods = null;
+      this.ObjetivosODSForm.cod_ods = '';
       this.codNumero = '';
-      this.ObjetivosPolForm.detalle_obj_pol = '';
+      this.ObjetivosODSForm.detalle_ods = '';
     },
 
-    async eliminarObjetivosPol(id) {
+    async eliminarODS(id) {
       const response = await elimnarpermanente(
-        `${this.baseUrl}/obj_pol_plandne/`,
+        `${this.baseUrl}/ods/`,
         id,
-        'Eliminar Objetivo',
-        '¿Realmente desea eliminar el objetivo?'
+        'Eliminar ODS',
+        '¿Realmente desea eliminar el ODS?'
       );
       if (response && response.status === 200) {
-        this.ListaObjetivosPol = this.ListaObjetivosPol.filter(sub => sub.id_obj_pol_pladne !== id);
+        this.ListaODS = this.ListaODS.filter(sub => sub.id_ods !== id);
       }
     },
     abrirModalEdicion(user) {
       // Clonamos el objeto para no modificar la tabla directamente antes de guardar
       this.objetoeditar = {
-        id_pladne: user.id_pladne,
-        nombre_plandne: user.nombre_plandne,
-        anio_plandne: user.anio_plandne,
-        estado_plandne: user.estado_plandne,
-        link_plandne: user.link_plandne
+        id_ag_ods: user.id_ag_ods,
+        nombre_ag_ods: user.nombre_ag_ods,
+        anio_ag_ods: user.anio_ag_ods,
+        estado_ag_ods: user.estado_ag_ods,
+        link_ag_ods: user.link_ag_ods
       };
       this.$.setupState.isEditModalOpen = true;
     },
@@ -879,13 +655,13 @@ export default {
           page: page,
           search_query: searchQuery // Parámetro para búsqueda
         };
-        const response = await API.get(`${this.baseUrl}/plandne`, { params });
-
+        const response = await API.get(`${this.baseUrl}/agenda_ods`, { params });
         const data = response.data?.data || [];
         this.filteredarray = data;
         const pagination = response.data?.pagination || {};
         this.currentPage = pagination.current_page || 1;
         this.lastPage = pagination.last_page || 1;
+        
       } catch (error) {
         console.warn("⚠️ Error al obtener datos:", error?.response?.data || error);
         this.filteredarray = [];
@@ -922,33 +698,33 @@ export default {
 
       try {
         const params = {
-          nombre_plandne: this.objetoguardar.nombre_plandne,
-          anio_plandne: this.objetoguardar.anio_plandne,
-          estado_plandne: this.objetoguardar.estado_plandne,
-          link_plandne: this.objetoguardar.link_plandne
+          nombre_ag_ods: this.objetoguardar.nombre_ag_ods,
+          anio_ag_ods: this.objetoguardar.anio_ag_ods,
+          estado_ag_ods: this.objetoguardar.estado_ag_ods,
+          link_ag_ods: this.objetoguardar.link_ag_ods
         };
-        const exito = await enviarsolig('POST', params, `${this.baseUrl}/plandne`, 'PLANDNE registrado con éxito');
+        const exito = await enviarsolig('POST', params, `${this.baseUrl}/agenda_ods`, 'Agenda ODS registrado con éxito');
         if (exito) {
           this.$.setupState.isProfileAddressModal = false;
 
           this.limpiarFormulario();
           this.actualizar();
         } else {
-          mostraralertas2("No se pudo registrar el PLANDNE", "error");
+          mostraralertas2("No se pudo registrar el ODS", "error");
         }
       } catch (error) {
-        console.error("❌ Error al registrar PLANDNE:", error.response?.data || error);
+        console.error("❌ Error al registrar ODS:", error.response?.data || error);
       }
     },
     async Update() {
       try {
         const params = {
-          nombre_plandne: this.objetoeditar.nombre_plandne,
-          anio_plandne: this.objetoeditar.anio_plandne,
-          estado_plandne: this.objetoeditar.estado_plandne,
-          link_plandne: this.objetoeditar.link_plandne
+          nombre_ag_ods: this.objetoeditar.nombre_ag_ods,
+          anio_ag_ods: this.objetoeditar.anio_ag_ods,
+          estado_ag_ods: this.objetoeditar.estado_ag_ods,
+          link_ag_ods: this.objetoeditar.link_ag_ods
         };
-        const exito = await enviarsolig('PUT', params, `${this.baseUrl}/plandne/${this.objetoeditar.id_pladne}`, 'PLANDNE actualizado con éxito');
+        const exito = await enviarsolig('PUT', params, `${this.baseUrl}/agenda_ods/${this.objetoeditar.id_ag_ods}`, 'Agenda ODS actualizado con éxito');
         if (exito) {
           this.$.setupState.isEditModalOpen = false;
 
@@ -956,38 +732,38 @@ export default {
           this.actualizar();
         } else {
           this.$.setupState.isEditModalOpen = false;
-          mostraralertas2("No se pudo editar el PLANDNE", "error");
+          mostraralertas2("No se pudo editar el ODS", "error");
         }
       } catch (error) {
-        console.error("❌ Error al registrar plandne:", error.response?.data || error);
+        console.error("❌ Error al registrar ODS:", error.response?.data || error);
       }
     },
     limpiarFormulario() {
       this.objetoguardar = {
-        nombre_plandne: "",
-        anio_plandne: "",
-        estado_plandne: 0,
-        link_plandne: ""
+        nombre_ag_ods: "",
+        anio_ag_ods: "",
+        estado_ag_ods: 0,
+        link_ag_ods: ""
       };
       this.objetoeditar = {
-        id_plandne: 0,
-        nombre_plandne: "",
-        anio_plandne: "",
-        estado_plandne: 0,
-        link_plandne: ""
+        id_ag_ods: 0,
+        nombre_ag_ods: "",
+        anio_ag_ods: "",
+        estado_ag_ods: 0,
+        link_ag_ods: ""
       };
     },
     eliminar(id, nombre) {
       try {
         eliminacion(
-          `${this.baseUrl}/inhabilitar_plandne/`,
+          `${this.baseUrl}/inhabilitar_agenda_ods/`,
           id,
           'Deshabilitar registro',
-          '¿Realmente desea deshabilitar el PLANDNE  ' + nombre + '?',
+          '¿Realmente desea deshabilitar la Agenda ODS  ' + nombre + '?',
           this.actualizar   // 👈 callback para refrescar la tabla al confirmar
         );
       } catch (error) {
-        console.error("Error al eliminar el PLANDNE:", error);
+        console.error("Error al eliminar la Agenda ODS:", error);
         this.cargando = false;
       }
     },
@@ -996,10 +772,10 @@ export default {
         // No hace falta poner this.cargando = true aquí si confimarhabi maneja la alerta,
         // pero si lo haces, asegúrate de cerrarlo.
         await confimarhabi(
-          `${this.baseUrl}/habilitar_plandne/`,
+          `${this.baseUrl}/habilitar_agenda_ods/`,
           id,
           'Habilitar registro',
-          `¿Desea habilitar el PLANDNE "${nombre}"?`,
+          `¿Desea habilitar la Agenda ODS "${nombre}"?`,
           this.actualizar
         );
       } catch (error) {

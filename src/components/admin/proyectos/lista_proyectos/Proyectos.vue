@@ -160,152 +160,171 @@
                             <button @click="cancelarEdicion"
                                 class="text-xs text-red-500 font-bold hover:underline">Cancelar</button>
                         </div>
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex flex-col items-center space-y-2">
+                                <div
+                                    class="w-32 h-32 rounded-xl border-2 border-dashed border-blue-200 bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden shadow-sm">
 
-                        <div v-if="modoNuevo || (formInt.reemplazado == 1)"
-                            class="mb-6 flex gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-blue-100 shadow-sm">
+                                    <template v-if="nuevoIntegranteData || integranteEdit">
+                                        <img :src="getPhotoUrl(nuevoIntegranteData?.cedula || integranteEdit?.cedula)"
+                                            class="w-full h-full object-cover animate-fadeIn" alt="Foto de perfil" />
+                                    </template>
+
+                                    <template v-else>
+                                        <span class="text-[10px] text-gray-400 text-center px-2">
+                                            Esperando integrante...
+                                        </span>
+                                    </template>
+
+                                </div>
+                                <p class="text-[10px] font-bold text-blue-500 uppercase">Perfil</p>
+                            </div>
                             <div class="flex-1">
-                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Buscar por
-                                    Cédula</label>
-                                <input type="text" v-model="cedulaBusqueda" placeholder="Ej: 08xxxxxxx"
-                                    class="w-full border rounded-lg p-2 text-sm focus:ring-2 ring-blue-200 outline-none">
-                            </div>
-                            <button @click="buscarNuevoIntegrante"
-                                class="mt-5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold">
-                                Verificar
-                            </button>
-                        </div>
-
-                        <div v-if="!modoNuevo || (modoNuevo && nuevoIntegranteData)"
-                            class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div v-if="nuevoIntegranteData"
-                                class="md:col-span-3 p-3 bg-green-50 border border-green-100 rounded-lg text-sm text-green-700">
-                                Confirmado: <b>{{ nuevoIntegranteData.nombre_completo }}</b> ({{
-                                    nuevoIntegranteData.tipo == 'doc' ? 'Docente' : 'Estudiante' }})
-                            </div>
-
-                            <div class="relative">
-                                <label class="block text-[10px] font-bold mb-1">Función</label>
-                                <select v-model="formInt.id_funcion" @change="calcularHoras"
-                                    class="w-full border rounded-lg p-2 text-sm bg-white dark:bg-gray-800 max-w-full overflow-hidden truncate">
-                                    <option :value="null">Seleccione Función</option>
-                                    <option v-for="f in funciones" :key="f.id_funcion" :value="f.id_funcion">{{
-                                        f.nombre_funcion }}</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-[10px] font-bold mb-1">Horas (Automático)</label>
-                                <input type="number" v-model="formInt.horas" disabled
-                                    class="w-full border rounded-lg p-2 text-sm bg-gray-100 dark:bg-gray-700 cursor-not-allowed font-bold text-blue-600">
-                            </div>
-
-                            <div class="relative">
-                                <label class="block text-[10px] font-bold mb-1">Carrera</label>
-                                <select v-model="formInt.idCarr"
-                                    class="w-full border rounded-lg p-2 text-sm bg-white dark:bg-gray-800 max-w-full overflow-hidden truncate">
-                                    <option v-for="c in carreras" :key="c.idCarr" :value="c.idCarr">{{ c.NombCarr }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <div v-if="formInt.reemplazado == 1 || modoNuevo" class="md:col-span-2">
-                                <label class="block text-[10px] font-bold mb-1">Documento Respaldo (PDF)</label>
-                                <div @click="$refs.fileFoto.click()"
-                                    class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
-                                    :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
-                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <svg v-if="!archivoPreviewName" class="w-8 h-8 mb-3 text-gray-400" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                        </svg>
-                                        <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor"
-                                            viewBox="0 0 20 20">
-                                            <path
-                                                d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
-                                            <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
-                                        </svg>
-
-                                        <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                                            <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para
-                                                cargar</span>
-                                            <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName
-                                            }}</span>
-                                        </p>
-                                        <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
+                                <div v-if="modoNuevo || (formInt.reemplazado == 1)"
+                                    class="mb-6 flex gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-blue-100 shadow-sm">
+                                    <div class="flex-1">
+                                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Buscar por
+                                            Cédula</label>
+                                        <input type="text" v-model="cedulaBusqueda" placeholder="Ej: 08xxxxxxx"
+                                            class="w-full border rounded-lg p-2 text-sm focus:ring-2 ring-blue-200 outline-none">
+                                    </div>
+                                    <button @click="buscarNuevoIntegrante"
+                                        class="mt-5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold">
+                                        Verificar
+                                    </button>
+                                </div>
+                                <div v-if="!modoNuevo || (modoNuevo && nuevoIntegranteData)"
+                                    class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div v-if="nuevoIntegranteData"
+                                        class="md:col-span-3 p-3 bg-green-50 border border-green-100 rounded-lg text-sm text-green-700">
+                                        Confirmado: <b>{{ nuevoIntegranteData.nombre_completo }}</b> ({{
+                                            nuevoIntegranteData.tipo == 'doc' ? 'Docente' : 'Estudiante' }})
                                     </div>
 
-                                    <input type="file" ref="fileFoto" class="hidden" accept="application/pdf"
-                                        @change="handleFileChange" />
-                                </div>
-                            </div>
+                                    <div class="relative">
+                                        <label class="block text-[10px] font-bold mb-1">Función</label>
+                                        <select v-model="formInt.id_funcion" @change="calcularHoras"
+                                            class="w-full border rounded-lg p-2 text-sm bg-white dark:bg-gray-800 max-w-full overflow-hidden truncate">
+                                            <option :value="null">Seleccione Función</option>
+                                            <option v-for="f in funciones" :key="f.id_funcion" :value="f.id_funcion">{{
+                                                f.nombre_funcion }}</option>
+                                        </select>
+                                    </div>
 
-                            <div v-if="!modoNuevo" class="flex items-center pt-4">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" v-model="formInt.reemplazado" :true-value="1"
-                                        :false-value="0">
-                                    <span class="text-sm font-bold text-red-600">Reemplazar Integrante</span>
-                                </label>
-                            </div>
-                            <div v-if="!modoNuevo && formInt.reemplazado == 1" class="md:col-span-3 space-y-4">
-
-                                <div class="flex items-center p-3 bg-blue-50 rounded-xl border border-blue-100">
-                                    <label class="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" v-model="continuarEnProyecto" :true-value="true"
-                                            :false-value="false" class="w-4 h-4 text-blue-600 rounded">
-                                        <span class="text-sm font-bold text-gray-700">
-                                            ¿El integrante al que estás reemplazando seguirá en el proyecto?
-                                        </span>
-                                    </label>
-                                </div>
-
-                                <div v-if="continuarEnProyecto"
-                                    class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-xl bg-gray-50 animate-fadeIn">
                                     <div>
-                                        <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
-                                            Función para el integrante saliente</label>
-                                        <select v-model="formInt.id_funcion_reemplazado"
-                                            @change="calcularHorasReemplazo"
-                                            class="w-full border rounded-lg p-2 text-sm bg-white">
-                                            <option :value="null">Seleccione nueva función</option>
-                                            <option v-for="f in funcionesFiltradasSinDireccion" :key="f.id_funcion"
-                                                :value="f.id_funcion">
-                                                {{ f.nombre_funcion }}
+                                        <label class="block text-[10px] font-bold mb-1">Horas (Automático)</label>
+                                        <input type="number" v-model="formInt.horas" disabled
+                                            class="w-full border rounded-lg p-2 text-sm bg-gray-100 dark:bg-gray-700 cursor-not-allowed font-bold text-blue-600">
+                                    </div>
+
+                                    <div class="relative">
+                                        <label class="block text-[10px] font-bold mb-1">Carrera</label>
+                                        <select v-model="formInt.idCarr"
+                                            class="w-full border rounded-lg p-2 text-sm bg-white dark:bg-gray-800 max-w-full overflow-hidden truncate">
+                                            <option v-for="c in carreras" :key="c.idCarr" :value="c.idCarr">{{ c.NombCarr }}
                                             </option>
                                         </select>
                                     </div>
-                                    <div>
-                                        <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nuevas
-                                            Horas</label>
-                                        <input type="number" v-model="formInt.horas_reemplazado" disabled
-                                            class="w-full border rounded-lg p-2 text-sm">
+
+                                    <div v-if="formInt.reemplazado == 1 || modoNuevo" class="md:col-span-2">
+                                        <label class="block text-[10px] font-bold mb-1">Documento Respaldo (PDF)</label>
+                                        <div @click="$refs.fileFoto.click()"
+                                            class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
+                                            :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
+                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <svg v-if="!archivoPreviewName" class="w-8 h-8 mb-3 text-gray-400" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                </svg>
+                                                <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path
+                                                        d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                                                    <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                                                </svg>
+
+                                                <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                                                    <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para
+                                                        cargar</span>
+                                                    <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName
+                                                    }}</span>
+                                                </p>
+                                                <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
+                                            </div>
+
+                                            <input type="file" ref="fileFoto" class="hidden" accept="application/pdf"
+                                                @change="handleFileChange" />
+                                        </div>
                                     </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
-                                            Carrera (Opcional)</label>
-                                        <select v-model="formInt.idCarr_reemplazado"
-                                            class="w-full border rounded-lg p-2 text-sm bg-white">
-                                            <option v-for="c in carreras" :key="c.idCarr" :value="c.idCarr">{{
-                                                c.NombCarr }}</option>
-                                        </select>
+
+                                    <div v-if="!modoNuevo" class="flex items-center pt-4">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" v-model="formInt.reemplazado" :true-value="1"
+                                                :false-value="0">
+                                            <span class="text-sm font-bold text-red-600">Reemplazar Integrante</span>
+                                        </label>
+                                    </div>
+                                    <div v-if="!modoNuevo && formInt.reemplazado == 1" class="md:col-span-3 space-y-4">
+
+                                        <div class="flex items-center p-3 bg-blue-50 rounded-xl border border-blue-100">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <input type="checkbox" v-model="continuarEnProyecto" :true-value="true"
+                                                    :false-value="false" class="w-4 h-4 text-blue-600 rounded">
+                                                <span class="text-sm font-bold text-gray-700">
+                                                    ¿El integrante al que estás reemplazando seguirá en el proyecto?
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div v-if="continuarEnProyecto"
+                                            class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-xl bg-gray-50 animate-fadeIn">
+                                            <div>
+                                                <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
+                                                    Función para el integrante saliente</label>
+                                                <select v-model="formInt.id_funcion_reemplazado"
+                                                    @change="calcularHorasReemplazo"
+                                                    class="w-full border rounded-lg p-2 text-sm bg-white">
+                                                    <option :value="null">Seleccione nueva función</option>
+                                                    <option v-for="f in funcionesFiltradasSinDireccion" :key="f.id_funcion"
+                                                        :value="f.id_funcion">
+                                                        {{ f.nombre_funcion }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nuevas
+                                                    Horas</label>
+                                                <input type="number" v-model="formInt.horas_reemplazado" disabled
+                                                    class="w-full border rounded-lg p-2 text-sm">
+                                            </div>
+                                            <div class="md:col-span-2">
+                                                <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
+                                                    Carrera (Opcional)</label>
+                                                <select v-model="formInt.idCarr_reemplazado"
+                                                    class="w-full border rounded-lg p-2 text-sm bg-white">
+                                                    <option v-for="c in carreras" :key="c.idCarr" :value="c.idCarr">{{
+                                                        c.NombCarr }}</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="mt-6 flex justify-end gap-3">
+                                    <button @click="guardarCambios" :disabled="enviando"
+                                        class="bg-blue-700 text-white px-8 py-2 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                        <span v-if="enviando">
+                                            Procesando...
+                                        </span>
+                                        <span v-else>
+                                            {{ modoNuevo ? 'Registrar Integrante' : 'Guardar Cambios' }}
+                                        </span>
+                                    </button>
+                                </div>
+
                             </div>
                         </div>
-
-                        <div class="mt-6 flex justify-end gap-3">
-                            <button @click="guardarCambios" :disabled="enviando"
-                                class="bg-blue-700 text-white px-8 py-2 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-                                <span v-if="enviando">
-                                    Procesando...
-                                </span>
-                                <span v-else>
-                                    {{ modoNuevo ? 'Registrar Integrante' : 'Guardar Cambios' }}
-                                </span>
-                            </button>
-                        </div>
                     </div>
-
                     <div>
                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
                             <h3 class="font-bold text-gray-800 dark:text-white flex items-center gap-2">
@@ -663,6 +682,14 @@ export default {
             });
 
             return `${fechaLegible} - ${horaLegible}`;
+        },
+        getPhotoUrl(ci) {
+            // Si no hay CI, retornamos una imagen vacía o un placeholder
+            if (!ci) return '';
+
+            const baseURL2 = API.defaults.baseURL;
+            // Usamos el timestamp para evitar problemas de caché al cambiar de integrante
+            return `${baseURL2}/vin/getFotoDocente/${ci}?t=${new Date().getTime()}`;
         },
         handleFileChange(event) {
             //Obtener el archivo seleccionado por el usuario

@@ -50,6 +50,7 @@ import MantenimientoIcon from "./MantenimientoIcon.vue";
 import MesaIcon from "./MesaIcon.vue";
 import PedidosIcon from "./PedidosIcon.vue";
 import Ventas from "./VentasIcon.vue";
+import FormularioIcon from "./FormularioIcon.vue";
 
 
 
@@ -105,6 +106,7 @@ export {
   MantenimientoIcon,
   MesaIcon,
   PedidosIcon,
-  Ventas
+  Ventas,
+  FormularioIcon,
 
 };

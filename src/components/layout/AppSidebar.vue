@@ -167,6 +167,7 @@ import {
   MesaIcon,
   PedidosIcon,
   Ventas,
+  FormularioIcon,
 } from "../../icons";
 import SidebarWidget from "./SidebarWidget.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
@@ -193,6 +194,14 @@ const menuData = [
         subItems: [
           { name: "PEI", path: "/site-admin/pei", pro: false },
           { name: "PLANDNE", path: "/site-admin/plandne", pro: false },
+          { name: "Agenda ODS", path: "/site-admin/agenda_ods", pro: false },
+        ],
+      },
+      {
+        icon: FormularioIcon,
+        name: "Formularios",
+        subItems: [
+          { name: "Formulario Cátedra", path: "/site-admin/formulario_catedra", pro: false },
         ],
       },
       {
