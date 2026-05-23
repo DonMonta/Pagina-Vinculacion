@@ -17,6 +17,7 @@ use App\Http\Controllers\Agenda_ODSController;
 use App\Http\Controllers\ODSController;
 use App\Http\Controllers\SeguiFormularioController;
 use App\Http\Controllers\SeguiPreguntasController;
+use App\Http\Controllers\SeguiTipoRespuestaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -101,6 +102,8 @@ Route::prefix('vin')->group(function () {
         Route::delete('inhabilitar_formulario/{id}', [SeguiFormularioController::class, 'destroy']);
         //Definición de endpoint para el recurso SeguiPreguntas, perimitiendo operaciones CRUD
         Route::apiResource("seguipreguntas", SeguiPreguntasController::class);
+        //Definción de endpoint para el recurso SeguiTipoRespuesta, perimitiendo operaciones CRUD
+        Route::apiResource("seguitiporespuesta", SeguiTipoRespuestaController::class);
     });
 }); 
 

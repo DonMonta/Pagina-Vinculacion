@@ -166,7 +166,7 @@ class SeguiPreguntasController extends Controller
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El formulario con id: $id no Existe",
+                'mensaje' => "La pregunta con id: $id no Existe",
             ]);
         }
     }
@@ -196,13 +196,13 @@ class SeguiPreguntasController extends Controller
             } else {
                 return response()->json([
                     'data' => $data,
-                    'mensaje' => "El ods no existe (puede que ya lo haya eliminado)",
+                    'mensaje' => "La pregunta no existe (puede que ya lo haya eliminado)",
                 ]);
             }
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El ods con id: $request->id no Existe",
+                'mensaje' => "La pregunta con id: $request->id no Existe",
             ]);
         }
     }
