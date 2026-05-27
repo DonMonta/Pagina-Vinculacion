@@ -28,10 +28,14 @@ export default {
         } else if (response) {
           const role = response.Rol;
           const tok = response.token;
-          if (role === 'sotics' || role === 'atics' || role === 'sa' || role === 'vinc' || role === 'avinc') {
+          if (role === 'sotics' || role === 'atics' || role === 'sa' || role === 'vinc' || role === 'avinc' ) {
             mostraralertas('LE DAMOS LA BIENVENIDA ADMIN ' + (response.name || ''), 'success');
             this.$router.push('/site-admin');
           } 
+          else if (role === 'est') {
+            mostraralertas('LE DAMOS LA BIENVENIDA ESTUDANTE ' + (response.name || ''), 'success');
+            this.$router.push('/site-admin/perfil');
+          }
         }
       } catch (error) {
         this.isLoggingIn = false;

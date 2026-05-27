@@ -97,6 +97,17 @@
             <!-- Acciones de Edición y Eliminación -->
             <td class="py-3 text-right whitespace-nowrap">
               <div class="flex justify-end gap-2">
+                <button v-if="post.total_encuestas > 0" @click="abrirModalInscritos(post)"
+                  class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                  title="Ver Alumnos Inscritos">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </button>
                 <button @click="abrirModalEdicion(post)"
                   class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -153,6 +164,100 @@
         Actualizar
       </button>
     </div>
+    <div v-if="mostrarModalInscritos" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
+      <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900">
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ formularioSeleccionado?.NOMBRE }}</h3>
+            <p class="text-sm text-gray-500 mt-1">Total de Personas Inscritas: <span class="font-bold text-brand-600 px-2 py-0.5 bg-brand-50 rounded-md">{{ totalInscritos }}</span></p>
+          </div>
+          <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" @click="mostrarModalInscritos = false">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-grow">
+          <div v-if="cargandoInscritos" class="flex flex-col items-center justify-center py-12 gap-2">
+            <span class="animate-spin h-8 w-8 border-4 border-brand-500 border-t-transparent rounded-full"></span>
+            <p class="text-gray-500 text-sm">Cargando base de alumnos...</p>
+          </div>
+          <table v-else class="min-w-full">
+            <thead>
+              <tr class="border-b border-gray-100 dark:border-gray-800 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <th class="pb-3 px-4">Foto</th>
+                <th class="pb-3 px-4">Cédula</th>
+                <th class="pb-3 px-4">Nombres y Apellidos</th>
+                <th class="pb-3 px-4">Carrera / Nivel</th>
+                <th class="pb-3 px-4 text-right">Detalles</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="alumno in listaInscritos" :key="alumno.CIInfPer" class="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-white/[0.01]">
+                <td class="py-3 px-4">
+                  <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200 bg-gray-100">
+                    <img :src="getPhotoUrl(alumno.CIInfPer)" alt="Perfil" class="w-full h-full object-cover" />
+                  </div>
+                </td>
+                <td class="py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">{{ alumno.CIInfPer }}</td>
+                <td class="py-3 px-4 text-sm font-bold text-gray-900 dark:text-white">{{ alumno.NombInfPer }} {{ alumno.ApellInfPer }} {{ alumno.ApellMatInfPer }}</td>
+                <td class="py-3 px-4 text-xs text-gray-600 dark:text-gray-400">
+                  <p class="font-medium">{{ alumno.NombCarr }}</p>
+                  <p class="text-gray-400 mt-0.5">{{ alumno.nivel }}to Ciclo ({{ alumno.facultad_siglas }})</p>
+                </td>
+                <td class="py-3 px-4 text-right">
+                  <button @click="abrirDetalleRespuestas(alumno.CIInfPer)" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors rounded-lg">
+                    Ver respuestas
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="mostrarModalRespuestas" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
+      <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white">Hoja de Respuestas Individual</h3>
+          <button class="text-gray-400 hover:text-gray-600" @click="mostrarModalRespuestas = false">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-grow" v-if="detalleAlumno">
+          <div class="flex flex-col sm:flex-row gap-5 p-4 bg-gray-50 dark:bg-white/[0.02] rounded-xl border border-gray-100 dark:border-gray-800 mb-6">
+            <div class="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-white shrink-0 mx-auto sm:mx-0">
+              <img :src="getPhotoUrl(detalleAlumno.persona.CIInfPer)" alt="Perfil" class="w-full h-full object-cover" />
+            </div>
+            <div class="text-center sm:text-left flex-grow">
+              <h4 class="text-base font-bold text-gray-900 dark:text-white">{{ detalleAlumno.persona.NombInfPer }} {{ detalleAlumno.persona.ApellInfPer }} {{ detalleAlumno.persona.ApellMatInfPer }}</h4>
+              <p class="text-xs text-gray-500 mt-0.5">Cédula: {{ detalleAlumno.persona.CIInfPer }} | {{ detalleAlumno.persona.mailInst }}</p>
+              <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 border-t border-gray-200/60 dark:border-gray-700/50 pt-2 text-xs">
+                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Carrera:</b> {{ detalleAlumno.persona.NombCarr }}</p>
+                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Facultad:</b> {{ detalleAlumno.persona.facultad_siglas }}</p>
+                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Nivel actual:</b> {{ detalleAlumno.persona.nivel }}to Ciclo</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div v-for="(item, index) in detalleAlumno.respuestas" :key="index" class="p-4 border border-gray-100 dark:border-gray-800 bg-white dark:bg-transparent rounded-xl">
+              <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pregunta {{ index + 1 }}</p>
+              <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">{{ item.PREGUNTA }}</p>
+              
+              <div class="p-2.5 bg-gray-50 dark:bg-white/[0.01] rounded-lg border border-dashed border-gray-200 dark:border-gray-800">
+                <p v-if="item.opcion_seleccionada" class="text-sm text-gray-900 dark:text-white flex items-center gap-1.5 font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                  {{ item.opcion_seleccionada }}
+                </p>
+                <p v-else class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed break-words" v-html="renderizarTextoConEnlaces(item.textorespuesta || 'Sin respuesta registrada')"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div v-if="isPreguntasModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
 
@@ -167,8 +272,7 @@
             <p class="text-sm text-success-600 font-medium">{{ selectedFormulario?.NOMBRE }}</p>
           </div>
 
-          <button @click="cerrarModalPreguntas"
-            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <button @click="cerrarModalPreguntas" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -297,8 +401,7 @@
             <h3 class="text-lg font-bold text-gray-800 dark:text-white">Opciones de Respuesta</h3>
             <p class="text-xs text-purple-600 font-semibold mt-0.5">Pregunta: "{{ selectedPregunta?.PREGUNTA }}"</p>
           </div>
-          <button @click="cerrarModalOpciones"
-            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <button @click="cerrarModalOpciones" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -624,7 +727,14 @@ export default {
         IDPREGUNTA: null,
         TIPORESPUESTA: '',
         valor: null
-      }
+      },
+      mostrarModalInscritos: false,
+      mostrarModalRespuestas: false,
+      cargandoInscritos: false,
+      totalInscritos: 0,
+      listaInscritos: [],
+      formularioSeleccionado: null,
+      detalleAlumno: null
     };
   },
   created() {
@@ -654,6 +764,9 @@ export default {
     },
   },
   methods: {
+    getPhotoUrl(ci) {
+      return `${API.defaults.baseURL}/vin/getFoto/${ci}`;
+    },
     async cerrarModalPreguntas() {
       this.isPreguntasModalOpen = false;
       this.selectedFormulario = null;
@@ -679,6 +792,38 @@ export default {
       this.cancelarEdicionOpciones();
       await this.getOpciones();
       this.isOpcionesModalOpen = true;
+    },
+    async abrirModalInscritos(formulario) {
+      this.formularioSeleccionado = formulario;
+      this.mostrarModalInscritos = true;
+      this.cargandoInscritos = true;
+      try {
+        const response = await API.get(`${this.baseUrl}/getEstudiantesInscritos/${formulario.ID}`);
+        this.listaInscritos = response.data.estudiantes;
+        this.totalInscritos = response.data.total;
+      } catch (error) {
+        console.error("Error cargando alumnos inscritos", error);
+      } finally {
+        this.cargandoInscritos = false;
+      }
+    },
+    async abrirDetalleRespuestas(cedula) {
+      try {
+        const response = await API.get(`${this.baseUrl}/getDetalleRespuestasEstudiante/${this.formularioSeleccionado.ID}/${cedula}`);
+        this.detalleAlumno = response.data;
+        this.mostrarModalRespuestas = true;
+      } catch (error) {
+        console.error("Error al recuperar respuestas del estudiante", error);
+      }
+    },
+    renderizarTextoConEnlaces(texto) {
+      if (!texto) return '';
+      // Expresión regular para identificar URLs de forma segura (http, https y www)
+      const regexUrl = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+      
+      return texto.replace(regexUrl, function(url) {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-brand-600 hover:text-brand-700 underline font-semibold inline-flex items-center gap-0.5">${url} <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></a>`;
+      });
     },
 
     async getOpciones() {

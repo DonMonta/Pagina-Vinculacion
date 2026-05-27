@@ -6,6 +6,10 @@ export default createStore({
     email: localStorage.getItem('email_vinc') || null,
     idusu: localStorage.getItem('id_vinc') || null,
     name: localStorage.getItem('name_vinc') || null,
+    carrera: localStorage.getItem('carrera_vinc') || null,
+    nivel: localStorage.getItem('nivel_vinc') || null,
+    idcarrera: localStorage.getItem('idcarrera_vinc') || null,
+    facultad: localStorage.getItem('facultad_vinc') || null,
     token: localStorage.getItem('token_vinc') || null,
     token_type: localStorage.getItem('token_type_vinc') || null,
   },
@@ -38,6 +42,22 @@ export default createStore({
     setTokenType_vinc(state, type) {
       state.token_type = type;
       localStorage.setItem('token_type_vinc', type);
+    },
+    setCarrera_vinc(state, carrera) {
+      state.carrera = carrera;
+      localStorage.setItem('carrera_vinc', carrera);
+    },
+    setNivel_vinc(state, nivel) {
+      state.nivel = nivel;
+      localStorage.setItem('nivel_vinc', nivel);
+    },
+    setIdcarrera_vinc(state, idcarrera) {
+      state.idcarrera = idcarrera;
+      localStorage.setItem('idcarrera_vinc', idcarrera);
+    },
+    setFacultad_vinc(state, facultad) {
+      state.facultad = facultad;
+      localStorage.setItem('facultad_vinc', facultad);
     },
     logout_vinc(state) {
       // Limpia el state y localStorage al cerrar sesión

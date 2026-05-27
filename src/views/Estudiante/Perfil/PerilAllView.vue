@@ -1,13 +1,11 @@
 <template>
   <AdminLayout>
     <PageBreadcrumb :pageTitle="currentPageTitle" />
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
 
-    <div class="col-span-12 space-y-6 xl:col-span-7">
-
-      <VentasAll />
+      <ProfileCard />
 
     </div>
-    
   </AdminLayout>
 </template>
 
@@ -16,7 +14,6 @@ import { ref } from "vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 //import ComponentCard from "@/components/common/ComponentCard.vue";
-import MonthlySale from '@/components/ecommerce/MonthlySale.vue'
-import VentasAll from "@/components/admin/VentasAll.vue";
-const currentPageTitle = ref("Ventas");
+import ProfileCard from "@/components/estudiantes/perfil/ProfileCard.vue";
+const currentPageTitle = ref("Información Personal");
 </script>

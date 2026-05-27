@@ -211,30 +211,19 @@ const menuData = [
           { name: "Lista de Proyectos", path: "/site-admin/proyectos", pro: false },
         ],
       },
-      /*{
-        icon: MesaIcon,
-        name: "Mesas",
+      {
+        icon: UserCircleIcon,
+        name: "Estudiante",
         subItems: [
-          //{ name: "Mesas Disponibles", path: "/mesas", pro: false },
+          { name: "Mi Perfil", path: "/site-admin/perfil", pro: false },
         ],
-      },*/
-     
+      },
       
     ],
   },
   {
     title: "Administración",
     items: [
-      /*{
-        icon: PedidosIcon,
-        name: "Pedidos",
-        path: "/pedidos_recientes",
-      },
-      {
-        icon: Ventas,
-        name: "Ventas",
-        path: "/ventas",
-      },*/
 
       // ... Add other menu items here
     ],
@@ -253,9 +242,13 @@ const menuGroups = computed(() => {
   return menuData.map(group => ({
     ...group,
     items: group.items.filter(item => {
-      if (rol === 'vinc') {
+      if (rol === 'vinc' ) {
         // Solo permitimos "Proyectos" y "Principal"
         return item.name === "Proyectos" || item.name === "Principal";
+      }
+      if (rol === 'est' ) {
+        // Solo permitimos "Principal"
+        return item.name === "Estudiante";
       }
       return true;
     })
