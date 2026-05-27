@@ -99,7 +99,7 @@ class SeguiPreguntasController extends Controller
                 'bt_fechahora'   => Carbon::now(),
                 'bt_accion'      => "Crear Pregunta" . " - VINCULACIÓN",
                 'bt_ippc'        => $request->ip(),
-                'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Crear Pregunta de tipo {$request->tipo} CON NOMBRE: {$request->PREGUNTA}",
+                'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Crear Pregunta de tipo {$request->tipo}",
             ]);
             return response()->json([
                 'data' => $res,

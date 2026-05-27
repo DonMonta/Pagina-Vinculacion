@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Bitacora;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use App\Models\SeguiEncuesta;
+use App\Models\SeguiDetalleEncuesta;
+use Illuminate\Http\Response;
 
 class SeguiFormularioController extends Controller
 {
@@ -90,6 +94,28 @@ class SeguiFormularioController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error en el servidor: ' . $e->getMessage()], 500);
         }
+    }
+    //Funcion para obtener el formulario de inscripcion de catedra habilitado
+    public function getCatedraInscripcion(Request $request)
+    {
+        // 1. Buscar el formulario activo de tipo Inscripción
+        $data = SeguiFormulario::where('seguiformulario.tipoencuesta', 'LIKE', '%Inscripción%')
+            ->where('seguiformulario.ACTIVO', 1)
+            ->first();
+
+        $yaInscrito = false;
+
+        // 2. Si hay un formulario activo y se envió la cédula, validar si ya existe la encuesta
+        if ($data && $request->has('cedula')) {
+            $yaInscrito = SeguiEncuesta::where('cedula_estudiante', $request->cedula)
+                ->where('idformulario', $data->ID)
+                ->exists(); // Retorna true si ya se inscribió
+        }
+
+        return response()->json([
+            'data' => $data,
+            'yaInscrito' => $yaInscrito
+        ]);
     }
 
 
@@ -295,5 +321,200 @@ class SeguiFormularioController extends Controller
                 'mensaje' => "Formulario con id: $id no Existe",
             ]);
         }
+    }
+    public function getFormularioInscripcion()
+    {
+        try {
+            $formulario = SeguiFormulario::where('seguiformulario.tipoencuesta', 'LIKE', '%Inscripción%')
+                ->where('ACTIVO', 1)
+                ->with(['seguipreguntas' => function ($query) {
+                    // Si tienes soft deletes o filtros de preguntas, añádelos aquí
+                }, 'seguipreguntas.seguitiporespuesta'])
+                ->first();
+
+            if (!$formulario) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay ningún formulario de inscripción activo en este momento.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $formulario
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            Log::error("Error al obtener formulario de inscripción: " . $e->getMessage());
+            return response()->json([
+                'error' => 'Error interno del servidor al cargar el formulario.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function guardarInscripcion(Request $request)
+    {
+        $request->validate([
+            'idformulario'      => 'required|integer',
+            'cedula_estudiante' => 'required|string',
+            'idcarr'            => 'required',
+            'respuestas'        => 'required|array',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // 1. Registrar la cabecera de la encuesta
+            $encuesta = SeguiEncuesta::create([
+                'cedula_estudiante' => $request->cedula_estudiante,
+                'fecha'             => Carbon::now()->format('Y-m-d'),
+                'idformulario'      => $request->idformulario,
+                'idcarr'            => $request->idcarr,
+                'encuestador'       => '', // TODO: Cambiar por el nombre del encuestador
+            ]);
+
+            // 2. Registrar cada una de las respuestas en el detalle
+            foreach ($request->respuestas as $resp) {
+
+                // SI ES SELECCIÓN MÚLTIPLE (idtiporespuesta llega como un Array del Front)
+                if (isset($resp['idtiporespuesta']) && is_array($resp['idtiporespuesta'])) {
+                    foreach ($resp['idtiporespuesta'] as $idOpcion) {
+                        SeguiDetalleEncuesta::create([
+                            'idseguiencuesta' => $encuesta->getKey(),
+                            'idpregunta'      => $resp['idpregunta'],
+                            'idtiporespuesta' => $idOpcion,
+                            'textorespuesta'  => '', // No lleva texto por ser opción fija
+                        ]);
+                    }
+                }
+                // SI ES ABIERTA O SELECCIÓN ÚNICA
+                else {
+                    // EXPLICACIÓN: Si idtiporespuesta es null (Pregunta Abierta), le asignamos 0 
+                    // para que pase la restricción NOT NULL de la base de datos de forma segura.
+                    $idTipoRespuestaFinal = (!isset($resp['idtiporespuesta']) || is_null($resp['idtiporespuesta'])) ? 0 : $resp['idtiporespuesta'];
+
+                    SeguiDetalleEncuesta::create([
+                        'idseguiencuesta' => $encuesta->getKey(),
+                        'idpregunta'      => $resp['idpregunta'],
+                        'idtiporespuesta' => $idTipoRespuestaFinal,
+                        'textorespuesta'  => $resp['textorespuesta'] ?? '',
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tu inscripción ha sido procesada y guardada con éxito.'
+            ], \Illuminate\Http\Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Error al guardar inscripción de estudiante: " . $e->getMessage());
+            return response()->json([
+                'error' => 'No se pudo procesar la inscripción. Inténtalo de nuevo más tarde.'
+            ], \Illuminate\Http\Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function getEstudiantesInscritos(Request $request, string $idFormulario)
+    {
+        // 1. Obtener las cédulas de los estudiantes que llenaron este formulario
+        $cedulasInscritas = SeguiEncuesta::where('idformulario', $idFormulario)
+            ->pluck('cedula_estudiante')
+            ->toArray();
+
+        if (empty($cedulasInscritas)) {
+            return response()->json([
+                'total' => 0,
+                'estudiantes' => []
+            ]);
+        }
+
+        // 2. Ejecutar la consulta SQL adaptada usando el filtro del periodo lectivo activo
+        $estudiantes = DB::table('informacionpersonal')
+            ->select(
+                'informacionpersonal.CIInfPer',
+                'informacionpersonal.NombInfPer',
+                'informacionpersonal.ApellInfPer',
+                'informacionpersonal.ApellMatInfPer',
+                'informacionpersonal.mailInst',
+                'carrera.NombCarr',
+                'carrera.idCarr',
+                'facultad.siglas as facultad_siglas',
+                'detalle_matricula.nivel'
+            )
+            ->join('factura', 'factura.cedula', '=', 'informacionpersonal.CIInfPer')
+            ->join('detalle_matricula', 'factura.id', '=', 'detalle_matricula.idfactura')
+            ->join('carrera', 'carrera.idCarr', '=', 'detalle_matricula.idcarr')
+            ->join('facultad', 'facultad.idfacultad', '=', 'carrera.idfacultad')
+            ->whereIn('informacionpersonal.CIInfPer', $cedulasInscritas)
+            ->where('factura.idper', function($query) {
+                $query->select('idper')->from('periodolectivo')->where('StatusPerLec', 1)->limit(1);
+            })
+            ->where('carrera.StatusCarr', 1)
+            ->whereIn('factura.tipo_documento', ['MATRICULA', 'MATRÍCULA'])
+            ->where('carrera.optativa', 0)
+            ->distinct()
+            ->get();
+
+        return response()->json([
+            'total' => $estudiantes->count(),
+            'estudiantes' => $estudiantes
+        ]);
+    }
+    public function getDetalleRespuestasEstudiante(Request $request, string $idFormulario, string $cedula)
+    {
+        // 1. Obtener los datos de la cabecera de la encuesta del estudiante
+        $encuesta = SeguiEncuesta::where('idformulario', $idFormulario)
+            ->where('cedula_estudiante', $cedula)
+            ->first();
+
+        if (!$encuesta) {
+            return response()->json(['error' => 'No se encontró registro de encuesta.'], 404);
+        }
+
+        // 2. Obtener los datos personales con la consulta proporcionada
+        $datosPersona = DB::table('informacionpersonal')
+            ->select(
+                'informacionpersonal.CIInfPer',
+                'informacionpersonal.NombInfPer',
+                'informacionpersonal.ApellInfPer',
+                'informacionpersonal.ApellMatInfPer',
+                'informacionpersonal.mailInst',
+                'carrera.NombCarr',
+                'facultad.siglas as facultad_siglas',
+                'detalle_matricula.nivel'
+            )
+            ->join('factura', 'factura.cedula', '=', 'informacionpersonal.CIInfPer')
+            ->join('detalle_matricula', 'factura.id', '=', 'detalle_matricula.idfactura')
+            ->join('carrera', 'carrera.idCarr', '=', 'detalle_matricula.idcarr')
+            ->join('facultad', 'facultad.idfacultad', '=', 'carrera.idfacultad')
+            ->where('informacionpersonal.CIInfPer', $cedula)
+            ->where('factura.idper', function($query) {
+                $query->select('idper')->from('periodolectivo')->where('StatusPerLec', 1)->limit(1);
+            })
+            ->where('carrera.StatusCarr', 1)
+            ->whereIn('factura.tipo_documento', ['MATRICULA', 'MATRÍCULA'])
+            ->where('carrera.optativa', 0)
+            ->distinct()
+            ->first();
+
+        // 3. Traer de forma estructurada todas las respuestas mapeadas con las preguntas del formulario
+        $respuestas = DB::table('seguipreguntas')
+            ->leftJoin('seguidetalleencuesta', function($join) use ($encuesta) {
+                $join->on('seguidetalleencuesta.idpregunta', '=', 'seguipreguntas.ID')
+                     ->where('seguidetalleencuesta.idseguiencuesta', '=', $encuesta->ID);
+            })
+            ->leftJoin('seguitiporespuesta', 'seguitiporespuesta.ID', '=', 'seguidetalleencuesta.idtiporespuesta')
+            ->where('seguipreguntas.IDFORMULARIO', $idFormulario)
+            ->select(
+                'seguipreguntas.PREGUNTA',
+                'seguipreguntas.tipo as tipo_pregunta',
+                'seguidetalleencuesta.textorespuesta',
+                'seguitiporespuesta.TIPORESPUESTA as opcion_seleccionada'
+            )
+            ->get();
+
+        return response()->json([
+            'persona' => $datosPersona,
+            'respuestas' => $respuestas
+        ]);
     }
 }

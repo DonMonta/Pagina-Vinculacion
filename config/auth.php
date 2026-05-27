@@ -15,7 +15,7 @@ return [
 
     'defaults' => [
         'guard' => 'api',
-        'passwords' => 'vin_users',
+        'passwords' => 'usuario',
     ],
 
     /*
@@ -38,7 +38,11 @@ return [
     'guards' => [
         'api' => [
             'driver' => 'jwt',
-            'provider' => 'vin_users',
+            'provider' => 'usuario',
+        ],
+        'estudiante' => [
+            'driver' => 'jwt',
+            'provider' => 'estudiantes',
         ],
     ],
 
@@ -60,9 +64,14 @@ return [
     */
 
     'providers' => [
-        'vin_users' => [
+        'usuario' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+
+        'estudiantes' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\informacionpersonal::class,
         ],
 
         // 'users' => [
@@ -91,9 +100,9 @@ return [
     */
 
     'passwords' => [
-        'vin_users' => [
-            'provider' => 'vin_users',
-            'table' => 'vin_password_reset_tokens',
+        'usuario' => [
+            'provider' => 'usuario',
+            'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

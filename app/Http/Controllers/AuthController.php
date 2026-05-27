@@ -7,15 +7,16 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 //use App\Models\RegistroTitulos;
-//use App\Models\informacionpersonal;
+use App\Models\informacionpersonal;
 use Illuminate\Validation\Rule;
 use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
-use App\Models\Bitacora; 
+use App\Models\Bitacora;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -43,6 +44,7 @@ class AuthController extends Controller
             ->where('StatusUsu', 1)
             ->whereIn('idperfil', $perfilesPermitidos)
             ->first();
+        $estudiante = informacionpersonal::where('CIInfPer', $CIInfPer)->first();
 
         if ($user) {
 
@@ -78,6 +80,77 @@ class AuthController extends Controller
                 'name' => $user->NombUsu,
                 'email' => $user->email,
                 'Role' => $user->idperfil,
+                'cedula' => $user->ciinfper,
+            ]);
+        } elseif ($estudiante) {
+            // Validamos la clave dactilar (asumo que se guarda sin MD5, si lleva md5 ajusta la comparación)
+            if (md5($codigo_dactilar) !== $estudiante->codigo_dactilar) {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => 'Usuario correcto pero la clave es incorrecta',
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+
+            // Obtener ID del periodo lectivo activo para la subconsulta
+            $idPerActivo = DB::table('periodolectivo')->where('StatusPerLec', 1)->value('idper');
+            // Ejecutar tu consulta para saber si está matriculado
+            $matricula = DB::table('informacionpersonal')
+                ->select(
+                    'informacionpersonal.CIInfPer',
+                    'informacionpersonal.NombInfPer',
+                    'informacionpersonal.ApellInfPer',
+                    'informacionpersonal.mailInst',
+                    'carrera.idCarr',
+                    'carrera.NombCarr',
+                    'facultad.siglas',
+                    'detalle_matricula.nivel'
+                )
+                ->join('factura', 'factura.cedula', '=', 'informacionpersonal.CIInfPer')
+                ->join('detalle_matricula', 'factura.id', '=', 'detalle_matricula.idfactura')
+                ->join('carrera', 'carrera.idCarr', '=', 'detalle_matricula.idcarr')
+                ->join('facultad', 'facultad.idfacultad', '=', 'carrera.idfacultad')
+                ->where('factura.idper', $idPerActivo)
+                ->where('carrera.StatusCarr', 1)
+                ->whereIn('factura.tipo_documento', ['MATRICULA', 'MATRÍCULA'])
+                ->where('carrera.optativa', 0)
+                ->where('informacionpersonal.CIInfPer', $CIInfPer)
+                ->first();
+            if (!$matricula) {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => 'Usuario correcto pero aun no se ha matriculado en el periodo lectivo activo',
+                ], Response::HTTP_FORBIDDEN); // 403 Forbidden 
+            }
+
+            // --- REGISTRO EN BITÁCORA ESTUDIANTE ---
+            try {
+                Bitacora::create([
+                    'bt_usuario'     => $estudiante->CIInfPer,
+                    'bt_fechahora'   => Carbon::now(),
+                    'bt_accion'      => 'INICIO DE SESIÓN ESTUDIANTE VINCULACIÓN',
+                    'bt_ippc'        => $request->ip(),
+                    'bt_observacion' => 'INICIO DE SESIÓN ESTUDIANTE: ' . $estudiante->NombInfPer . ' ' . $estudiante->ApellInfPer,
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Error al registrar bitácora ESTUDIANTE: " . $e->getMessage());
+            }
+
+            // Generamos Token explícitamente para este modelo alternativo
+            $token = auth('estudiante')->login($estudiante);
+
+            return response()->json([
+                'mensaje'    => 'Autenticación exitosa',
+                'token'      => $token,
+                'token_type' => 'bearer',
+                'expires_in' => config('jwt.ttl') * 60,
+                'name'       => $estudiante->NombInfPer . ' ' . $estudiante->ApellInfPer,
+                'email'      => $estudiante->mailInst,
+                'cedula'    => $estudiante->CIInfPer,
+                'Role'       => 'est', // Retornamos Rol estático 'est' como solicitaste
+                'carrera'    => $matricula->NombCarr,
+                'nivel'      => $matricula->nivel,
+                'IDCarrera'  => $matricula->idCarr,
+                'facultad'    => $matricula->siglas,
             ]);
         } else {
 
@@ -90,22 +163,41 @@ class AuthController extends Controller
 
     public function me()
     {
-        return response()->json(auth()->user());
+        // 1. Verificamos si es un usuario administrativo/docente
+        if (auth('api')->check()) {
+            return response()->json(auth('api')->user());
+        }
+
+        // 2. Verificamos si es un estudiante
+        if (auth('estudiante')->check()) {
+            return response()->json(auth('estudiante')->user());
+        }
+
+        // Si el token llegó pero expiró o no pertenece a ningún guard válido
+        return response()->json([
+            'error' => 'No autorizado o sesión expirada'
+        ], Response::HTTP_UNAUTHORIZED);
     }
     public function logout()
     {
-        //auth()->logout();
         try {
             $token = JWTAuth::getToken();
             if (!$token) {
-                return response()->json(['error' => 'No hay token'], Response::HTTP_BAD_REQUEST);
+                return response()->json(['error' => 'No hay token activo'], Response::HTTP_BAD_REQUEST);
             }
+
+            // Invalidamos el token globalmente (bloquea el token tanto para api como estudiante)
             JWTAuth::invalidate($token);
-            return response()->json(['message' => 'Has cerrado sesion'], Response::HTTP_OK);
+
+            // Forzamos el cierre de sesión en los estados locales de los guards
+            auth('api')->logout();
+            auth('estudiante')->logout();
+
+            return response()->json(['message' => 'Has cerrado sesión exitosamente'], Response::HTTP_OK);
         } catch (TokenInvalidException $e) {
-            return response()->json(['error' => 'Token inválido'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => 'Token inválido o ya revocado'], Response::HTTP_UNAUTHORIZED);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'No se pudo cerrar sesion'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['error' => 'No se pudo cerrar sesión'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
     public function refresh()

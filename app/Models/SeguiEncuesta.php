@@ -27,4 +27,8 @@ class SeguiEncuesta extends Model
     {
         return $this->belongsTo(SeguiFormulario::class, 'idformulario');
     }
+    public function informacionpersonal()
+    {
+        return $this->belongsTo(informacionpersonal::class, 'cedula_estudiante', 'CIInfPer');
+    }
 }

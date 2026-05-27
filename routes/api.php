@@ -32,9 +32,10 @@ use App\Http\Controllers\SeguiTipoRespuestaController;
 
 Route::prefix('vin')->group(function () {
     Route::get('getFotoDocente/{ci}', [InformacionPersonal_DController::class, 'getFotografia']);
+     Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFotografia']);
 
     Route::post('login', [AuthController::class, 'login']);
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware('auth:api,estudiante')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::get('logout', [AuthController::class, 'logout'])->name('logout');
@@ -78,7 +79,7 @@ Route::prefix('vin')->group(function () {
         //Definición de la ruta para reemplazar un integrante
         Route::post('reemplazar-integrante', [Invi_proyectosController::class, 'reemplazarIntegrante']);
         //Definicion para obtener foto del estudiante
-        Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFoto']);
+       
         //Definicion para obtener la foto del docente
         //Definición de ruta para subir un archivo
         Route::post('subir_archivo_anexo', [Invi_proyectosController::class, 'uploadArchivo']);
@@ -104,6 +105,16 @@ Route::prefix('vin')->group(function () {
         Route::apiResource("seguipreguntas", SeguiPreguntasController::class);
         //Definción de endpoint para el recurso SeguiTipoRespuesta, perimitiendo operaciones CRUD
         Route::apiResource("seguitiporespuesta", SeguiTipoRespuestaController::class);
+        //Definición de endpoint para obtener el formulario de inscripcion de catedra habilitado
+        Route::get('getCatedraInscripcion', [SeguiFormularioController::class, 'getCatedraInscripcion']);
+        //Definición de endpoint para obtener el formulario de inscripcion de catedra habilitado
+        Route::get('getFormularioInscripcion', [SeguiFormularioController::class, 'getFormularioInscripcion']);
+        //Definición de endpoint para guardar el formulario de inscripcion de catedra habilitado
+        Route::post('guardarInscripcion', [SeguiFormularioController::class, 'guardarInscripcion']);
+        //Definición para obtener los estudiantes inscritos en un formulario
+        Route::get('getEstudiantesInscritos/{idFormulario}', [SeguiFormularioController::class, 'getEstudiantesInscritos']);
+        //Definición para obtener los detalles de respuestas de un estudiante
+        Route::get('getDetalleRespuestasEstudiante/{idFormulario}/{cedula}', [SeguiFormularioController::class, 'getDetalleRespuestasEstudiante']);
     });
 }); 
 
