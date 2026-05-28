@@ -14,6 +14,7 @@ import Agenda_ODSAllView from '../views/Admin/Mantenimiento/Op_Agenda_ODS/Agenda
 import FormCatedraAllView from '../views/Admin/Formulario/Cátedra/Form_CatedraAllView.vue'
 import PerfilAllView from '../views/Estudiante/Perfil/PerilAllView.vue'
 import InscripcionCatedraAllView from '../views/Admin/Formulario/Cátedra/Inscripcion/Inscripcion_CatedraAllView.vue'
+import ExamenCatedraAllView from '../views/Admin/Formulario/Cátedra/Examen/Examen_CatedraAllView.vue'
 
 
 const routes = [
@@ -92,8 +93,12 @@ const routes = [
     name: 'site-admin-formulario_catedra-inscripcion',
     component: InscripcionCatedraAllView
   },
+  {
+    path: '/site-admin/formulario_catedra/examen',
+    name: 'site-admin-formulario_catedra-examen',
+    component: ExamenCatedraAllView
+  }
 
-  
 ]
 
 const router = createRouter({

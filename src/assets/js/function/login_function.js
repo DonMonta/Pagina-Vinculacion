@@ -38,7 +38,7 @@ export async function enviarsolilogin(method, parametros, url, mensaje) {
         store.commit("setemail_vinc", response.data.email);
         store.commit("setCarrera_vinc", response.data.carrera);
         store.commit("setNivel_vinc", response.data.nivel);
-        //store.commit("setid_vinc", response.data.id);
+        store.commit("setid_vinc", response.data.cedula);
 
         store.commit("setname_vinc", response.data.name);
         store.commit("setToken_vinc", response.data.token);
@@ -48,7 +48,7 @@ export async function enviarsolilogin(method, parametros, url, mensaje) {
         return {
           token: response.data.token,
           Rol: response.data.Role,
-          //id: response.data.id,
+          id: response.data.cedula,
           name: response.data.name,
           email: response.data.email,
           carrera: response.data.carrera,

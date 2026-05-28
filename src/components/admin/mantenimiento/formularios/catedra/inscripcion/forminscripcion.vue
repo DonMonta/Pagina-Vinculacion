@@ -45,8 +45,7 @@
 
       <div v-else>
         <div v-if="activeTab === 1" class="space-y-4">
-          <h3 class="text-lg font-bold text-gray-800 dark:text-white">Formulario de Inscripción Concurso Ayudantías
-            IS2026</h3>
+          <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ formularioData.NOMBRE }}</h3>
           <p class="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
             La Universidad Técnica "Luis Vargas Torres" de Esmeraldas reafirma su compromiso con la excelencia educativa
             y el desarrollo integral de su estudiantado.
@@ -98,7 +97,7 @@
         </div>
 
         <div v-if="activeTab === 2" class="space-y-6">
-          <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Fase 2: Cuestionario Diagnóstico</h3>
+          <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Fase 2: Inscripción</h3>
 
           <div v-for="(pregunta, idx) in formularioData.seguipreguntas" :key="pregunta.ID"
             class="border-b border-gray-100 dark:border-gray-800 pb-5 last:border-0">

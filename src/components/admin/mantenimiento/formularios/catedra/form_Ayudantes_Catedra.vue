@@ -165,11 +165,11 @@
       </button>
     </div>
     <div v-if="mostrarModalInscritos" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
-      <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
         <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900">
           <div>
             <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ formularioSeleccionado?.NOMBRE }}</h3>
-            <p class="text-sm text-gray-500 mt-1">Total de Personas Inscritas: <span class="font-bold text-brand-600 px-2 py-0.5 bg-brand-50 rounded-md">{{ totalInscritos }}</span></p>
+            <p class="text-sm text-gray-500 mt-1">Total de Personas Inscritas/Evaluadas: <span class="font-bold text-brand-600 px-2 py-0.5 bg-brand-50 rounded-md">{{ totalInscritos }}</span></p>
           </div>
           <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" @click="mostrarModalInscritos = false">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -188,6 +188,7 @@
                 <th class="pb-3 px-4">Cédula</th>
                 <th class="pb-3 px-4">Nombres y Apellidos</th>
                 <th class="pb-3 px-4">Carrera / Nivel</th>
+                <th v-if="esEvaluacion" class="pb-3 px-4 text-center">Puntaje</th>
                 <th class="pb-3 px-4 text-right">Detalles</th>
               </tr>
             </thead>
@@ -204,9 +205,20 @@
                   <p class="font-medium">{{ alumno.NombCarr }}</p>
                   <p class="text-gray-400 mt-0.5">{{ alumno.nivel }}to Ciclo ({{ alumno.facultad_siglas }})</p>
                 </td>
+                
+                <td v-if="esEvaluacion" class="py-3 px-4 text-center">
+                  <div v-if="alumno.puntaje !== null" class="flex flex-col items-center gap-1">
+                    <span class="text-lg font-black" :class="alumno.puntaje >= 7 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">{{ alumno.puntaje }}</span>
+                    <span class="px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-md" :class="alumno.puntaje >= 7 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'">
+                      {{ alumno.puntaje >= 7 ? 'Aprobado' : 'Reprobado' }}
+                    </span>
+                  </div>
+                  <span v-else class="text-xs text-gray-400">N/A</span>
+                </td>
+
                 <td class="py-3 px-4 text-right">
                   <button @click="abrirDetalleRespuestas(alumno.CIInfPer)" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors rounded-lg">
-                    Ver respuestas
+                    Ver {{ esEvaluacion ? 'respuestas' : 'detalles' }}
                   </button>
                 </td>
               </tr>
@@ -217,16 +229,16 @@
     </div>
 
     <div v-if="mostrarModalRespuestas" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
-      <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white">Hoja de Respuestas Individual</h3>
+      <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-gray-100 dark:border-gray-800">
+        <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/30 dark:bg-gray-800/30">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white">Hoja de {{ esEvaluacionDetalle ? 'Calificación' : 'Respuestas' }} Individual</h3>
           <button class="text-gray-400 hover:text-gray-600" @click="mostrarModalRespuestas = false">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
 
         <div class="p-6 overflow-y-auto flex-grow" v-if="detalleAlumno">
-          <div class="flex flex-col sm:flex-row gap-5 p-4 bg-gray-50 dark:bg-white/[0.02] rounded-xl border border-gray-100 dark:border-gray-800 mb-6">
+          <div class="flex flex-col sm:flex-row gap-5 p-4 bg-gray-50 dark:bg-white/[0.02] rounded-xl border border-gray-100 dark:border-gray-800 mb-6 items-center">
             <div class="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-white shrink-0 mx-auto sm:mx-0">
               <img :src="getPhotoUrl(detalleAlumno.persona.CIInfPer)" alt="Perfil" class="w-full h-full object-cover" />
             </div>
@@ -235,26 +247,43 @@
               <p class="text-xs text-gray-500 mt-0.5">Cédula: {{ detalleAlumno.persona.CIInfPer }} | {{ detalleAlumno.persona.mailInst }}</p>
               <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 border-t border-gray-200/60 dark:border-gray-700/50 pt-2 text-xs">
                 <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Carrera:</b> {{ detalleAlumno.persona.NombCarr }}</p>
-                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Facultad:</b> {{ detalleAlumno.persona.facultad_siglas }}</p>
-                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Nivel actual:</b> {{ detalleAlumno.persona.nivel }}to Ciclo</p>
+                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Nivel:</b> {{ detalleAlumno.persona.nivel }}to Ciclo ({{ detalleAlumno.persona.facultad_siglas }})</p>
               </div>
+            </div>
+
+            <div v-if="esEvaluacionDetalle" class="shrink-0 text-center px-6 py-3 rounded-xl border-2 bg-white dark:bg-gray-800" :class="puntajeDetalle >= 7 ? 'border-emerald-200 dark:border-emerald-800' : 'border-red-200 dark:border-red-800'">
+              <p class="text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-400">Puntaje Total</p>
+              <div class="text-3xl font-black" :class="puntajeDetalle >= 7 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
+                {{ puntajeDetalle }} <span class="text-lg text-gray-400 font-medium">/ {{ totalPreguntasDetalle }}</span>
+              </div>
+              <p class="text-[10px] font-bold uppercase tracking-wider mt-1" :class="puntajeDetalle >= 7 ? 'text-emerald-600' : 'text-red-600'">
+                {{ puntajeDetalle >= 7 ? 'Aprobado' : 'Reprobado' }}
+              </p>
             </div>
           </div>
 
           <div class="space-y-4">
-            <div v-for="(item, index) in detalleAlumno.respuestas" :key="index" class="p-4 border border-gray-100 dark:border-gray-800 bg-white dark:bg-transparent rounded-xl">
-              <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pregunta {{ index + 1 }}</p>
-              <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">{{ item.PREGUNTA }}</p>
+            <div v-for="(item, index) in detalleAlumno.respuestas" :key="index" 
+                 class="p-4 rounded-xl border"
+                 :class="esEvaluacionDetalle ? (item.valor == 1 ? 'bg-emerald-50/30 border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/40' : 'bg-red-50/30 border-red-100 dark:bg-red-900/10 dark:border-red-900/40') : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-transparent'">
               
-              <div class="p-2.5 bg-gray-50 dark:bg-white/[0.01] rounded-lg border border-dashed border-gray-200 dark:border-gray-800">
-                <p v-if="item.opcion_seleccionada" class="text-sm text-gray-900 dark:text-white flex items-center gap-1.5 font-medium">
-                  <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
-                  {{ item.opcion_seleccionada }}
-                </p>
-                <p v-else class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed break-words" v-html="renderizarTextoConEnlaces(item.textorespuesta || 'Sin respuesta registrada')"></p>
+              <div class="flex justify-between items-start gap-4 mb-2">
+                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ index + 1 }}. {{ item.PREGUNTA }}</p>
+                <div v-if="esEvaluacionDetalle" class="shrink-0 mt-0.5">
+                  <svg v-if="item.valor == 1" class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <svg v-else class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+              </div>
+              
+              <div class="mt-3 text-sm px-3 py-2 rounded-lg flex items-center gap-2 border" 
+                   :class="esEvaluacionDetalle ? 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800' : 'bg-gray-50 dark:bg-white/[0.01] border-dashed border-gray-200 dark:border-gray-800'">
+                <span class="font-bold text-gray-400">Respuesta:</span>
+                <span class="font-medium break-words" :class="esEvaluacionDetalle ? (item.valor == 1 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400') : 'text-gray-900 dark:text-white'" 
+                      v-html="renderizarTextoConEnlaces(item.opcion_seleccionada || item.textorespuesta || 'Sin respuesta registrada')"></span>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -734,7 +763,11 @@ export default {
       totalInscritos: 0,
       listaInscritos: [],
       formularioSeleccionado: null,
-      detalleAlumno: null
+      detalleAlumno: null,
+      esEvaluacion: false,
+      esEvaluacionDetalle: false,
+      puntajeDetalle: 0,
+      totalPreguntasDetalle: 0
     };
   },
   created() {
@@ -801,6 +834,7 @@ export default {
         const response = await API.get(`${this.baseUrl}/getEstudiantesInscritos/${formulario.ID}`);
         this.listaInscritos = response.data.estudiantes;
         this.totalInscritos = response.data.total;
+        this.esEvaluacion = response.data.esEvaluacion;
       } catch (error) {
         console.error("Error cargando alumnos inscritos", error);
       } finally {
@@ -811,6 +845,18 @@ export default {
       try {
         const response = await API.get(`${this.baseUrl}/getDetalleRespuestasEstudiante/${this.formularioSeleccionado.ID}/${cedula}`);
         this.detalleAlumno = response.data;
+        // 1. Verificar de forma dinámica si esta tabla de respuestas contiene puntajes ("valor" !== null)
+        this.esEvaluacionDetalle = this.detalleAlumno.respuestas.some(item => item.valor !== null);
+        
+        // 2. Si es una evaluación, calculamos el puntaje sobre 10
+        if (this.esEvaluacionDetalle) {
+          this.totalPreguntasDetalle = this.detalleAlumno.respuestas.length;
+          
+          // Uso del reducer para sumar dinámicamente +1 por cada item con valor 1 (Correcto)
+          this.puntajeDetalle = this.detalleAlumno.respuestas.reduce((total, item) => {
+            return total + (item.valor !== null && parseInt(item.valor) === 1 ? 1 : 0);
+          }, 0);
+        }
         this.mostrarModalRespuestas = true;
       } catch (error) {
         console.error("Error al recuperar respuestas del estudiante", error);

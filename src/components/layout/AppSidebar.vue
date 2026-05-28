@@ -145,9 +145,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-
+import API from "@/assets/js/services/axios";
 import {
   GridIcon,
   CalenderIcon,
@@ -174,11 +174,27 @@ import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
 import { useSidebar } from "@/composables/useSidebar";
 import { useUsuario } from "@/composables/useUsuario";
 
+
 const route = useRoute();
 
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar();
-const { rolUsuario } = useUsuario();
-
+const { rolUsuario, idUsuario } = useUsuario();
+const estudianteLlenoEncuesta = ref(false);
+onMounted(async () => {
+  // Solo consultamos si el usuario actual es un estudiante y posee su cédula asignada
+  if (rolUsuario.value === 'est' && idUsuario.value) {
+    try {
+      const response = await API.get('/vin/getCatedraInscripcion', {
+        params: { cedula: idUsuario.value }
+      });
+      // Asignamos el valor que retorna tu backend ('yaInscrito')
+      estudianteLlenoEncuesta.value = !!response.data?.yaInscrito;
+    } catch (error) {
+      console.error("Error al validar inscripción del estudiante:", error);
+      estudianteLlenoEncuesta.value = false;
+    }
+  }
+});
 const menuData = [
   {
     title: "Menu",
@@ -216,9 +232,10 @@ const menuData = [
         name: "Estudiante",
         subItems: [
           { name: "Mi Perfil", path: "/site-admin/perfil", pro: false },
+          { name: "Exámen Cátedra", path: "/site-admin/formulario_catedra/examen", pro: false },
         ],
       },
-      
+
     ],
   },
   {
@@ -234,25 +251,50 @@ const menuGroups = computed(() => {
   const rol = rolUsuario.value;
 
   // Si es administrador (sa) o técnico (atics), devolvemos todo sin filtrar
-  if (rol === 'sa' || rol === 'atics' || rol === 'avinc') {
-    return menuData;
+  if (rol === 'sa' || rol === 'atics' || rol === 'avinc' || rol === 'sotics') {
+    return menuData.map(group => ({
+      ...group,
+      items: group.items.filter(item => item.name !== "Estudiante")
+    })).filter(group => group.items.length > 0);
   }
 
-  // Si es sotics, filtramos los items dentro de cada grupo
-  return menuData.map(group => ({
-    ...group,
-    items: group.items.filter(item => {
-      if (rol === 'vinc' ) {
+  // REGLA 2: Lógica para los demás roles incluyendo el filtro dinámico para "est"
+  return menuData.map(group => {
+    // Clonamos los items para evitar mutaciones directas en el array original
+    const filteredItems = group.items.filter(item => {
+      if (rol === 'vinc') {
         // Solo permitimos "Proyectos" y "Principal"
         return item.name === "Proyectos" || item.name === "Principal";
       }
-      if (rol === 'est' ) {
-        // Solo permitimos "Principal"
+      
+      if (rol === 'est') {
+        // Solo permitimos el menú "Estudiante"
         return item.name === "Estudiante";
       }
+      
       return true;
-    })
-  })).filter(group => group.items.length > 0); // Opcional: oculta grupos que queden vacíos
+    }).map(item => {
+      // Si es estudiante, validamos los sub-ítems internos de "Estudiante"
+      if (rol === 'est' && item.name === "Estudiante" && item.subItems) {
+        return {
+          ...item,
+          subItems: item.subItems.filter(subItem => {
+            // Si NO ha llenado la encuesta, ocultamos el sub-item "Exámen Cátedra"
+            if (subItem.name === "Exámen Cátedra" || subItem.name === "Examen Cátedra") {
+              return estudianteLlenoEncuesta.value;
+            }
+            return true;
+          })
+        };
+      }
+      return item;
+    });
+
+    return {
+      ...group,
+      items: filteredItems
+    };
+  }).filter(group => group.items.length > 0);
 });
 const isActive = (path) => route.path === path;
 
