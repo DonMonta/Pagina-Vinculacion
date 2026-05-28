@@ -107,10 +107,16 @@ Route::prefix('vin')->group(function () {
         Route::apiResource("seguitiporespuesta", SeguiTipoRespuestaController::class);
         //Definición de endpoint para obtener el formulario de inscripcion de catedra habilitado
         Route::get('getCatedraInscripcion', [SeguiFormularioController::class, 'getCatedraInscripcion']);
+        //Definición de endpoint para obtener el formulario de evaluación de catedra habilitado
+        Route::get('getCatedraEvaluacion', [SeguiFormularioController::class, 'getCatedraEvaluacion']);
         //Definición de endpoint para obtener el formulario de inscripcion de catedra habilitado
         Route::get('getFormularioInscripcion', [SeguiFormularioController::class, 'getFormularioInscripcion']);
+        //Definición de endpoint para obtener el formulario de evaluación de catedra habilitado
+        Route::get('getFormularioEvaluacion', [SeguiFormularioController::class, 'getFormularioEvaluacion']);
         //Definición de endpoint para guardar el formulario de inscripcion de catedra habilitado
         Route::post('guardarInscripcion', [SeguiFormularioController::class, 'guardarInscripcion']);
+        //Definición de endpoint para guardar el formulario de evaluación de catedra habilitado
+        Route::post('guardarEvaluacion', [SeguiFormularioController::class, 'guardarEvaluacion']);
         //Definición para obtener los estudiantes inscritos en un formulario
         Route::get('getEstudiantesInscritos/{idFormulario}', [SeguiFormularioController::class, 'getEstudiantesInscritos']);
         //Definición para obtener los detalles de respuestas de un estudiante
