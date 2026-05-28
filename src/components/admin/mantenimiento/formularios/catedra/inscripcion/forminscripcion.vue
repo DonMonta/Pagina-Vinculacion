@@ -150,8 +150,14 @@
 
             <div v-if="pregunta.tipo === 'Abierta'">
               <textarea rows="3" v-model="respuestasEstudiante[pregunta.ID].textorespuesta"
-                placeholder="Escribe tu respuesta detallada aquí..."
-                class="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:ring-brand-500 focus:border-brand-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"></textarea>
+                :disabled="isPreguntaPromedio(pregunta.PREGUNTA)"
+                :placeholder="isPreguntaPromedio(pregunta.PREGUNTA) ? 'Cálculo automático de promedio...' : 'Escribe tu respuesta detallada aquí...'"
+                :class="[
+                  'w-full px-4 py-3 text-sm border rounded-xl focus:ring-brand-500 focus:border-brand-500 dark:border-gray-700',
+                  isPreguntaPromedio(pregunta.PREGUNTA) 
+                    ? 'bg-gray-100 text-gray-600 cursor-not-allowed font-semibold border-gray-300 dark:bg-gray-800/80 dark:text-gray-400' 
+                    : 'border-gray-200 dark:bg-gray-800 dark:text-white'
+                ]"></textarea>
             </div>
 
             <div v-else-if="pregunta.tipo === 'Selección Única'" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -242,30 +248,47 @@ export default {
       PersonalInfo: {},
       UsuarioInfo: {},
       formularioData: null,
-      respuestasEstudiante: {}
+      respuestasEstudiante: {},
+      promedioEstudiante: null
     };
   },
   async mounted() {
     const usuario = await getMe();
     this.PersonalInfo = usuario;
     this.UsuarioInfo = useUsuario();
+    await this.fetchPromedioEstudiante();
     await this.fetchFormulario();
   },
   methods: {
+    isPreguntaPromedio(texto) {
+      return texto && texto.toLowerCase().includes('promedio');
+    },
+    async fetchPromedioEstudiante() {
+      if (!this.PersonalInfo || !this.PersonalInfo.CIInfPer) return;
+      try {
+        const response = await API.get(`/vin/getPromedioEstudiante/${this.PersonalInfo.CIInfPer}`);
+        if (response.data?.success) {
+          this.promedioEstudiante = response.data.promedio_final;
+        }
+      } catch (error) {
+        console.error("Error al obtener el promedio:", error);
+        this.promedioEstudiante = "N/A"; 
+      }
+    },
     async fetchFormulario() {
       this.loading = true;
       try {
         const response = await API.get("/vin/getFormularioInscripcion");
         if (response.data?.success) {
           this.formularioData = response.data.data;
-
           // Inicializar las estructuras de datos según el tipo de pregunta
           this.formularioData.seguipreguntas.forEach(preg => {
+            // Verificar si es la pregunta del promedio para pre-llenar la respuesta
+            const esPromedio = preg.tipo === 'Abierta' && this.isPreguntaPromedio(preg.PREGUNTA);
             this.respuestasEstudiante[preg.ID] = {
               idpregunta: preg.ID,
-              // Si es múltiple se inicializa como Array [], si no, como null
               idtiporespuesta: preg.tipo === 'SELECCIÓN MÚLTIPLE' ? [] : null,
-              textorespuesta: ""
+              textorespuesta: esPromedio ? String(this.promedioEstudiante !== null ? this.promedioEstudiante : 0) : ""
             };
           });
         }
@@ -274,6 +297,23 @@ export default {
         console.error(error);
       } finally {
         this.loading = false;
+      }
+    },
+    formatNivel(nivel) {
+      const n = parseInt(nivel);
+      if (isNaN(n)) return nivel;
+      switch (n) {
+        case 1: return '1er';
+        case 2: return '2do';
+        case 3: return '3er';
+        case 4: return '4to';
+        case 5: return '5to';
+        case 6: return '6to';
+        case 7: return '7mo';
+        case 8: return '8vo';
+        case 9: return '9no';
+        case 10: return '10mo';
+        default: return `${n}vo`;
       }
     },
     async descargarAnexoWord() {
@@ -302,7 +342,8 @@ export default {
         const telefono = this.PersonalInfo.TelInfPer || "_________________________________";
         const carrera = this.UsuarioInfo.carreraUsuario || "_________________________________";
         const facultad = this.UsuarioInfo.facultadUsuario || "_________________________________";
-        const nivel = this.UsuarioInfo.nivelUsuario || "_________________________________";
+        const nivel = this.formatNivel(this.UsuarioInfo.nivelUsuario) || "_________________________________";
+        const promedioWordDoc = this.promedioEstudiante !== null ? String(this.promedioEstudiante) : "_____________________";
 
         // 3. Formatear la fecha del día automáticamente
         const fechaActual = new Date();
@@ -384,7 +425,7 @@ export default {
               new docx.Paragraph({ spacing: { after: 50, line: 360 }, children: [new docx.TextRun({ text: `Carrera: `, bold: true }), new docx.TextRun({ text: carrera })] }),
               new docx.Paragraph({ spacing: { after: 50, line: 360 }, children: [new docx.TextRun({ text: `Facultad: `, bold: true }), new docx.TextRun({ text: facultad })] }),
               new docx.Paragraph({ spacing: { after: 50, line: 360 }, children: [new docx.TextRun({ text: `Nivel actual (indicar ciclo): `, bold: true }), new docx.TextRun({ text: nivel })] }),
-              new docx.Paragraph({ spacing: { after: 200, line: 360 }, children: [new docx.TextRun({ text: `Promedio General (últimos dos periodos): _____________________` })] }),
+              new docx.Paragraph({ spacing: { after: 200, line: 360 }, children: [new docx.TextRun({ text: `Promedio General (últimos dos periodos): `, bold: true }), new docx.TextRun({ text: promedioWordDoc })] }),
 
 
               // Sección 3: Experiencia

@@ -163,11 +163,14 @@
                         </div>
                     </div>
 
-                    <div v-if="activeTab === 2" class="space-y-6">
-                        <div class="flex items-center justify-between bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40 p-4 rounded-xl mb-4 sticky top-0 z-20 backdrop-blur-md">
+                    <div v-if="activeTab === 2" class="space-y-6" @copy.prevent @contextmenu.prevent>
+                        <div
+                            class="flex items-center justify-between bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40 p-4 rounded-xl mb-4 sticky top-0 z-20 backdrop-blur-md">
                             <span class="text-sm font-semibold text-red-700 dark:text-red-400 flex items-center gap-2">
-                                <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 Tiempo restante para rendir el examen:
                             </span>
@@ -181,7 +184,7 @@
                         <div v-for="(pregunta, idx) in formularioData?.seguipreguntas" :key="pregunta.ID"
                             class="border-b border-gray-100 dark:border-gray-800 pb-5 last:border-0">
 
-                            <label class="block text-sm font-semibold text-gray-800 dark:text-white mb-3">
+                            <label class="block text-sm font-semibold text-gray-800 dark:text-white mb-3 select-none">
                                 {{ idx + 1 }}. {{ pregunta.PREGUNTA }}
                                 <span class="text-xs font-normal text-gray-400 italic">({{ pregunta.tipo }})</span>
                             </label>
@@ -200,7 +203,7 @@
                                         :value="opcion.ID" v-model="respuestasEstudiante[pregunta.ID].idtiporespuesta"
                                         class="w-4 h-4 text-brand-600 border-gray-300 focus:ring-brand-500" />
                                     <label :for="'radio_' + opcion.ID"
-                                        class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full">
+                                        class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full select-none">
                                         {{ opcion.TIPORESPUESTA }}
                                     </label>
                                 </div>
@@ -214,7 +217,7 @@
                                         v-model="respuestasEstudiante[pregunta.ID].idtiporespuesta"
                                         class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500" />
                                     <label :for="'check_' + opcion.ID"
-                                        class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full">
+                                        class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full select-none">
                                         {{ opcion.TIPORESPUESTA }}
                                     </label>
                                 </div>
@@ -327,7 +330,7 @@ export default {
     methods: {
         iniciarCronometro() {
             // Asegurar que no existan múltiples intervalos abiertos
-            this.detenerCronometro(); 
+            this.detenerCronometro();
             this.intervaloTimer = setInterval(() => {
                 if (this.tiempoRestante > 0) {
                     this.tiempoRestante--;
@@ -336,6 +339,23 @@ export default {
                     this.manejarTiempoExpirado();
                 }
             }, 1000);
+        },
+        formatNivel(nivel) {
+            const n = parseInt(nivel);
+            if (isNaN(n)) return nivel;
+            switch (n) {
+                case 1: return '1er';
+                case 2: return '2do';
+                case 3: return '3er';
+                case 4: return '4to';
+                case 5: return '5to';
+                case 6: return '6to';
+                case 7: return '7mo';
+                case 8: return '8vo';
+                case 9: return '9no';
+                case 10: return '10mo';
+                default: return `${n}vo`;
+            }
         },
         detenerCronometro() {
             if (this.intervaloTimer) {
@@ -347,7 +367,7 @@ export default {
             // Si el alumno continúa estancado en el tab de preguntas (Fase 2)
             if (this.activeTab === 2) {
                 mostraralertas2(
-                    "Ya pasó el tiempo límite para rendir el examen. Tus respuestas seleccionadas hasta el momento han sido enviadas de manera automática.", 
+                    "Ya pasó el tiempo límite para rendir el examen. Tus respuestas seleccionadas hasta el momento han sido enviadas de manera automática.",
                     "warning"
                 );
                 await this.finalizarevaluacion();

@@ -14,8 +14,7 @@
               <p class="text-sm text-gray-500 dark:text-gray-400">{{ UsuarioInfo.carreraUsuario }} ({{
                 UsuarioInfo.facultadUsuario }})</p>
               <div class="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Nivel Actual: {{ UsuarioInfo.nivelUsuario }}to Ciclo
-              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Nivel Actual: {{ formatNivel(UsuarioInfo.nivelUsuario) }} Ciclo</p>
             </div>
           </div>
 
@@ -165,6 +164,41 @@
       </div>
     </div>
   </div>
+  <div v-else
+    class="relative overflow-hidden p-6 border border-amber-200 bg-gradient-to-r from-amber-50/80 to-white rounded-2xl dark:border-amber-900/40 dark:from-amber-950/20 dark:to-gray-900 shadow-md shadow-amber-500/5">
+
+    <div class="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl"></div>
+
+    <div class="relative z-10 flex flex-col sm:flex-row items-start gap-5">
+
+      <div class="shrink-0 p-3 bg-amber-100 dark:bg-amber-900/50 rounded-full text-amber-600 dark:text-amber-400 mt-1">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+
+      <div class="max-w-3xl">
+        <div
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 mb-3 text-xs font-bold text-amber-800 bg-amber-200/50 dark:bg-amber-900/40 dark:text-amber-300 rounded-md uppercase tracking-wider">
+          Requisito no cumplido
+        </div>
+
+        <h4 class="text-xl font-extrabold text-gray-900 dark:text-white mb-2">
+          ¡No cumples con los requisitos para postular a Ayudantías de Cátedra!
+        </h4>
+
+        <p class="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+          Actualmente, las inscripciones para ayudantías de cátedra están dirigidas exclusivamente a estudiantes que se
+          encuentran en el
+          <strong class="font-bold text-gray-800 dark:text-gray-200">5to ciclo o superior</strong>.
+          Esto se debe a que buscamos asegurar que los postulantes tengan una base sólida de conocimientos y experiencia
+          académica para desempeñarse eficazmente en el rol de ayudante de cátedra.
+        </p>
+      </div>
+
+    </div>
+  </div>
   <div v-if="mostrarModalResultados"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
     <div
@@ -189,10 +223,10 @@
               class="w-full h-full object-cover" />
           </div>
           <div class="flex-grow text-center sm:text-left">
-            <h4 class="text-base font-bold text-gray-900 dark:text-white">{{ detalleResultados.persona.NombInfPer }} {{
-              detalleResultados.persona.ApellInfPer }} {{ detalleResultados.persona.ApellMatInfPer }}</h4>
-            <p class="text-xs text-gray-500 mt-1">{{ detalleResultados.persona.NombCarr }} - {{
-              detalleResultados.persona.nivel }}to Ciclo</p>
+            <h4 class="text-base font-bold text-gray-900 dark:text-white">{{ detalleResultados.persona.NombInfPer }}
+              {{
+                detalleResultados.persona.ApellInfPer }} {{ detalleResultados.persona.ApellMatInfPer }}</h4>
+            <p class="text-xs text-gray-500 mt-1">{{ detalleResultados.persona.NombCarr }} - {{formatNivel(detalleResultados.persona.nivel)}} Ciclo</p>
           </div>
           <div class="shrink-0 text-center px-6 py-3 rounded-xl border-2"
             :class="puntaje >= 7 ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'">
@@ -205,7 +239,8 @@
           </div>
         </div>
 
-        <h4 class="font-bold text-gray-800 dark:text-white mb-4 uppercase text-xs tracking-wider">Detalle de Respuestas
+        <h4 class="font-bold text-gray-800 dark:text-white mb-4 uppercase text-xs tracking-wider">Detalle de
+          Respuestas
           Seleccionadas</h4>
 
         <div class="space-y-4">
@@ -213,7 +248,8 @@
             :class="item.valor == 1 ? 'bg-emerald-50/50 border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/50' : 'bg-red-50/50 border-red-100 dark:bg-red-900/10 dark:border-red-900/50'">
 
             <div class="flex justify-between items-start gap-4 mb-2">
-              <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ index + 1 }}. {{ item.PREGUNTA }}</p>
+              <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ index + 1 }}. {{ item.PREGUNTA }}
+              </p>
               <div class="shrink-0 mt-0.5">
                 <svg v-if="item.valor == 1" class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
@@ -277,6 +313,23 @@ export default {
   methods: {
     getPhotoUrl(ci) {
       return `${API.defaults.baseURL}/vin/getFoto/${ci}`;
+    },
+    formatNivel(nivel) {
+      const n = parseInt(nivel);
+      if (isNaN(n)) return nivel;
+      switch (n) {
+        case 1: return '1er';
+        case 2: return '2do';
+        case 3: return '3er';
+        case 4: return '4to';
+        case 5: return '5to';
+        case 6: return '6to';
+        case 7: return '7mo';
+        case 8: return '8vo';
+        case 9: return '9no';
+        case 10: return '10mo';
+        default: return `${n}vo`;
+      }
     },
     async getFormulariosEstado() {
       try {

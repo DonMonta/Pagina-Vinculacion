@@ -203,7 +203,7 @@
                 <td class="py-3 px-4 text-sm font-bold text-gray-900 dark:text-white">{{ alumno.NombInfPer }} {{ alumno.ApellInfPer }} {{ alumno.ApellMatInfPer }}</td>
                 <td class="py-3 px-4 text-xs text-gray-600 dark:text-gray-400">
                   <p class="font-medium">{{ alumno.NombCarr }}</p>
-                  <p class="text-gray-400 mt-0.5">{{ alumno.nivel }}to Ciclo ({{ alumno.facultad_siglas }})</p>
+                  <p class="text-gray-400 mt-0.5">{{ formatNivel(alumno.nivel) }} Ciclo ({{ alumno.facultad_siglas }})</p>
                 </td>
                 
                 <td v-if="esEvaluacion" class="py-3 px-4 text-center">
@@ -247,7 +247,7 @@
               <p class="text-xs text-gray-500 mt-0.5">Cédula: {{ detalleAlumno.persona.CIInfPer }} | {{ detalleAlumno.persona.mailInst }}</p>
               <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 border-t border-gray-200/60 dark:border-gray-700/50 pt-2 text-xs">
                 <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Carrera:</b> {{ detalleAlumno.persona.NombCarr }}</p>
-                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Nivel:</b> {{ detalleAlumno.persona.nivel }}to Ciclo ({{ detalleAlumno.persona.facultad_siglas }})</p>
+                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Nivel:</b> {{ formatNivel(detalleAlumno.persona.nivel) }} Ciclo ({{ detalleAlumno.persona.facultad_siglas }})</p>
               </div>
             </div>
 
@@ -799,6 +799,23 @@ export default {
   methods: {
     getPhotoUrl(ci) {
       return `${API.defaults.baseURL}/vin/getFoto/${ci}`;
+    },
+    formatNivel(nivel) {
+      const n = parseInt(nivel);
+      if (isNaN(n)) return nivel;
+      switch (n) {
+        case 1: return '1er';
+        case 2: return '2do';
+        case 3: return '3er';
+        case 4: return '4to';
+        case 5: return '5to';
+        case 6: return '6to';
+        case 7: return '7mo';
+        case 8: return '8vo';
+        case 9: return '9no';
+        case 10: return '10mo';
+        default: return `${n}vo`;
+      }
     },
     async cerrarModalPreguntas() {
       this.isPreguntasModalOpen = false;
