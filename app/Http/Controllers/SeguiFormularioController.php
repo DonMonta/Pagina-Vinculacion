@@ -660,4 +660,62 @@ class SeguiFormularioController extends Controller
             'respuestas' => $respuestas
         ]);
     }
+    public function getPromedioEstudiante(Request $request, string $cedula)
+    {
+        try {
+            // 1. Construir la subconsulta para obtener los últimos 2 periodos cerrados
+            // equivalentes a: SELECT idper FROM periodolectivo WHERE idper < (MAX(idper)...) ORDER BY idper DESC LIMIT 2
+            $subquery = DB::table('periodolectivo')
+                ->select('idper')
+                ->where('idper', '<', function ($query) {
+                    $query->select(DB::raw('MAX(idper)'))
+                          ->from('periodolectivo')
+                          ->where('StatusPerLec', 1);
+                })
+                ->orderBy('idper', 'DESC')
+                ->limit(2);
+
+            // 2. Construir la consulta principal uniendo la subconsulta
+            $resultado = DB::table('notasalumnoasignatura as n')
+                ->joinSub($subquery, 'p', function ($join) {
+                    $join->on('p.idper', '=', 'n.idPer');
+                })
+                ->select(
+                    'n.CIInfPer',
+                    DB::raw('ROUND(AVG(n.CalifFinal), 2) AS promedio_final')
+                )
+                ->whereNotIn('n.idAsig', [8807, 8808, 68628, 68629, 68630, 68631, 69122, 69123])
+                ->where('n.CIInfPer', $cedula)
+                ->whereNotNull('n.CalifFinal')
+                ->whereRaw('IFNULL(n.retirado, 0) = 0')
+                ->whereRaw('IFNULL(n.anulada, 0) = 0')
+                ->whereRaw('IFNULL(n.convalidacion, 0) = 0')
+                ->groupBy('n.CIInfPer')
+                ->first();
+
+            // 3. Validar si el estudiante tiene notas en esos periodos
+            if (!$resultado) {
+                return response()->json([
+                    'success' => true,
+                    'promedio_final' => 0,
+                    'message' => 'No se encontraron notas válidas para los últimos dos periodos o el estudiante no existe.'
+                ], 200);
+            }
+
+            // 4. Retornar el promedio
+            return response()->json([
+                'success' => true,
+                'promedio_final' => $resultado->promedio_final,
+                'cedula' => $resultado->CIInfPer
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error("Error al obtener el promedio del estudiante {$cedula}: " . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Error interno del servidor al calcular el promedio.'
+            ], 500);
+        }
+    }
 }

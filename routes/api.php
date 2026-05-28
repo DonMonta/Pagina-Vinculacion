@@ -121,6 +121,8 @@ Route::prefix('vin')->group(function () {
         Route::get('getEstudiantesInscritos/{idFormulario}', [SeguiFormularioController::class, 'getEstudiantesInscritos']);
         //Definición para obtener los detalles de respuestas de un estudiante
         Route::get('getDetalleRespuestasEstudiante/{idFormulario}/{cedula}', [SeguiFormularioController::class, 'getDetalleRespuestasEstudiante']);
+        //Definición de endpoint para obtener el promedio de un estudiante
+        Route::get('getPromedioEstudiante/{cedula}', [SeguiFormularioController::class, 'getPromedioEstudiante']);
     });
 }); 
 
