@@ -18,6 +18,9 @@ use App\Http\Controllers\ODSController;
 use App\Http\Controllers\SeguiFormularioController;
 use App\Http\Controllers\SeguiPreguntasController;
 use App\Http\Controllers\SeguiTipoRespuestaController;
+use App\Http\Controllers\Invi_dom_humaController;
+use App\Http\Controllers\Invi_linea_investigaController;
+use App\Http\Controllers\Invi_sub_linea_invesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +35,7 @@ use App\Http\Controllers\SeguiTipoRespuestaController;
 
 Route::prefix('vin')->group(function () {
     Route::get('getFotoDocente/{ci}', [InformacionPersonal_DController::class, 'getFotografia']);
-     Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFotografia']);
+    Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFotografia']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api,estudiante')->group(function () {
@@ -79,7 +82,7 @@ Route::prefix('vin')->group(function () {
         //Definición de la ruta para reemplazar un integrante
         Route::post('reemplazar-integrante', [Invi_proyectosController::class, 'reemplazarIntegrante']);
         //Definicion para obtener foto del estudiante
-       
+
         //Definicion para obtener la foto del docente
         //Definición de ruta para subir un archivo
         Route::post('subir_archivo_anexo', [Invi_proyectosController::class, 'uploadArchivo']);
@@ -123,6 +126,22 @@ Route::prefix('vin')->group(function () {
         Route::get('getDetalleRespuestasEstudiante/{idFormulario}/{cedula}', [SeguiFormularioController::class, 'getDetalleRespuestasEstudiante']);
         //Definición de endpoint para obtener el promedio de un estudiante
         Route::get('getPromedioEstudiante/{cedula}', [SeguiFormularioController::class, 'getPromedioEstudiante']);
+        //Definción del recurso Dominio Humano, perimitiendo operaciones CRUD
+        Route::apiResource("invi_dom_huma", Invi_dom_humaController::class);
+        //Definición del recurso Línea de Investigación, perimitiendo operaciones CRUD
+        Route::apiResource("invi_linea_investiga", Invi_linea_investigaController::class);
+        //Definición de endpoint para habilitar una línea de investigación
+        Route::delete('habilitar_linea_investiga/{id}', [Invi_linea_investigaController::class, 'habilitar']);
+        //Definición de endpoint para deshabilitar una línea de investigación
+        Route::delete('inhabilitar_linea_investiga/{id}', [Invi_linea_investigaController::class, 'destroy']);
+        //Definición de endpoint para obtener las facultades de una sede
+        Route::get('getFacultades', [Invi_linea_investigaController::class, 'getFacultades']);
+        //Definición de endpoint para obtener las carreras de una facultad
+        Route::get('getCarreras/{idfacultad}', [Invi_sub_linea_invesController::class, 'getCarrerasPorFacultad']);
+        //Definición de endpoint para obtener las sublineas de una línea de investigación
+        Route::get('getSublineas/{id_lin_investiga}', [Invi_sub_linea_invesController::class, 'getSublineasPorLinea']);
+        //Definición de recurso para las sublineas de una línea de investigación
+        Route::apiResource("invi_sub_linea_inves", Invi_sub_linea_invesController::class);
     });
 }); 
 

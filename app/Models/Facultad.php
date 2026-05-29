@@ -44,5 +44,9 @@ class Facultad extends Model
     {
         return $this->belongsTo(Sede::class, 'idsede', 'idsede');
     }
+    public function linea_investigacion()
+    {
+        return $this->hasMany(Invi_linea_investigacion::class, 'idfacultad', 'idfacultad');
+    }
     
 }

@@ -74,6 +74,10 @@ class Carreras extends Model
     {
         return $this->hasMany(Facultad::class, 'idfacultad', 'idfacultad');
     }
+    public function sub_linea_investigacion()
+    {
+        return $this->hasMany(Invi_sub_linea_inves::class, 'idCarr');
+    }
 
    
 }

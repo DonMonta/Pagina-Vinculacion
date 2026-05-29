@@ -14,8 +14,15 @@ class PlandneController extends Controller
     public function index(Request $request)
     {
         try {
+            $searchQuery = $request->input('search_query');
             // Usamos withCount para obtener los totales de las relaciones
             $query = Plandne::withCount(['objetivos_plandne', 'politicas_plandne']);
+            if ($searchQuery) {
+                $query->where(function ($q) use ($searchQuery) {
+                    $q->where('nombre_plandne', 'LIKE', '%' . $searchQuery . '%')
+                        ->orWhere('anio_plandne', 'LIKE', '%' . $searchQuery . '%');
+                });
+            }
 
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();

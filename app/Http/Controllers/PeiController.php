@@ -14,8 +14,15 @@ class PeiController extends Controller
     public function index(Request $request)
     {
         try {
+            $searchQuery = $request->input('search_query');
             // Usamos withCount para obtener los totales de las relaciones
             $query = Pei::withCount(['subsistemas_pei', 'objetivos']);
+            if ($searchQuery) {
+                $query->where(function ($q) use ($searchQuery) {
+                    $q->where('nombre_pei', 'LIKE', '%' . $searchQuery . '%')
+                        ->orWhere('anios_pei', 'LIKE', '%' . $searchQuery . '%');
+                });
+            }
 
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
