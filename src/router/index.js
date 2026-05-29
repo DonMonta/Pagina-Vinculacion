@@ -15,6 +15,8 @@ import FormCatedraAllView from '../views/Admin/Formulario/Cátedra/Form_CatedraA
 import PerfilAllView from '../views/Estudiante/Perfil/PerilAllView.vue'
 import InscripcionCatedraAllView from '../views/Admin/Formulario/Cátedra/Inscripcion/Inscripcion_CatedraAllView.vue'
 import ExamenCatedraAllView from '../views/Admin/Formulario/Cátedra/Examen/Examen_CatedraAllView.vue'
+import DominioAcademicoAllView from '../views/Admin/Mantenimiento/Op_dominio_Aca/Dom_AcademicoAllView.vue'
+import LinInvestigaAllView from '../views/Admin/Mantenimiento/Op_Lin_Inves/Lin_InvestigaAllView.vue'
 
 
 const routes = [
@@ -97,7 +99,17 @@ const routes = [
     path: '/site-admin/formulario_catedra/examen',
     name: 'site-admin-formulario_catedra-examen',
     component: ExamenCatedraAllView
-  }
+  },
+  {
+    path: '/site-admin/dominio_academico',
+    name: 'site-admin-dominio_academico',
+    component: DominioAcademicoAllView
+  },
+  {
+    path: '/site-admin/linea_investigacion',
+    name: 'site-admin-linea_investigacion',
+    component: LinInvestigaAllView
+  },
 
 ]
 

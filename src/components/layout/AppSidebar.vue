@@ -211,6 +211,8 @@ const menuData = [
           { name: "PEI", path: "/site-admin/pei", pro: false },
           { name: "PLANDNE", path: "/site-admin/plandne", pro: false },
           { name: "Agenda ODS", path: "/site-admin/agenda_ods", pro: false },
+          { name: "DOMINIOS ACADEMICOS", path: "/site-admin/dominio_academico", pro: false },
+          { name: "LÍNEAS DE INVESTIGACIÓN", path: "/site-admin/linea_investigacion", pro: false },
         ],
       },
       {
