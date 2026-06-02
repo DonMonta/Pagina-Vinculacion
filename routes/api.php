@@ -21,6 +21,9 @@ use App\Http\Controllers\SeguiTipoRespuestaController;
 use App\Http\Controllers\Invi_dom_humaController;
 use App\Http\Controllers\Invi_linea_investigaController;
 use App\Http\Controllers\Invi_sub_linea_invesController;
+use App\Http\Controllers\SubAreaUnescoController;
+use App\Http\Controllers\Zona_planificacionController;
+use App\Http\Controllers\PraempresaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -142,6 +145,24 @@ Route::prefix('vin')->group(function () {
         Route::get('getSublineas/{id_lin_investiga}', [Invi_sub_linea_invesController::class, 'getSublineasPorLinea']);
         //Definición de recurso para las sublineas de una línea de investigación
         Route::apiResource("invi_sub_linea_inves", Invi_sub_linea_invesController::class);
+        //Definición para obtener las Subareas de UNESCO
+        Route::get('getSubareas', [SubAreaUnescoController::class, 'index']);
+        //Definición de recurso para las zonas de planificación, perimitiendo operaciones CRUD
+        Route::apiResource("zona_planificacion", Zona_planificacionController::class);
+        //Definición de endpoint para obtener las provincias
+        Route::get('getProvincias', [Zona_planificacionController::class, 'getProvincias']);
+        //Definición de endpoint para obtener las provincias asignadas a una zona de planificación
+        Route::get('getProvinciasPorZona/{id_zona_plan}', [Zona_planificacionController::class, 'getProvinciasPorZona']);
+        //Definición de endpoint para guardar las provincias asignadas a una zona de planificación
+        Route::post('guardarProvincias', [Zona_planificacionController::class, 'guardarProvincias']);
+        //Definiciónd del recurso Empresa, perimitiendo operaciones CRUD
+        Route::apiResource("empresa", PraempresaController::class);
+        //Definición de endpoint para subir un archivo
+        Route::post('subir_archivo', [PraempresaController::class, 'uploadArchivo']);
+        //Definición de endpoint para habilitar un empresa
+        Route::delete('habilitar_empresa/{id}', [PraempresaController::class, 'habilitar']);
+        //Definición de endpoint para inhabilitar un empresa
+        Route::delete('inhabilitar_empresa/{id}', [PraempresaController::class, 'destroy']);
     });
 }); 
 

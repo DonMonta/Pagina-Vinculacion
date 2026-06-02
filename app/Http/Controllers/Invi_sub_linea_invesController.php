@@ -16,8 +16,10 @@ class Invi_sub_linea_invesController extends Controller
     public function getCarrerasPorFacultad(string $idfacultad)
     {
         // Asumiendo que StatusCarr = 1 significa habilitada
+        $carrerasomitir = ['7109'];
         $carreras = Carreras::where('idfacultad', $idfacultad)
             ->where('StatusCarr', 1)
+            ->whereNotIn('idCarr', $carrerasomitir)
             ->where('NombCarr', 'NOT LIKE', '%TRABAJO DE INTEGRACIÓN CURRICULAR%')
             ->get();
 
