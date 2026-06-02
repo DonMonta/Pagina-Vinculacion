@@ -17,6 +17,9 @@ import InscripcionCatedraAllView from '../views/Admin/Formulario/Cátedra/Inscri
 import ExamenCatedraAllView from '../views/Admin/Formulario/Cátedra/Examen/Examen_CatedraAllView.vue'
 import DominioAcademicoAllView from '../views/Admin/Mantenimiento/Op_dominio_Aca/Dom_AcademicoAllView.vue'
 import LinInvestigaAllView from '../views/Admin/Mantenimiento/Op_Lin_Inves/Lin_InvestigaAllView.vue'
+import SubAreaUnescoAllView from '../views/Admin/Mantenimiento/Op_SubArea/SubAreaUnescoAllView.vue'
+import ZonaPlanificacionAllView from '../views/Admin/Mantenimiento/Op_ZonaPlan/Zona_PlanificacionAllView.vue'
+import EmpresaAllView from '../views/Admin/Mantenimiento/Op_Empresa/EmpresaAllView.vue'
 
 
 const routes = [
@@ -110,7 +113,21 @@ const routes = [
     name: 'site-admin-linea_investigacion',
     component: LinInvestigaAllView
   },
-
+  {
+    path: '/site-admin/subarea_unesco',
+    name: 'site-admin-subarea_unesco',
+    component: SubAreaUnescoAllView
+  },
+  {
+    path: '/site-admin/zona_planificacion',
+    name: 'site-admin-zona_planificacion',
+    component: ZonaPlanificacionAllView
+  },
+  { 
+    path: '/site-admin/empresa',
+    name: 'site-admin-empresa',
+    component: EmpresaAllView
+  },
 ]
 
 const router = createRouter({

@@ -154,25 +154,36 @@
       </button>
     </div>
     <div v-if="isSublineasModalOpen"
-      class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
+      class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-[99999]">
       <div
         class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
 
-        <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+        <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-start">
           <div>
             <h3 class="text-xl font-bold text-gray-800 dark:text-white">Gestionar Sub-líneas</h3>
             <div
               class="bg-brand-50 rounded-lg p-4 mt-4 border border-brand-100 dark:bg-brand-500/10 dark:border-brand-500/20">
-              <p class="text-sm text-gray-600 dark:text-gray-400"><strong>Línea de Investigación:</strong> {{
-                lineaSeleccionada?.nombre_lin }}</p>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>Facultad:</strong> {{
-                getFacultadInfo(lineaSeleccionada?.idfacultad).siglas }} - {{
-                  getFacultadInfo(lineaSeleccionada?.idfacultad).facultad }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                <strong>Línea de Investigación:</strong> {{ lineaSeleccionada?.nombre_lin }}
+              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <strong>Facultad:</strong>
+                {{ getFacultadInfo(lineaSeleccionada?.idfacultad).siglas }} - {{
+                  getFacultadInfo(lineaSeleccionada?.idfacultad).facultad }}
+              </p>
             </div>
           </div>
-          <button @click="isSublineasModalOpen = false" class="text-gray-400 hover:text-gray-600">✕</button>
+          <button @click="isSublineasModalOpen = false"
+            class="p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-colors focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-        <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20">
+
+        <div
+          class="m-6 mb-2 p-4 rounded-xl bg-blue-50 border border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20">
           <div class="flex gap-3">
             <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2">
@@ -181,39 +192,54 @@
               <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
             <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-              <strong>Nota importante:</strong> Las sub-líneas que añada aquí deben ser únicamente las que se encuentran directamente relacionadas con la línea de investigación seleccionada.
+              <strong>Nota importante:</strong> Las sub-líneas que añada aquí deben ser únicamente las que se encuentran
+              directamente relacionadas con la línea de investigación seleccionada.
             </p>
           </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div class="flex-1 overflow-y-auto p-6 pt-2 grid grid-cols-1 md:grid-cols-12 gap-8">
 
           <div class="md:col-span-4 border-r border-gray-100 dark:border-gray-800 pr-8">
             <div class="space-y-4">
+
               <div>
                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Carrera</label>
                 <div class="relative group">
                   <div
                     class="max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 custom-scrollbar">
-                      <div v-for="carr in carrerasList" :key="carr.idCarr"
-                        @click="objetoSublinea.idCarr = carr.idCarr" :class="[
-                          'p-3 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-0 transition-all hover:bg-blue-50 dark:hover:bg-blue-900/20',
-                          objetoSublinea.idCarr === carr.idCarr ? 'border-l-4 border-l-blue-600' : ''
-                        ]">
-                        <div class="flex items-center justify-between mb-1">
-                          <span class="text-xs font-bold text-blue-500 uppercase">{{ carr.NombCarr }}</span>
-                          <span v-if="objetoSublinea.idCarr === carr.idCarr" class="text-blue-600">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="3">
-                              <path d="M20 6L9 17l-5-5" />
-                            </svg>
+                    <div v-for="carr in carrerasList" :key="carr.idCarr"
+                      @click="!isCarreraBloqueada(carr.idCarr) && (objetoSublinea.idCarr = carr.idCarr)" :class="[
+                        'p-3 border-b border-gray-100 dark:border-gray-800 last:border-0 transition-all',
+                        isCarreraBloqueada(carr.idCarr)
+                          ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800/80'
+                          : 'cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20',
+                        objetoSublinea.idCarr === carr.idCarr && !isCarreraBloqueada(carr.idCarr) ? 'border-l-4 border-l-blue-600 bg-blue-50/50 dark:bg-blue-900/10' : ''
+                      ]">
+                      <div class="flex items-center justify-between mb-1">
+                        <div>
+                          <span class="text-xs font-bold uppercase"
+                            :class="isCarreraBloqueada(carr.idCarr) ? 'text-gray-500' : 'text-blue-500'">
+                            {{ carr.NombCarr }}
+                          </span>
+                          <span v-if="isCarreraBloqueada(carr.idCarr)"
+                            class="inline-block ml-2 text-[9px] font-semibold px-1.5 py-0.5 bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded">
+                            Asignada
                           </span>
                         </div>
+                        <span v-if="objetoSublinea.idCarr === carr.idCarr && !isCarreraBloqueada(carr.idCarr)"
+                          class="text-blue-600">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3">
+                            <path d="M20 6L9 17l-5-5" />
+                          </svg>
+                        </span>
                       </div>
                     </div>
+                  </div>
                 </div>
                 <p v-if="!objetoSublinea.idCarr" class="mt-2 text-[10px] text-gray-500 font-medium italic">
-                  * Debe seleccionar una carrera
+                  * Debe seleccionar una carrera disponible
                 </p>
               </div>
 
@@ -247,57 +273,55 @@
 
           <div class="md:col-span-8 flex flex-col min-h-0">
             <div class="overflow-y-auto border rounded-xl dark:border-gray-800 custom-scrollbar"
-              style="max-height: 400px;">
+              style="max-height: 500px;">
               <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
-                <thead class="bg-gray-50 dark:bg-gray-800/50">
+                <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0">
                   <tr>
                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Sub-línea /
                       Objeto</th>
-                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Carrera
-                    </th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Carrera</th>
                     <th class="py-3 px-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400">Acciones
                     </th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                   <tr v-if="sublineasList.length === 0">
-                      <td colspan="3" class="py-8 text-center text-sm text-gray-500">No hay sub-líneas registradas.</td>
-                    </tr>
-                    <tr v-else v-for="sub in sublineasList" :key="sub.id_sublin_investiga"
-                      class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
-                      <td class="py-3 px-4">
-                        <p class="font-bold text-sm text-gray-800 dark:text-white/90">{{ sub.nombre_sublin }}</p>
-                        <p class="text-xs text-gray-500 mt-1 line-clamp-2" :title="sub.objeto_estudio_sublin">{{
-                          sub.objeto_estudio_sublin }}</p>
-                      </td>
-                      <td class="py-3 px-4">
-                        <span
-                          class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-md dark:bg-blue-500/10 dark:text-blue-400">
-                          {{ sub.carreras?.NombCarr || 'Carrera no encontrada' }}
-                        </span>
-                      </td>
-                      <td class="py-3 px-4 text-right">
-                        <div class="flex justify-end gap-1">
-                          <button @click="prepararEdicionSublinea(sub)"
-                            class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                            </svg>
-                          </button>
-                          <button @click="eliminarSublinea(sub.id_sublin_investiga, sub.nombre_sublin)"
-                            class="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
-                              <polyline points="3 6 5 6 21 6" />
-                              <path
-                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                    <td colspan="3" class="py-8 text-center text-sm text-gray-500">No hay sub-líneas registradas.</td>
+                  </tr>
+                  <tr v-else v-for="sub in sublineasList" :key="sub.id_sublin_investiga"
+                    class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                    <td class="py-3 px-4">
+                      <p class="font-bold text-sm text-gray-800 dark:text-white/90">{{ sub.nombre_sublin }}</p>
+                      <p class="text-xs text-gray-500 mt-1 line-clamp-2" :title="sub.objeto_estudio_sublin">{{
+                        sub.objeto_estudio_sublin }}</p>
+                    </td>
+                    <td class="py-3 px-4">
+                      <span
+                        class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-md dark:bg-blue-500/10 dark:text-blue-400">
+                        {{ sub.carreras?.NombCarr || 'Carrera no encontrada' }}
+                      </span>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                      <div class="flex justify-end gap-1">
+                        <button @click="prepararEdicionSublinea(sub)"
+                          class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        </button>
+                        <button @click="eliminarSublinea(sub.id_sublin_investiga, sub.nombre_sublin)"
+                          class="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -634,6 +658,17 @@ export default {
         console.error("Error al obtener facultades:", error);
       }
     },
+    isCarreraBloqueada(idCarr) {
+      return this.sublineasList.some(sub => {
+        // Verifica si el id de la carrera coincide (dependiendo de cómo te lo devuelva el backend)
+        const coincideCarrera = sub.idCarr === idCarr || (sub.carreras && sub.carreras.idCarr === idCarr);
+        
+        // Si estamos editando y la carrera es la misma de la sublínea que estoy editando, NO la bloqueamos.
+        const noEsLaSublineaActual = sub.id_sublin_investiga !== this.objetoSublinea.id_sublin_investiga;
+
+        return coincideCarrera && noEsLaSublineaActual;
+      });
+    },
     getFacultadInfo(idfacultad) {
       if (!idfacultad) return { siglas: '', facultad: '' };
       const fac = this.facultades.find(f => f.idfacultad === idfacultad);
@@ -653,7 +688,8 @@ export default {
       this.lineaSeleccionada = post;
       this.cancelarEdicionSublinea(); // Limpia formulario
       this.isSublineasModalOpen = true;
-
+      this.sublineasList = []; // Limpia sub-líneas anteriores
+      this.carrerasList = []; // Limpia carreras anteriores
       await this.cargarCarrerasDeFacultad(post.idfacultad);
       await this.cargarSublineas(post.id_lin_investiga);
     },
