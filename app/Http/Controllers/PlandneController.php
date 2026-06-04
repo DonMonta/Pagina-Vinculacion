@@ -63,10 +63,12 @@ class PlandneController extends Controller
 
             return response()->json([
                 'data' => $data->items(),
-                'current_page' => $data->currentPage(),
-                'per_page' => $data->perPage(),
-                'total' => $data->total(),
-                'last_page' => $data->lastPage(),
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);

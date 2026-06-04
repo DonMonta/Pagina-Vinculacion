@@ -36,5 +36,6 @@ class Praempresa extends Model
         'usuario_id',
         'archivo'
     ];
+    protected $hidden = ['imagen'];
 
 }

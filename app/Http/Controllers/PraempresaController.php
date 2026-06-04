@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 
 class PraempresaController extends Controller
 {
@@ -20,34 +21,33 @@ class PraempresaController extends Controller
     {
         try {
             $searchQuery = $request->input('search_query');
-
             $query = Praempresa::select('praempresa.*');
 
-            // Capturar dirección de ordenamiento desde el frontend ('desc' por defecto)
             $direction = $request->input('direction', 'desc');
             if (!in_array($direction, ['asc', 'desc'])) {
-                $direction = 'desc'; // Validación por seguridad
+                $direction = 'desc';
             }
 
-            // Aplicar ordenamiento por fecha
             $query->orderBy('fechafin', $direction);
 
-            // Filtro de búsqueda
             if ($searchQuery) {
                 $query->where(function ($q) use ($searchQuery) {
-                    $q->where('ruc', 'LIKE', '%' . $searchQuery . '%');
+                    $q->where('ruc', 'LIKE', '%' . $searchQuery . '%')
+                        ->orWhere('empresa', 'LIKE', '%' . $searchQuery . '%');
                 });
             }
 
-            // Respuesta para cuando piden todos los registros
+            // --- RESPUESTA PARA TODOS LOS REGISTROS ---
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
 
-                // Asegurar codificación UTF-8
                 $data->transform(function ($item) {
                     $attributes = $item->getAttributes();
                     foreach ($attributes as $key => $value) {
-                        if (is_string($value)) {
+                        if ($key === 'imagen') {
+                            // ✅ Optimización: Solo enviamos si tiene o no imagen (true/false)
+                            $attributes[$key] = !empty($value);
+                        } elseif (is_string($value)) {
                             $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                         }
                     }
@@ -57,20 +57,19 @@ class PraempresaController extends Controller
                 return response()->json(['data' => $data]);
             }
 
-            // Paginación por defecto (Mantiene el orden establecido arriba)
+            // --- RESPUESTA CON PAGINACIÓN ---
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
                 return response()->json(['error' => 'No se encontraron datos'], 404);
             }
 
-            // Convertir los datos a UTF-8 válido y formatear BLOBs
             $data->getCollection()->transform(function ($item) {
                 $attributes = $item->getAttributes();
                 foreach ($attributes as $key => $value) {
-                    if ($key === 'imagen' && !empty($value)) {
-                        // ✅ Convertir BLOB a base64
-                        $attributes[$key] = base64_encode($value);
+                    if ($key === 'imagen') {
+                        // ✅ Enviar true/false para no inflar el JSON de la tabla con megabytes de imágenes
+                        $attributes[$key] = !empty($value);
                     } elseif (is_string($value) && $key !== 'imagen') {
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
@@ -79,14 +78,16 @@ class PraempresaController extends Controller
             });
 
             return response()->json([
-                'data'         => $data->items(),
-                'current_page' => $data->currentPage(),
-                'per_page'     => $data->perPage(),
-                'total'        => $data->total(),
-                'last_page'    => $data->lastPage(),
+                'data' => $data->items(),
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ],
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error en el servidor: ' . $e->getMessage()], 500);
         }
     }
 
@@ -96,30 +97,40 @@ class PraempresaController extends Controller
     public function store(Request $request)
     {
         DB::beginTransaction();
-        $user = Auth::user();
-        $inputs = $request->input();
+        try {
+            $user = Auth::user();
+            $inputs = $request->input();
 
-        if (!empty($inputs['imagen'])) {
-            $inputs['imagen'] = base64_decode($inputs['imagen']);
+            if (!empty($inputs['imagen'])) {
+                $inputs['imagen'] = base64_decode($inputs['imagen']);
+            }
+            $inputs['usuario_id'] = $user->ciinfper;
+
+            $res = Praempresa::create($inputs);
+
+            Bitacora::create([
+                'bt_usuario'     => $user->ciinfper,
+                'bt_fechahora'   => Carbon::now(),
+                'bt_accion'      => "Crear Empresa - VINCULACIÓN",
+                'bt_ippc'        => $request->ip(),
+                'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Crear Empresa CON NOMBRE: {$request->empresa}", // ✅ Corregido campo nombre
+            ]);
+
+            DB::commit();
+
+            $data = $res->toArray();
+            if (!empty($res->imagen)) {
+                $data['imagen'] = $request->imagen; // Retornamos el mismo base64 que envió el cliente
+            }
+
+            return response()->json([
+                'message' => 'Registro creado exitosamente',
+                'data' => $data
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al guardar: ' . $e->getMessage()], 500);
         }
-        $inputs['usuario_id'] = $user->ciinfper;
-        $res = Praempresa::create($inputs);
-        $data = $res->toArray();
-        if (!empty($res->imagen)) {
-            $data['imagen'] = base64_encode($res->imagen);
-        }
-        DB::commit();
-        Bitacora::create([
-            'bt_usuario'     => $user->ciinfper,
-            'bt_fechahora'   => Carbon::now(),
-            'bt_accion'      => "Crear Empresa" . " - VINCULACIÓN",
-            'bt_ippc'        => $request->ip(),
-            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Crear Empresa CON NOMBRE: {$request->NOMBRE}",
-        ]);
-        return response()->json([
-            'message' => 'Registro creado exitosamente',
-            'data' => $data
-        ], 201);
     }
 
     /**
@@ -148,7 +159,16 @@ class PraempresaController extends Controller
     {
         $res = Praempresa::find($id);
         $user = Auth::user();
-        if (isset($res)) {
+
+        if (!$res) {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "La Empresa con id: $id no Existe",
+            ], 404);
+        }
+
+        DB::beginTransaction(); // ✅ Agregado inicio de transacción
+        try {
             $res->ruc = $request->ruc;
             $res->empresa = $request->empresa;
             $res->empresacorta = $request->empresacorta;
@@ -157,7 +177,6 @@ class PraempresaController extends Controller
             $res->telefono = $request->telefono;
             $res->email = $request->email;
             $res->url = $request->url;
-            $res->logo = $request->logo;
             $res->tipo = $request->tipo;
             $res->titulo = $request->titulo;
             $res->representante = $request->representante;
@@ -167,38 +186,45 @@ class PraempresaController extends Controller
             $res->tipoinstitucion = $request->tipoinstitucion;
             $res->pais = $request->pais;
             $res->ciudad = $request->ciudad;
-            if (!empty($request->imagen)) {
-                $res->imagen = base64_decode($request->imagen);
-            }
             $res->estado_empr = $request->estado_empr;
             $res->vision = $request->vision;
             $res->mision = $request->mision;
             $res->usuario_id = $user->ciinfper;
-            $res->archivo = $request->archivo;
-            DB::commit();
+            if ($request->filled('archivo')) {
+                $res->archivo = $request->archivo;
+            }
+
+            if (!empty($request->imagen)) {
+                $res->imagen = base64_decode($request->imagen);
+            }
+
+            $res->save(); // ✅ Guardar primero antes del commit
+
             Bitacora::create([
                 'bt_usuario'     => $user->ciinfper,
                 'bt_fechahora'   => Carbon::now(),
-                'bt_accion'      => "Actualizar Empresa" . " - VINCULACIÓN",
+                'bt_accion'      => "Actualizar Empresa - VINCULACIÓN",
                 'bt_ippc'        => $request->ip(),
-                'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualizar Empresa CON NOMBRE: {$request->NOMBRE}",
+                'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualizar Empresa CON NOMBRE: {$request->empresa}", // ✅ Corregido campo nombre
             ]);
-            if ($res->save()) {
-                return response()->json([
-                    'data' => $res,
-                    'mensaje' => "Actualizado con Éxito!!",
-                ]);
-            } else {
-                return response()->json([
-                    'error' => true,
-                    'mensaje' => "Error al Actualizar",
-                ]);
+
+            DB::commit(); // ✅ Hacer commit al final de todo el bloque exitoso
+
+            $data = $res->toArray();
+            if (!empty($request->imagen)) {
+                $data['imagen'] = $request->imagen;
             }
-        } else {
+
+            return response()->json([
+                'data' => $data,
+                'mensaje' => "Actualizado con Éxito!!",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // ✅ Si algo falla deshace los cambios de forma segura
             return response()->json([
                 'error' => true,
-                'mensaje' => "La Empresa con id: $id no Existe",
-            ]);
+                'mensaje' => "Error al Actualizar: " . $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -336,6 +362,44 @@ class PraempresaController extends Controller
                 'message' => 'Seguridad: El archivo no pudo ser procesado.',
                 'error'   => $e->getMessage()
             ], 500);
+        }
+    }
+    public function getFotografia($ci)
+    {
+        try {
+            $empresa = Praempresa::where('idempresa', $ci)
+                ->select('imagen')
+                ->first();
+
+            if (!$empresa || empty($empresa->imagen)) {
+                return response()->json(['error' => 'Fotografía no encontrada.'], 404);
+            }
+
+            $fotoBinaria = $empresa->imagen;
+
+            // ✅ CORRECCIÓN CLAVE: Si la base de datos retorna un recurso stream para el BLOB, lo leemos
+            if (is_resource($fotoBinaria)) {
+                $fotoBinaria = stream_get_contents($fotoBinaria);
+            }
+
+            $mime = 'image/jpeg'; // Por defecto
+
+            if (extension_loaded('fileinfo')) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $detectedMime = finfo_buffer($finfo, $fotoBinaria);
+                finfo_close($finfo);
+
+                if ($detectedMime && strpos($detectedMime, 'image') === 0) {
+                    $mime = $detectedMime;
+                }
+            }
+
+            // Devolver la respuesta binaria limpia (STREAM)
+            return Response::make($fotoBinaria, 200)
+                ->header('Content-Type', $mime)
+                ->header('Content-Disposition', 'inline; filename="foto_' . $ci . '"');
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la fotografía: ' . $e->getMessage()], 500);
         }
     }
 }

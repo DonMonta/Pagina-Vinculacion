@@ -55,11 +55,13 @@ class Obj_pol_plandneController extends Controller
                 return $attributes;
             });
             return response()->json([
-                'data' => $data->items(),
-                'current_page' => $data->currentPage(),
-                'per_page' => $data->perPage(),
-                'total' => $data->total(),
-                'last_page' => $data->lastPage(),
+               'data' => $data->items(),
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);

@@ -39,6 +39,7 @@ use App\Http\Controllers\PraempresaController;
 Route::prefix('vin')->group(function () {
     Route::get('getFotoDocente/{ci}', [InformacionPersonal_DController::class, 'getFotografia']);
     Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFotografia']);
+    Route::get('getFotoEmpresa/{ci}', [PraempresaController::class, 'getFotografia']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api,estudiante')->group(function () {
@@ -104,6 +105,8 @@ Route::prefix('vin')->group(function () {
         Route::delete('inhabilitar_agenda_ods/{id}', [Agenda_ODSController::class, 'destroy']);
         //Definición de endpoint para el recurso SeguiFormulario, perimitiendo operaciones CRUD
         Route::apiResource("seguiformulario", SeguiFormularioController::class);
+        //Definición de endpoint para obtener los formularios de graduados
+        Route::get('getformGraduados', [SeguiFormularioController::class, 'getformGraduados']);
         //Definición de endpoint para habilitar e inhabilitar un formulario
         Route::delete('habilitar_formulario/{id}', [SeguiFormularioController::class, 'habilitar']);
         Route::delete('inhabilitar_formulario/{id}', [SeguiFormularioController::class, 'destroy']);
@@ -125,8 +128,12 @@ Route::prefix('vin')->group(function () {
         Route::post('guardarEvaluacion', [SeguiFormularioController::class, 'guardarEvaluacion']);
         //Definición para obtener los estudiantes inscritos en un formulario
         Route::get('getEstudiantesInscritos/{idFormulario}', [SeguiFormularioController::class, 'getEstudiantesInscritos']);
+        //Definición para obtener los estudiantes inscritos en un formulario
+        Route::get('getEncuestadosGraduados/{idFormulario}', [SeguiFormularioController::class, 'getEncuestadosGraduados']);
         //Definición para obtener los detalles de respuestas de un estudiante
         Route::get('getDetalleRespuestasEstudiante/{idFormulario}/{cedula}', [SeguiFormularioController::class, 'getDetalleRespuestasEstudiante']);
+        //Definición para obtener los detalles de respuestas de un graduado
+        Route::get('getDetalleRespuestasGraduados/{idFormulario}/{cedula}', [SeguiFormularioController::class, 'getDetalleRespuestasGraduados']);
         //Definición de endpoint para obtener el promedio de un estudiante
         Route::get('getPromedioEstudiante/{cedula}', [SeguiFormularioController::class, 'getPromedioEstudiante']);
         //Definción del recurso Dominio Humano, perimitiendo operaciones CRUD

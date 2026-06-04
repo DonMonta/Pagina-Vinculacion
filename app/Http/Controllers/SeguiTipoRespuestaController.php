@@ -47,8 +47,12 @@ class SeguiTipoRespuestaController extends Controller
             $data = $query->paginate(20);
             return response()->json([
                 'data' => $data->items(),
-                'current_page' => $data->currentPage(),
-                'total' => $data->total(),
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al listar opciones: ' . $e->getMessage()], 500);
