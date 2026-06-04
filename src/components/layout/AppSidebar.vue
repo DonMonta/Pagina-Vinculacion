@@ -222,6 +222,7 @@ const menuData = [
         icon: FormularioIcon,
         name: "Formularios",
         subItems: [
+          { name: "Formulario Graduados", path: "/site-admin/formulario_graduados", pro: false },
           { name: "Formulario Cátedra", path: "/site-admin/formulario_catedra", pro: false },
         ],
       },
