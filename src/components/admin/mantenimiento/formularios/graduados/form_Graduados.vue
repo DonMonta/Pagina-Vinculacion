@@ -168,12 +168,14 @@
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
       <div
         class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+
         <div
           class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900">
           <div>
             <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ formularioSeleccionado?.NOMBRE }}</h3>
-            <p class="text-sm text-gray-500 mt-1">Total de Graudados Encuestados: <span
-                class="font-bold text-brand-600 px-2 py-0.5 bg-brand-50 rounded-md">{{ totalInscritos }}</span></p>
+            <p class="text-sm text-gray-500 mt-1">Total de Graduados Encuestados:
+              <span class="font-bold text-brand-600 px-2 py-0.5 bg-brand-50 rounded-md">{{ totalInscritos }}</span>
+            </p>
           </div>
           <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
             @click="mostrarModalInscritos = false">
@@ -183,48 +185,94 @@
           </button>
         </div>
 
-        <div class="p-6 overflow-y-auto flex-grow">
+        <div class="flex border-b border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-900/50 px-6 gap-2">
+          <button @click="tabActivo = 'encuestados'"
+            :class="tabActivo === 'encuestados' ? 'border-brand-500 text-brand-600 dark:text-brand-400 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
+            class="py-3 px-4 text-sm border-b-2 transition-all duration-200">
+            Listado de Encuestados
+          </button>
+          <button @click="tabActivo = 'preguntas'"
+            :class="tabActivo === 'preguntas' ? 'border-brand-500 text-brand-600 dark:text-brand-400 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
+            class="py-3 px-4 text-sm border-b-2 transition-all duration-200">
+            Estadísticas por Pregunta
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-grow bg-white dark:bg-gray-900">
+
           <div v-if="cargandoInscritos" class="flex flex-col items-center justify-center py-12 gap-2">
             <span class="animate-spin h-8 w-8 border-4 border-brand-500 border-t-transparent rounded-full"></span>
-            <p class="text-gray-500 text-sm">Cargando base de alumnos...</p>
+            <p class="text-gray-500 text-sm">Procesando información...</p>
           </div>
-          <table v-else class="min-w-full">
-            <thead>
-              <tr
-                class="border-b border-gray-100 dark:border-gray-800 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                <th class="pb-3 px-4">Foto</th>
-                <th class="pb-3 px-4">Cédula</th>
-                <th class="pb-3 px-4">Nombres y Apellidos</th>
-                <th class="pb-3 px-4">Carrera / Facultad</th>
-                <th class="pb-3 px-4 text-right">Detalles</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="alumno in listaInscritos" :key="alumno.CIInfPer"
-                class="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-white/[0.01]">
-                <td class="py-3 px-4">
-                  <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200 bg-gray-100">
-                    <img :src="getPhotoUrl(alumno.CIInfPer)" alt="Perfil" class="w-full h-full object-cover" />
-                  </div>
-                </td>
-                <td class="py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">{{ alumno.CIInfPer }}</td>
-                <td class="py-3 px-4 text-sm font-bold text-gray-900 dark:text-white">{{ alumno.NombInfPer }} {{
-                  alumno.ApellInfPer }} {{ alumno.ApellMatInfPer }}</td>
-                <td class="py-3 px-4 text-xs text-gray-600 dark:text-gray-400">
-                  <p class="font-medium">{{ alumno.NombCarr }}</p>
-                  <p class="text-gray-400 mt-0.5">{{ formatNivel(alumno.nivel) }} - ({{ alumno.facultad_siglas }})</p>
-                </td>
 
-                <td class="py-3 px-4 text-right">
-                  <button @click="abrirDetalleRespuestas(alumno.CIInfPer)"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors rounded-lg">
-                    Ver respuestas
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div v-else>
+            <div v-if="tabActivo === 'encuestados'" class="overflow-x-auto">
+              <table class="min-w-full">
+                <thead>
+                  <tr
+                    class="border-b border-gray-100 dark:border-gray-800 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    <th class="pb-3 px-4">Foto</th>
+                    <th class="pb-3 px-4">Cédula</th>
+                    <th class="pb-3 px-4">Nombres y Apellidos</th>
+                    <th class="pb-3 px-4">Carrera / Facultad</th>
+                    <th class="pb-3 px-4 text-right">Detalles</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="alumno in listaInscritos" :key="alumno.CIInfPer"
+                    class="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-white/[0.01]">
+                    <td class="py-3 px-4">
+                      <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200 bg-gray-100">
+                        <img :src="getPhotoUrl(alumno.CIInfPer)" alt="Perfil" class="w-full h-full object-cover" />
+                      </div>
+                    </td>
+                    <td class="py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">{{ alumno.CIInfPer }}
+                    </td>
+                    <td class="py-3 px-4 text-sm font-bold text-gray-900 dark:text-white">{{ alumno.NombInfPer }} {{
+                      alumno.ApellInfPer }} {{ alumno.ApellMatInfPer }}</td>
+                    <td class="py-3 px-4 text-xs text-gray-600 dark:text-gray-400">
+                      <p class="font-medium">{{ alumno.NombCarr }}</p>
+                      <p class="text-gray-400 mt-0.5">{{ formatNivel(alumno.nivel) }} - ({{ alumno.facultad_siglas }})
+                      </p>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                      <button @click="abrirDetalleRespuestas(alumno.CIInfPer)"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors rounded-lg">
+                        Ver respuestas
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div v-if="tabActivo === 'preguntas'" class="space-y-8">
+              <div v-if="cargandoEstadisticasPreguntas" class="text-center py-8 text-gray-500 text-sm">
+                Generando visualizaciones estadísticas...
+              </div>
+              <div v-else-if="statsPreguntas.length === 0" class="text-center py-8 text-gray-500 text-sm">
+                No hay respuestas registradas para generar gráficos.
+              </div>
+              <div v-else v-for="(preg, index) in statsPreguntas" :key="preg.id_pregunta"
+                class="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/20 dark:bg-transparent">
+                <div class="mb-4">
+                  <h4 class="text-base font-bold text-gray-900 dark:text-white">{{ index + 1 }}. {{ preg.pregunta }}
+                  </h4>
+                  <p class="text-xs text-gray-400 mt-1">Total Respuestas en esta pregunta: <span
+                      class="font-semibold text-gray-700 dark:text-gray-200">{{ preg.total_encuestados }}</span></p>
+                </div>
+
+                <div class="max-w-full overflow-x-auto custom-scrollbar">
+                  <div class="-ml-4 min-w-[800px] xl:min-w-full pl-2">
+                    <apexchart type="area" height="260" :options="preg.chartOptions" :series="preg.chartSeries" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
+
       </div>
     </div>
 
@@ -257,8 +305,9 @@
                 class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 border-t border-gray-200/60 dark:border-gray-700/50 pt-2 text-xs">
                 <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Carrera:</b> {{
                   detalleAlumno.persona.NombCarr }}</p>
-                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Nivel:</b> {{
-                  formatNivel(detalleAlumno.persona.nivel) }} Ciclo ({{ detalleAlumno.persona.facultad_siglas }})</p>
+                <p class="text-gray-600 dark:text-gray-400"><b class="text-gray-800 dark:text-gray-200">Estudiante:</b>
+                  {{
+                    formatNivel(detalleAlumno.persona.nivel) }} - ({{ detalleAlumno.persona.facultad_siglas }})</p>
               </div>
             </div>
           </div>
@@ -764,7 +813,45 @@ export default {
       esEvaluacion: false,
       esEvaluacionDetalle: false,
       puntajeDetalle: 0,
-      totalPreguntasDetalle: 0
+      totalPreguntasDetalle: 0,
+      // ESTADOS EXCLUSIVOS DE LOS NUEVOS NAV-TABS
+      tabActivo: 'encuestados', // Cambia entre 'encuestados', 'preguntas', 'periodos'
+      
+      // Datos Tab 2 (Preguntas)
+      cargandoEstadisticasPreguntas: false,
+      statsPreguntas: [],
+
+      
+
+      // CONFIGURACIÓN BASE DE TUS GRÁFICOS (Extraída exactamente de tu plantilla)
+      baseChartOptions: {
+        legend: { show: false, position: 'top', horizontalAlign: 'left' },
+        colors: ['#465FFF', '#9CB9FF'],
+        chart: {
+          fontFamily: 'Outfit, sans-serif',
+          type: 'area',
+          toolbar: { show: false }
+        },
+        fill: {
+          gradient: { enabled: true, opacityFrom: 0.55, opacityTo: 0 }
+        },
+        stroke: { curve: 'straight', width: [2, 2] },
+        markers: { size: 0 },
+        dataLabels: { enabled: false },
+        grid: {
+          xaxis: { lines: { show: false } },
+          yaxis: { lines: { show: true } }
+        },
+        xaxis: {
+          type: 'category',
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          tooltip: { enabled: false }
+        },
+        yaxis: {
+          title: { style: { fontSize: '0px' } }
+        }
+      }
     };
   },
   created() {
@@ -844,15 +931,98 @@ export default {
       this.formularioSeleccionado = formulario;
       this.mostrarModalInscritos = true;
       this.cargandoInscritos = true;
+      this.tabActivo = 'encuestados'; // Resetear a la pestaña inicial
+      this.periodoSeleccionado = "";
+      this.periodoMetricasData = null;
+
       try {
+        // 1. Cargar alumnos inscritos (Tab 1)
         const response = await API.get(`${this.baseUrl}/getEncuestadosGraduados/${formulario.ID}`);
         this.listaInscritos = response.data.estudiantes;
         this.totalInscritos = response.data.total;
         this.esEvaluacion = response.data.esEvaluacion;
+
+        // 2. Ejecutar de forma asíncrona la precarga de las pestañas estadísticas
+        this.cargarEstadisticasDePreguntas(formulario.ID);
+        this.cargarListaDePeriodos();
+
       } catch (error) {
         console.error("Error cargando alumnos inscritos", error);
       } finally {
         this.cargandoInscritos = false;
+      }
+    },
+    async cargarEstadisticasDePreguntas(idFormulario) {
+      this.cargandoEstadisticasPreguntas = true;
+      try {
+        const response = await API.get(`${this.baseUrl}/getEstadisticasPreguntas/${idFormulario}`);
+        
+        // Mapeamos los datos para construir el array de series y opciones requerido por ApexCharts por cada ítem
+        this.statsPreguntas = response.data.estadisticas.map(p => {
+          const categorias = p.opciones.map(o => o.opcion || 'Sin responder/Abierta');
+          const totales = p.opciones.map(o => o.total_votos);
+
+          return {
+            id_pregunta: p.id_pregunta,
+            pregunta: p.pregunta,
+            total_encuestados: p.total_encuestados,
+            chartSeries: [{
+              name: 'Total Respuestas',
+              data: totales
+            }],
+            chartOptions: {
+              ...this.baseChartOptions,
+              xaxis: {
+                ...this.baseChartOptions.xaxis,
+                categories: categorias
+              }
+            }
+          };
+        });
+      } catch (error) {
+        console.error("Error cargando estadísticas de preguntas", error);
+      } finally {
+        this.cargandoEstadisticasPreguntas = false;
+      }
+    },
+    async cargarListaDePeriodos() {
+      try {
+        const response = await API.get(`${this.baseUrl}/getPeriodosLectivos?all=true`);
+        console.log("Lista de periodos obtenida:", response)
+        this.listaPeriodos = response.data.data;
+      } catch (error) {
+        console.error("Error recuperando catálogo de periodos", error);
+      }
+    },
+    async cargarEstadisticasPeriodo() {
+      if (!this.periodoSeleccionado) return;
+      this.cargandoEstadisticasPeriodo = true;
+      try {
+        const response = await API.get(`${this.baseUrl}/getGraduadosPorPeriodo/${this.periodoSeleccionado}`);
+        this.periodoMetricasData = response.data;
+
+        if (this.periodoMetricasData && this.periodoMetricasData.total_graduados > 0) {
+          // Mapeamos las carreras obtenidas del controlador de estadísticas
+          const nombresCarreras = this.periodoMetricasData.distribucion_por_carrera.map(c => c.carrera);
+          const cantidades = this.periodoMetricasData.distribucion_por_carrera.map(c => c.cantidad_graduados);
+
+          this.periodoChartSeries = [{
+            name: 'Graduados',
+            data: cantidades
+          }];
+
+          this.periodoChartOptions = {
+            ...this.baseChartOptions,
+            xaxis: {
+              ...this.baseChartOptions.xaxis,
+              categories: nombresCarreras
+            }
+          };
+        }
+      } catch (error) {
+        console.error("Error al consultar estadísticas del periodo", error);
+      } finally {
+        this.cargandoEstadisticasPeriodo = false;
       }
     },
     async abrirDetalleRespuestas(cedula) {
