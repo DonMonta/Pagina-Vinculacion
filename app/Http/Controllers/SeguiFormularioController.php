@@ -844,7 +844,13 @@ class SeguiFormularioController extends Controller
             return response()->json(['error' => 'No se encontró registro de encuesta.'], 404);
         }
 
-        // 2. Obtener los datos personales aplicando la solución en cascada (Estudiantes activos / Egresados)
+        $idEncuesta = $encuesta->ID ?? $encuesta->id ?? $encuesta->idseguiencuesta;
+
+        if (!$idEncuesta) {
+            return response()->json(['error' => 'No se pudo determinar el ID de la encuesta.'], 500);
+        }
+
+        // 2. Obtener los datos personales con la consulta en cascada (Estudiantes / Egresados)
         $datosPersona = DB::table('informacionpersonal')
             ->where('informacionpersonal.CIInfPer', $cedula)
             ->leftJoin('factura', function ($join) {
@@ -855,11 +861,7 @@ class SeguiFormularioController extends Controller
                     });
             })
             ->leftJoin('detalle_matricula', 'factura.id', '=', 'detalle_matricula.idfactura')
-
-            // 🔴 NUEVO: Unimos la tabla registrotitulos para dar soporte a egresados
             ->leftJoin('registrotitulos', 'registrotitulos.ciinfper', '=', 'informacionpersonal.CIInfPer')
-
-            // 🔴 MODIFICADO: Combinación inteligente de carreras usando COALESCE
             ->leftJoin('carrera', function ($join) {
                 $join->on('carrera.idCarr', '=', DB::raw('COALESCE(detalle_matricula.idcarr, registrotitulos.idcarr)'))
                     ->where('carrera.StatusCarr', 1)
@@ -876,22 +878,25 @@ class SeguiFormularioController extends Controller
                 'carrera.NombCarr',
                 'carrera.idCarr',
                 'facultad.siglas as facultad_siglas',
-                // 🔴 MODIFICADO: Si no posee matrícula en el periodo actual, se marca como Egresado/Graduado
                 DB::raw("COALESCE(detalle_matricula.nivel, 'EGRESADO/GRADUADO') as nivel")
             )
             ->distinct()
             ->first();
 
-        // 3. Traer SOLO las preguntas que el estudiante respondió (Inner Join)
-        $respuestas = DB::table('seguipreguntas')
-            ->join('seguidetalleencuesta', function ($join) use ($encuesta) {
+        // 3. Traer las respuestas desde la base de datos (aquí vienen duplicadas las de selección múltiple)
+        $respuestasRaw = DB::table('seguipreguntas')
+            ->join('seguidetalleencuesta', function ($join) use ($idEncuesta) {
                 $join->on('seguidetalleencuesta.idpregunta', '=', 'seguipreguntas.ID')
-                    ->where('seguidetalleencuesta.idseguiencuesta', '=', $encuesta->ID);
+                    ->where('seguidetalleencuesta.idseguiencuesta', '=', $idEncuesta);
             })
             ->leftJoin('seguitiporespuesta', 'seguitiporespuesta.ID', '=', 'seguidetalleencuesta.idtiporespuesta')
-            ->where('seguipreguntas.IDFORMULARIO', $idFormulario)
+            ->where(function ($query) use ($idFormulario) {
+                $query->where('seguipreguntas.idformulario', $idFormulario)
+                    ->orWhere('seguipreguntas.IDFORMULARIO', $idFormulario);
+            })
             ->select(
-                'seguipreguntas.PREGUNTA',
+                'seguipreguntas.ID as id_pregunta', // 🔴 NUEVO: Lo necesitamos para agrupar de forma única
+                'seguipreguntas.PREGUNTA as PREGUNTA',
                 'seguipreguntas.tipo as tipo_pregunta',
                 'seguidetalleencuesta.textorespuesta',
                 'seguitiporespuesta.TIPORESPUESTA as opcion_seleccionada',
@@ -899,9 +904,33 @@ class SeguiFormularioController extends Controller
             )
             ->get();
 
+        // 🔴 NUEVO: Agrupar y unificar las respuestas múltiples usando colecciones de Laravel
+        $respuestasAgrupadas = $respuestasRaw->groupBy('id_pregunta')->map(function ($grupo) {
+            $primerRegistro = $grupo->first();
+
+            // Extraer todas las opciones seleccionadas distintas y unirlas por coma (ej: "Opción A, Opción C")
+            // Si prefieres que salgan una debajo de otra en tu modal, puedes cambiar ', ' por '<br>'
+            $opcionesUnificadas = $grupo->pluck('opcion_seleccionada')->filter()->unique()->implode(', ');
+
+            // Lo mismo para respuestas abiertas (por si acaso)
+            $textosUnificados = $grupo->pluck('textorespuesta')->filter()->unique()->implode(', ');
+
+            // Gestionar el puntaje (si es evaluación): tomamos el valor más alto o validamos la presencia de puntos
+            $valores = $grupo->pluck('valor')->whereNotNull();
+            $valorFinal = $valores->isEmpty() ? null : $valores->max();
+
+            return [
+                'PREGUNTA'            => $primerRegistro->PREGUNTA,
+                'tipo_pregunta'       => $primerRegistro->tipo_pregunta,
+                'textorespuesta'      => $textosUnificados ?: null,
+                'opcion_seleccionada' => $opcionesUnificadas ?: null,
+                'valor'               => $valorFinal
+            ];
+        })->values(); // .values() resetea las llaves del array para que el JSON sea un arreglo [] limpio
+
         return response()->json([
             'persona' => $datosPersona,
-            'respuestas' => $respuestas
+            'respuestas' => $respuestasAgrupadas // Enviamos la lista limpia y sin duplicados
         ]);
     }
     public function getPromedioEstudiante(Request $request, string $cedula)
@@ -958,6 +987,59 @@ class SeguiFormularioController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Error interno del servidor al calcular el promedio.'
+            ], 500);
+        }
+    }
+    public function getEstadisticasPreguntas(string $idFormulario)
+    {
+        try {
+            // 1. Obtener todas las preguntas del formulario
+            $preguntas = DB::table('seguipreguntas')
+                ->where('idformulario', $idFormulario)
+                ->orWhere('IDFORMULARIO', $idFormulario)
+                ->select('ID', 'PREGUNTA', 'tipo')
+                ->get();
+
+            $resultadoMétricas = [];
+
+            // 2. Por cada pregunta, calcular la distribución de sus respuestas
+            foreach ($preguntas as $pregunta) {
+                
+                // Contar cuántas personas seleccionaron cada opción de respuesta estructurada
+                $conteoOpciones = DB::table('seguidetalleencuesta')
+                    ->join('seguitiporespuesta', 'seguitiporespuesta.ID', '=', 'seguidetalleencuesta.idtiporespuesta')
+                    ->where('seguidetalleencuesta.idpregunta', $pregunta->ID)
+                    ->select(
+                        'seguitiporespuesta.TIPORESPUESTA as opcion',
+                        DB::raw('COUNT(*) as total_votos')
+                    )
+                    ->groupBy('seguitiporespuesta.TIPORESPUESTA')
+                    ->get();
+
+                // Contar también el total general de respuestas registradas para esta pregunta
+                $totalRespondieron = DB::table('seguidetalleencuesta')
+                    ->where('idpregunta', $pregunta->ID)
+                    ->count();
+
+                $resultadoMétricas[] = [
+                    'id_pregunta' => $pregunta->ID,
+                    'pregunta' => $pregunta->PREGUNTA,
+                    'tipo_pregunta' => $pregunta->tipo,
+                    'total_encuestados' => $totalRespondieron,
+                    'opciones' => $conteoOpciones
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'estadisticas' => $resultadoMétricas
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al compilar estadísticas de preguntas.',
+                'message' => $e->getMessage()
             ], 500);
         }
     }

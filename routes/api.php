@@ -24,6 +24,9 @@ use App\Http\Controllers\Invi_sub_linea_invesController;
 use App\Http\Controllers\SubAreaUnescoController;
 use App\Http\Controllers\Zona_planificacionController;
 use App\Http\Controllers\PraempresaController;
+use App\Http\Controllers\GraduadosController;
+use App\Http\Controllers\PeriodoLectivoController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -37,9 +40,9 @@ use App\Http\Controllers\PraempresaController;
 */
 
 Route::prefix('vin')->group(function () {
-    Route::get('getFotoDocente/{ci}', [InformacionPersonal_DController::class, 'getFotografia']);
-    Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFotografia']);
-    Route::get('getFotoEmpresa/{ci}', [PraempresaController::class, 'getFotografia']);
+    Route::get('getFotoDocente/{ci}', [InformacionPersonal_DController::class, 'getFotografia'])->middleware('throttle:10000,1');
+    Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFotografia'])->middleware('throttle:10000,1');
+    Route::get('getFotoEmpresa/{ci}', [PraempresaController::class, 'getFotografia'])->middleware('throttle:10000,1');
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api,estudiante')->group(function () {
@@ -131,9 +134,9 @@ Route::prefix('vin')->group(function () {
         //Definición para obtener los estudiantes inscritos en un formulario
         Route::get('getEncuestadosGraduados/{idFormulario}', [SeguiFormularioController::class, 'getEncuestadosGraduados']);
         //Definición para obtener los detalles de respuestas de un estudiante
-        Route::get('getDetalleRespuestasEstudiante/{idFormulario}/{cedula}', [SeguiFormularioController::class, 'getDetalleRespuestasEstudiante']);
+        Route::get('getDetalleRespuestasEstudiante/{idFormulario}/{cedula}', [SeguiFormularioController::class, 'getDetalleRespuestasEstudiante'])->middleware('throttle:10000,1');
         //Definición para obtener los detalles de respuestas de un graduado
-        Route::get('getDetalleRespuestasGraduados/{idFormulario}/{cedula}', [SeguiFormularioController::class, 'getDetalleRespuestasGraduados']);
+        Route::get('getDetalleRespuestasGraduados/{idFormulario}/{cedula}', [SeguiFormularioController::class, 'getDetalleRespuestasGraduados'])->middleware('throttle:10000,1');
         //Definición de endpoint para obtener el promedio de un estudiante
         Route::get('getPromedioEstudiante/{cedula}', [SeguiFormularioController::class, 'getPromedioEstudiante']);
         //Definción del recurso Dominio Humano, perimitiendo operaciones CRUD
@@ -170,6 +173,12 @@ Route::prefix('vin')->group(function () {
         Route::delete('habilitar_empresa/{id}', [PraempresaController::class, 'habilitar']);
         //Definición de endpoint para inhabilitar un empresa
         Route::delete('inhabilitar_empresa/{id}', [PraempresaController::class, 'destroy']);
+        //Definición de endpoint para obtener las estadísticas de graduados por periodo
+        Route::get('getGraduadosPorPeriodo/{id_periodo}', [GraduadosController::class, 'getGraduadosPorPeriodo']);
+        //Definición de endpoint para obtener las estadísticas de preguntas de un formulario
+        Route::get('getEstadisticasPreguntas/{id_formulario}', [SeguiFormularioController::class, 'getEstadisticasPreguntas']);
+        //Definción de enpoint para obtener los periodos lectivos
+        Route::get('getPeriodosLectivos', [PeriodoLectivoController::class, 'index']);
     });
 }); 
 
