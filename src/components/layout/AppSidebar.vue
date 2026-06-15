@@ -241,6 +241,13 @@ const menuData = [
           { name: "Exámen Cátedra", path: "/site-admin/formulario_catedra/examen", pro: false },
         ],
       },
+      {
+        icon: UserCircleIcon,
+        name: "Equipo",
+        subItems: [
+          { name: "Roles", path: "/site-admin/roles_equipo", pro: false },
+        ],
+      },
 
     ],
   },
