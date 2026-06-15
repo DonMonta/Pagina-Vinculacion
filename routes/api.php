@@ -26,6 +26,8 @@ use App\Http\Controllers\Zona_planificacionController;
 use App\Http\Controllers\PraempresaController;
 use App\Http\Controllers\GraduadosController;
 use App\Http\Controllers\PeriodoLectivoController;
+use App\Http\Controllers\Invi_equipo_departController;
+use App\Http\Controllers\Invi_equipo_rolesController;
 
 
 /*
@@ -179,6 +181,13 @@ Route::prefix('vin')->group(function () {
         Route::get('getEstadisticasPreguntas/{id_formulario}', [SeguiFormularioController::class, 'getEstadisticasPreguntas']);
         //Definción de enpoint para obtener los periodos lectivos
         Route::get('getPeriodosLectivos', [PeriodoLectivoController::class, 'index']);
+        //Definición de recurso para el Equipo de Roles, perimitiendo operaciones CRUD
+        Route::apiResource("invi_equipo_roles", Invi_equipo_rolesController::class);
+        //Definición de endpoint para habilitar un Equipo de Roles
+        Route::delete('habilitar_equipo_roles/{id}', [Invi_equipo_rolesController::class, 'habilitar']);
+        //Definición de endpoint para inhabilitar un Equipo de Roles
+        Route::delete('inhabilitar_equipo_roles/{id}', [Invi_equipo_rolesController::class, 'destroy']);
+        
     });
 }); 
 
