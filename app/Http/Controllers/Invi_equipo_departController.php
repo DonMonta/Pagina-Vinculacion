@@ -80,6 +80,54 @@ class Invi_equipo_departController extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
+    public function getEquipoVinculacion()
+    {
+        // 1. Traer los miembros de vinculación con sus relaciones
+        $miembros = Invi_equipo_depart::with(['equipo_roles', 'informacionpersonald'])
+            ->where('estado_equipo_dep', 1)
+            ->whereHas('equipo_roles', function($query) {
+                $query->where('tipo_rol', 'VINCULACIÓN')
+                      ->where('estado_rol', 1);
+            })
+            ->get()
+            ->map(function($item) {
+                return [
+                    'ci' => $item->ciinfper_doc,
+                    'nombre' => $item->informacionpersonald->NombInfPer . ' ' . $item->informacionpersonald->ApellInfPer . ' ' . $item->informacionpersonald->ApellMatInfPer,
+                    'rol' => $item->equipo_roles->nombre_rol,
+                    'detalle' => $item->equipo_roles->detalle_rol,
+                    'funciones' => $item->equipo_roles->funciones_rol
+                ];
+            })->toArray();
+
+        if (count($miembros) === 0) {
+            return response()->json([]);
+        }
+
+        // 2. Lógica para poner al Director en el centro exacto
+        $directorIndex = -1;
+        foreach ($miembros as $index => $miembro) {
+            // Buscamos la palabra "director" en el nombre del rol
+            if (stripos($miembro['rol'], 'director') !== false) {
+                $directorIndex = $index;
+                break;
+            }
+        }
+
+        if ($directorIndex !== -1) {
+            // Extraemos al director del grupo
+            $director = array_splice($miembros, $directorIndex, 1)[0];
+            
+            // Calculamos la mitad del array restante
+            $mitad = floor(count($miembros) / 2);
+            
+            // Insertamos al director en el centro
+            array_splice($miembros, $mitad, 0, [$director]);
+        }
+
+        return response()->json($miembros);
+    }
+
 
     /**
      * Store a newly created resource in storage.

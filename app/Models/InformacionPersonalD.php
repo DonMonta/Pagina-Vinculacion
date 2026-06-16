@@ -35,4 +35,8 @@ class InformacionPersonalD extends Model
     {
         return $this->hasMany(Invi_deta_inte::class, 'CIInfPer', 'ciinfper_doc');
     }
+    public function equipo_depart()
+    {
+        return $this->hasMany(Invi_equipo_depart::class, 'ciinfper_doc', 'ciinfper_doc');
+    }
 }
