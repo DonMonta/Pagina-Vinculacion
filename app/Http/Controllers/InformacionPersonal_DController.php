@@ -67,6 +67,25 @@ class InformacionPersonal_DController extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
+    //Metodo para buscar un docente por su cédula sin fotografía
+    public function getDocente(Request $request)
+    {
+        $cedula = $request->cedula;
+        $docente = InformacionPersonalD::select('informacionpersonal_d.CIInfPer',
+        'informacionpersonal_d.ApellInfPer','informacionpersonal_d.ApellMatInfPer',
+        'informacionpersonal_d.NombInfPer')
+            ->where('CIInfPer', $cedula)
+            ->where('StatusPer', 1)
+            ->first();
+        if (!$docente) {
+            return response()->json(['message' => 'Docente no encontrado en la base de datos institucional.'], 404);
+        }
+        return response()->json([
+            'data' => $docente,
+            'mensaje' => "Encontrado con Éxito!!",
+        ]);
+    }
+        // 1. Extraer la fotografia
 
     /**
      * Update the specified resource in storage.

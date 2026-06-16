@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usuario;
+use App\Models\Invi_equipo_depart;
+use App\Models\Invi_equipo_roles;
 
 use Illuminate\Http\Request;
 
@@ -14,25 +15,23 @@ class Invi_equipo_departController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Usuario::select(
-                'usuario.*',
-                'perfil.nombperfil as perfil_nombre',
-                'carrera.NombCarr as carrera_nombre',
-                'facultad.siglas as facultad_siglas',
-                'informacionpersonal_d.fotografia',
+            $searchQuery = $request->input('search_query');
+            $query = Invi_equipo_depart::select(
+                'invi_equipo_depart.*',
+                'invi_equipo_roles.*',
                 'informacionpersonal_d.NombInfPer',
                 'informacionpersonal_d.ApellInfPer',
                 'informacionpersonal_d.ApellMatInfPer'
             )
-                ->join('perfil', 'perfil.idperfil', '=', 'usuario.idperfil')
-                ->join('carrera', 'carrera.idCarr', '=', 'usuario.idcarr')
-                ->leftJoin('facultad', 'facultad.idfacultad', '=', 'carrera.idfacultad')
-                ->join('informacionpersonal_d', 'informacionpersonal_d.CIInfPer', '=', 'usuario.ciinfper')
-                ->where('usuario.StatusUsu', '=', 1)
-                ->where('usuario.idperfil', '=', 'coord')
-                ->where('perfil.status', '=', 1)
-                ->where('carrera.StatusCarr', '=', 1);
+                ->join('invi_equipo_roles', 'invi_equipo_roles.id_equipo_roles', '=', 'invi_equipo_depart.id_equipo_roles')
+                ->join('informacionpersonal_d', 'informacionpersonal_d.CIInfPer', '=', 'invi_equipo_depart.ciinfper_doc')
+                ->where('tipo_rol', '=', 'VINCULACIÓN');
 
+            if ($searchQuery) {
+                $query->where(function ($q) use ($searchQuery) {
+                    $q->where('invi_equipo_depart.ciinfper_doc', 'LIKE', '%' . $searchQuery . '%');
+                });
+            }
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
 
@@ -70,10 +69,12 @@ class Invi_equipo_departController extends Controller
 
             return response()->json([
                 'data' => $data->items(),
-                'current_page' => $data->currentPage(),
-                'per_page' => $data->perPage(),
-                'total' => $data->total(),
-                'last_page' => $data->lastPage(),
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
@@ -85,7 +86,61 @@ class Invi_equipo_departController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'ciinfper_doc' => 'required|digits:10',
+            'id_equipo_roles' => 'required|integer',
+        ]);
+
+        try {
+            // Validamos por BD que no le estén inyectando un rol ocupado por un activo distinto a él
+            $existeOcupado = Invi_equipo_depart::where('id_equipo_roles', $request->id_equipo_roles)
+                ->where('estado_equipo_dep', 1)
+                ->where('ciinfper_doc', '!=', $request->ciinfper_doc)
+                ->first();
+
+            if ($existeOcupado) {
+                return response()->json(['mensaje' => 'Este rol ya se encuentra asignado a otra persona activa.'], 422);
+            }
+
+            Invi_equipo_depart::create([
+                'ciinfper_doc' => $request->ciinfper_doc,
+                'id_equipo_roles' => $request->id_equipo_roles,
+                'estado_equipo_dep' => 1
+            ]);
+
+            return response()->json(['mensaje' => 'Registrado con éxito']);
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => 'Error al guardar los datos'], 500);
+        }
+    }
+    public function getRolesVinculacion(Request $request)
+    {
+        try {
+            $idExcluir = $request->input('id_excluir');
+
+            $roles = Invi_equipo_roles::where('tipo_rol', 'VINCULACIÓN')
+                ->where('estado_rol', 1)
+                ->get();
+
+            // Obtenemos los asignados, pero excluimos el ID que estamos editando
+            $queryAsignados = Invi_equipo_depart::where('estado_equipo_dep', 1);
+
+            if ($idExcluir) {
+                $queryAsignados->where('id_equipo_depart', '!=', $idExcluir);
+            }
+
+            $asignados = $queryAsignados->pluck('ciinfper_doc', 'id_equipo_roles')->toArray();
+
+            $roles->transform(function ($rol) use ($asignados) {
+                $rol->is_assigned = isset($asignados[$rol->id_equipo_roles]);
+                $rol->asignado_a = $asignados[$rol->id_equipo_roles] ?? null;
+                return $rol;
+            });
+
+            return response()->json(['data' => $roles]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -93,7 +148,18 @@ class Invi_equipo_departController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $res = Invi_equipo_depart::find($id);
+        if (isset($res)) {
+            return response()->json([
+                'data' => $res,
+                'mensaje' => "Encontrado con Éxito!!",
+            ]);
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El Equipo de Departamento con id: $id no Existe",
+            ]);
+        }
     }
 
     /**
@@ -101,7 +167,34 @@ class Invi_equipo_departController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'ciinfper_doc' => 'required|digits:10',
+            'id_equipo_roles' => 'required|integer',
+        ]);
+
+        try {
+            $asignacion = Invi_equipo_depart::findOrFail($id);
+
+            // Validamos que el rol no esté ocupado por OTRA persona
+            $existeOcupado = Invi_equipo_depart::where('id_equipo_roles', $request->id_equipo_roles)
+                ->where('estado_equipo_dep', 1)
+                ->where('id_equipo_depart', '!=', $id) // ignoramos el registro actual
+                ->first();
+
+            if ($existeOcupado) {
+                return response()->json(['mensaje' => 'Este rol ya se encuentra asignado a otra persona.'], 422);
+            }
+
+            $asignacion->update([
+                'ciinfper_doc' => $request->ciinfper_doc,
+                'id_equipo_roles' => $request->id_equipo_roles,
+                'estado_equipo_dep' => $request->estado_equipo_dep ?? $asignacion->estado_equipo_dep
+            ]);
+
+            return response()->json(['mensaje' => 'Actualizado con éxito']);
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => 'Error al actualizar'], 500);
+        }
     }
 
     /**
@@ -109,6 +202,54 @@ class Invi_equipo_departController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $res = Invi_equipo_depart::find($id);
+        if (isset($res)) {
+            $res->estado_equipo_dep = 0;
+            $res->save();
+            $data = $res->toArray();
+            if ($data) {
+
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "Inhabilitado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "El Equipo de Roles no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El Equipo de Roles con id: $id no Existe",
+            ]);
+        }
+    }
+    public function habilitar(string $id)
+    {
+        $res = Invi_equipo_depart::find($id);
+        if (isset($res)) {
+            $res->estado_equipo_dep = 1;
+            $res->save();
+            $data = $res->toArray();
+            if ($data) {
+
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "Habilitado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "El Equipo no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El Equipo con id: $id no Existe",
+            ]);
+        }
     }
 }

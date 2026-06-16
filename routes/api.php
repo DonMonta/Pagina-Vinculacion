@@ -187,6 +187,16 @@ Route::prefix('vin')->group(function () {
         Route::delete('habilitar_equipo_roles/{id}', [Invi_equipo_rolesController::class, 'habilitar']);
         //Definición de endpoint para inhabilitar un Equipo de Roles
         Route::delete('inhabilitar_equipo_roles/{id}', [Invi_equipo_rolesController::class, 'destroy']);
+        //Definición de recurso para el Equipo de Departamento, perimitiendo operaciones CRUD
+        Route::apiResource("invi_equipo_depart", Invi_equipo_departController::class);
+        //Definición de endpoint para habilitar un Equipo de Departamento
+        Route::delete('habilitar_equipo_depart/{id}', [Invi_equipo_departController::class, 'habilitar']);
+        //Definición de endpoint para inhabilitar un Equipo de Departamento
+        Route::delete('inhabilitar_equipo_depart/{id}', [Invi_equipo_departController::class, 'destroy']);
+        //Definición de endpint para obtener a un docente por su cédula
+        Route::get('getDocente/{cedula}', [InformacionPersonal_DController::class, 'getDocente']);
+        //Definición de endpoint para obtener los roles vinculacion
+        Route::get('getRolesVinculacion', [Invi_equipo_departController::class, 'getRolesVinculacion']);
         
     });
 }); 

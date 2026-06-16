@@ -18,7 +18,7 @@ class Invi_equipo_rolesController extends Controller
             $query = Invi_equipo_roles::select(
                 'invi_equipo_roles.*'
             )
-            ->where('tipo_rol', '=', 'VINCULACIÓN');
+                ->where('tipo_rol', '=', 'VINCULACIÓN');
 
             if ($searchQuery) {
                 $query->where(function ($q) use ($searchQuery) {
@@ -79,6 +79,18 @@ class Invi_equipo_rolesController extends Controller
      */
     public function store(Request $request)
     {
+        $existeRolActivo = Invi_equipo_roles::where('nombre_rol', $request->nombre_rol)
+            ->where('estado_rol', 1) // o '1' según sea tu tipo de dato en la BD
+            ->exists();
+
+        if ($existeRolActivo) {
+            return response()->json([
+                'error' => true,
+                'mensaje' => 'No se puede registrar. Ya existe un rol activo con este nombre.'
+            ], 422); // 422 indica un error de validación de datos
+        }
+
+        // 2. Si pasa la validación, guardar normalmente
         $inputs = $request->all();
         $res = Invi_equipo_roles::create($inputs);
 
@@ -93,7 +105,7 @@ class Invi_equipo_rolesController extends Controller
      */
     public function show(string $id)
     {
-         $res = Invi_equipo_roles::find($id);
+        $res = Invi_equipo_roles::find($id);
         if (isset($res)) {
             return response()->json([
                 'data' => $res,
@@ -106,19 +118,40 @@ class Invi_equipo_rolesController extends Controller
             ]);
         }
     }
+    
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-         $res = Invi_equipo_roles::find($id);
+        $res = Invi_equipo_roles::find($id);
+
         if (isset($res)) {
+
+            // 1. Validar duplicados excluyendo el ID actual
+            // Solo bloquea si se intenta activar o mantener activo un nombre que ya pertenezca a OTRO rol activo
+            if ((int)$request->estado_rol === 1) {
+                $existeRolActivo = Invi_equipo_roles::where('nombre_rol', $request->nombre_rol)
+                    ->where('estado_rol', 1)
+                    ->where('id_equipo_roles', '!=', $id) // Reemplaza 'id_equipo_roles' por tu clave primaria real si es diferente
+                    ->exists();
+
+                if ($existeRolActivo) {
+                    return response()->json([
+                        'error' => true,
+                        'mensaje' => 'No se puede actualizar. Ya existe otro rol diferente activo con este nombre.'
+                    ], 422);
+                }
+            }
+
+            // 2. Si pasa la validación, asignar datos y guardar
             $res->nombre_rol = $request->nombre_rol;
             $res->detalle_rol = $request->detalle_rol;
             $res->funciones_rol = $request->funciones_rol;
             $res->tipo_rol = $request->tipo_rol;
             $res->estado_rol = $request->estado_rol;
+
             if ($res->save()) {
                 return response()->json([
                     'data' => $res,
@@ -128,13 +161,13 @@ class Invi_equipo_rolesController extends Controller
                 return response()->json([
                     'error' => true,
                     'mensaje' => "Error al Actualizar",
-                ]);
+                ], 500);
             }
         } else {
             return response()->json([
                 'error' => true,
                 'mensaje' => "El Equipo de Roles con id: $id no Existe",
-            ]);
+            ], 404);
         }
     }
 
@@ -193,7 +226,4 @@ class Invi_equipo_rolesController extends Controller
             ]);
         }
     }
-
-
-
 }
