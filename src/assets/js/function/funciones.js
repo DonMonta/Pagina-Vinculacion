@@ -248,7 +248,7 @@ export function enviarsolig(metodo, parametros, url, mensaje) {
                 mostraralertas(error.response.data.mensaje, 'warning');
             } else if (error.response.status === 422) {
                 // Errores de validación de Laravel
-                mostraralertas("Datos inválidos o faltantes", 'warning');
+                mostraralertas(error.response.data.mensaje, 'warning');
             } else {
                 mostraralertas('Error interno del servidor', 'error');
             }

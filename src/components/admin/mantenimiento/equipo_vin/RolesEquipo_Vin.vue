@@ -451,6 +451,7 @@ export default {
         nombre_rol: user.nombre_rol,
         detalle_rol: user.detalle_rol,
         funciones_rol: user.funciones_rol,
+        tipo_rol: user.tipo_rol,
         estado_rol: user.estado_rol
       };
       this.$.setupState.isEditModalOpen = true;
@@ -512,17 +513,18 @@ export default {
           tipo_rol: this.objetoguardar.tipo_rol,
           estado_rol: this.objetoguardar.estado_rol
         };
+
         const exito = await enviarsolig('POST', params, `${this.baseUrl}/invi_equipo_roles`, 'Rol al equipo de Vinculación registrado con éxito');
         if (exito) {
           this.$.setupState.isProfileAddressModal = false;
-
           this.limpiarFormulario();
           this.actualizar();
-        } else {
-          mostraralertas2("No se pudo registrar el Rol al equipo de Vinculación", "error");
         }
       } catch (error) {
-        console.error("❌ Error al registrar Rol al equipo de Vinculación:", error.response?.data || error);
+        // Aquí capturamos el error 422 o cualquier otro del servidor
+        const mensajeError = error.response?.data?.mensaje || "No se pudo registrar el Rol al equipo de Vinculación";
+        mostraralertas2(mensajeError, "error");
+        console.error("❌ Error al registrar Rol:", error.response?.data || error);
       }
     },
     async Update() {
@@ -534,18 +536,19 @@ export default {
           tipo_rol: this.objetoeditar.tipo_rol,
           estado_rol: this.objetoeditar.estado_rol
         };
+
         const exito = await enviarsolig('PUT', params, `${this.baseUrl}/invi_equipo_roles/${this.objetoeditar.id_equipo_roles}`, 'Rol al equipo de Vinculación actualizado con éxito');
+
         if (exito) {
           this.$.setupState.isEditModalOpen = false;
-
           this.limpiarFormulario();
           this.actualizar();
-        } else {
-          this.$.setupState.isEditModalOpen = false;
-          mostraralertas2("No se pudo editar el Rol al equipo de Vinculación", "error");
         }
       } catch (error) {
-        console.error("❌ Error al registrar Rol al equipo de Vinculación:", error.response?.data || error);
+        // Captura el mensaje enviado desde Laravel (422 o 500)
+        const mensajeError = error.response?.data?.mensaje || "No se pudo editar el Rol al equipo de Vinculación";
+        mostraralertas2(mensajeError, "error");
+        console.error("❌ Error al editar Rol:", error.response?.data || error);
       }
     },
     limpiarFormulario() {

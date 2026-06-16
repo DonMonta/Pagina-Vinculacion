@@ -16,6 +16,7 @@ import SubAreaUnescoAllView from '../views/Admin/Mantenimiento/Op_SubArea/SubAre
 import ZonaPlanificacionAllView from '../views/Admin/Mantenimiento/Op_ZonaPlan/Zona_PlanificacionAllView.vue'
 import EmpresaAllView from '../views/Admin/Mantenimiento/Op_Empresa/EmpresaAllView.vue'
 import RolesEquipoAllView from '../views/Admin/Equipo/RolesEquipoAllView.vue'
+import EquipoAllView from '../views/Admin/Equipo/EquipoAllView.vue'
 
 
 const routes = [
@@ -103,6 +104,11 @@ const routes = [
     path: '/site-admin/roles_equipo',
     name: 'site-admin-roles_equipo',
     component: RolesEquipoAllView
+  },
+  {
+    path: '/site-admin/equipo',
+    name: 'site-admin-equipo',
+    component: EquipoAllView
   },
 ]
 

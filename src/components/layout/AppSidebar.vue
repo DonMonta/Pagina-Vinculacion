@@ -246,6 +246,7 @@ const menuData = [
         name: "Equipo",
         subItems: [
           { name: "Roles", path: "/site-admin/roles_equipo", pro: false },
+          { name: "Equipo", path: "/site-admin/equipo", pro: false },
         ],
       },
 
