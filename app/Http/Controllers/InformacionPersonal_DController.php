@@ -7,30 +7,26 @@ use App\Models\InformacionPersonald;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Http;
+
 class InformacionPersonal_DController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        
-    }
+    public function index() {}
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        
-    }
+    public function store(Request $request) {}
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-       // Aplica paginación al resultado del filtro
+        // Aplica paginación al resultado del filtro
         $data = InformacionPersonald::select('informacionpersonal_d.*')
             ->where('informacionpersonal_d.CIInfPer', $id)
             ->paginate(20);
@@ -71,9 +67,12 @@ class InformacionPersonal_DController extends Controller
     public function getDocente(Request $request)
     {
         $cedula = $request->cedula;
-        $docente = InformacionPersonalD::select('informacionpersonal_d.CIInfPer',
-        'informacionpersonal_d.ApellInfPer','informacionpersonal_d.ApellMatInfPer',
-        'informacionpersonal_d.NombInfPer')
+        $docente = InformacionPersonalD::select(
+            'informacionpersonal_d.CIInfPer',
+            'informacionpersonal_d.ApellInfPer',
+            'informacionpersonal_d.ApellMatInfPer',
+            'informacionpersonal_d.NombInfPer'
+        )
             ->where('CIInfPer', $cedula)
             ->where('StatusPer', 1)
             ->first();
@@ -90,10 +89,7 @@ class InformacionPersonal_DController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        
-    }
+    public function update(Request $request, string $id) {}
 
     /**
      * Remove the specified resource from storage.
@@ -102,7 +98,7 @@ class InformacionPersonal_DController extends Controller
     {
         //
     }
-     public function getFotografia($ci)
+    public function getFotografia($ci)
     {
         try {
             // 1. Obtener SÓLO la columna 'fotografia' para el CI específico
@@ -141,6 +137,53 @@ class InformacionPersonal_DController extends Controller
         } catch (\Exception $e) {
             // Manejo de errores
             return response()->json(['error' => 'Error al obtener la fotografía: ' . $e->getMessage()], 500);
+        }
+    }
+    public function getSinfondoFotografia($ci)
+    {
+        try {
+            // 1. Obtener la fotografía binaria desde la base de datos
+            $persona = InformacionPersonald::where('CIInfPer', $ci)
+                ->select('fotografia')
+                ->first();
+
+            if (!$persona || empty($persona->fotografia)) {
+                return response()->json(['error' => 'Fotografía no encontrada.'], 404);
+            }
+
+            $fotoBinaria = $persona->fotografia;
+
+            // 2. Enviar la imagen binaria a la IA de Remove.bg
+            // Usamos el cliente HTTP nativo de Laravel (instalado vía Composer)
+            $response = Http::withHeaders([
+                'X-Api-Key' => env('REMOVE_BG_API_KEY')
+            ])->attach(
+                'image_file',       // Nombre del campo que espera la API
+                $fotoBinaria,       // Los bytes de la foto de tu BD
+                'director_foto.jpg' // Nombre ficticio del archivo
+            )->post('https://api.remove.bg/v1.0/removebg', [
+                'size' => 'auto',   // 'auto' para máxima calidad o 'preview' para ahorrar créditos
+            ]);
+
+            // 3. Verificar si la IA respondió correctamente
+            if ($response->failed()) {
+                return response()->json([
+                    'error' => 'La IA de recortes falló.',
+                    'detalle' => $response->json()['errors'][0]['title'] ?? 'Error desconocido'
+                ], $response->status());
+            }
+
+            // 4. La API nos devuelve directamente los bytes del PNG ya transparente
+            $fotoProcesada = $response->body();
+
+            // 5. Enviar el resultado final a Vue como un flujo de imagen PNG limpia
+            return Response::make($fotoProcesada, 200)
+                ->header('Content-Type', 'image/png')
+                ->header('Content-Disposition', 'inline; filename="foto_ia_' . $ci . '.png"')
+                ->header('Cache-Control', 'public, max-age=86400'); // Caché por un día para no gastar de más tu API
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error del servidor: ' . $e->getMessage()], 500);
         }
     }
 }

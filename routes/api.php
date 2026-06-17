@@ -43,9 +43,11 @@ use App\Http\Controllers\Invi_equipo_rolesController;
 
 Route::prefix('vin')->group(function () {
     Route::get('getFotoDocente/{ci}', [InformacionPersonal_DController::class, 'getFotografia'])->middleware('throttle:10000,1');
+    Route::get('getFotoSinfondo/{ci}', [InformacionPersonal_DController::class, 'getSinfondoFotografia'])->middleware('throttle:10000,1');
     Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFotografia'])->middleware('throttle:10000,1');
     Route::get('getFotoEmpresa/{ci}', [PraempresaController::class, 'getFotografia'])->middleware('throttle:10000,1');
     Route::get('getEquipoVinculacion', [Invi_equipo_departController::class, 'getEquipoVinculacion']);
+    Route::get('getDirectorInfo', [Invi_equipo_departController::class, 'getDirectorInfo']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api,estudiante')->group(function () {

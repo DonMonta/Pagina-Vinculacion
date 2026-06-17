@@ -14,17 +14,74 @@ class InformacionPersonalD extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'CIInfPer', 'cedula_pasaporte', 'TipoDocInfPer', 'ApellInfPer', 'ApellMatInfPer', 'NombInfPer', 'NacionalidadPer', 
-        'EtniaPer', 'FechNacimPer', 'LugarNacimientoPer', 'GeneroPer', 'EstadoCivilPer', 'CiudadPer', 'DirecDomicilioPer', 
-        'Telf1InfPer', 'Telf2InfPer', 'CelularInfPer', 'TipoInfPer', 'StatusPer', 'mailPer', 'mailInst', 'GrupoSanguineo', 
-        'tipo_discapacidad', 'carnet_conadis', 'num_carnet_conadis', 'porcentaje_discapacidad', 'fotografia', 'codigo_dactilar', 
-        'huella_dactilar', 'ultima_actualizacion', 'LoginUsu', 'ClaveUsu', 'StatusUsu', 'idcarr', 'usa_biometrico', 'fecha_reg', 
-        'fecha_ultimo_acceso', 'usu_registra', 'usu_modifica', 'fecha_ultima_modif', 'usu_modifica_clave', 'fecha_ultima_modif_clave', 
-        'actualizoDP', 'idprovincia', 'idcanton', 'idparroquia', 'direccion2', 'numerocasa', 'idprovinciacasa', 'idcantoncasa', 
-        'idparroquiacasa', 'referenciacasa', 'sectorcasa', 'barriocasa', 'viviendapropia', 'padre', 'madre', 'conyuge', 
-        'nacionalidadetnia', 'fechaingreso', 'fechasalida', 'hd_posicion', 'tipoaccion', 'denominacion', 'area', 'cargo'
+        'CIInfPer',
+        'cedula_pasaporte',
+        'TipoDocInfPer',
+        'ApellInfPer',
+        'ApellMatInfPer',
+        'NombInfPer',
+        'NacionalidadPer',
+        'EtniaPer',
+        'FechNacimPer',
+        'LugarNacimientoPer',
+        'GeneroPer',
+        'EstadoCivilPer',
+        'CiudadPer',
+        'DirecDomicilioPer',
+        'Telf1InfPer',
+        'Telf2InfPer',
+        'CelularInfPer',
+        'TipoInfPer',
+        'StatusPer',
+        'mailPer',
+        'mailInst',
+        'GrupoSanguineo',
+        'tipo_discapacidad',
+        'carnet_conadis',
+        'num_carnet_conadis',
+        'porcentaje_discapacidad',
+        'fotografia',
+        'codigo_dactilar',
+        'huella_dactilar',
+        'ultima_actualizacion',
+        'LoginUsu',
+        'ClaveUsu',
+        'StatusUsu',
+        'idcarr',
+        'usa_biometrico',
+        'fecha_reg',
+        'fecha_ultimo_acceso',
+        'usu_registra',
+        'usu_modifica',
+        'fecha_ultima_modif',
+        'usu_modifica_clave',
+        'fecha_ultima_modif_clave',
+        'actualizoDP',
+        'idprovincia',
+        'idcanton',
+        'idparroquia',
+        'direccion2',
+        'numerocasa',
+        'idprovinciacasa',
+        'idcantoncasa',
+        'idparroquiacasa',
+        'referenciacasa',
+        'sectorcasa',
+        'barriocasa',
+        'viviendapropia',
+        'padre',
+        'madre',
+        'conyuge',
+        'nacionalidadetnia',
+        'fechaingreso',
+        'fechasalida',
+        'hd_posicion',
+        'tipoaccion',
+        'denominacion',
+        'area',
+        'cargo'
     ];
-    protected $hidden = ['ClaveUsu', 'fotografia']; 
+    protected $hidden = ['ClaveUsu', 'fotografia'];
 
     // Relaciones con otras tablas (ejemplo: carrera)
     public function carrera()
@@ -38,5 +95,9 @@ class InformacionPersonalD extends Model
     public function equipo_depart()
     {
         return $this->hasMany(Invi_equipo_depart::class, 'ciinfper_doc', 'ciinfper_doc');
+    }
+    public function titulos()
+    {
+        return $this->hasMany(AcademicoDocente::class, 'ciinfper', 'CIInfPer');
     }
 }
