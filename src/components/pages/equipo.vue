@@ -69,21 +69,23 @@
                 <h1 class="mb-0">Equipo de Trabajo y Estructura Orgánica y Funcional</h1>
             </div>
             <div class="packages-carousel owl-carousel">
-                <div class="packages-item">
+                <div class="packages-item" v-for="(miembro, index) in equipo" :key="index">
                     <div class="packages-img">
-                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top"
-                            alt="Image">
+                        <img :src="getPhotoUrl2(miembro.ci) || require('@/assets/img/img/logovincusinfondo.png')"
+                            class="img-fluid w-100 rounded-top" alt="Image">
                         <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
                             style="width: 100%; bottom: 0; left: 0; z-index: 5;">
-                            <small class="flex-fill text-center border-end py-2"><i
-                                    class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
+                            <small class="flex-fill text-center border-end py-2">
+                                <i class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador
+                            </small>
                         </div>
                         <div class="packages-price py-2 px-4 text-center"><i class="fa fa-user me-2"></i></div>
                     </div>
-                    <div class="packages-content ">
+
+                    <div class="packages-content">
                         <div class="p-4 pb-0">
-                            <h5 class="mb-0">Nombre: </h5>
-                            <small class="text-uppercase">Cargo: Analista de proyectos de vinculación</small>
+                            <h5 class="mb-0">Nombre: {{ miembro.nombre_completo }}</h5>
+                            <small class="text-uppercase">Cargo: {{ miembro.genero_labels.titulo_rol }}</small>
                             <div class="mb-3">
                                 <small class="fa fa-star text-primary"></small>
                                 <small class="fa fa-star text-primary"></small>
@@ -91,123 +93,18 @@
                                 <small class="fa fa-star text-primary"></small>
                                 <small class="fa fa-star text-primary"></small>
                             </div>
-                            <p class="mb-4">Es el o la profesional responsable del
-                                monitoreo y evaluación de los proyectos de vinculación de la UTLVTE</p>
+                            <p class="mb-4">{{ miembro.detalle_rol }}</p>
                         </div>
                         <div class="row rounded-bottom mx-0 boton">
                             <div class="col-6 text-start px-0">
                                 <a class="btn-hover btn text-white py-2 px-4" href="#" data-bs-toggle="modal"
-                                    data-bs-target="#funcionesModal2">Ver funciones</a>
+                                    data-bs-target="#funcionesModal2" @click="verFunciones(miembro)">
+                                    Ver funciones
+                                </a>
                             </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="packages-item">
-                    <div class="packages-img">
-                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top"
-                            alt="Image">
-                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
-                            style="width: 100%; bottom: 0; left: 0; z-index: 5;">
-                            <small class="flex-fill text-center border-end py-2"><i
-                                    class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
-                        </div>
-                        <div class="packages-price py-2 px-4 text-center"><i class="fa fa-user me-2"></i></div>
-                    </div>
-                    <div class="packages-content bg-light">
-                        <div class="p-4 pb-0">
-                            <h5 class="mb-0">Nombre: </h5>
-                            <small class="text-uppercase">Cargo: Analista de prácticas preprofesionales</small>
-                            <div class="mb-3">
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                            </div>
-                            <p class="mb-4">Es el (la) profesional encargado (a) de
-                                coordinar acciones para el cumplimiento de las prácticas pre profesionales</p>
-                        </div>
-                        <div class="row rounded-bottom mx-0 boton">
-                            <div class="col-6 text-start px-0">
-                                <a class="btn-hover btn text-white py-2 px-4" href="#" data-bs-toggle="modal"
-                                    data-bs-target="#funcionesModal3">Ver funciones</a>
-                            </div>
-
                         </div>
                     </div>
                 </div>
-                <div class="packages-item">
-                    <div class="packages-img">
-                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top"
-                            alt="Image">
-                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
-                            style="width: 100%; bottom: 0; left: 0; z-index: 5;">
-                            <small class="flex-fill text-center border-end py-2"><i
-                                    class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
-                        </div>
-                        <div class="packages-price py-2 px-4 text-center"><i class="fa fa-user me-2"></i></div>
-                    </div>
-                    <div class="packages-content bg-light">
-                        <div class="p-4 pb-0">
-                            <h5 class="mb-0">Nombre: </h5>
-                            <small class="text-uppercase">Cargo: Analista de servicio a la sociedad</small>
-                            <div class="mb-3">
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                            </div>
-                            <p class="mb-4">Es el o la profesional responsable de la
-                                ejecución de las actividades de servicio a la sociedad</p>
-                        </div>
-                        <div class="row rounded-bottom mx-0 boton">
-                            <div class="col-6 text-start px-0">
-                                <a class="btn-hover btn text-white py-2 px-4" href="#" data-bs-toggle="modal"
-                                    data-bs-target="#funcionesModal4">Ver funciones</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="packages-item">
-                    <div class="packages-img">
-                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100 rounded-top"
-                            alt="Image">
-                        <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
-                            style="width: 100%; bottom: 0; left: 0; z-index: 5;">
-                            <small class="flex-fill text-center border-end py-2"><i
-                                    class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador</small>
-                        </div>
-                        <div class="packages-price py-2 px-4 text-center"><i class="fa fa-user me-2"></i></div>
-                    </div>
-                    <div class="packages-content bg-light">
-                        <div class="p-4 pb-0">
-                            <h5 class="mb-0">Nombre: </h5>
-                            <small class="text-uppercase">Cargo: Secretaría de Vinculación</small>
-                            <div class="mb-3">
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small>
-                            </div>
-                        </div>
-                        <div class="row rounded-bottom mx-0 boton">
-                            <div class="col-6 text-start px-0">
-                                <a class="btn-hover btn text-white py-2 px-4" href="#" data-bs-toggle="modal"
-                                    data-bs-target="#funcionesModal5">Ver funciones</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-
             </div>
         </div>
     </div>
@@ -506,7 +403,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="funcionesModal2Label">
-                        Analista de proyectos de vinculación
+                        {{ miembroSeleccionado.genero_labels.titulo_rol }}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -516,14 +413,14 @@
                             <div class="row g-5">
                                 <div class="col-xl-6">
                                     <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
+                                        <img :src="getPhotoUrl2(miembroSeleccionado.ci) || require('@/assets/img/img/logovincusinfondo.png')"
+                                            class="img-fluid w-100"
                                             style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
                                     </div>
                                 </div>
                                 <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Nombre:</h1>
-                                    <p class="mb-4">Es el o la profesional responsable del
-                                        monitoreo y evaluación de los proyectos de vinculación de la UTLVTE.
+                                    <h1 class="display-6 mb-4">{{ miembroSeleccionado.nombre_completo }}</h1>
+                                    <p class="mb-4">{{ miembroSeleccionado.detalle_rol }}
                                     </p>
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="fas fa-map-marker-alt text-primary me-3"></i>
@@ -531,11 +428,11 @@
                                     </div>
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">vinculacion@utelvt.edu.ec</p>
+                                        <p class="text-dark mb-0">{{ miembroSeleccionado.email }}</p>
                                     </div>
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
+                                        <p class="text-dark mb-0">{{ miembroSeleccionado.telefono }}</p>
                                     </div>
                                     <div class="d-flex align-items-center mb-4">
                                         <i class="fab fa-firefox-browser text-primary me-3"></i>
@@ -550,168 +447,14 @@
                         <h2>Funciones</h2>
                     </div>
                     <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
-                        <div class="testimonial-item1">
+                        <div v-for="(funcion, i) in miembroSeleccionado.funciones" :key="i" class="testimonial-item1">
                             <div class="testimonial-text border rounded p-4 pt-5 mb-5">
                                 <div class="btn-square bg-white border rounded-circle">
                                     <i class="fa fa-quote-right fa-2x text-primary"></i>
                                 </div>
-                                a. Apoyar logísticamente en las actividades programadas por la Comisión de
-                                Vinculación de la Sociedad y Dirección de Vinculación con la Sociedad de la UTLVTE.
+                                {{ funcion }}
                             </div>
-                            <img class="rounded-circle novige mb-3" height="200" width="230"
-                                src="@/assets/img/img/icno/FA_a.png" alt="">
-
                         </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                b. Coordinar acciones con los responsables de vinculación en las unidades académicas
-                                y la sociedad: en lo referente a proyectos de vinculación.
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_b.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                c. Gestionar la oportuna entrega de recursos a los directores y directoras de Proyectos
-                                desde la Coordinación de Gestión, Dirección Administrativa y de Talento Humano y
-                                Dirección Financiera.
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_c.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                d. Hacer seguimiento y evaluación a los proyectos, eventos y actividades planificadas
-                                en la Comisión de Vinculación de la Sociedad y Dirección de Vinculación con la
-                                Sociedad.
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_d.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                e. Supervisar la aplicación de los formatos institucionales en los procesos de
-                                formulación, seguimiento y evaluación de proyectos.
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_e.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                f. Revisar periódicamente la pertinencia de los formatos utilizados y proponer a la
-                                Comisión de Vinculación con la Sociedad por intermedio de la Dirección de
-                                Vinculación con la Sociedad, los cambios y mejoras pertinentes.
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_f.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                g. Revisar el cumplimiento de los convenios y cartas de compromiso en lo referente a
-                                proyectos de vinculación.
-
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_g.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                h. Coordinar eventos de difusión de los proyectos de vinculación.
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_h.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                i. Informar mensual y semestralmente a la Dirección de Vinculación sobre las
-                                actividades realizadas.
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_i.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                j. Participar con voz y voto en las sesiones de la Comisión de
-                                Vinculación con la Sociedad.
-
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_j.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                k. Velar por el mantenimiento del buen estado de las instalaciones, equipos y demás
-                                enseres de la oficina.
-
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_k.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                l. Cumplir la normativa establecida en el Reglamento de Vinculación.
-
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_l.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                m. Reportar incumplimientos detectados en el desarrollo de los procesos a su cargo.
-
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_m.png" alt="">
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                n. Las demás que le asigne el director de Vinculación con la Sociedad, de conformidad
-                                con el Estatuto de la UTLVTE.
-
-                            </div>
-                            <img class="rounded-circle novige mb-3" src="@/assets/img/img/icno/FA_n.png" alt="">
-
-                        </div>
-
                     </div>
 
                 </div>
@@ -2723,7 +2466,17 @@ export default {
             pdfUrl: '/Docs/reglamernto_vincul_reformado.pdf',
             // página inicial (se reemplaza al llamar al modal)
             pdfPage: 1,
-            director: null
+            director: null,
+            equipo: [], // Aquí guardarás lo que responde el método getTeamInfo()
+            miembroSeleccionado: {
+                ci: '',
+                nombre_completo: '',
+                genero_labels: { titulo_rol: '' },
+                detalle_rol: '',
+                email: '',
+                telefono: '',
+                funciones: []
+            }
         }
     },
     computed: {
@@ -2733,6 +2486,7 @@ export default {
     },
     async mounted() {
         await this.getDirector();
+        await this.getTeamInfo();
     },
     methods: {
         getPhotoUrl(ci) {
@@ -2743,11 +2497,52 @@ export default {
             // Usamos el timestamp para evitar problemas de caché al cambiar de integrante
             return `${baseURL2}/vin/getFotoSinfondo/${ci}?t=${new Date().getTime()}`;
         },
+        getPhotoUrl2(ci) {
+            // Si no hay CI, retornamos una imagen vacía o un placeholder
+            if (!ci) return '';
+
+            const baseURL2 = API.defaults.baseURL;
+            // Usamos el timestamp para evitar problemas de caché al cambiar de integrante
+            return `${baseURL2}/vin/getFotoDocente/${ci}?t=${new Date().getTime()}`;
+        },
+        inicializarcarrousel() {
+            this.$nextTick(() => {
+                const $carousel = $(".event-carousel");
+
+                // Destruimos la instancia previa por si el mixin la inicializó vacía
+                if ($carousel.hasClass('owl-loaded')) {
+                    $carousel.trigger('destroy.owl.carousel');
+                    $carousel.removeClass('owl-hidden');
+                    $carousel.find('.owl-stage-outer').children().unwrap();
+                }
+
+                // Inicializamos el carrusel con los datos reales
+                $carousel.owlCarousel({
+                    autoplay: true,
+                    smartSpeed: 1000,
+                    center: false,
+                    dots: false,
+                    loop: true,
+                    margin: 25,
+                    nav: true,
+                    navText: [
+                        '<i class="fas fa-angle-double-left"></i>',
+                        '<i class="fas fa-angle-double-right"></i>',
+                    ],
+                    responsiveClass: true,
+                    responsive: {
+                        0: { items: 1 },
+                        768: { items: 1 },
+                        992: { items: 2 },
+                        1200: { items: 3 },
+                    },
+                });
+            });
+        },
         async getDirector() {
             try {
                 const response = await API.get(`${this.baseUrl}/getDirectorInfo`);
                 this.director = response.data;
-                console.log(response);
 
                 // Esperamos a que Vue dibuje el v-for en el DOM
                 this.$nextTick(() => {
@@ -2786,6 +2581,53 @@ export default {
             } catch (error) {
                 console.error("Error cargando al director:", error);
             }
+        },
+        async getTeamInfo() {
+            try {
+                const response = await API.get(`${this.baseUrl}/getTeamInfo`);
+                this.equipo = response.data;
+                this.$nextTick(() => {
+                    const $carousel = $(".packages-carousel");
+
+                    // Destruimos la instancia previa por si el mixin la inicializó vacía
+                    if ($carousel.hasClass('owl-loaded')) {
+                        $carousel.trigger('destroy.owl.carousel');
+                        $carousel.removeClass('owl-hidden');
+                        $carousel.find('.owl-stage-outer').children().unwrap();
+                    }
+                    const totalMiembros = this.equipo.length;
+                    const activarEfectos = totalMiembros > 5;
+
+                    // Inicializamos el carrusel con los datos reales
+                    $carousel.owlCarousel({
+                        autoplay: activarEfectos,
+                        smartSpeed: 1000,
+                        center: false,
+                        dots: false,
+                        loop: activarEfectos,
+                        margin: 25,
+                        nav: activarEfectos,
+                        navText: [
+                            '<i class="fas fa-arrow-left"></i>',
+                            '<i class="fas fa-arrow-right"></i>',
+                        ],
+                        responsiveClass: true,
+                        responsive: {
+                            0: { items: 1 },
+                            768: { items: 2 },
+                            992: { items: 2 },
+                            1200: { items: 3 },
+                        },
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error cargando el equipo:", error);
+            }
+        },
+        verFunciones(miembro) {
+            this.miembroSeleccionado = miembro;
+            this.inicializarcarrousel();
         },
         openPdfModal(page) {
             this.pdfPage = page;
