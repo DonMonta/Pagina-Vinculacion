@@ -408,4 +408,123 @@ class Invi_equipo_departController extends Controller
             ], 500);
         }
     }
+    public function getTeamInfo(): JsonResponse
+    {
+        try {
+            // 1. Buscamos a todos los integrantes excepto al director
+            $miembros = Invi_equipo_depart::with([
+                'informacionpersonald.titulos.nivel',
+                'equipo_roles'
+            ])
+                ->whereHas('equipo_roles', function ($query) {
+                    $query->where('nombre_rol', 'NOT LIKE', '%Director%')
+                        ->where('estado_rol', 1);
+                })
+                ->where('estado_equipo_dep', 1)
+                ->get();
+
+            $resultado = [];
+
+            foreach ($miembros as $miembro) {
+                $persona = $miembro->informacionpersonald;
+                $rol = $miembro->equipo_roles;
+
+                if (!$persona || !$rol) {
+                    continue;
+                }
+
+                // 2. Lógica de Género
+                $esMujer = strtoupper($persona->GeneroPer) === 'F';
+
+                $labels = [
+                    'pronombre'  => $esMujer ? 'Ella' : 'Él',
+                    'articulo'   => $esMujer ? 'la' : 'el',
+                    'titulo_rol' => $rol->nombre_rol, // Usa el nombre dinámico del rol
+                ];
+
+                // 3. Procesar títulos académicos filtrando por nv_numnivel
+                $tituloGrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 3; // TERCER NIVEL
+                });
+                
+                $tituloPosgrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 4; // CUARTO NIVEL
+                });
+
+                $prefijoNombre = '';
+                $sufijoNombre = '';
+
+                // A. Mapeo ampliado de PREFIJOS (3er Nivel)
+                if ($tituloGrado) {
+                    $textoGrado = mb_strtolower($tituloGrado->ad_titulo);
+
+                    if (str_contains($textoGrado, 'licencia')) {
+                        $prefijoNombre = $esMujer ? 'Lcda.' : 'Lcdo.';
+                    } elseif (str_contains($textoGrado, 'ingenier') or str_contains($textoGrado, 'ing.')) {
+                        $prefijoNombre = 'Ing.';
+                    } elseif (str_contains($textoGrado, 'econom') or str_contains($textoGrado, 'econ.')) {
+                        $prefijoNombre = $esMujer ? 'Econ.' : 'Econ.';
+                    } elseif (str_contains($textoGrado, 'abogad') or str_contains($textoGrado, 'abg.')) {
+                        $prefijoNombre = $esMujer ? 'Abg.' : 'Abg.';
+                    } elseif (str_contains($textoGrado, 'arquitect') or str_contains($textoGrado, 'arq.')) {
+                        $prefijoNombre = $esMujer ? 'Arq.' : 'Arq.';
+                    } else {
+                        // Cualquier otra profesión o fallback de 3er nivel
+                        $prefijoNombre = 'Prof.';
+                    }
+                } else {
+                    // Respaldo por defecto si NO posee títulos registrados
+                    $prefijoNombre = $esMujer ? 'Sra.' : 'Sr.';
+                }
+
+                // B. Definir el SUFIJO (4to Nivel)
+                if ($tituloPosgrado) {
+                    $textoPosgrado = mb_strtolower($tituloPosgrado->ad_titulo);
+
+                    if (str_contains($textoPosgrado, 'phd') || str_contains($textoPosgrado, 'doctorado') || str_contains($textoPosgrado, 'doctor')) {
+                        $sufijoNombre = ', PhD';
+                    } elseif (str_contains($textoPosgrado, 'msc') || str_contains($textoPosgrado, 'science') || str_contains($textoPosgrado, 'ciencias')) {
+                        $sufijoNombre = ', MSc.';
+                    } else {
+                        // Para Magíster, Mgtr, Maestría u otros de 4to nivel por defecto
+                        $sufijoNombre = ', Mgtr.';
+                    }
+                }
+
+                // Construcción del nombre
+                $nombreCompletoConTitulo = "{$prefijoNombre} {$persona->NombInfPer} {$persona->ApellInfPer}{$sufijoNombre}";
+
+                // 4. Separar funciones por renglones
+                $funcionesArray = [];
+                if (!empty($rol->funciones_rol)) {
+                    $funcionesArray = array_filter(
+                        explode("\n", str_replace("\r", "", $rol->funciones_rol)),
+                        'trim'
+                    );
+                    $funcionesArray = array_values($funcionesArray);
+                }
+
+                // Estructura individual del objeto miembro del equipo
+                $resultado[] = [
+                    'ci'              => $persona->CIInfPer,
+                    'nombre_completo' => $nombreCompletoConTitulo,
+                    'email'           => $persona->mailInst ?? 'vinculacion@utelvt.edu.ec',
+                    'telefono'        => $persona->Telf1InfPer ?? $persona->CelularInfPer ?? 'S/N',
+                    'detalle_rol'     => $rol->detalle_rol,
+                    'funciones'       => $funcionesArray,
+                    'genero_labels'   => $labels,
+                    'titulo_grado'    => $tituloGrado ? $tituloGrado->ad_titulo : null,
+                    'titulo_posgrado' => $tituloPosgrado ? $tituloPosgrado->ad_titulo : null,
+                ];
+            }
+
+            return response()->json($resultado);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al procesar la solicitud del equipo',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

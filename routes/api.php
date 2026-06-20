@@ -48,6 +48,7 @@ Route::prefix('vin')->group(function () {
     Route::get('getFotoEmpresa/{ci}', [PraempresaController::class, 'getFotografia'])->middleware('throttle:10000,1');
     Route::get('getEquipoVinculacion', [Invi_equipo_departController::class, 'getEquipoVinculacion']);
     Route::get('getDirectorInfo', [Invi_equipo_departController::class, 'getDirectorInfo']);
+    Route::get('getTeamInfo', [Invi_equipo_departController::class, 'getTeamInfo']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api,estudiante')->group(function () {

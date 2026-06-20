@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\InformacionPersonald;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Response;
 
 class InformacionPersonal_DController extends Controller
 {
@@ -39,10 +38,10 @@ class InformacionPersonal_DController extends Controller
             $attributes = $item->getAttributes();
 
             foreach ($attributes as $key => $value) {
-                if (in_array($key, ['fotografia']) && !empty($value)) {
+                if (in_array($key, ['fotografia']) && ! empty($value)) {
                     // ✅ Convertir BLOB a base64
                     $attributes[$key] = base64_encode($value);
-                } elseif (is_string($value) && !in_array($key, ['fotografia'])) {
+                } elseif (is_string($value) && ! in_array($key, ['fotografia'])) {
                     $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                 }
             }
@@ -60,10 +59,11 @@ class InformacionPersonal_DController extends Controller
                 'last_page' => $data->lastPage(),
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
         }
     }
-    //Metodo para buscar un docente por su cédula sin fotografía
+
+    // Metodo para buscar un docente por su cédula sin fotografía
     public function getDocente(Request $request)
     {
         $cedula = $request->cedula;
@@ -76,15 +76,16 @@ class InformacionPersonal_DController extends Controller
             ->where('CIInfPer', $cedula)
             ->where('StatusPer', 1)
             ->first();
-        if (!$docente) {
+        if (! $docente) {
             return response()->json(['message' => 'Docente no encontrado en la base de datos institucional.'], 404);
         }
+
         return response()->json([
             'data' => $docente,
-            'mensaje' => "Encontrado con Éxito!!",
+            'mensaje' => 'Encontrado con Éxito!!',
         ]);
     }
-        // 1. Extraer la fotografia
+    // 1. Extraer la fotografia
 
     /**
      * Update the specified resource in storage.
@@ -98,6 +99,7 @@ class InformacionPersonal_DController extends Controller
     {
         //
     }
+
     public function getFotografia($ci)
     {
         try {
@@ -107,7 +109,7 @@ class InformacionPersonal_DController extends Controller
                 ->first();
 
             // 2. Verificar si el usuario existe y si tiene foto
-            if (!$persona || empty($persona->fotografia)) {
+            if (! $persona || empty($persona->fotografia)) {
                 // Devolver una respuesta HTTP 404 o una foto predeterminada pequeña
                 return response()->json(['error' => 'Fotografía no encontrada.'], 404);
             }
@@ -133,57 +135,92 @@ class InformacionPersonal_DController extends Controller
             // Esto evita convertir el BLOB entero a Base64 en el servidor, lo que previene la saturación de memoria.
             return Response::make($fotoBinaria, 200)
                 ->header('Content-Type', $mime)
-                ->header('Content-Disposition', 'inline; filename="foto_' . $ci . '"');
+                ->header('Content-Disposition', 'inline; filename="foto_'.$ci.'"');
         } catch (\Exception $e) {
             // Manejo de errores
-            return response()->json(['error' => 'Error al obtener la fotografía: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al obtener la fotografía: '.$e->getMessage()], 500);
         }
     }
+
     public function getSinfondoFotografia($ci)
     {
         try {
-            // 1. Obtener la fotografía binaria desde la base de datos
-            $persona = InformacionPersonald::where('CIInfPer', $ci)
-                ->select('fotografia')
-                ->first();
+            $persona = InformacionPersonald::where('CIInfPer', $ci)->select('fotografia')->first();
 
-            if (!$persona || empty($persona->fotografia)) {
+            if (! $persona || empty($persona->fotografia)) {
                 return response()->json(['error' => 'Fotografía no encontrada.'], 404);
             }
 
-            $fotoBinaria = $persona->fotografia;
-
-            // 2. Enviar la imagen binaria a la IA de Remove.bg
-            // Usamos el cliente HTTP nativo de Laravel (instalado vía Composer)
-            $response = Http::withHeaders([
-                'X-Api-Key' => env('REMOVE_BG_API_KEY')
-            ])->attach(
-                'image_file',       // Nombre del campo que espera la API
-                $fotoBinaria,       // Los bytes de la foto de tu BD
-                'director_foto.jpg' // Nombre ficticio del archivo
-            )->post('https://api.remove.bg/v1.0/removebg', [
-                'size' => 'auto',   // 'auto' para máxima calidad o 'preview' para ahorrar créditos
-            ]);
-
-            // 3. Verificar si la IA respondió correctamente
-            if ($response->failed()) {
-                return response()->json([
-                    'error' => 'La IA de recortes falló.',
-                    'detalle' => $response->json()['errors'][0]['title'] ?? 'Error desconocido'
-                ], $response->status());
+            // Crear una imagen de GD a partir del string binario
+            $imgOriginal = imagecreatefromstring($persona->fotografia);
+            if (! $imgOriginal) {
+                return response()->json(['error' => 'Formato de imagen no soportado por GD.'], 500);
             }
 
-            // 4. La API nos devuelve directamente los bytes del PNG ya transparente
-            $fotoProcesada = $response->body();
+            $ancho = imagesx($imgOriginal);
+            $alto = imagesy($imgOriginal);
 
-            // 5. Enviar el resultado final a Vue como un flujo de imagen PNG limpia
-            return Response::make($fotoProcesada, 200)
+            // Crear lona transparente
+            $imgFinal = imagecreatetruecolor($ancho, $alto);
+            imagealphablending($imgFinal, false);
+            imagesavealpha($imgFinal, true);
+
+            // Definir el color que será la transparencia
+            $transparencia = imagecolorallocatealpha($imgFinal, 0, 0, 0, 127);
+            imagefill($imgFinal, 0, 0, $transparencia);
+
+            // 1. MUESTREO AUTOMÁTICO DEL FONDO
+            // Asumimos que el píxel en la coordenada (5, 5) es parte del fondo real
+            // (Usamos 5,5 en lugar de 0,0 para evitar bordes negros de recortes o escaneos)
+            $rgbFondo = imagecolorat($imgOriginal, 5, 5);
+            $colorFondo = imagecolorsforindex($imgOriginal, $rgbFondo);
+
+            $bgR = $colorFondo['red'];
+            $bgG = $colorFondo['green'];
+            $bgB = $colorFondo['blue'];
+
+            // 2. TOLERANCIA DINÁMICA
+            // La distancia máxima posible entre blanco y negro es ~441.
+            // Un valor entre 40 y 80 suele funcionar bien para sombras y degradados.
+            $tolerancia = 60;
+
+            // 3. RECORRIDO Y EVALUACIÓN POR DISTANCIA EUCLIDIANA
+            for ($x = 0; $x < $ancho; $x++) {
+                for ($y = 0; $y < $alto; $y++) {
+                    $rgb = imagecolorat($imgOriginal, $x, $y);
+                    $col = imagecolorsforindex($imgOriginal, $rgb);
+
+                    // Calcular qué tan parecido es este píxel al color del fondo
+                    $distanciaColor = sqrt(
+                        pow($col['red'] - $bgR, 2) +
+                        pow($col['green'] - $bgG, 2) +
+                        pow($col['blue'] - $bgB, 2)
+                    );
+
+                    // Si se parece mucho al fondo (distancia pequeña), lo hacemos transparente
+                    if ($distanciaColor <= $tolerancia) {
+                        imagesetpixel($imgFinal, $x, $y, $transparencia);
+                    } else {
+                        // Mantenemos el píxel del sujeto original
+                        $colorPixel = imagecolorallocatealpha($imgFinal, $col['red'], $col['green'], $col['blue'], $col['alpha']);
+                        imagesetpixel($imgFinal, $x, $y, $colorPixel);
+                    }
+                }
+            }
+
+            ob_start();
+            imagepng($imgFinal);
+            $imagenPngBinaria = ob_get_clean();
+
+            imagedestroy($imgOriginal);
+            imagedestroy($imgFinal);
+
+            return Response::make($imagenPngBinaria, 200)
                 ->header('Content-Type', 'image/png')
-                ->header('Content-Disposition', 'inline; filename="foto_ia_' . $ci . '.png"')
-                ->header('Cache-Control', 'public, max-age=86400'); // Caché por un día para no gastar de más tu API
+                ->header('Cache-Control', 'public, max-age=86400');
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error del servidor: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error en procesamiento local: '.$e->getMessage()], 500);
         }
     }
 }
