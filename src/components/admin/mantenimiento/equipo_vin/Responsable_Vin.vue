@@ -27,7 +27,7 @@
 
         <button @click="isProfileAddressModal = true"
           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
-          Añadir Equipo de Vinculación
+          Añadir Responsable de Vinculación
         </button>
       </div>
     </div>
@@ -42,10 +42,13 @@
               <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Personal</p>
             </th>
             <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm">Rol Designado</p>
+              <p class="font-semibold text-gray-500 text-sm">Facultad</p>
             </th>
             <th class="py-5 px-4 text-left">
               <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Estado</p>
+            </th>
+            <th class="py-5 px-4 text-center">
+              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Evidencia</p>
             </th>
             <th class="py-5 px-4 text-right">
               <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Acciones</p>
@@ -62,11 +65,11 @@
             </td>
           </tr>
 
-          <tr v-else v-for="post in filteredarray" :key="post.id_equipo_depart"
+          <tr v-else v-for="post in filteredarray" :key="post.id_responsable"
             class="border-t border-gray-100 hover:bg-gray-50/50 dark:border-gray-800 dark:hover:bg-white/[0.02] transition-colors">
 
             <td class="py-5 px-4 whitespace-nowrap align-top">
-              <p class="text-gray-600 text-sm font-medium dark:text-gray-400">{{ post.id_equipo_depart }}</p>
+              <p class="text-gray-600 text-sm font-medium dark:text-gray-400">{{ post.id_responsable }}</p>
             </td>
             <td class="py-5 px-4 align-middle whitespace-nowrap">
               <div class="flex items-center gap-3">
@@ -83,30 +86,37 @@
             </td>
 
             <td class="py-5 px-4 align-middle">
-              <p class="text-gray-800 text-sm font-semibold">{{ post.nombre_rol }}</p>
+              <p class="text-gray-800 text-sm font-semibold" v-if="post.siglas == 'SC'">SEDE CONCORDIA</p>
+              <p class="text-gray-800 text-sm font-semibold" v-else>{{ post.siglas }}</p>
             </td>
 
             <td class="py-5 px-4 whitespace-nowrap align-top">
               <span :class="{
                 'rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-wider': true,
-                'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_equipo_dep === 1,
-                'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_equipo_dep === 0
+                'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_responsable === 1,
+                'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_responsable === 0
               }">
-                {{ post.estado_equipo_dep === 1 ? 'Activo' : 'Inactivo' }}
+                {{ post.estado_responsable === 1 ? 'Activo' : 'Inactivo' }}
               </span>
+            </td>
+            <td class="p-3 text-center">
+              <div v-if="post.evidencia_arch" class="flex justify-center">
+                <a :href="`http://vinculacionbackend.test/Documentos/Vinculación/AnexoResponsable/${post.ciinfper_doc}/${post.evidencia_arch}`"
+                  target="_blank"
+                  class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                  title="Ver documento PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    <path d="M9 15h6M9 11h6" />
+                  </svg>
+                </a>
+              </div>
+              <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
             </td>
 
             <td class="py-4 text-right whitespace-nowrap align-top">
               <div class="flex justify-end gap-2">
-                <button @click="abrirModalDetalles(post)"
-                  class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                  title="Ver Detalles del Rol">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                </button>
                 <button @click="abrirModalEdicion(post)"
                   class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -114,14 +124,14 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button @click="eliminar(post.id_equipo_depart, post.ciinfper_doc)" v-if="post.estado_equipo_dep === 1"
+                <button @click="eliminar(post.id_responsable, post.ciinfper_doc)" v-if="post.estado_responsable === 1"
                   class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
                 </button>
-                <button @click="habilitar(post.id_equipo_depart, post.ciinfper_doc)" v-if="post.estado_equipo_dep === 0"
+                <button @click="habilitar(post.id_responsable, post.ciinfper_doc)" v-if="post.estado_responsable === 0"
                   class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:bg-white/10"
                   title="Refrescar lista">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -154,31 +164,6 @@
         Actualizar
       </button>
     </div>
-    <div v-if="showDetallesModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
-      <div
-        class="bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
-        <button @click="showDetallesModal = false"
-          class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-        <h3 class="text-2xl font-bold text-brand-700 mb-1 border-b pb-2">{{ rolDetalleSeleccionado.nombre_rol }}</h3>
-        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 text-justify">{{ rolDetalleSeleccionado.detalle_rol }}</p>
-
-        <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-lg mb-3">Funciones asignadas:</h4>
-        <ul class="list-disc pl-6 space-y-2 text-gray-700 dark:text-gray-300 text-justify">
-          <li v-for="(funcion, index) in formatFunciones(rolDetalleSeleccionado.funciones_rol)" :key="index">
-            {{ funcion }}
-          </li>
-        </ul>
-        <div class="mt-6 flex justify-end">
-          <button @click="showDetallesModal = false"
-            class="bg-gray-100 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-200 font-medium transition-colors">Cerrar</button>
-        </div>
-      </div>
-    </div>
     <!-- Modal de Registro-->
     <Modal v-if="isProfileAddressModal || isEditModalOpen" @close="cerrarModalGeneral">
       <template #body>
@@ -195,9 +180,9 @@
 
           <div class="mb-6 mt-2">
             <h4 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-              {{ isEditModalOpen ? 'Editar' : 'Agregar' }} Equipo de Vinculación
+              {{ isEditModalOpen ? 'Editar' : 'Agregar' }} Responsable de Vinculación
             </h4>
-            <p class="text-sm text-gray-500">Asigne o modifique el rol dentro del equipo de vinculación.</p>
+            <p class="text-sm text-gray-500">Asigne o modifique el responsable de vinculación.</p>
           </div>
 
           <form class="flex flex-col gap-6" @submit.prevent>
@@ -231,21 +216,22 @@
             </div>
 
             <div v-if="docenteEncontrado">
-              <label class="mb-3 block text-sm font-medium text-gray-700">Seleccione un Rol disponible</label>
+              <label class="mb-3 block text-sm font-medium text-gray-700">Seleccione una facultad</label>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label v-for="rol in rolesDisponibles" :key="rol.id_equipo_roles" :class="['relative flex p-4 border rounded-xl cursor-pointer transition-all duration-200 shadow-sm',
-                  (rol.is_assigned && rol.asignado_a !== docenteEncontrado.CIInfPer) ? 'opacity-50 cursor-not-allowed bg-gray-50 border-gray-200' : 'hover:border-brand-400 hover:bg-brand-50/30',
-                  formularioRolesID === rol.id_equipo_roles ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500' : 'border-gray-200 bg-white'
+                <label v-for="facu in facultadesDisponibles" :key="facu.idfacultad" :class="['relative flex p-4 border rounded-xl cursor-pointer transition-all duration-200 shadow-sm',
+                  (facu.is_assigned && facu.asignado_a !== docenteEncontrado.CIInfPer) ? 'opacity-50 cursor-not-allowed bg-gray-50 border-gray-200' : 'hover:border-brand-400 hover:bg-brand-50/30',
+                  formularioFacultadesID === facu.idfacultad ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500' : 'border-gray-200 bg-white'
                 ]">
-                  <input type="radio" :value="rol.id_equipo_roles" v-model="formularioRolesID"
-                    :disabled="rol.is_assigned && rol.asignado_a !== docenteEncontrado.CIInfPer" class="hidden" />
+                  <input type="radio" :value="facu.idfacultad" v-model="formularioFacultadesID"
+                    :disabled="facu.is_assigned && facu.asignado_a !== docenteEncontrado.CIInfPer" class="hidden" />
 
                   <div class="flex-1">
                     <div class="flex justify-between items-start">
-                      <h5 class="font-semibold text-gray-900 text-sm">{{ rol.nombre_rol }}</h5>
-                      <span v-if="rol.is_assigned && rol.asignado_a !== docenteEncontrado.CIInfPer"
+                      <h5 class="font-semibold text-gray-900 text-sm" v-if="facu.siglas == 'SC'">SEDE CONCORDIA</h5>
+                      <h5 class="font-semibold text-gray-900 text-sm" v-else>{{ facu.siglas }}</h5>
+                      <span v-if="facu.is_assigned && facu.asignado_a !== docenteEncontrado.CIInfPer"
                         class="text-[10px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded uppercase">Ocupado</span>
-                      <svg v-else-if="formularioRolesID === rol.id_equipo_roles" class="w-5 h-5 text-brand-600"
+                      <svg v-else-if="formularioFacultadesID === facu.idfacultad" class="w-5 h-5 text-brand-600"
                         fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                           d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -255,15 +241,43 @@
                   </div>
                 </label>
               </div>
+              <label class="block text-[10px] font-bold mb-1">Documento Respaldo (PDF)</label>
+              <div @click="$refs.fileFoto.click()"
+                class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
+                :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                  <svg v-if="!archivoPreviewName" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                    <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                  </svg>
+
+                  <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para
+                      cargar</span>
+                    <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName
+                    }}</span>
+                  </p>
+                  <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
+                </div>
+
+                <input type="file" ref="fileFoto" class="hidden" accept="application/pdf" @change="handleFileChange" />
+              </div>
+
             </div>
 
             <div class="mt-4 flex flex-col-reverse items-center justify-end gap-3 sm:flex-row">
               <button @click="cerrarModalGeneral" type="button"
                 class="w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto">Cancelar</button>
-              <button v-if="docenteEncontrado && formularioRolesID" @click="isEditModalOpen ? Update() : registrar()"
-                type="button"
+              <button v-if="docenteEncontrado && formularioFacultadesID"
+                @click="isEditModalOpen ? Update() : registrar()" type="button"
                 class="w-full rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-brand-700 sm:w-auto">
-                {{ isEditModalOpen ? 'Guardar Cambios' : 'Asignar Rol' }}
+                {{ isEditModalOpen ? 'Guardar Cambios' : 'Asignar Responsable' }}
               </button>
             </div>
           </form>
@@ -308,14 +322,14 @@ export default {
       usersarray: [],
       objetoguardar: {
         ciinfper_doc: "",
-        id_equipo_roles: "",
-        estado_equipo_dep: 1
+        idfacultad: "",
+        estado_responsable: 1
       },
       objetoeditar: {
-        id_equipo_depart: 0,
+        id_responsable: 0,
         ciinfper_doc: "",
-        id_equipo_roles: "",
-        estado_equipo_dep: 0
+        idfacultad: "",
+        estado_responsable: 0
       },
       filteredarray: [],
       searchQuery: "",
@@ -329,13 +343,15 @@ export default {
       cedulaFormulario: "",
       buscandoDocenteModal: false,
       docenteEncontrado: null,
-      rolesDisponibles: [],
-      formularioRolesID: null,
+      facultadesDisponibles: [],
+      formularioFacultadesID: null,
       idEquipoDepartEdit: 0,
 
       // Modal Nativo de Detalles
       showDetallesModal: false,
-      rolDetalleSeleccionado: {},
+      archivoSeleccionado: null,
+      archivoPreviewName: '',
+      uploading: false,
     };
   },
   created() {
@@ -346,7 +362,7 @@ export default {
   },
   async mounted() {
     this.GetData(1, this.searchQuery);
-    this.cargarRoles();
+    this.cargarFacultades();
 
   },
   computed: {
@@ -355,29 +371,86 @@ export default {
 
       return (
         this.objetoguardar.ciinfper_doc.trim() !== '' &&
-        this.objetoguardar.id_equipo_roles.trim() !== '' &&
-        this.objetoguardar.estado_equipo_dep !== null
+        this.objetoguardar.idfacultad.trim() !== '' &&
+        this.objetoguardar.estado_responsable !== null
       );
     },
     formIsValidEdit() {
       return (
         this.objetoeditar.ciinfper_doc.trim() !== '' &&
-        this.objetoeditar.id_equipo_roles.trim() !== '' &&
-        this.objetoeditar.estado_equipo_dep !== null
+        this.objetoeditar.idfacultad.trim() !== '' &&
+        this.objetoeditar.estado_responsable !== null
       );
     },
 
 
   },
   methods: {
+    handleFileChange(event) {
+      //Obtener el archivo seleccionado por el usuario
+      const file = event.target.files[0];
+      //Validar que el archivo seleccionado sea un archivo PDF, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+      if (!file) return;
+      // validación básica: pdf y tamaño si quieres
+      if (file.type !== 'application/pdf') {
+        //Mostrar una alerta de advertencia si el archivo seleccionado no es un archivo PDF, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+        mostraralertas2('Solo se permiten archivos PDF', 'warning');
+        //Limpiar el archivo seleccionado
+        this.$refs.fileFoto.value = null;
+        //Devolver sin hacer nada más
+        return;
+      }
+      //Validar que el tamaño del archivo no exceda el límite de 10 MB, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+      const maxMB = 10;
+      //Si el tamaño del archivo es mayor que el límite de 10 MB, se muestra una alerta y se limpia el archivo seleccionado
+      if (file.size > maxMB * 1024 * 1024) {
+        //Mostrar una alerta de advertencia si el tamaño del archivo es mayor que el límite de 10 MB, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+        mostraralertas2(`Archivo muy grande. Máx ${maxMB} MB`, 'warning');
+        //Limpiar el archivo seleccionado
+        this.$refs.fileFoto.value = null;
+        //Devolver sin hacer nada más
+        return;
+      }
+      //Asignar el archivo seleccionado a la variable archivoSeleccionado
+      this.archivoSeleccionado = file;
+      //Asignar el nombre del archivo seleccionado a la variable archivoPreviewName
+      this.archivoPreviewName = file.name;
+    },
+    async uploadarchivo(ci, oldFilename = null) {
+      if (!this.archivoSeleccionado) return null; // nada que subir
+      try {
+        this.uploading = true;
+        const form = new FormData();
+        form.append('file', this.archivoSeleccionado);
+        form.append('ci', ci);
+        if (oldFilename) {
+          form.append('old_filename', oldFilename); // Enviamos el nombre del archivo viejo
+        }
+
+        // Si tu backend exige otros campos (ej: tipo), añade aquí
+        const resp = await API.post(`${this.baseUrl}/subir_archivo_responsable`, form, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        if (resp && resp.data && resp.data.filename) {
+          this.archivoSeleccionado = null;
+          this.archivoPreviewName = '';
+          this.$refs.fileFoto.value = null;
+          return resp.data; // { filename, url }
+        } else {
+          mostraralertas2('Error subiendo archivo', 'danger');
+          return null;
+        }
+      } catch (error) {
+        mostraralertas2('Error subiendo archivo', 'danger');
+        return null;
+      } finally {
+        this.uploading = false;
+      }
+    },
     formatFunciones(texto) {
       if (!texto) return [];
       // Dividimos por salto de línea y limpiamos espacios o guiones iniciales
       return texto.split('\n').map(line => line.replace(/^[-*•]\s*/, '').trim()).filter(line => line.length > 0);
-    },
-    abrirModalDetalles(post) {
-      this.rolDetalleSeleccionado = post;
-      this.showDetallesModal = true;
     },
     validarInputCedula(e) {
       // Solo permite números y máximo 10
@@ -385,17 +458,17 @@ export default {
     },
     async abrirModalEdicion(user) {
       this.limpiarFormulario();
-      this.idEquipoDepartEdit = user.id_equipo_depart; // Asignamos el ID
+      this.idEquipoDepartEdit = user.id_responsable; // Asignamos el ID
       this.cedulaFormulario = user.ciinfper_doc;
 
       // IMPORTANTE: Primero cargamos los roles con el ID a excluir
-      await this.cargarRoles();
+      await this.cargarFacultades();
 
       // Luego buscamos al docente
       await this.buscarDocenteAPI();
 
       // Finalmente asignamos el rol
-      this.formularioRolesID = user.id_equipo_roles;
+      this.formularioFacultadesID = user.idfacultad;
       this.$.setupState.isEditModalOpen = true;
     },
     cerrarModalGeneral() {
@@ -406,7 +479,7 @@ export default {
     limpiarFormulario() {
       this.cedulaFormulario = "";
       this.docenteEncontrado = null;
-      this.formularioRolesID = null;
+      this.formularioFacultadesID = null;
       this.idEquipoDepartEdit = 0;
     },
     getPhotoUrl(ci) {
@@ -421,23 +494,23 @@ export default {
       if (this.cedulaFormulario.length !== 10) return;
       this.buscandoDocenteModal = true;
       this.docenteEncontrado = null;
-      this.formularioRolesID = null;
+      this.formularioFacultadesID = null;
 
       try {
         const response = await API.get(`${this.baseUrl}/getDocente/${this.cedulaFormulario}`);
         this.docenteEncontrado = response.data.data;
-        await this.cargarRoles(); // Refrescamos estados de roles (ocupados/libres)
+        await this.cargarFacultades(); // Refrescamos estados de roles (ocupados/libres)
       } catch (error) {
         mostraralertas2("Docente no encontrado o inactivo.", "error");
       } finally {
         this.buscandoDocenteModal = false;
       }
     },
-    async cargarRoles() {
+    async cargarFacultades() {
       try {
         const params = { id_excluir: this.idEquipoDepartEdit };
-        const res = await API.get(`${this.baseUrl}/getRolesVinculacion`, { params });
-        this.rolesDisponibles = res.data.data;
+        const res = await API.get(`${this.baseUrl}/getFacultadesVinculacion`, { params });
+        this.facultadesDisponibles = res.data.data;
       } catch (e) { console.error("Error cargando roles", e); }
     },
     async GetData(page = 1, searchQuery = "") {
@@ -448,7 +521,7 @@ export default {
           page: page,
           search_query: searchQuery // Parámetro para búsqueda
         };
-        const response = await API.get(`${this.baseUrl}/invi_equipo_depart`, { params });
+        const response = await API.get(`${this.baseUrl}/invi_responsable`, { params });
 
         const data = response.data?.data || [];
         this.filteredarray = data;
@@ -490,8 +563,28 @@ export default {
     async registrar() {
 
       try {
-        const params = { ciinfper_doc: this.cedulaFormulario, id_equipo_roles: this.formularioRolesID, estado_equipo_dep: 1 };
-        const exito = await enviarsolig('POST', params, `${this.baseUrl}/invi_equipo_depart`, 'Asignación registrada éxito');
+        // 1. Inicializar la variable del anexo como vacía por defecto
+        let nombreArchivoSubido = null;
+
+        // 2. Si hay un archivo en cola, se sube primero
+        if (this.archivoSeleccionado) {
+          const resultadoSubida = await this.uploadarchivo(this.cedulaFormulario);
+
+          // Si falló el upload (mostró alerta internamente), cortamos el flujo para corregir
+          if (!resultadoSubida || !resultadoSubida.filename) {
+            return;
+          }
+
+          nombreArchivoSubido = resultadoSubida.filename;
+        }
+        const params = {
+          ciinfper_doc: this.cedulaFormulario,
+          tipo_responsable: 'VINCULACIÓN',
+          estado_responsable: 1,
+          idfacultad: this.formularioFacultadesID,
+          evidencia_arch: nombreArchivoSubido
+        };
+        const exito = await enviarsolig('POST', params, `${this.baseUrl}/invi_responsable`, 'Asignación registrada éxito');
         if (exito) {
           this.$.setupState.isProfileAddressModal = false;
           this.limpiarFormulario();
@@ -506,8 +599,28 @@ export default {
     },
     async Update() {
       try {
-        const params = { ciinfper_doc: this.cedulaFormulario, id_equipo_roles: this.formularioRolesID, estado_equipo_dep: 1 };
-        const exito = await enviarsolig('PUT', params, `${this.baseUrl}/invi_equipo_depart/${this.idEquipoDepartEdit}`, 'Asignación actualizada con éxito');
+        // 1. Mantener por defecto el archivo que ya tenía asignado el registro en edición
+        let nombreArchivoSubido = this.archivoActualNombre;
+
+        // 2. Si el usuario seleccionó un archivo nuevo para reemplazar el anterior
+        if (this.archivoSeleccionado) {
+          // Pasamos la cédula y el nombre viejo para que Laravel limpie el disco público automáticamente
+          const resultadoSubida = await this.uploadarchivo(this.cedulaFormulario, this.archivoActualNombre);
+
+          if (!resultadoSubida || !resultadoSubida.filename) {
+            return;
+          }
+
+          nombreArchivoSubido = resultadoSubida.filename;
+        }
+        const params = {
+          ciinfper_doc: this.cedulaFormulario,
+          tipo_responsable: 'VINCULACIÓN',
+          estado_responsable: 1,
+          idfacultad: this.formularioFacultadesID,
+          evidencia_arch: nombreArchivoSubido
+        };
+        const exito = await enviarsolig('PUT', params, `${this.baseUrl}/invi_responsable/${this.idEquipoDepartEdit}`, 'Asignación actualizada con éxito');
         if (exito) {
           this.$.setupState.isEditModalOpen = false;
           this.limpiarFormulario();
@@ -524,14 +637,14 @@ export default {
     eliminar(id, nombre) {
       try {
         eliminacion(
-          `${this.baseUrl}/inhabilitar_equipo_depart/`,
+          `${this.baseUrl}/inhabilitar_responsable/`,
           id,
           'Deshabilitar registro',
-          '¿Realmente desea deshabilitar el rol al equipo de Vinculación  ' + nombre + '?',
+          '¿Realmente desea deshabilitar al responsable de Vinculación  ' + nombre + '?',
           this.actualizar   // 👈 callback para refrescar la tabla al confirmar
         );
       } catch (error) {
-        console.error("Error al Deshabilitar el rol al equipo de Vinculación:", error);
+        console.error("Error al Deshabilitar al responsable de Vinculación:", error);
         this.cargando = false;
       }
     },
@@ -540,10 +653,10 @@ export default {
         // No hace falta poner this.cargando = true aquí si confimarhabi maneja la alerta,
         // pero si lo haces, asegúrate de cerrarlo.
         await confimarhabi(
-          `${this.baseUrl}/habilitar_equipo_depart/`,
+          `${this.baseUrl}/habilitar_responsable/`,
           id,
           'Habilitar registro',
-          `¿Desea habilitar el rol al equipo de Vinculación "${nombre}"?`,
+          `¿Desea habilitar al responsable de Vinculación "${nombre}"?`,
           this.actualizar
         );
       } catch (error) {

@@ -17,6 +17,7 @@ import ZonaPlanificacionAllView from '../views/Admin/Mantenimiento/Op_ZonaPlan/Z
 import EmpresaAllView from '../views/Admin/Mantenimiento/Op_Empresa/EmpresaAllView.vue'
 import RolesEquipoAllView from '../views/Admin/Equipo/RolesEquipoAllView.vue'
 import EquipoAllView from '../views/Admin/Equipo/EquipoAllView.vue'
+import ResponsableVinAllView from '../views/Admin/Equipo/ResponsableVinAllView.vue'
 
 
 const routes = [
@@ -110,6 +111,11 @@ const routes = [
     name: 'site-admin-equipo',
     component: EquipoAllView
   },
+  {
+    path: '/site-admin/responsables_vin',
+    name: 'site-admin-responsables_vin',
+    component: ResponsableVinAllView
+  }
 ]
 
 const router = createRouter({
