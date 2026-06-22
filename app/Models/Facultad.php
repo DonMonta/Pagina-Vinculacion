@@ -48,5 +48,9 @@ class Facultad extends Model
     {
         return $this->hasMany(Invi_linea_investigacion::class, 'idfacultad', 'idfacultad');
     }
+    public function responsables()
+    {
+        return $this->hasMany(Invi_responsable::class, 'idfacultad', 'idfacultad');
+    }
     
 }

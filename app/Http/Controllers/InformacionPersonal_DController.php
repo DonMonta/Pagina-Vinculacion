@@ -151,70 +151,90 @@ class InformacionPersonal_DController extends Controller
                 return response()->json(['error' => 'Fotografía no encontrada.'], 404);
             }
 
-            // Crear una imagen de GD a partir del string binario
+            // Crear una imagen de GD a partir del string binario de la BD
             $imgOriginal = imagecreatefromstring($persona->fotografia);
             if (! $imgOriginal) {
                 return response()->json(['error' => 'Formato de imagen no soportado por GD.'], 500);
             }
 
+            // Obtener dimensiones
             $ancho = imagesx($imgOriginal);
             $alto = imagesy($imgOriginal);
 
-            // Crear lona transparente
+            // Crear una nueva lona con soporte de transparencia (PNG)
             $imgFinal = imagecreatetruecolor($ancho, $alto);
             imagealphablending($imgFinal, false);
             imagesavealpha($imgFinal, true);
 
-            // Definir el color que será la transparencia
+            // Definir el color transparente
             $transparencia = imagecolorallocatealpha($imgFinal, 0, 0, 0, 127);
             imagefill($imgFinal, 0, 0, $transparencia);
 
-            // 1. MUESTREO AUTOMÁTICO DEL FONDO
-            // Asumimos que el píxel en la coordenada (5, 5) es parte del fondo real
-            // (Usamos 5,5 en lugar de 0,0 para evitar bordes negros de recortes o escaneos)
-            $rgbFondo = imagecolorat($imgOriginal, 5, 5);
+            // 1. Muestreo del color de fondo original (Esquina superior izquierda)
+            $rgbFondo = imagecolorat($imgOriginal, 10, 10);
             $colorFondo = imagecolorsforindex($imgOriginal, $rgbFondo);
 
             $bgR = $colorFondo['red'];
             $bgG = $colorFondo['green'];
             $bgB = $colorFondo['blue'];
 
-            // 2. TOLERANCIA DINÁMICA
-            // La distancia máxima posible entre blanco y negro es ~441.
-            // Un valor entre 40 y 80 suele funcionar bien para sombras y degradados.
-            $tolerancia = 60;
+            // 2. Tolerancia base para la distancia de color
+            $tolerancia = 65;
 
-            // 3. RECORRIDO Y EVALUACIÓN POR DISTANCIA EUCLIDIANA
             for ($x = 0; $x < $ancho; $x++) {
                 for ($y = 0; $y < $alto; $y++) {
+                    // Obtener el color del píxel actual
                     $rgb = imagecolorat($imgOriginal, $x, $y);
-                    $col = imagecolorsforindex($imgOriginal, $rgb);
+                    $colores = imagecolorsforindex($imgOriginal, $rgb);
 
-                    // Calcular qué tan parecido es este píxel al color del fondo
+                    $r = $colores['red'];
+                    $g = $colores['green'];
+                    $b = $colores['blue'];
+
+                    // 3. FILTRO DE CROMATISMO (Guardia de seguridad para colores vivos)
+                    // Calculamos la diferencia entre el canal más alto y el más bajo
+                    $maxCanal = max($r, $g, $b);
+                    $minCanal = min($r, $g, $b);
+                    $saturacionLocal = $maxCanal - $minCanal;
+
+                    // Si la diferencia es alta, significa que el píxel tiene un color definido
+                    // (como el rosa de la camisa o el tono de la piel) y NO debe ser fondo.
+                    if ($saturacionLocal > 22) {
+                        // Forzamos a mantener el píxel original
+                        $colorPixel = imagecolorallocatealpha($imgFinal, $r, $g, $b, $colores['alpha']);
+                        imagesetpixel($imgFinal, $x, $y, $colorPixel);
+
+                        continue;
+                    }
+
+                    // 4. Si pasó el filtro de cromatismo, evaluamos la distancia euclidiana normal
                     $distanciaColor = sqrt(
-                        pow($col['red'] - $bgR, 2) +
-                        pow($col['green'] - $bgG, 2) +
-                        pow($col['blue'] - $bgB, 2)
+                        pow($r - $bgR, 2) +
+                        pow($g - $bgG, 2) +
+                        pow($b - $bgB, 2)
                     );
 
-                    // Si se parece mucho al fondo (distancia pequeña), lo hacemos transparente
                     if ($distanciaColor <= $tolerancia) {
+                        // Es fondo o una sombra del fondo -> Volver transparente
                         imagesetpixel($imgFinal, $x, $y, $transparencia);
                     } else {
-                        // Mantenemos el píxel del sujeto original
-                        $colorPixel = imagecolorallocatealpha($imgFinal, $col['red'], $col['green'], $col['blue'], $col['alpha']);
+                        // Mantener el píxel original
+                        $colorPixel = imagecolorallocatealpha($imgFinal, $r, $g, $b, $colores['alpha']);
                         imagesetpixel($imgFinal, $x, $y, $colorPixel);
                     }
                 }
             }
 
+            // Capturar el output del archivo binario PNG procesado internamente
             ob_start();
             imagepng($imgFinal);
             $imagenPngBinaria = ob_get_clean();
 
+            // Liberar memoria de GD
             imagedestroy($imgOriginal);
             imagedestroy($imgFinal);
 
+            // Retornar el flujo de la imagen transparente construida localmente
             return Response::make($imagenPngBinaria, 200)
                 ->header('Content-Type', 'image/png')
                 ->header('Cache-Control', 'public, max-age=86400');

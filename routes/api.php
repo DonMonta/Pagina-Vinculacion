@@ -28,6 +28,7 @@ use App\Http\Controllers\GraduadosController;
 use App\Http\Controllers\PeriodoLectivoController;
 use App\Http\Controllers\Invi_equipo_departController;
 use App\Http\Controllers\Invi_equipo_rolesController;
+use App\Http\Controllers\Invi_responsableController;
 
 
 /*
@@ -201,6 +202,21 @@ Route::prefix('vin')->group(function () {
         Route::get('getDocente/{cedula}', [InformacionPersonal_DController::class, 'getDocente']);
         //Definición de endpoint para obtener los roles vinculacion
         Route::get('getRolesVinculacion', [Invi_equipo_departController::class, 'getRolesVinculacion']);
+        /**
+         * Endpoints del controlador Invi_responsableController
+         * Los endpoints aquí son de tipo: API Resource el cual permite la creación (post), 
+         * lectura (get), actualización (put) y eliminación (delete) de recursos.
+         * Y un endpoint de tipo delete que permite la habilitación (habilitar) y inhabilitación (inhabilitar) de registros.
+         */
+        Route::apiResource("invi_responsable", Invi_responsableController::class);
+        //Definición de endpoint para habilitar un Responsible
+        Route::delete('habilitar_responsable/{id}', [Invi_responsableController::class, 'habilitar']);
+        //Definición de endpoint para inhabilitar un Responsible
+        Route::delete('inhabilitar_responsable/{id}', [Invi_responsableController::class, 'destroy']);
+        //Definición de endpoint para subir un archivo
+        Route::post('subir_archivo_responsable', [Invi_responsableController::class, 'uploadArchivo']);
+        //Definición de endpoint para obtener las facultades de Vinculación
+        Route::get('getFacultadesVinculacion', [Invi_responsableController::class, 'getFacultadesVinculacion']);
         
     });
 }); 
