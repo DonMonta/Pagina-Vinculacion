@@ -71,8 +71,12 @@
             <div class="packages-carousel owl-carousel">
                 <div class="packages-item" v-for="(miembro, index) in equipo" :key="index">
                     <div class="packages-img">
-                        <img :src="getPhotoUrl2(miembro.ci) || require('@/assets/img/img/logovincusinfondo.png')"
-                            class="img-fluid w-100 rounded-top" alt="Image">
+                        <div class="position-relative overflow-hidden w-100"
+                            style="aspect-ratio: 1 / 1; background-color: #f4f6f9;">
+                            <img :src="getPhotoUrl2(miembro.ci) || require('@/assets/img/img/logovincusinfondo.png')"
+                                class="w-100 h-100" style="object-fit: cover; object-position: center;"
+                                alt="Foto miembro">
+                        </div>
                         <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
                             style="width: 100%; bottom: 0; left: 0; z-index: 5;">
                             <small class="flex-fill text-center border-end py-2">
@@ -84,7 +88,7 @@
 
                     <div class="packages-content">
                         <div class="p-4 pb-0">
-                            <h5 class="mb-0">Nombre: {{ miembro.nombre_completo }}</h5>
+                            <h5 class="mb-0">{{ miembro.nombre_completo }}</h5>
                             <small class="text-uppercase">Cargo: {{ miembro.genero_labels.titulo_rol }}</small>
                             <div class="mb-3">
                                 <small class="fa fa-star text-primary"></small>
@@ -124,84 +128,26 @@
                 <h1 class="mb-0">Conoce a los Responsables de­­­­ Vinculación de las Facultades de la UTLVTE</h1>
             </div>
             <div class="event-carousel owl-carousel">
-                <div class="event-item">
-                    <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100" alt="Image">
+                <div class="event-item" v-for="(respons, index) in responsables" :key="index">
+                    <div class="position-relative overflow-hidden w-100"
+                        style="aspect-ratio: 1 / 1; background-color: #f4f6f9;">
+                        <img :src="getPhotoUrl2(respons.ci) || require('@/assets/img/img/logovincusinfondo.png')"
+                            class="w-100 h-100" style="object-fit: cover; object-position: center;" alt="Foto miembro">
+                    </div>
                     <div class="event-content p-4">
                         <div class="d-flex justify-content-between mb-4">
                             <span class="text-body"><i class="fas fa-map-marker-alt me-2"></i>Esmeraldas-Ecuador</span>
-                            <span class="text-body"><i class="fas fa-calendar-alt me-2"></i>10 Feb, 2023</span>
                         </div>
-                        <h4 class="mb-4">Ing. Gladys Macas Giler, Magister</h4>
-                        <p class="mb-4">FACULTAD DE CIENCIAS AGROPECUARIAS - FACAP</p>
+                        <h4 class="mb-4">{{ respons.nombre_completo }}</h4>
+                        <p class="mb-4" v-if="respons.facultad.siglas === 'SC'">SEDE LA CONCORDIA</p>
+                        <p class="mb-4" v-else>FACULTAD DE {{ respons.facultad.nombre }} - {{ respons.facultad.siglas }}
+                        </p>
                         <a class="btn-hover-bg btn btn-primary text-white py-2 px-4" data-bs-toggle="modal"
-                            data-bs-target="#funcionesModal6">Ver Más Información </a>
+                            data-bs-target="#funcionesModal6" @click="verRespFunciones(respons)">Ver Más Información
+                        </a>
                     </div>
                 </div>
-                <div class="event-item">
-                    <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100" alt="Image">
-                    <div class="event-content p-4">
-                        <div class="d-flex justify-content-between mb-4">
-                            <span class="text-body"><i class="fas fa-map-marker-alt me-2"></i>Esmeraldas-Ecuador</span>
-                            <span class="text-body"><i class="fas fa-calendar-alt me-2"></i>10 Feb, 2023</span>
-                        </div>
-                        <h4 class="mb-4">Dra. Luz Marina Cifuentes Quiñónez, Magister</h4>
-                        <p class="mb-4"> FACULTAD DE CIENCIAS ADMINISTRATIVAS Y ECONÓMICAS - FACAE</p>
-                        <a class="btn-hover-bg btn btn-primary text-white py-2 px-4" data-bs-toggle="modal"
-                            data-bs-target="#funcionesModal7">Ver Más Información</a>
-                    </div>
-                </div>
-                <div class="event-item">
-                    <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100" alt="Image">
-                    <div class="event-content p-4">
-                        <div class="d-flex justify-content-between mb-4">
-                            <span class="text-body"><i class="fas fa-map-marker-alt me-2"></i>Esmeraldas-Ecuador</span>
-                            <span class="text-body"><i class="fas fa-calendar-alt me-2"></i>10 Feb, 2023</span>
-                        </div>
-                        <h4 class="mb-4">Lcda. Ana Bedoya Gutiérrez, Magister</h4>
-                        <p class="mb-4">FACULTAD DE LA PEDAGOGÍA - FACPED</p>
-                        <a class="btn-hover-bg btn btn-primary text-white py-2 px-4" data-bs-toggle="modal"
-                            data-bs-target="#funcionesModal8">Ver Más Información</a>
-                    </div>
-                </div>
-                <div class="event-item">
-                    <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100" alt="Image">
-                    <div class="event-content p-4">
-                        <div class="d-flex justify-content-between mb-4">
-                            <span class="text-body"><i class="fas fa-map-marker-alt me-2"></i>Esmeraldas-Ecuador</span>
-                            <span class="text-body"><i class="fas fa-calendar-alt me-2"></i>10 Feb, 2023</span>
-                        </div>
-                        <h4 class="mb-4">Lcda. Mariuxi de los Angeles Rodríguez Enriquez, Magister</h4>
-                        <p class="mb-4">FACULTAD DE CIENCIAS SOCIALES Y DE SERVICIOS - FACSOS</p>
-                        <a class="btn-hover-bg btn btn-primary text-white py-2 px-4" data-bs-toggle="modal"
-                            data-bs-target="#funcionesModal9">Ver Más Información</a>
-                    </div>
-                </div>
-                <div class="event-item">
-                    <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100" alt="Image">
-                    <div class="event-content p-4">
-                        <div class="d-flex justify-content-between mb-4">
-                            <span class="text-body"><i class="fas fa-map-marker-alt me-2"></i>Esmeraldas-Ecuador</span>
-                            <span class="text-body"><i class="fas fa-calendar-alt me-2"></i>10 Feb, 2023</span>
-                        </div>
-                        <h4 class="mb-4">Ing. Marco Vinicio Navarrete Villavicencio, Magister</h4>
-                        <p class="mb-4">FACULTAD DE INGENIERÍAS - FACI</p>
-                        <a class="btn-hover-bg btn btn-primary text-white py-2 px-4" data-bs-toggle="modal"
-                            data-bs-target="#funcionesModal10">Ver Más Información</a>
-                    </div>
-                </div>
-                <div class="event-item">
-                    <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100" alt="Image">
-                    <div class="event-content p-4">
-                        <div class="d-flex justify-content-between mb-4">
-                            <span class="text-body"><i class="fas fa-map-marker-alt me-2"></i>Esmeraldas-Ecuador</span>
-                            <span class="text-body"><i class="fas fa-calendar-alt me-2"></i>10 Feb, 2023</span>
-                        </div>
-                        <h4 class="mb-4">Ing. Félix Lenin Preciado, Magister</h4>
-                        <p class="mb-4">SEDE LA CONCORDIA</p>
-                        <a class="btn-hover-bg btn btn-primary text-white py-2 px-4" data-bs-toggle="modal"
-                            data-bs-target="#funcionesModal11">Ver Más Información</a>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
@@ -227,55 +173,19 @@
 
             <div class="row gy-4">
 
-                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100"
+                    v-for="(direc, index) in directoresCarrera.slice(0, 4)" :key="index">
                     <div class="team-member d-flex align-items-start">
-                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" alt="">
+                        <div class="pic">
+                            <img :src="getPhotoUrl3(direc.cedula_director) || require('@/assets/img/img/logovincusinfondo.png')"
+                                @error="onImageError" class="img-fluid" alt="">
                         </div>
                         <div class="member-info">
-                            <h4>Mgs. Alex Paul Alencastro Guerrero</h4>
-                            <span>FACAE</span>
-                            <p>Director de la Carrera de Comercio Exterior</p>
-
-                        </div>
-                    </div>
-                </div><!-- End Team Member -->
-
-                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="team-member d-flex align-items-start">
-                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" alt="">
-                        </div>
-                        <div class="member-info">
-                            <h4>Ing. Jefferson Humberto Figueroa Moreno</h4>
-                            <span>FACAE</span>
-                            <p>Director de la Carrera de Contabilidad y Auditoría</p>
-
-                        </div>
-                    </div>
-                </div><!-- End Team Member -->
-
-                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
-                    <div class="team-member d-flex align-items-start">
-                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" alt="">
-                        </div>
-                        <div class="member-info">
-                            <h4>Mgs. Mayra Alejandra Escandon Franco</h4>
-                            <span>FACAE</span>
-                            <p>Directora de la Carrera de Administración de Empresas</p>
-
-                        </div>
-                    </div>
-                </div><!-- End Team Member -->
-
-                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                    <div class="team-member d-flex align-items-start">
-                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" alt="">
-                        </div>
-                        <div class="member-info">
-                            <h4>Mgs. Ana Carminia Bedoya Gutierrez</h4>
-                            <span>FACPED</span>
-                            <p>Directora de la Carrera de Educación Inicial y Parvularia y Estudios
-                                Sociales</p>
-
+                            <h4>{{ direc.director_procesado }}</h4>
+                            <span v-if="direc.facultad.siglas === 'SC'">SEDE LA CONCORDIA</span>
+                            <span v-else>{{ direc.facultad.siglas }}</span>
+                            <p v-if="direc.facultad.siglas === 'SC'">{{ direc.nombre_carrera }}</p>
+                            <p v-else>Director(a) de la Carrera de {{ direc.nombre_carrera }}</p>
                         </div>
                     </div>
                 </div><!-- End Team Member -->
@@ -316,7 +226,7 @@
             </div>
         </div>
     </div>
-    <!-- Modal -->
+    <!-- Modal Director-->
     <div class="modal fade" id="funcionesModal1" tabindex="-1" aria-labelledby="funcionesModal1Label"
         aria-hidden="true">
         <div class="modal-dialog custom-modal modal-lg modal-dialog-centered">
@@ -396,7 +306,7 @@
             </div>
         </div>
     </div>
-    <!-- Modal 2 -->
+    <!-- Modal 2 Equipo-->
     <div class="modal fade" id="funcionesModal2" tabindex="-1" aria-labelledby="funcionesModal2Label"
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -466,621 +376,14 @@
             </div>
         </div>
     </div>
-    <!-- Modal 3 -->
-    <div class="modal fade" id="funcionesModal3" tabindex="-1" aria-labelledby="funcionesModal3Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal3Label">
-                        Analista de prácticas preprofesionales
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-12 col-lg-12">
-                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
-                            <div class="row g-5">
-                                <div class="col-xl-6">
-                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
-                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
-                                    </div>
-                                </div>
-                                <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Nombre:</h1>
-                                    <p class="mb-4">Es el (la) profesional encargado (a) de
-                                        coordinar acciones para el cumplimiento de las prácticas pre profesionales.
-                                    </p>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">vinculacion@utelvt.edu.ec</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-4">
-                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
-                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container section-title py-5">
-                        <h2>Funciones</h2>
-                    </div>
-                    <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                a. Apoyar logísticamente en las actividades programadas por la Comisión de
-                                Vinculación de la Sociedad y Dirección de Vinculación con la Sociedad de la UTLVTE.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                b. Coordinar acciones con los responsables de vinculación en las unidades académicas
-                                y la sociedad; en lo referente a prácticas preprofesionales.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                c. Gestionar con la Unidad de Tecnologías de la Información y Comunicación, el
-                                correcto funcionamiento de la Plataforma Informática de las Prácticas
-                                Preprofesionales.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                d. Coordinar junto a los y las responsables de Vinculación de Facultades, acciones
-                                inherentes para la firma de convenios o cartas de compromiso con instituciones
-                                públicas o privadas para la realización de prácticas preprofesionales del
-                                estudiantado.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                e. Revisar los informes de prácticas preprofesionales del estudiantado para la firma del
-                                director(a) de Vinculación con la Sociedad de la UTLVTE.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                f. Mantener actualizada la base de datos de los estudiantes que presentan los informes
-                                de prácticas preprofesionales de la UTLVTE
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                g. Informar mensual y semestralmente a la Dirección de Vinculación sobre las
-                                actividades realizadas.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                h. Velar por el mantenimiento del buen estado de las instalaciones, equipos y demás
-                                enseres de la oficina.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                i. Cumplir la normativa establecida en el Reglamento de Vinculación.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                j. Reportar incumplimientos detectados en el desarrollo de los procesos a su cargo.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                k. Las demás que le asigne el director de Vinculación con la Sociedad, de conformidad
-                                con el estatuto de la UTLVTE.
-                            </div>
-
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal 4 -->
-    <div class="modal fade" id="funcionesModal4" tabindex="-1" aria-labelledby="funcionesModal4Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal4Label">
-                        Analista de servicio a la sociedad
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-12 col-lg-12">
-                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
-                            <div class="row g-5">
-                                <div class="col-xl-6">
-                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
-                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
-                                    </div>
-                                </div>
-                                <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Nombre:</h1>
-                                    <p class="mb-4">Es el o la profesional responsable de la
-                                        ejecución de las actividades de servicio a la sociedad.
-                                    </p>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">vinculacion@utelvt.edu.ec</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-4">
-                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
-                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container section-title py-5">
-                        <h2>Funciones</h2>
-                    </div>
-                    <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                a. Apoyar logísticamente en las actividades programadas por la Comisión de
-                                Vinculación de la Sociedad y Dirección de Vinculación con la Sociedad de la UTLVTE.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                b. Coordinar acciones con los y las responsables de vinculación en las unidades
-                                académicas y la sociedad: en lo referente a servicio a la sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                c. Gestionar la oportuna entrega de recursos para la ejecución de los eventos de
-                                capacitación, como servicio a la sociedad
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                d. Gestionar con la Unidad de Tecnologías de la Información y Comunicación, el
-                                correcto funcionamiento de la Plataforma Informática de Inserción Laboral.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                e. Coordinar junto a los y las responsables de Vinculación de Facultades, acciones
-                                inherentes para la firma de convenios o cartas de compromiso con instituciones
-                                públicas o privadas para generar articuladamente servicio a la sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                f. Planificar y ejecutar junto a los y las responsables de Vinculación de Facultades.
-                                eventos de capacitación dirigido mejorar las capacidades de personas de los sectores
-                                vulnerabilizados de la sociedad
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                g. Difundir oportunidades laborales y de capacitación a integrantes internos y externos
-                                de la comunidad universitaria, a través de la plataforma informática de inserción
-                                laboral, bolsa de empleo y redes sociales oficiales de la UTLVTE.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                h. Mantener actualizada la base de datos de los y las graduadas de la UTLVTE
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                i. Informar mensual y semestralmente a la Dirección de Vinculación sobre las
-                                actividades realizadas
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                j. Velar por el mantenimiento del buen estado de las instalaciones, equipos y demás
-                                enseres de la oficina.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                k. Cumplir la normativa establecida en el Reglamento de Vinculación.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                l. Reportar incumplimientos detectados en el desarrollo de los procesos a su cargo.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                m. Las demás que le asigne el director de Vinculación con la Sociedad, de conformidad
-                                con el estatuto de la UTLVTE.
-                            </div>
-
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal 5 -->
-    <div class="modal fade" id="funcionesModal5" tabindex="-1" aria-labelledby="funcionesModal5Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal5Label">
-                        Secretaría de Vinculación.
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-12 col-lg-12">
-                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
-                            <div class="row g-5">
-                                <div class="col-xl-6">
-                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
-                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
-                                    </div>
-                                </div>
-                                <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Ing. Gabriel Estupiñán</h1>
-                                    <p class="mb-4">Es la o el responsable de de realizar todo el proceso que realiza un
-                                        secretario/a.
-                                    </p>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">vinculacion@utelvt.edu.ec</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-4">
-                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
-                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container section-title py-5">
-                        <h2>Funciones</h2>
-                    </div>
-                    <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                a. Manejar y organizar el archivo, receptar y entregar documentos, así como revisar y
-                                contestar el correo electrónico de la oficina: vinculación @utelvt.edu.ec
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                b. Elaborar, remitir, recibir y archivar las comunicaciones que genere la Dirección de
-                                Vinculación con la Sociedad, dispuestas por el director de Vinculación con la
-                                Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                c. Informar a estudiantado y personal docente en relación a la función sustantiva
-                                Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                d. Colaborar en todas las actividades organizadas por la Dirección de Vinculación
-                                (foros, visitas, exposiciones, eventos, ferias, etc.), que se planifiquen desde la
-                                Dirección de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                e. Actualizar con carácter permanente la base de datos de Convenios y Cartas de
-                                Compromiso para las actividades de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                f. Elaborar actas de las reuniones que se realice desde la Comisión de Vinculación con
-                                la Sociedad y Dirección de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                g. Garantizar la idoneidad de los procedimientos administrativos y documentos que se
-                                generan en la Dirección de Vinculación con la Sociedad.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                h. Mantener una base de datos de proyectos de vinculación, en la que conste
-                                formulación, ejecución, seguimiento y evaluación de los mismos y la participación
-                                de docentes y estudiantado participante en las diferentes áreas de trabajo de
-                                vinculación.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                i. Informar a la Dirección de Vinculación sobre las actividades realizadas.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                j. Velar por el mantenimiento del buen estado de las instalaciones, equipos y demás
-                                enseres de la oficina.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                k. Cumplir la normativa establecida en el Reglamento de Vinculación.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                l. Reportar incumplimientos detectados en el desarrollo de los procesos a su cargo.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                m. Las demás que le asigne el director de Vinculación con la Sociedad, de conformidad
-                                con el estatuto de la UTLVTE.
-                            </div>
-
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal 6 -->
+    <!-- Modal 3 REsponsable -->
     <div class="modal fade" id="funcionesModal6" tabindex="-1" aria-labelledby="funcionesModal6Label"
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="funcionesModal6Label">
-                        Responsable de Vinculación de FACAP.
+                        {{ responsableSeleccionado?.genero_labels.titulo_rol }}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -1090,191 +393,24 @@
                             <div class="row g-5">
                                 <div class="col-xl-6">
                                     <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
+                                        <img :src="getPhotoUrl2(responsableSeleccionado?.ci) || require('@/assets/img/img/logovincusinfondo.png')"
+                                            class="img-fluid w-100"
                                             style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
                                     </div>
                                 </div>
                                 <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Ing. Gladys Macas Giler, Magister</h1>
-                                    <p class="mb-4">Responsable de Vinculación actualmente de la Facultad de Ciencias
-                                        Agropecuarias, UTLVTE. Docente titular de la UTLVTE, con
+                                    <h1 class="display-6 mb-4">{{ responsableSeleccionado?.nombre_completo }}</h1>
+                                    <p class="mb-4" v-if="responsableSeleccionado?.facultad.siglas === 'SC'">{{
+                                        responsableSeleccionado?.genero_labels?.pronombre }} es {{
+                                            responsableSeleccionado?.genero_labels?.titulo_rol }} actualmente de la SEDE {{
+                                            responsableSeleccionado?.facultad.nombre }}, UTLVTE. Docente titular de la
+                                        UTLVTE, con
                                         experiencia en el área de vinculación y docencia universitaria.
                                     </p>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">Mútile Esmeraldas Ecuador</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">gladys.macas@utelvt.edu.ec</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-4">
-                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
-                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container section-title py-5">
-                        <h2>Funciones</h2>
-                        <p>Estas son las funciones que realiza como responsable de vinculación de la Facultad</p>
-                    </div>
-                    <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                a. Proponer las políticas, planes y programas actualizados sobre la Vinculación con la
-                                Sociedad a la Dirección de Vinculación con la Sociedad de la UTLVTE.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                b. Coordinar, junto al Decano (a) y directores (as) de Carrera los proyectos de
-                                vinculación de su unidad académica, para la revisión y aprobación por parte de la
-                                Comisión de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                c. Coordinar la vinculación específica con la sociedad con los Decanatos y Direcciones
-                                de Carrera
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                d. Presentar y ejecutar proyectos de cursos de capacitación guiados por el personal
-                                académico de la institución, dirigido a los sectores más vulnerabilizados de la
-                                sociedad
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                e. Proponer a la Dirección de Vinculación con la Sociedad, políticas para fortalecer y
-                                diversificar la vinculación con los y las diferentes agentes de la producción, con
-                                Organismos No Gubernamentales y con prestigiosas Universidades o Escuelas
-                                Politécnicas Nacionales o Internacionales.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                f. Coordinar con la Dirección de Vinculación con la Sociedad, el diseño y ejecución de
-                                los diferentes programas de prácticas y pasantías en los ámbitos urbano y rural,
-                                según las propias características de las carreras y las necesidades de la sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                g. Velar por la adecuada difusión de las actividades de vinculación, conjuntamente con
-                                la Dirección de Vinculación con la Sociedad.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                h. Elaborar el informe anual de actividades y ponerlo a consideración de la Dirección
-                                de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                i. Realizar reuniones mensuales con los y las responsables de los proyectos de
-                                Vinculación con la Sociedad de su facultad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                j. Las demás actividades que les sean asignadas.
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal 7 -->
-    <div class="modal fade" id="funcionesModal7" tabindex="-1" aria-labelledby="funcionesModal7Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal7Label">
-                        Responsable de Vinculación de FACAE.
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-12 col-lg-12">
-                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
-                            <div class="row g-5">
-                                <div class="col-xl-6">
-                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
-                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
-                                    </div>
-                                </div>
-                                <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Dra. Luz Marina Cifuentes Quiñónez, Magister</h1>
-                                    <p class="mb-4">Responsable de Vinculación actualmente de la Facultad de Ciencias
-                                        Administrativas y Económicas, UTLVTE. Docente titular de la UTLVTE, con
+                                    <p class="mb-4" v-else>{{ responsableSeleccionado?.genero_labels?.pronombre }} es {{
+                                        responsableSeleccionado?.genero_labels?.titulo_rol }} actualmente de la Facultad
+                                        de {{ responsableSeleccionado?.facultad.nombre }}, UTLVTE. Docente titular de la
+                                        UTLVTE, con
                                         experiencia en el área de vinculación y docencia universitaria.
                                     </p>
                                     <div class="d-flex align-items-center mb-2">
@@ -1283,11 +419,11 @@
                                     </div>
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">luz.cifuentes@utelvt.edu.ec</p>
+                                        <p class="text-dark mb-0">{{ responsableSeleccionado.email }}</p>
                                     </div>
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
+                                        <p class="text-dark mb-0">{{ responsableSeleccionado.telefono }}</p>
                                     </div>
                                     <div class="d-flex align-items-center mb-4">
                                         <i class="fab fa-firefox-browser text-primary me-3"></i>
@@ -1427,715 +563,7 @@
             </div>
         </div>
     </div>
-    <!-- Modal 8 -->
-    <div class="modal fade" id="funcionesModal8" tabindex="-1" aria-labelledby="funcionesModal8Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal8Label">
-                        Responsable de Vinculación de FACPED.
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-12 col-lg-12">
-                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
-                            <div class="row g-5">
-                                <div class="col-xl-6">
-                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
-                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
-                                    </div>
-                                </div>
-                                <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Lcda. Ana Bedoya Gutiérrez, Magister</h1>
-                                    <p class="mb-4">Responsable de Vinculación actualmente de la Facultad de la
-                                        Pedagogía, UTLVTE. Docente titular de la UTLVTE, con
-                                        experiencia en el área de vinculación y docencia universitaria.
-                                    </p>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">ana.bedoya@utelvt.edu.ec</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-4">
-                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
-                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
-                                    </div>
 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container section-title py-5">
-                        <h2>Funciones</h2>
-                        <p>Estas son las funciones que realiza como responsable de vinculación de la Facultad</p>
-                    </div>
-                    <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                a. Proponer las políticas, planes y programas actualizados sobre la Vinculación con la
-                                Sociedad a la Dirección de Vinculación con la Sociedad de la UTLVTE.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                b. Coordinar, junto al Decano (a) y directores (as) de Carrera los proyectos de
-                                vinculación de su unidad académica, para la revisión y aprobación por parte de la
-                                Comisión de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                c. Coordinar la vinculación específica con la sociedad con los Decanatos y Direcciones
-                                de Carrera
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                d. Presentar y ejecutar proyectos de cursos de capacitación guiados por el personal
-                                académico de la institución, dirigido a los sectores más vulnerabilizados de la
-                                sociedad
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                e. Proponer a la Dirección de Vinculación con la Sociedad, políticas para fortalecer y
-                                diversificar la vinculación con los y las diferentes agentes de la producción, con
-                                Organismos No Gubernamentales y con prestigiosas Universidades o Escuelas
-                                Politécnicas Nacionales o Internacionales.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                f. Coordinar con la Dirección de Vinculación con la Sociedad, el diseño y ejecución de
-                                los diferentes programas de prácticas y pasantías en los ámbitos urbano y rural,
-                                según las propias características de las carreras y las necesidades de la sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                g. Velar por la adecuada difusión de las actividades de vinculación, conjuntamente con
-                                la Dirección de Vinculación con la Sociedad.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                h. Elaborar el informe anual de actividades y ponerlo a consideración de la Dirección
-                                de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                i. Realizar reuniones mensuales con los y las responsables de los proyectos de
-                                Vinculación con la Sociedad de su facultad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                j. Las demás actividades que les sean asignadas.
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal 9 -->
-    <div class="modal fade" id="funcionesModal9" tabindex="-1" aria-labelledby="funcionesModal9Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal9Label">
-                        Responsable de Vinculación de FACSOS.
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-12 col-lg-12">
-                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
-                            <div class="row g-5">
-                                <div class="col-xl-6">
-                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
-                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
-                                    </div>
-                                </div>
-                                <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Lcda. Mariuxi de los Angeles Rodríguez Enriquez, Magister
-                                    </h1>
-                                    <p class="mb-4">Responsable de Vinculación actualmente de la Facultad de
-                                        Ciencias Sociales y de Servicios, UTLVTE. Docente titular de la UTLVTE, con
-                                        experiencia en el área de vinculación y docencia universitaria.
-                                    </p>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">mariuxi.rodriguez.enriquez@utelvt.edu.ec</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-4">
-                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
-                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container section-title py-5">
-                        <h2>Funciones</h2>
-                        <p>Estas son las funciones que realiza como responsable de vinculación de la Facultad</p>
-                    </div>
-                    <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                a. Proponer las políticas, planes y programas actualizados sobre la Vinculación con la
-                                Sociedad a la Dirección de Vinculación con la Sociedad de la UTLVTE.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                b. Coordinar, junto al Decano (a) y directores (as) de Carrera los proyectos de
-                                vinculación de su unidad académica, para la revisión y aprobación por parte de la
-                                Comisión de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                c. Coordinar la vinculación específica con la sociedad con los Decanatos y Direcciones
-                                de Carrera
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                d. Presentar y ejecutar proyectos de cursos de capacitación guiados por el personal
-                                académico de la institución, dirigido a los sectores más vulnerabilizados de la
-                                sociedad
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                e. Proponer a la Dirección de Vinculación con la Sociedad, políticas para fortalecer y
-                                diversificar la vinculación con los y las diferentes agentes de la producción, con
-                                Organismos No Gubernamentales y con prestigiosas Universidades o Escuelas
-                                Politécnicas Nacionales o Internacionales.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                f. Coordinar con la Dirección de Vinculación con la Sociedad, el diseño y ejecución de
-                                los diferentes programas de prácticas y pasantías en los ámbitos urbano y rural,
-                                según las propias características de las carreras y las necesidades de la sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                g. Velar por la adecuada difusión de las actividades de vinculación, conjuntamente con
-                                la Dirección de Vinculación con la Sociedad.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                h. Elaborar el informe anual de actividades y ponerlo a consideración de la Dirección
-                                de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                i. Realizar reuniones mensuales con los y las responsables de los proyectos de
-                                Vinculación con la Sociedad de su facultad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                j. Las demás actividades que les sean asignadas.
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal 10 -->
-    <div class="modal fade" id="funcionesModal10" tabindex="-1" aria-labelledby="funcionesModal10Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal10Label">
-                        Responsable de Vinculación de FACI.
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-12 col-lg-12">
-                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
-                            <div class="row g-5">
-                                <div class="col-xl-6">
-                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
-                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
-                                    </div>
-                                </div>
-                                <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Ing. Marco Vinicio Navarrete Villavicencio, Magister</h1>
-                                    <p class="mb-4">Responsable de Vinculación actualmente de la Facultad de
-                                        Ingenierías, UTLVTE. Docente titular de la UTLVTE, con
-                                        experiencia en el área de vinculación y docencia universitaria.
-                                    </p>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">marco.navarrete@utelvt.edu.ec</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-4">
-                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
-                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container section-title py-5">
-                        <h2>Funciones</h2>
-                        <p>Estas son las funciones que realiza como responsable de vinculación de la Facultad</p>
-                    </div>
-                    <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                a. Proponer las políticas, planes y programas actualizados sobre la Vinculación con la
-                                Sociedad a la Dirección de Vinculación con la Sociedad de la UTLVTE.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                b. Coordinar, junto al Decano (a) y directores (as) de Carrera los proyectos de
-                                vinculación de su unidad académica, para la revisión y aprobación por parte de la
-                                Comisión de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                c. Coordinar la vinculación específica con la sociedad con los Decanatos y Direcciones
-                                de Carrera
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                d. Presentar y ejecutar proyectos de cursos de capacitación guiados por el personal
-                                académico de la institución, dirigido a los sectores más vulnerabilizados de la
-                                sociedad
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                e. Proponer a la Dirección de Vinculación con la Sociedad, políticas para fortalecer y
-                                diversificar la vinculación con los y las diferentes agentes de la producción, con
-                                Organismos No Gubernamentales y con prestigiosas Universidades o Escuelas
-                                Politécnicas Nacionales o Internacionales.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                f. Coordinar con la Dirección de Vinculación con la Sociedad, el diseño y ejecución de
-                                los diferentes programas de prácticas y pasantías en los ámbitos urbano y rural,
-                                según las propias características de las carreras y las necesidades de la sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                g. Velar por la adecuada difusión de las actividades de vinculación, conjuntamente con
-                                la Dirección de Vinculación con la Sociedad.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                h. Elaborar el informe anual de actividades y ponerlo a consideración de la Dirección
-                                de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                i. Realizar reuniones mensuales con los y las responsables de los proyectos de
-                                Vinculación con la Sociedad de su facultad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                j. Las demás actividades que les sean asignadas.
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal 11 -->
-    <div class="modal fade" id="funcionesModal11" tabindex="-1" aria-labelledby="funcionesModal11Label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal11Label">
-                        Responsable de Vinculación de la SEDE LA CONCORDIA.
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="col-12 col-lg-12">
-                        <div class="header-img d-flex h-100 pt-6 ps-6 pb-6">
-                            <div class="row g-5">
-                                <div class="col-xl-6">
-                                    <div class="bg-light p-4" style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;">
-                                        <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid w-100"
-                                            style="border-radius: 68% 32% 100% 0% / 0% 75% 25% 100%;" alt="Image">
-                                    </div>
-                                </div>
-                                <div class="col-xl-6">
-                                    <h1 class="display-6 mb-4">Ing. Félix Lenin Preciado, Magister, Magister</h1>
-                                    <p class="mb-4">Responsable de Vinculación actualmente de la SEDE, UTLVTE. Docente
-                                        titular de la UTLVTE, con
-                                        experiencia en el área de vinculación y docencia universitaria.
-                                    </p>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">Nuevos Horizontes, Esmeraldas Ecuador</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-envelope text-primary me-3"></i>
-                                        <p class="text-dark mb-0">marco.navarrete@utelvt.edu.ec</p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fa fa-phone-alt text-primary me-3"></i>
-                                        <p class="text-dark mb-0">189(06) - 2991770 </p>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-4">
-                                        <i class="fab fa-firefox-browser text-primary me-3"></i>
-                                        <p class="text-dark mb-0">utelvt.edu.ec</p>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container section-title py-5">
-                        <h2>Funciones</h2>
-                        <p>Estas son las funciones que realiza como responsable de vinculación de la Facultad</p>
-                    </div>
-                    <div class="event-carousel owl-carousel" data-wow-delay="0.3s">
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                a. Proponer las políticas, planes y programas actualizados sobre la Vinculación con la
-                                Sociedad a la Dirección de Vinculación con la Sociedad de la UTLVTE.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                b. Coordinar, junto al Decano (a) y directores (as) de Carrera los proyectos de
-                                vinculación de su unidad académica, para la revisión y aprobación por parte de la
-                                Comisión de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                c. Coordinar la vinculación específica con la sociedad con los Decanatos y Direcciones
-                                de Carrera
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                d. Presentar y ejecutar proyectos de cursos de capacitación guiados por el personal
-                                académico de la institución, dirigido a los sectores más vulnerabilizados de la
-                                sociedad
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                e. Proponer a la Dirección de Vinculación con la Sociedad, políticas para fortalecer y
-                                diversificar la vinculación con los y las diferentes agentes de la producción, con
-                                Organismos No Gubernamentales y con prestigiosas Universidades o Escuelas
-                                Politécnicas Nacionales o Internacionales.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                f. Coordinar con la Dirección de Vinculación con la Sociedad, el diseño y ejecución de
-                                los diferentes programas de prácticas y pasantías en los ámbitos urbano y rural,
-                                según las propias características de las carreras y las necesidades de la sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                g. Velar por la adecuada difusión de las actividades de vinculación, conjuntamente con
-                                la Dirección de Vinculación con la Sociedad.
-
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                h. Elaborar el informe anual de actividades y ponerlo a consideración de la Dirección
-                                de Vinculación con la Sociedad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                i. Realizar reuniones mensuales con los y las responsables de los proyectos de
-                                Vinculación con la Sociedad de su facultad.
-                            </div>
-
-
-                        </div>
-                        <div class="testimonial-item1">
-                            <div class="testimonial-text border rounded p-4 pt-5 mb-5">
-                                <div class="btn-square bg-white border rounded-circle">
-                                    <i class="fa fa-quote-right fa-2x text-primary"></i>
-                                </div>
-                                j. Las demás actividades que les sean asignadas.
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- Modal 12 -->
     <div class="modal fade" id="funcionesModal12" tabindex="-1" aria-labelledby="funcionesModal12Label"
         aria-hidden="true">
@@ -2161,281 +589,30 @@
                                 la
                                 UTLVTE.
                             </p>
-                            <h1 class="mb-0">Estos son todos los Directores de las 19 Carreras de la UTLVTE</h1>
+                            <h1 class="mb-0">Estos son todos los Directores de las {{ directoresCarrera.length }}
+                                Carreras de la UTLVTE</h1>
                         </div>
                         <div class="container-fluid event py-5 ">
 
                             <div class="row gy-4">
 
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100"
+                                    v-for="(direc, index) in directoresCarrera" :key="index">
                                     <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
+                                        <div class="pic"><img
+                                                :src="getPhotoUrl3(direc.cedula_director) || require('@/assets/img/img/logovincusinfondo.png')"
+                                                @error="onImageError" class="img-fluid" alt="">
                                         </div>
                                         <div class="member-info">
-                                            <h4>Mgs. Alex Paul Alencastro Guerrero</h4>
-                                            <span>FACAE</span>
-                                            <p>Director de la Carrera de Comercio Exterior</p>
+                                            <h4>{{ direc.director_procesado }}</h4>
+                                            <span v-if="direc.facultad.siglas === 'SC'">SEDE LA CONCORDIA</span>
+                                            <span v-else>{{ direc.facultad.siglas }}</span>
+                                            <p v-if="direc.facultad.siglas === 'SC'">{{ direc.nombre_carrera }}</p>
+                                            <p v-else>Director(a) de la Carrera de {{ direc.nombre_carrera }}</p>
 
                                         </div>
                                     </div>
-                                </div><!-- End Team Member -->
-
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Ing. Jefferson Humberto Figueroa Moreno</h4>
-                                            <span>FACAE</span>
-                                            <p>Director de la Carrera de Contabilidad y Auditoría</p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Mayra Alejandra Escandon Franco</h4>
-                                            <span>FACAE</span>
-                                            <p>Directora de la Carrera de Administración de Empresas</p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Ana Carminia Bedoya Gutierrez</h4>
-                                            <span>FACPED</span>
-                                            <p>Directora de la Carrera de Educación Inicial y Parvularia y Estudios
-                                                Sociales</p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Cecilia Mariana Ulloa Espinoza</h4>
-                                            <span>FACPED</span>
-                                            <p>Directora de Carrera de Pedagogía de la Lengua y Literatura
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Lucia Germania Chavez Ruano</h4>
-                                            <span>FACPED</span>
-                                            <p>Directora de Carrera de Pedagogía de las Ciencias Experimentales de
-                                                las Matemáticas y Física
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Lcda. Ludy Yoconda Gomez Pinillo</h4>
-                                            <span>FACPED</span>
-                                            <p>Directora de la Carrera de Ciencias Experimentales de la Química y
-                                                Biología
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Miryan Veronica Vera Mera</h4>
-                                            <span>FACPED</span>
-                                            <p>Directora de la Carrera de Educación Básica
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Tunin Gilmar Murillo Andrade</h4>
-                                            <span>FACPED</span>
-                                            <p>Director de Carrera de Pedagogía de la Actividad Física y Deporte
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Lcdo. Francisco Washington Pazmiño Mendez</h4>
-                                            <span>FACSOS</span>
-                                            <p>Director de la Carrera de Sociología
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Abg. Jerson Ante Valdez Verduga</h4>
-                                            <span>FACSOS</span>
-                                            <p>Director de la Carrera de Trabajo Social
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Nelly del Rocío Panchano Valencia</h4>
-                                            <span>FACSOS</span>
-                                            <p>Directora de la Carrera de Turismo
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Vlucher Santiago Quintero Samaniego</h4>
-                                            <span>FACI</span>
-                                            <p>Director de la Carrera de Ingeniería Mecánica
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Romulo Sandino Jurado Calero</h4>
-                                            <span>FACI</span>
-                                            <p>Director de la Carrera de Tecnología de la Información
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Raul Clemente Ulloa de Souza</h4>
-                                            <span>FACI</span>
-                                            <p>Director de la Carrera de Ingeniería Eléctrica
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Mirna Geraldine Cevallos Mina</h4>
-                                            <span>FACI</span>
-                                            <p>Director de la Carrera de Ingeniería Eléctrica
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Joel Darvin Velasco Quiñonez</h4>
-                                            <span>FACAP</span>
-                                            <p>Director de la Carrera de Ingeniería Forestal
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Mgs. Milton Jose Bolaños Ortega</h4>
-                                            <span>FACAP</span>
-                                            <p>Director de la Carrera de Ingeniería Zootécnica
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img src="@/assets/img/img/logovincusinfondo.png"
-                                                class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>Ing. Tito Eric Arce Olivo</h4>
-                                            <span>FACAP</span>
-                                            <p>Director de la Carrera de Ingeniería Agronómica -
-                                            </p>
-
-                                        </div>
-                                    </div>
-                                </div><!-- End Team Member -->
-
+                                </div>
                             </div>
 
 
@@ -2476,7 +653,17 @@ export default {
                 email: '',
                 telefono: '',
                 funciones: []
-            }
+            },
+            responsables: [],
+            responsableSeleccionado: {
+                ci: '',
+                nombre_completo: '',
+                genero_labels: { titulo_rol: '' },
+                email: '',
+                telefono: '',
+                facultad: [],
+            },
+            directoresCarrera: [],
         }
     },
     computed: {
@@ -2487,6 +674,8 @@ export default {
     async mounted() {
         await this.getDirector();
         await this.getTeamInfo();
+        await this.getResponsablesInfo();
+        await this.getDirectoresCarrera();
     },
     methods: {
         getPhotoUrl(ci) {
@@ -2504,6 +693,17 @@ export default {
             const baseURL2 = API.defaults.baseURL;
             // Usamos el timestamp para evitar problemas de caché al cambiar de integrante
             return `${baseURL2}/vin/getFotoDocente/${ci}?t=${new Date().getTime()}`;
+        },
+        getPhotoUrl3(ci) {
+            // Si no hay CI, retornamos una imagen vacía o un placeholder
+            if (!ci || ci === 'NO ENCONTRADO') return '';
+
+            const baseURL2 = API.defaults.baseURL;
+            return `${baseURL2}/vin/getFotoDocente3/${ci}?t=${new Date().getTime()}`;
+        },
+        onImageError(event) {
+            // Reemplazamos la imagen rota por tu logo por defecto dinámicamente
+            event.target.src = require('@/assets/img/img/logovincusinfondo.png');
         },
         inicializarcarrousel() {
             this.$nextTick(() => {
@@ -2625,8 +825,64 @@ export default {
                 console.error("Error cargando el equipo:", error);
             }
         },
+        async getResponsablesInfo() {
+            try {
+                const response = await API.get(`${this.baseUrl}/getResponsablesInfo`);
+                this.responsables = response.data;
+                this.$nextTick(() => {
+                    const $carousel = $(".event-carousel");
+
+                    // Destruimos la instancia previa por si el mixin la inicializó vacía
+                    if ($carousel.hasClass('owl-loaded')) {
+                        $carousel.trigger('destroy.owl.carousel');
+                        $carousel.removeClass('owl-hidden');
+                        $carousel.find('.owl-stage-outer').children().unwrap();
+                    }
+                    const totalMiembros = this.responsables.length;
+                    const activarEfectos = totalMiembros > 5;
+
+                    // Inicializamos el carrusel con los datos reales
+                    $carousel.owlCarousel({
+                        autoplay: activarEfectos,
+                        smartSpeed: 1000,
+                        center: false,
+                        dots: false,
+                        loop: activarEfectos,
+                        margin: 25,
+                        nav: activarEfectos,
+                        navText: [
+                            '<i class="fas fa-angle-double-left"></i>',
+                            '<i class="fas fa-angle-double-right"></i>',
+                        ],
+                        responsiveClass: true,
+                        responsive: {
+                            0: { items: 1 },
+                            768: { items: 1 },
+                            992: { items: 2 },
+                            1200: { items: 3 },
+                        },
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error cargando el equipo:", error);
+            }
+        },
+        async getDirectoresCarrera() {
+            try {
+                const response = await API.get(`${this.baseUrl}/getDirectoresCarreras`);
+                this.directoresCarrera = response.data.data;
+
+            } catch (error) {
+                console.error("Error cargando el equipo:", error);
+            }
+        },
         verFunciones(miembro) {
             this.miembroSeleccionado = miembro;
+            this.inicializarcarrousel();
+        },
+        verRespFunciones(responsable) {
+            this.responsableSeleccionado = responsable;
             this.inicializarcarrousel();
         },
         openPdfModal(page) {

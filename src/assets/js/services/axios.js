@@ -37,7 +37,7 @@ API.interceptors.response.use(
         console.warn("🔒 Sesión expirada. Cerrando sesión...");
         localStorage.removeItem("token_vinc");
         localStorage.removeItem("token_type_vinc");
-        window.location.href = "/login"; // Redirige al login si la sesión caduca
+        // Redirige al login si la sesión caduca
       }
     } else if (error.request) {
       console.error("📡 No hubo respuesta del servidor:", error.request);
