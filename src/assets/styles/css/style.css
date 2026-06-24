@@ -2036,3 +2036,29 @@
 .modal-body ul li {
     padding-left: 5px;
 }
+.modal-card {
+    transition: transform 0.2s ease;
+}
+
+.modal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Reducimos ligeramente el ancho de la imagen en el modal para dar más espacio al texto */
+.modal-card .pic-container {
+    width: 120px;
+    min-width: 120px;
+}
+
+/* Garantiza que la imagen cubra toda la altura de la tarjeta si el texto crece verticalmente */
+.modal-card .img-cover {
+    object-fit: cover;
+    object-position: top center; /* Enfoca el rostro por si la tarjeta se estira */
+    min-height: 100%;
+}
+
+/* Refinamiento del scroll del modal para que la cabecera y el footer queden fijos */
+.modal-dialog-scrollable .modal-content {
+    max-height: 90vh;
+}

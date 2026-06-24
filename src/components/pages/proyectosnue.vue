@@ -142,7 +142,8 @@
                                         <p class="mb-3">Son los y las
                                             profesores(as) Titulares u Ocasionales que participan activamente en la
                                             formulación...</p>
-                                        <a class="fw-semi-bold" href="">Leer Más <i
+                                        <a class="fw-semi-bold" href="" data-bs-toggle="modal"
+                                            data-bs-target="#funcionesModal3">Leer Más <i
                                                 class="fa fa-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
@@ -154,7 +155,9 @@
                                 <h4 class="mb-3">Estudiantado participante</h4>
                                 <p class="mb-3">Son los y las
                                     estudiantes que participan activamente en la formulación...</p>
-                                <a class="fw-semi-bold" href="">Leer Más <i class="fa fa-arrow-right ms-1"></i></a>
+                                <a class="fw-semi-bold" href="" data-bs-toggle="modal"
+                                    data-bs-target="#funcionesModal4">Leer Más <i
+                                        class="fa fa-arrow-right ms-1"></i></a>
                             </div>
                         </div>
                     </div>
@@ -171,144 +174,23 @@
                 <h1 class="mb-0">Vinculación 2025-2029</h1>
             </div>
             <div class="testimonial-carousel owl-carousel">
-                <div class="testimonial-item text-center rounded pb-4">
+                <div class="testimonial-item text-center rounded pb-4" v-for="(proy, index) in proyectos" :key="index">
                     <div class="testimonial-comment bg-light rounded p-4">
-                        <p class="text-center mb-5">NOMBRE DEL PROYECTO: Fortalecimiento de las capacidades locales del
-                            Sector Agropecuario de 5 Parroquias rurales del Cantón Esmeraldas
+                        <p class="text-center mb-5">NOMBRE DEL PROYECTO: {{ proy.nombre_proyecto }}
                         </p>
-                        <p class="text-center mb-5"> LÍNEA DE INVESTIGACIÓN: Desarrollo agropecuario sostenible
+                        <p class="text-center mb-5">
+                            LÍNEA DE INVESTIGACIÓN:
+                            {{ proy.lineas_investigacion && proy.lineas_investigacion.length > 0
+                                ? proy.lineas_investigacion[0].nombre_linea
+                            : 'No definida' }}
                         </p>
                     </div>
                     <div class="testimonial-img p-1">
-                        <img src="@/assets/img/img/facultades/faci.jpg" class="img-fluid rounded-circle" alt="Image">
+                        <img src="@/assets/img/img/logovincu.jpeg" class="img-fluid rounded-circle" alt="Image">
                     </div>
                     <div style="margin-top: -35px;">
-                        <h5 class="mb-0">FACULTAD PROPONENTE: FACAP</h5>
-                        <p class="mb-0">Carrera:</p>
-                        <div class="d-flex justify-content-center">
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center rounded pb-4">
-                    <div class="testimonial-comment bg-light rounded p-4">
-                        <p class="text-center mb-5">NOMBRE DEL PROYECTO: Capacitaciones continuas y asesorías técnicas
-                            relacionadas con aspectos sociales, tecnológicos y ambientales para el desarrollo
-                            socio-económico de la Provincia de Esmeraldas
-                        </p>
-                        <p class="text-center mb-5">LÍNEA DE INVESTIGACIÓN: Desarrollo de sectores tecnológicos y
-                            productivos
-                        </p>
-                    </div>
-                    <div class="testimonial-img p-1">
-                        <img src="@/assets/img/img/facultades/faci.jpg" class="img-fluid rounded-circle" alt="Image">
-                    </div>
-                    <div style="margin-top: -35px;">
-                        <h5 class="mb-0">FACULTAD PROPONENTE: FACI</h5>
-                        <p class="mb-0">Carrera:</p>
-                        <div class="d-flex justify-content-center">
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center rounded pb-4">
-                    <div class="testimonial-comment bg-light rounded p-4">
-                        <p class="text-center mb-5">NOMBRE DEL PROYECTO: Fomento innovador de modelos empresariales y
-                            gestión de la calidad a emprendimientos y MiPymes en el entorno comercial, económico,
-                            social, ambiental y tecnológico de la Provincia de Esmeraldas
-                        </p>
-                        <p class="text-center mb-5">LÍNEA DE INVESTIGACIÓN: Desarrollo local y perfeccionamiento
-                            empresarial
-                        </p>
-                    </div>
-                    <div class="testimonial-img p-1">
-                        <img src="@/assets/img/img/facultades/FACAE.jpg" class="img-fluid rounded-circle" alt="Image">
-                    </div>
-                    <div style="margin-top: -35px;">
-                        <h5 class="mb-0">FACULTAD PROPONENTE: FACAE</h5>
-                        <p class="mb-0">Carrera:</p>
-                        <div class="d-flex justify-content-center">
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center rounded pb-4">
-                    <div class="testimonial-comment bg-light rounded p-4">
-                        <p class="text-center mb-5">NOMBRE DEL PROYECTO: La FACPED impulsando el desarrollo educativo,
-                            la cultura, los saberes ancestrales y la recreaciión en la Provincia de Esmeraldas
-                        </p>
-                        <p class="text-center mb-5">LÍNEA DE INVESTIGACIÓN: Educación y Sociedad / Desarrollo de
-                            sectores tecnológicos y productivos
-                        </p>
-                    </div>
-                    <div class="testimonial-img p-1">
-                        <img src="@/assets/img/img/facultades/FACPED.jpg" class="img-fluid rounded-circle" alt="Image">
-                    </div>
-                    <div style="margin-top: -35px;">
-                        <h5 class="mb-0">FACULTAD PROPONENTE: FACPED</h5>
-                        <p class="mb-0">Carrera:</p>
-                        <div class="d-flex justify-content-center">
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center rounded pb-4">
-                    <div class="testimonial-comment bg-light rounded p-4">
-                        <p class="text-center mb-5">NOMBRE DEL PROYECTO: Centro de transferencia tecnológica y apoyo al
-                            emprendimiento para el desarrollo socioeconómico de la población del Cantón La Concordia
-                        </p>
-                        <p class="text-center mb-5">LÍNEA DE INVESTIGACIÓN: Desarrollo local y perfeccionamiento
-                            empresarial / Desarrollo de sectores tecnológicos y productivos
-                        </p>
-                    </div>
-                    <div class="testimonial-img p-1">
-                        <img src="@/assets/img/img/facultades/SEDE LA CONCORDIA.png" class="img-fluid rounded-circle"
-                            alt="Image">
-                    </div>
-                    <div style="margin-top: -35px;">
-                        <h5 class="mb-0">FACULTAD PROPONENTE: SEDE LA CONCORDIA</h5>
-                        <p class="mb-0">Carrera:</p>
-                        <div class="d-flex justify-content-center">
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                            <i class="fas fa-star text-primary"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center rounded pb-4">
-                    <div class="testimonial-comment bg-light rounded p-4">
-                        <p class="text-center mb-5">NOMBRE DEL PROYECTO: Fortalecimiento del tejido social a través de
-                            la conformación del Consejo Consultivo Interinstitucional de Vinculación con la Sociedad
-                            para el desarrollo socioeconómico de la Provincia de Esmeraldas
-                        </p>
-                        <p class="text-center mb-5">LÍNEA DE INVESTIGACIÓN: Desarrollo, memoria social histórica /
-                            Desarrollo local y perfeccionamiento empresarial
-                        </p>
-                    </div>
-                    <div class="testimonial-img p-1">
-                        <img src="@/assets/img/img/facultades/faci.jpg" class="img-fluid rounded-circle" alt="Image">
-                    </div>
-                    <div style="margin-top: -35px;">
-                        <h5 class="mb-0">FACULTAD PROPONENTE: FACSOS</h5>
-                        <p class="mb-0">Carrera:</p>
+                        <h5 class="mb-0">FACULTAD PROPONENTE: {{ proy.facultad_principal }}</h5>
+                        <p class="mb-0">Codigo Proyecto: {{ proy.codigo_proyecto }}</p>
                         <div class="d-flex justify-content-center">
                             <i class="fas fa-star text-primary"></i>
                             <i class="fas fa-star text-primary"></i>
@@ -344,91 +226,304 @@
             </div>
         </div>
     </div>
-    <!-- Modal 2 -->
+
     <div class="modal fade" id="funcionesModal2" tabindex="-1" aria-labelledby="funcionesModal2Label"
         aria-hidden="true">
-        <div class="modal-dialog modal-lg custom-modal modal-dialog-centered">
+        <div class="modal-dialog custom-modal modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal2Label">
-                        Director (a) y/o Subdirector(a) de Proyectos de Vinculación
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-primary fw-bold" id="funcionesModal12Label">
+                        <i class="fas fa-users-cog me-2"></i> Directores y/o Subdirectores de Proyectos de Vinculación
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="modal-body">
-
-                    <!-- Projects Start -->
-                    <div class="container-xxl py-3">
-                        <div class="container">
-                            <div class="text-center mx-auto" style="max-width: 600px;">
-                                <p class="d-inline-block border rounded text-primary fw-semi-bold py-1 px-3">Son los
-                                    profesores(as) Titulares u Ocasionales que lideran la formulación, ejecución y
-                                    evaluación
-                                    del proyecto de vinculación presentado y aprobados por el Consejo Superior
-                                    Universitario</p>
-                                <h3 class="display-5 mb-5">
-                                </h3>
+                <div class="modal-body p-4 bg-light packages">
+                    <div class="text-center mb-5">
+                        <h5 class="text-uppercase text-primary">Directores de Proyectos de Vinculación</h5>
+                        <p class="text-muted mx-auto" style="max-width: 900px;">
+                            Son los
+                            profesores(as) Titulares u Ocasionales que lideran la formulación, ejecución y evaluación
+                            del proyecto de vinculación presentado y aprobados por el Consejo Superior Universitario.
+                            Son sus funciones las siguientes:
+                        </p>
+                        <h3 class="mb-0 text-dark">
+                            Estos son los Directores de los <span class="text-primary">{{ directproyectos.length
+                            }}</span> proyectos de vinculación con la sociedad aprobados
+                        </h3>
+                    </div>
+                    <div class="packages-carousel owl-carousel">
+                        <div class="packages-item" v-for="(directpro, index) in directproyectos" :key="index">
+                            <div class="packages-img">
+                                <div class="position-relative overflow-hidden w-100"
+                                    style="aspect-ratio: 1 / 1; background-color: #f4f6f9;">
+                                    <img :src="getPhotoUrl2(directpro.cedula) || require('@/assets/img/img/logovincusinfondo.png')"
+                                        @error="onImageError" class="w-100 h-100"
+                                        style="object-fit: cover; object-position: center;" alt="Foto miembro">
+                                </div>
+                                <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                                    style="width: 100%; bottom: 0; left: 0; z-index: 5;">
+                                    <small class="flex-fill text-center border-end py-2">
+                                        <i class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador
+                                    </small>
+                                </div>
                             </div>
-                            <div class="container section-title py-3">
-                                <h2>Directores de los Proyectos de Vinculación con la Sociedad</h2>
-                                <p>Estas son los directores de los proyectos de vinculación con la sociedad de cada
-                                    carrera
-                                </p>
-                            </div>
-                            <div class="project-carousel owl-carousel">
-                                <div class="project-item pe-5 pb-5">
-                                    <div class="position-relative overflow-hidden">
-                                        <img class="img-fluid" src="@/assets/img/img/logovincu.jpeg" alt="">
-                                    </div>
-                                    <div class="project-title">
-                                        <div class="bg-light">
-                                            <h5 class="fw-bold mb-0">Full Name</h5>
-                                            <small>Designation</small>
-                                        </div>
-                                        <div class="bg-primary">
-                                            <a class="btn btn-square mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                                            <a class="btn btn-square mx-1" href=""><i class="fab fa-twitter"></i></a>
-                                            <a class="btn btn-square mx-1" href=""><i class="fab fa-instagram"></i></a>
-                                        </div>
-                                    </div>
 
+                            <div class="packages-content">
+                                <div class="p-4 pb-0">
+                                    <h5 class="mb-0">{{ directpro.nombre_con_titulo }}</h5>
+                                    <div class="mb-3">
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                    </div>
+                                    <p class="mb-4">Proyecto: {{ directpro.proyecto_nombre }}</p>
+                                </div>
+                                <div class="row rounded-bottom mx-0 boton">
+                                    <div class="col-12 text-center px-0">
 
-                                </div>
-                                <div class="project-item pe-5 pb-5">
-                                    <div class="project-img mb-3">
-                                        <img class="img-fluid rounded" src="@/assets/img/img/logovincu.jpeg" alt="">
-                                        <a href=""><i class="fa fa-link fa-3x text-primary"></i></a>
-                                    </div>
-                                    <div class="project-title">
-                                        <h4 class="mb-0">Cash Investment</h4>
-                                    </div>
-                                </div>
-                                <div class="project-item pe-5 pb-5">
-                                    <div class="project-img mb-3">
-                                        <img class="img-fluid rounded" src="@/assets/img/img/logovincu.jpeg" alt="">
-                                        <a href=""><i class="fa fa-link fa-3x text-primary"></i></a>
-                                    </div>
-                                    <div class="project-title">
-                                        <h4 class="mb-0">Financial Consultancy</h4>
-                                    </div>
-                                </div>
-                                <div class="project-item pe-5 pb-5">
-                                    <div class="project-img mb-3">
-                                        <img class="img-fluid rounded" src="@/assets/img/img/logovincu.jpeg" alt="">
-                                        <a href=""><i class="fa fa-link fa-3x text-primary"></i></a>
-                                    </div>
-                                    <div class="project-title">
-                                        <h4 class="mb-0">Business Loans</h4>
+                                        <a class="btn-hover btn text-white py-2 px-4 w-100 text-wrap d-flex align-items-center justify-content-center"
+                                            style="min-height: 60px;" href="#" v-if="directpro.siglas === 'SC'">
+                                            {{ directpro.carrera }} - SEDE LA CONCORDIA
+                                        </a>
+
+                                        <a class="btn-hover btn text-white py-2 px-4 w-100 text-wrap d-flex align-items-center justify-content-center"
+                                            style="min-height: 60px;" href="#" v-else>
+                                            {{ directpro.carrera }} - {{ directpro.siglas }}
+                                        </a>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Projects End -->
+                    <div class="text-center mb-5">
+                        <h5 class="text-uppercase text-primary">Sudirectores de Proyectos de Vinculación</h5>
+                        <p class="text-muted mx-auto" style="max-width: 900px;">
+                            Son los
+                            profesores(as) Titulares u Ocasionales que lideran la formulación, ejecución y evaluación
+                            del proyecto de vinculación presentado y aprobados por el Consejo Superior Universitario.
+                            Son sus funciones las siguientes:
+                        </p>
+                        <h3 class="mb-0 text-dark">
+                            Estos son los Subdirectores de los <span class="text-primary">{{ subdirectores.length
+                            }}</span> proyectos de vinculación con la sociedad aprobados
+                        </h3>
+                    </div>
+                    <div class="packages-carousel owl-carousel">
+                        <div class="packages-item" v-for="(subdirec, index) in subdirectores" :key="index">
+                            <div class="packages-img">
+                                <div class="position-relative overflow-hidden w-100"
+                                    style="aspect-ratio: 1 / 1; background-color: #f4f6f9;">
+                                    <img :src="getPhotoUrl2(subdirec.cedula) || require('@/assets/img/img/logovincusinfondo.png')"
+                                        @error="onImageError" class="w-100 h-100"
+                                        style="object-fit: cover; object-position: center;" alt="Foto miembro">
+                                </div>
+                                <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                                    style="width: 100%; bottom: 0; left: 0; z-index: 5;">
+                                    <small class="flex-fill text-center border-end py-2">
+                                        <i class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="packages-content">
+                                <div class="p-4 pb-0">
+                                    <h5 class="mb-0">{{ subdirec.nombre_con_titulo }}</h5>
+                                    <div class="mb-3">
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                    </div>
+                                    <p class="mb-4">Proyecto: {{ subdirec.proyecto_nombre }}</p>
+                                </div>
+                                <div class="row rounded-bottom mx-0 boton">
+                                    <div class="col-12 text-center px-0">
+
+                                        <a class="btn-hover btn text-white py-2 px-4 w-100 text-wrap d-flex align-items-center justify-content-center"
+                                            style="min-height: 60px;" href="#" v-if="subdirec.siglas === 'SC'">
+                                            {{ subdirec.carrera }} - SEDE LA CONCORDIA
+                                        </a>
+
+                                        <a class="btn-hover btn text-white py-2 px-4 w-100 text-wrap d-flex align-items-center justify-content-center"
+                                            style="min-height: 60px;" href="#" v-else>
+                                            {{ subdirec.carrera }} - {{ subdirec.siglas }}
+                                        </a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
+                <div class="modal-footer border-0 justify-content-center bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-5" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i> Cerrar Ventana
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="funcionesModal3" tabindex="-1" aria-labelledby="funcionesModal3Label"
+        aria-hidden="true">
+        <div class="modal-dialog custom-modal modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-primary fw-bold" id="funcionesModal3Label">
+                        <i class="fas fa-users-cog me-2"></i> Profesores(as) participantes en los Proyectos de
+                        Vinculación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-4 bg-light packages">
+                    <div class="text-center mb-5">
+                        <h5 class="text-uppercase text-primary">Profesores(as) de Proyectos de Vinculación</h5>
+                        <p class="text-muted mx-auto" style="max-width: 900px;">
+                            Son los y las
+                            profesores(as) Titulares u Ocasionales que participan activamente en la formulación,
+                            ejecución y evaluación del proyecto de vinculación al cual pertenecen
+                        </p>
+                        <h3 class="mb-0 text-dark">
+                            Estos son los Profesores(as) de los <span class="text-primary">{{ directproyectos.length
+                            }}</span> proyectos de vinculación con la sociedad aprobados
+                        </h3>
+                    </div>
+                    <div class="packages-carousel owl-carousel">
+                        <div class="packages-item" v-for="(profe, index) in profesores" :key="index">
+                            <div class="packages-img">
+                                <div class="position-relative overflow-hidden w-100"
+                                    style="aspect-ratio: 1 / 1; background-color: #f4f6f9;">
+                                    <img :src="getPhotoUrl2(profe.cedula) || require('@/assets/img/img/logovincusinfondo.png')"
+                                        @error="onImageError" class="w-100 h-100"
+                                        style="object-fit: cover; object-position: center;" alt="Foto miembro">
+                                </div>
+                                <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                                    style="width: 100%; bottom: 0; left: 0; z-index: 5;">
+                                    <small class="flex-fill text-center border-end py-2">
+                                        <i class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="packages-content">
+                                <div class="p-4 pb-0">
+                                    <h5 class="mb-0">{{ profe.nombre_con_titulo }}</h5>
+                                    <div class="mb-3">
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                    </div>
+                                    <p class="mb-4">Proyecto: {{ profe.proyecto_nombre }}</p>
+                                </div>
+                                <div class="row rounded-bottom mx-0 boton">
+                                    <div class="col-12 text-center px-0">
+
+                                        <a class="btn-hover btn text-white py-2 px-4 w-100 text-wrap d-flex align-items-center justify-content-center"
+                                            style="min-height: 60px;" href="#" v-if="profe.siglas === 'SC'">
+                                            {{ profe.carrera }} - SEDE LA CONCORDIA
+                                        </a>
+
+                                        <a class="btn-hover btn text-white py-2 px-4 w-100 text-wrap d-flex align-items-center justify-content-center"
+                                            style="min-height: 60px;" href="#" v-else>
+                                            {{ profe.carrera }} - {{ profe.siglas }}
+                                        </a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer border-0 justify-content-center bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-5" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i> Cerrar Ventana
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="funcionesModal4" tabindex="-1" aria-labelledby="funcionesModal4Label"
+        aria-hidden="true">
+        <div class="modal-dialog custom-modal modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-primary fw-bold" id="funcionesModal4Label">
+                        <i class="fas fa-users-cog me-2"></i> Estudiantado participante en los Proyectos de Vinculación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-4 bg-light packages">
+                    <div class="text-center mb-5">
+                        <h5 class="text-uppercase text-primary">Estudiantado participante en los Proyectos de
+                            Vinculación</h5>
+                        <p class="text-muted mx-auto" style="max-width: 900px;">
+                            Son los y las
+                            estudiantes que participan activamente en la formulación, ejecución y evaluación del
+                            proyecto de vinculación al cual pertenecen
+                        </p>
+                        <h3 class="mb-0 text-dark">
+                            Estos son los Estudiantes de los <span class="text-primary">{{ directproyectos.length
+                            }}</span> proyectos de vinculación con la sociedad aprobados
+                        </h3>
+                    </div>
+                    <div class="packages-carousel owl-carousel">
+                        <div class="packages-item" v-for="(est, index) in estudiantes" :key="index">
+                            <div class="packages-img">
+                                <div class="position-relative overflow-hidden w-100"
+                                    style="aspect-ratio: 1 / 1; background-color: #f4f6f9;">
+                                    <img :src="getPhotoUrl3(est.cedula) || require('@/assets/img/img/logovincusinfondo.png')"
+                                        @error="onImageError" class="w-100 h-100"
+                                        style="object-fit: cover; object-position: center;" alt="Foto miembro">
+                                </div>
+                                <div class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                                    style="width: 100%; bottom: 0; left: 0; z-index: 5;">
+                                    <small class="flex-fill text-center border-end py-2">
+                                        <i class="fa fa-map-marker-alt me-2"></i>Esmeraldas - Ecuador
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="packages-content">
+                                <div class="p-4 pb-0">
+                                    <h5 class="mb-0">{{ est.nombres_apellidos }}</h5>
+                                    <div class="mb-3">
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                        <small class="fa fa-star text-primary"></small>
+                                    </div>
+                                    <p class="mb-4">Proyecto: {{ est.proyecto_nombre }}</p>
+                                </div>
+                                <div class="row rounded-bottom mx-0 boton">
+                                    <div class="col-12 text-center px-0">
+
+                                        <a class="btn-hover btn text-white py-2 px-4 w-100 text-wrap d-flex align-items-center justify-content-center"
+                                            style="min-height: 60px;" href="#" v-if="est.siglas === 'SC'">
+                                            {{ est.carrera }} - SEDE LA CONCORDIA
+                                        </a>
+
+                                        <a class="btn-hover btn text-white py-2 px-4 w-100 text-wrap d-flex align-items-center justify-content-center"
+                                            style="min-height: 60px;" href="#" v-else>
+                                            {{ est.carrera }} - {{ est.siglas }}
+                                        </a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer border-0 justify-content-center bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-5" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i> Cerrar Ventana
                     </button>
                 </div>
             </div>
@@ -439,12 +534,18 @@
 <script>
 import 'owl.carousel';
 import script2 from '@/assets/scripts/js/main.js'
-
+import API from "@/assets/js/services/axios";
 
 export default {
     name: 'proyectosnue',
     data() {
         return {
+            baseUrl: "/vin",
+            directproyectos: [],
+            subdirectores: [],
+            profesores: [],
+            estudiantes: [],
+            proyectos: [],
             // ruta base de tu PDF
             pdfUrl: '/Docs/16_Agosto_Convocatoria_Proyectos_Vinculación_2024-signed.pdf',
             // página inicial (se reemplaza al llamar al modal)
@@ -456,6 +557,15 @@ export default {
             return `${this.pdfUrl}#page=${this.pdfPage}`;
         }
     },
+    async mounted() {
+        await Promise.all([
+            this.getDirectoresProyectos(),
+            this.getSubdirecProyectos(),
+            this.getProfesoreProyectos(),
+            this.getEstProyectos(),
+            this.getProyectos()
+        ]);
+    },
     methods: {
         openPdfModal(page) {
             this.pdfPage = page;
@@ -463,6 +573,242 @@ export default {
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
         },
+        getPhotoUrl2(ci) {
+            // Si no hay CI, retornamos una imagen vacía o un placeholder
+            if (!ci) return '';
+
+            const baseURL2 = API.defaults.baseURL;
+            // Usamos el timestamp para evitar problemas de caché al cambiar de integrante
+            return `${baseURL2}/vin/getFotoDocente/${ci}`;
+        },
+        getPhotoUrl3(ci) {
+            // Si no hay CI, retornamos una imagen vacía o un placeholder
+            if (!ci) return '';
+
+            const baseURL2 = API.defaults.baseURL;
+            // Usamos el timestamp para evitar problemas de caché al cambiar de integrante
+            return `${baseURL2}/vin/getFoto/${ci}`;
+        },
+        onImageError(event) {
+            // Reemplazamos la imagen rota por tu logo por defecto dinámicamente
+            event.target.src = require('@/assets/img/img/logovincusinfondo.png');
+        },
+        async getDirectoresProyectos() {
+            try {
+                const response = await API.get(`${this.baseUrl}/getDirectoresProyectosVinculacion`);
+                this.directproyectos = response.data.data;
+                this.$nextTick(() => {
+                    const $carousel = $(".packages-carousel");
+
+                    // Destruimos la instancia previa por si el mixin la inicializó vacía
+                    if ($carousel.hasClass('owl-loaded')) {
+                        $carousel.trigger('destroy.owl.carousel');
+                        $carousel.removeClass('owl-hidden');
+                        $carousel.find('.owl-stage-outer').children().unwrap();
+                    }
+                    const totalMiembros = this.directproyectos.length;
+                    const activarEfectos = totalMiembros > 5;
+
+                    // Inicializamos el carrusel con los datos reales
+                    $carousel.owlCarousel({
+                        autoplay: activarEfectos,
+                        smartSpeed: 1000,
+                        center: false,
+                        dots: false,
+                        loop: activarEfectos,
+                        margin: 25,
+                        nav: activarEfectos,
+                        navText: [
+                            '<i class="fas fa-arrow-left"></i>',
+                            '<i class="fas fa-arrow-right"></i>',
+                        ],
+                        responsiveClass: true,
+                        responsive: {
+                            0: { items: 1 },
+                            768: { items: 2 },
+                            992: { items: 2 },
+                            1200: { items: 3 },
+                        },
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error cargando el equipo:", error);
+            }
+        },
+        async getSubdirecProyectos() {
+            try {
+                const response = await API.get(`${this.baseUrl}/getSubdirectoresProyectosVinculacion`);
+                this.subdirectores = response.data.data;
+                this.$nextTick(() => {
+                    const $carousel = $(".packages-carousel");
+
+                    // Destruimos la instancia previa por si el mixin la inicializó vacía
+                    if ($carousel.hasClass('owl-loaded')) {
+                        $carousel.trigger('destroy.owl.carousel');
+                        $carousel.removeClass('owl-hidden');
+                        $carousel.find('.owl-stage-outer').children().unwrap();
+                    }
+                    const totalMiembros = this.subdirectores.length;
+                    const activarEfectos = totalMiembros > 5;
+
+                    // Inicializamos el carrusel con los datos reales
+                    $carousel.owlCarousel({
+                        autoplay: activarEfectos,
+                        smartSpeed: 1000,
+                        center: false,
+                        dots: false,
+                        loop: activarEfectos,
+                        margin: 25,
+                        nav: activarEfectos,
+                        navText: [
+                            '<i class="fas fa-arrow-left"></i>',
+                            '<i class="fas fa-arrow-right"></i>',
+                        ],
+                        responsiveClass: true,
+                        responsive: {
+                            0: { items: 1 },
+                            768: { items: 2 },
+                            992: { items: 2 },
+                            1200: { items: 3 },
+                        },
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error cargando el equipo:", error);
+            }
+        },
+        async getProfesoreProyectos() {
+            try {
+                const response = await API.get(`${this.baseUrl}/getDocentesProyectosVinculacion`);
+                this.profesores = response.data.data;
+                this.$nextTick(() => {
+                    const $carousel = $(".packages-carousel");
+
+                    // Destruimos la instancia previa por si el mixin la inicializó vacía
+                    if ($carousel.hasClass('owl-loaded')) {
+                        $carousel.trigger('destroy.owl.carousel');
+                        $carousel.removeClass('owl-hidden');
+                        $carousel.find('.owl-stage-outer').children().unwrap();
+                    }
+                    const totalMiembros = this.profesores.length;
+                    const activarEfectos = totalMiembros > 5;
+
+                    // Inicializamos el carrusel con los datos reales
+                    $carousel.owlCarousel({
+                        autoplay: activarEfectos,
+                        smartSpeed: 1000,
+                        center: false,
+                        dots: false,
+                        loop: activarEfectos,
+                        margin: 25,
+                        nav: activarEfectos,
+                        navText: [
+                            '<i class="fas fa-arrow-left"></i>',
+                            '<i class="fas fa-arrow-right"></i>',
+                        ],
+                        responsiveClass: true,
+                        responsive: {
+                            0: { items: 1 },
+                            768: { items: 2 },
+                            992: { items: 2 },
+                            1200: { items: 3 },
+                        },
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error cargando el equipo:", error);
+            }
+        },
+        async getEstProyectos() {
+            try {
+                const response = await API.get(`${this.baseUrl}/getEstudiantesProyectosVinculacion`);
+                this.estudiantes = response.data.data;
+                this.$nextTick(() => {
+                    const $carousel = $(".packages-carousel");
+
+                    // Destruimos la instancia previa por si el mixin la inicializó vacía
+                    if ($carousel.hasClass('owl-loaded')) {
+                        $carousel.trigger('destroy.owl.carousel');
+                        $carousel.removeClass('owl-hidden');
+                        $carousel.find('.owl-stage-outer').children().unwrap();
+                    }
+                    const totalMiembros = this.estudiantes.length;
+                    const activarEfectos = totalMiembros > 5;
+
+                    // Inicializamos el carrusel con los datos reales
+                    $carousel.owlCarousel({
+                        autoplay: activarEfectos,
+                        smartSpeed: 1000,
+                        center: false,
+                        dots: false,
+                        loop: activarEfectos,
+                        margin: 25,
+                        nav: activarEfectos,
+                        navText: [
+                            '<i class="fas fa-arrow-left"></i>',
+                            '<i class="fas fa-arrow-right"></i>',
+                        ],
+                        responsiveClass: true,
+                        responsive: {
+                            0: { items: 1 },
+                            768: { items: 2 },
+                            992: { items: 2 },
+                            1200: { items: 3 },
+                        },
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error cargando el equipo:", error);
+            }
+        },
+        async getProyectos() {
+            try {
+                const response = await API.get(`${this.baseUrl}/getProyectosVinculacionInfo`);
+                this.proyectos = response.data.data;
+                console.log(this.proyectos);
+                this.$nextTick(() => {
+                    const $carousel = $(".testimonial-carousel");
+
+                    // Destruimos la instancia previa por si el mixin la inicializó vacía
+                    if ($carousel.hasClass('owl-loaded')) {
+                        $carousel.trigger('destroy.owl.carousel');
+                        $carousel.removeClass('owl-hidden');
+                        $carousel.find('.owl-stage-outer').children().unwrap();
+                    }
+                    const totalMiembros = this.proyectos.length;
+                    const activarEfectos = totalMiembros > 5;
+
+                    // Inicializamos el carrusel con los datos reales
+                    $carousel.owlCarousel({
+                        autoplay: activarEfectos,
+                        smartSpeed: 1000,
+                        center: true,
+                        dots: false,
+                        loop: activarEfectos,
+                        margin: 25,
+                        nav: activarEfectos,
+                        navText: [
+                            '<i class="far fa-hand-point-left"></i>',
+                            '<i class="far fa-hand-point-right"></i>',
+                        ],
+                        responsiveClass: true,
+                        responsive: {
+                            0: { items: 1 },
+                            768: { items: 2 },
+                            992: { items: 2 },
+                            1200: { items: 3 },
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("Error cargando el equipo:", error);
+            }
+        },
+
         closePdfModal() {
             const modalEl = this.$refs.pdfModal;
             const modal = bootstrap.Modal.getInstance(modalEl);

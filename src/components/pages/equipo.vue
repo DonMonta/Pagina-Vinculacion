@@ -68,6 +68,7 @@
                 <h5 class="section-title px-3">Nuestro</h5>
                 <h1 class="mb-0">Equipo de Trabajo y Estructura Orgánica y Funcional</h1>
             </div>
+
             <div class="packages-carousel owl-carousel">
                 <div class="packages-item" v-for="(miembro, index) in equipo" :key="index">
                     <div class="packages-img">
@@ -118,14 +119,14 @@
     <div class="container-fluid event py-5">
         <div class="container py-5">
             <div class="text-center mx-auto mb-5" style="max-width: 800px;">
-                <h5 class="text-uppercase text-primary">Responsables de­­­­ Vinculación de las Facultades</h5>
+                <h5 class="text-uppercase text-primary">Responsables de­­­­ Vinculación de las Facultades y SEDE</h5>
                 <p class="mb-4">Es el o la Profesora Titular que
                     será designado(a) por el Vicerrector(a) de Investigación, Vinculación y Posgrado de una
                     terna enviada por la o el Decano(a) de la Facultad respectiva; tendrá como responsabilidad
                     la planificación, ejecución, seguimiento y control de las actividades de Vinculación con la
                     Sociedad que..... <a class="text-secondary" @click="openPdfModal(20)">Leer Más</a>
                 </p>
-                <h1 class="mb-0">Conoce a los Responsables de­­­­ Vinculación de las Facultades de la UTLVTE</h1>
+                <h1 class="mb-0">Conoce a los Responsables de­­­­ Vinculación de las Facultades y SEDE de la UTLVTE</h1>
             </div>
             <div class="event-carousel owl-carousel">
                 <div class="event-item" v-for="(respons, index) in responsables" :key="index">
@@ -168,27 +169,57 @@
             </p>
             <h1 class="mb-0">Conoce a los Directores de Carreras de la UTLVTE</h1>
         </div>
-
-        <div class="container-fluid event py-5 ">
+        <div v-if="loadingDirCarrera" class="d-flex flex-column align-items-center justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem;">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <h5 class="text-muted mt-3 animate__animated animate__fadeIn animate__infinite">Obteniendo información
+                del personal...</h5>
+        </div>
+        <div class="container-fluid event py-5" v-else>
 
             <div class="row gy-4">
 
-                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100"
+                <div class="col-lg-6 col-md-12" data-aos="fade-up" :data-aos-delay="100 * (index + 1)"
                     v-for="(direc, index) in directoresCarrera.slice(0, 4)" :key="index">
-                    <div class="team-member d-flex align-items-start">
-                        <div class="pic">
+
+                    <div
+                        class="team-member-card d-flex align-items-center bg-white rounded-4 shadow-sm h-100 overflow-hidden position-relative">
+
+                        <div class="pic-container position-relative h-100 flex-shrink-0">
                             <img :src="getPhotoUrl3(direc.cedula_director) || require('@/assets/img/img/logovincusinfondo.png')"
-                                @error="onImageError" class="img-fluid" alt="">
+                                @error="onImageError" class="img-cover w-100 h-100" alt="Foto Director">
+
+                            <div class="overlay d-flex align-items-center justify-content-center">
+                                <i class="fas fa-user-tie text-white fs-3"></i>
+                            </div>
                         </div>
-                        <div class="member-info">
-                            <h4>{{ direc.director_procesado }}</h4>
-                            <span v-if="direc.facultad.siglas === 'SC'">SEDE LA CONCORDIA</span>
-                            <span v-else>{{ direc.facultad.siglas }}</span>
-                            <p v-if="direc.facultad.siglas === 'SC'">{{ direc.nombre_carrera }}</p>
-                            <p v-else>Director(a) de la Carrera de {{ direc.nombre_carrera }}</p>
+
+                        <div class="member-info p-4 d-flex flex-column justify-content-center w-100">
+                            <h4 class="mb-3 text-dark fw-bold text-truncate" style="max-width: 100%;">
+                                {{ direc.director_procesado }}
+                            </h4>
+
+                            <div class="mb-3">
+                                <span class="badge bg-primary text-white px-3 py-2 rounded-pill shadow-sm"
+                                    v-if="direc.facultad.siglas === 'SC'">
+                                    <i class="fas fa-map-marker-alt me-1"></i> SEDE LA CONCORDIA
+                                </span>
+                                <span class="badge bg-secondary text-white px-3 py-2 rounded-pill shadow-sm" v-else>
+                                    <i class="fas fa-building me-1"></i> {{ direc.facultad.siglas }}
+                                </span>
+                            </div>
+
+                            <p class="text-muted mb-0 fw-medium" v-if="direc.facultad.siglas === 'SC'">
+                                <i class="fas fa-graduation-cap me-2 text-primary"></i> Carrera: {{ direc.nombre_carrera }}
+                            </p>
+                            <p class="text-muted mb-0 fw-medium" v-else>
+                                <i class="fas fa-graduation-cap me-2 text-primary"></i> {{ direc.cargo_genero }} de la carrera de {{
+                                    direc.nombre_carrera }}
+                            </p>
                         </div>
                     </div>
-                </div><!-- End Team Member -->
+                </div>
 
             </div>
             <div class="col-12 py-5">
@@ -567,61 +598,80 @@
     <!-- Modal 12 -->
     <div class="modal fade" id="funcionesModal12" tabindex="-1" aria-labelledby="funcionesModal12Label"
         aria-hidden="true">
-        <div class="modal-dialog custom-modal modal-lg modal-dialog-centered">
+        <div class="modal-dialog custom-modal modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionesModal12Label">
-                        Directores de Carreras de la UTLVTE
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-primary fw-bold" id="funcionesModal12Label">
+                        <i class="fas fa-users-cog me-2"></i> Directores de Carreras de la UTLVTE
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="modal-body">
-                    <section id="doctors" class="doctors section container-fluid event py-5">
-                        <div class="container section-title text-center" data-aos="fade-up">
-                            <h5 class="text-uppercase text-primary">Directores de Carreras</h5>
-                            <p class="mb-4">Tendrá como compromiso el seguimiento a las
-                                actividades de Vinculación con la Sociedad que se realicen desde la Carrera que dirige.
-                                El o
-                                la directora(a) de Carrera elaborará un informe semestral de las actividades de
-                                Vinculación
-                                con la Sociedad que se desarrollen en la carrera, el cual lo entregará al responsable de
-                                Vinculación de la Facultad, con copia al director(a) de Vinculación con la Sociedad de
-                                la
-                                UTLVTE.
-                            </p>
-                            <h1 class="mb-0">Estos son todos los Directores de las {{ directoresCarrera.length }}
-                                Carreras de la UTLVTE</h1>
-                        </div>
-                        <div class="container-fluid event py-5 ">
+                <div class="modal-body p-4 bg-light">
+                    <div class="text-center mb-5">
+                        <h5 class="text-uppercase text-primary">Directores de Carreras</h5>
+                        <p class="text-muted mx-auto" style="max-width: 900px;">
+                            Tendrá como compromiso el seguimiento a las
+                            actividades de Vinculación con la Sociedad que se realicen desde la Carrera que dirige.
+                            El o
+                            la directora(a) de Carrera elaborará un informe semestral de las actividades de
+                            Vinculación
+                            con la Sociedad que se desarrollen en la carrera, el cual lo entregará al responsable de
+                            Vinculación de la Facultad, con copia al director(a) de Vinculación con la Sociedad de
+                            la
+                            UTLVTE.
+                        </p>
+                        <h3 class="mb-0 text-dark">
+                            Estos son los Directores de las <span class="text-primary">{{ directoresCarrera.length
+                                }}</span> Carreras
+                        </h3>
+                    </div>
+                    <div class="row gy-4">
+                        <div class="col-lg-6 col-md-12" data-aos="zoom-in" :data-aos-delay="50 * index"
+                            v-for="(direc, index) in directoresCarrera" :key="index">
 
-                            <div class="row gy-4">
+                            <div
+                                class="team-member-card modal-card d-flex align-items-stretch bg-white rounded-4 shadow-sm h-100 overflow-hidden border-0">
 
-                                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100"
-                                    v-for="(direc, index) in directoresCarrera" :key="index">
-                                    <div class="team-member d-flex align-items-start">
-                                        <div class="pic"><img
-                                                :src="getPhotoUrl3(direc.cedula_director) || require('@/assets/img/img/logovincusinfondo.png')"
-                                                @error="onImageError" class="img-fluid" alt="">
-                                        </div>
-                                        <div class="member-info">
-                                            <h4>{{ direc.director_procesado }}</h4>
-                                            <span v-if="direc.facultad.siglas === 'SC'">SEDE LA CONCORDIA</span>
-                                            <span v-else>{{ direc.facultad.siglas }}</span>
-                                            <p v-if="direc.facultad.siglas === 'SC'">{{ direc.nombre_carrera }}</p>
-                                            <p v-else>Director(a) de la Carrera de {{ direc.nombre_carrera }}</p>
-
-                                        </div>
+                                <div class="pic-container position-relative flex-shrink-0">
+                                    <img :src="getPhotoUrl3(direc.cedula_director) || require('@/assets/img/img/logovincusinfondo.png')"
+                                        @error="onImageError" class="img-cover w-100 h-100" alt="Foto Director">
+                                    <div class="overlay d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-id-badge text-white fs-4"></i>
                                     </div>
                                 </div>
+
+                                <div class="member-info p-3 d-flex flex-column justify-content-center w-100">
+                                    <h5 class="mb-2 text-dark fw-bold" style="line-height: 1.3;">
+                                        {{ direc.director_procesado }}
+                                    </h5>
+
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary text-white px-2 py-1 rounded-pill shadow-sm"
+                                            v-if="direc.facultad.siglas === 'SC'">
+                                            <i class="fas fa-map-marker-alt me-1"></i> SEDE LA CONCORDIA
+                                        </span>
+                                        <span class="badge bg-secondary text-white px-2 py-1 rounded-pill shadow-sm"
+                                            v-else>
+                                            <i class="fas fa-building me-1"></i> {{ direc.facultad.siglas }}
+                                        </span>
+                                    </div>
+
+                                    <p class="text-muted mb-0 small fw-medium" v-if="direc.facultad.siglas === 'SC'">
+                                        <i class="fas fa-graduation-cap me-1 text-primary"></i> Carrera: {{ direc.nombre_carrera
+                                        }}
+                                    </p>
+                                    <p class="text-muted mb-0 small fw-medium" v-else>
+                                        <i class="fas fa-graduation-cap me-1 text-primary"></i> {{ direc.cargo_genero }} de la carrera de {{
+                                            direc.nombre_carrera }}
+                                    </p>
+                                </div>
                             </div>
-
-
                         </div>
-                    </section>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">
-                        Cerrar
+                <div class="modal-footer border-0 justify-content-center bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-5" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i> Cerrar Ventana
                     </button>
                 </div>
             </div>
@@ -655,6 +705,7 @@ export default {
                 funciones: []
             },
             responsables: [],
+            loadingResponsables: true,
             responsableSeleccionado: {
                 ci: '',
                 nombre_completo: '',
@@ -664,6 +715,7 @@ export default {
                 facultad: [],
             },
             directoresCarrera: [],
+            loadingDirCarrera: true,
         }
     },
     computed: {
@@ -672,10 +724,12 @@ export default {
         }
     },
     async mounted() {
-        await this.getDirector();
-        await this.getTeamInfo();
-        await this.getResponsablesInfo();
-        await this.getDirectoresCarrera();
+        await Promise.all([
+            this.getDirector(),
+            this.getTeamInfo(),
+            this.getResponsablesInfo(),
+            this.getDirectoresCarrera()
+        ]);
     },
     methods: {
         getPhotoUrl(ci) {
@@ -684,7 +738,7 @@ export default {
 
             const baseURL2 = API.defaults.baseURL;
             // Usamos el timestamp para evitar problemas de caché al cambiar de integrante
-            return `${baseURL2}/vin/getFotoSinfondo/${ci}?t=${new Date().getTime()}`;
+            return `${baseURL2}/vin/getFotoSinfondo/${ci}`;
         },
         getPhotoUrl2(ci) {
             // Si no hay CI, retornamos una imagen vacía o un placeholder
@@ -692,14 +746,14 @@ export default {
 
             const baseURL2 = API.defaults.baseURL;
             // Usamos el timestamp para evitar problemas de caché al cambiar de integrante
-            return `${baseURL2}/vin/getFotoDocente/${ci}?t=${new Date().getTime()}`;
+            return `${baseURL2}/vin/getFotoDocente/${ci}`;
         },
         getPhotoUrl3(ci) {
             // Si no hay CI, retornamos una imagen vacía o un placeholder
             if (!ci || ci === 'NO ENCONTRADO') return '';
 
             const baseURL2 = API.defaults.baseURL;
-            return `${baseURL2}/vin/getFotoDocente3/${ci}?t=${new Date().getTime()}`;
+            return `${baseURL2}/vin/getFotoDocente3/${ci}`;
         },
         onImageError(event) {
             // Reemplazamos la imagen rota por tu logo por defecto dinámicamente
@@ -866,15 +920,18 @@ export default {
 
             } catch (error) {
                 console.error("Error cargando el equipo:", error);
-            }
+            } 
         },
         async getDirectoresCarrera() {
+            this.loadingDirCarrera = true;
             try {
                 const response = await API.get(`${this.baseUrl}/getDirectoresCarreras`);
                 this.directoresCarrera = response.data.data;
 
             } catch (error) {
                 console.error("Error cargando el equipo:", error);
+            } finally {
+                this.loadingDirCarrera = false; // <-- APAGA el Spinner pase lo que pase
             }
         },
         verFunciones(miembro) {
@@ -907,5 +964,63 @@ export default {
     max-width: 1200px;
     /* o el valor que prefieras */
     width: 100%;
+}
+
+/* Contenedor principal de la tarjeta */
+.team-member-card {
+    transition: all 0.3s ease-in-out;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    cursor: default;
+    /* O 'pointer' si planeas hacer que la tarjeta sea clicable a futuro */
+}
+
+/* Efecto de elevación de la tarjeta al pasar el cursor */
+.team-member-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Restricción de tamaño para la imagen lateral */
+.pic-container {
+    width: 140px;
+    min-width: 140px;
+    overflow: hidden;
+}
+
+/* Ajuste de la imagen para que llene el contenedor sin deformarse */
+.img-cover {
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.5s ease;
+}
+
+/* Zoom suave a la fotografía al pasar el cursor por la tarjeta */
+.team-member-card:hover .img-cover {
+    transform: scale(1.15);
+}
+
+/* Capa transparente que aparece sobre la foto */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Utiliza el color primario de tu tema, o cambia este rgba */
+    background: rgba(13, 110, 253, 0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Revelar la capa oscura al hacer hover */
+.team-member-card:hover .overlay {
+    opacity: 1;
+}
+
+/* Asegurar que los textos largos no rompan el diseño */
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>
