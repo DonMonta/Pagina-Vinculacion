@@ -141,6 +141,47 @@ class InformacionPersonal_DController extends Controller
             return response()->json(['error' => 'Error al obtener la fotografía: '.$e->getMessage()], 500);
         }
     }
+    public function getFotografia3($ci)
+    {
+        try {
+            // 1. Obtener SÓLO la columna 'fotografia' para el CI específico
+            $persona = InformacionPersonald::where('CIInfPer', $ci)
+                ->select('fotografia')
+                ->first();
+
+            // 2. Verificar si el usuario existe y si tiene foto
+            if (! $persona || empty($persona->fotografia)) {
+                // Devolver una respuesta HTTP 404 o una foto predeterminada pequeña
+                return response()->json(['error' => 'Fotografía no encontrada.'], 404);
+            }
+
+            $fotoBinaria = $persona->fotografia;
+
+            // 3. Determinar el MIME type (es un paso crítico, asume que es JPEG/PNG si no tienes metadata)
+            // Opcional: Si almacenas el MIME type en la DB, úsalo aquí. Si no, usa finfo para detectarlo (esto es más seguro).
+            $mime = 'image/jpeg'; // MIME type por defecto
+
+            // Intenta determinar el MIME type si el ambiente lo permite y no satura
+            if (extension_loaded('fileinfo')) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $detectedMime = finfo_buffer($finfo, $fotoBinaria);
+                finfo_close($finfo);
+
+                if ($detectedMime && strpos($detectedMime, 'image') === 0) {
+                    $mime = $detectedMime;
+                }
+            }
+
+            // 4. Devolver la imagen como una respuesta binaria (STREAM)
+            // Esto evita convertir el BLOB entero a Base64 en el servidor, lo que previene la saturación de memoria.
+            return Response::make($fotoBinaria, 200)
+                ->header('Content-Type', $mime)
+                ->header('Content-Disposition', 'inline; filename="foto_'.$ci.'"');
+        } catch (\Exception $e) {
+            // Manejo de errores
+            return response()->json(['error' => 'Error al obtener la fotografía: '.$e->getMessage()], 500);
+        }
+    }
 
     public function getSinfondoFotografia($ci)
     {

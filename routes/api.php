@@ -43,13 +43,28 @@ use App\Http\Controllers\Invi_responsableController;
 */
 
 Route::prefix('vin')->group(function () {
-    Route::get('getFotoDocente/{ci}', [InformacionPersonal_DController::class, 'getFotografia'])->middleware('throttle:10000,1');
-    Route::get('getFotoSinfondo/{ci}', [InformacionPersonal_DController::class, 'getSinfondoFotografia'])->middleware('throttle:10000,1');
-    Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFotografia'])->middleware('throttle:10000,1');
-    Route::get('getFotoEmpresa/{ci}', [PraempresaController::class, 'getFotografia'])->middleware('throttle:10000,1');
+    Route::get('getFotoDocente/{ci}', [InformacionPersonal_DController::class, 'getFotografia']);
+    Route::get('getFotoDocente3/{ci}', [InformacionPersonal_DController::class, 'getFotografia3']);
+    Route::get('getFotoSinfondo/{ci}', [InformacionPersonal_DController::class, 'getSinfondoFotografia']);
+    Route::get('getFoto/{ci}', [InformacionPersonalController::class, 'getFotografia']);
+    Route::get('getFotoEmpresa/{ci}', [PraempresaController::class, 'getFotografia']);
     Route::get('getEquipoVinculacion', [Invi_equipo_departController::class, 'getEquipoVinculacion']);
     Route::get('getDirectorInfo', [Invi_equipo_departController::class, 'getDirectorInfo']);
     Route::get('getTeamInfo', [Invi_equipo_departController::class, 'getTeamInfo']);
+    //Definición de endpoint para obtener información de los responsables de Vinculación
+    Route::get('getResponsablesInfo', [Invi_responsableController::class, 'getResponsablesInfo']);
+    //Definición de enndpoint para obtener a los directores de carreras
+    Route::get('getDirectoresCarreras', [DirectorCarrerasController::class, 'getCarrerasDirectores']);
+    //Definición de endpoint para obtener a los directores de proyectos vinculacion
+    Route::get('getDirectoresProyectosVinculacion', [Invi_proyectosController::class, 'getDirectoresProyectosVinculacion']);
+    //Definición de endpoint para obtener a los subdirectores de proyectos de vinculación
+    Route::get('getSubdirectoresProyectosVinculacion', [Invi_proyectosController::class, 'getSubDireProyectosVinculacion']);
+    //Definición de endpoint para obtener a los docentes de proyectos de vinculación
+    Route::get('getDocentesProyectosVinculacion', [Invi_proyectosController::class, 'getDocentesProyectosVinculacion']);
+    //Definición de endpoint para obtener a los estudiantes de proyectos de vinculación
+    Route::get('getEstudiantesProyectosVinculacion', [Invi_proyectosController::class, 'getEstProyectosVinculacion']);
+    //Definición de endpoint para obtener a los proyectos de vinculación
+    Route::get('getProyectosVinculacionInfo', [Invi_proyectosController::class, 'getProyectosVinculacionInfo']);
 
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:api,estudiante')->group(function () {
@@ -217,6 +232,7 @@ Route::prefix('vin')->group(function () {
         Route::post('subir_archivo_responsable', [Invi_responsableController::class, 'uploadArchivo']);
         //Definición de endpoint para obtener las facultades de Vinculación
         Route::get('getFacultadesVinculacion', [Invi_responsableController::class, 'getFacultadesVinculacion']);
+        
         
     });
 }); 
