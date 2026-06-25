@@ -9,7 +9,7 @@
                 Investigación, Vinculación y Posgrado, Nuevos
                 Horizontes, Esmeraldas, Ecuador</a>
               <a href="#" class="me-4 text-light"><i class="fas fa-phone-alt text-white me-1"></i>+01234567890</a>
-              <a href="#" class="text-light"><i class="fas fa-envelope text-white me-2"></i>Example@gmail.com</a>
+              <a href="#" class="text-light"><i class="fas fa-envelope text-white me-2"></i>vinculacion@utelvt.edu.ec</a>
             </div>
           </div>
           <div class="col-lg-2">
@@ -30,11 +30,10 @@
         <a href="index.html" class="navbar-brand">
           <img src="@/assets/img/img/log2.gif" class="img-fluid" height="350px" width="350px" alt="UTELVT" />
         </a>
-        <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-          data-bs-target="#navbarCollapse">
+        <button class="navbar-toggler py-2 px-3" type="button" @click.stop="toggleMenu">
           <span class="fa fa-bars text-primary"></span>
         </button>
-        <div class="collapse navbar-collapse py-3" id="navbarCollapse">
+        <div class="collapse navbar-collapse py-3" :class="{ 'show': isMenuOpen }" id="navbarCollapse">
           <div class="navbar-nav mx-auto border-top">
             <router-link :to="{ path: '/'}" class="nav-item nav-link inicio" :class="{ active: activeNav === 'inicio' }"
             @click.native="setActive('inicio')">Inicio</router-link>
@@ -56,6 +55,7 @@
             </div>
             <a href="contacto.html" class="nav-item nav-link contacto">Contacto</a>
           </div>
+            <!-- Carousel End 
           <div class="d-flex align-items-center flex-nowrap pt-xl-0">
             <button class="theme-switcher gray-circle-btn" type="button" title="Switch theme">
               <span class="sr-only">Switch theme</span>
@@ -86,7 +86,7 @@
               </button>
 
             </div>
-          </div>
+          </div>-->
         </div>
       </nav>
     </div>
@@ -165,8 +165,8 @@
               <img src="@/assets/img/img/logovincusinfondo.png" class="img-fluid" height="350px" width="350px" alt="UTELVT" />
               <div class="position-relative mx-auto rounded-pill">
                 <input class="form-control rounded-pill border-1 w-100 py-3 ps-4 pe-5" type="text" placeholder="-">
-                <router-link :to="{path:'/login'}" type="button"
-                  class="btn btn-primary btn-primary-outline-0 rounded-pill position-absolute top-0 end-0 py-2 mt-2 me-2">Inicia Sesión</router-link>
+                <a href="http://vinculacionconlasociedad.utelvt.edu.ec/site/site-login" target="_blank" type="button"
+                  class="btn btn-primary btn-primary-outline-0 rounded-pill position-absolute top-0 end-0 py-2 mt-2 me-2">Inicia Sesión</a>
               </div>
             </div>
           </div>
@@ -206,7 +206,7 @@
               <a href=""><i class="fas fa-angle-right me-2"></i> Instagram</a>
               <a href=""><i class="fas fa-angle-right me-2"></i> Twitter</a>
               <h4 class="my-4 text-black">Contacto </h4>
-              <p class="mb-0"><i class="fas fa-envelope text-secondary me-2"></i> info@example.com</p>
+              <p class="mb-0"><i class="fas fa-envelope text-secondary me-2"></i> vinculacion@utelvt.edu.ec</p>
               <p class="mb-0"><i class="fas fa-phone text-secondary me-2"></i> (+012) 3456 7890 123</p>
             </div>
           </div>
@@ -270,10 +270,37 @@ import feather from 'feather-icons';
 export default {
   data() {
     return {
-      activeNav: "" // Almacena el enlace actualmente activo
+      activeNav: "", // Almacena el enlace actualmente activo
+      isMenuOpen: false
     };
   },
+  watch: {
+    // Escuchamos el objeto $route de Vue Router
+    $route: {
+      immediate: true, // Esto hace que se ejecute también al recargar la página
+      handler(to) {
+        // Asignamos el valor de activeNav dependiendo de la ruta actual
+        if (to.path === '/') {
+          this.activeNav = 'inicio';
+        } else if (to.path.includes('/noticias')) {
+          this.activeNav = 'noticias';
+        } else if (to.path.includes('/equipo')) {
+          this.activeNav = 'equipo';
+        } else if (to.path.includes('/normativas')) {
+          this.activeNav = 'normativas';
+        } else if (to.path.includes('/proyectosnuevos')) {
+          this.activeNav = '2025'; // O 'proyectos', según tu lógica
+        } else {
+          this.activeNav = '';
+        }
+      }
+    }
+  },
   methods: {
+    toggleMenu() {
+      // 2. Método para alternar el estado del menú
+      this.isMenuOpen = !this.isMenuOpen;
+    },
     setActive(item) {
       // Si se hace clic en el mismo activo, se desactiva
       if (this.activeNav === item) {
@@ -286,6 +313,9 @@ export default {
   mixins: [script2],
   mounted() {
     feather.replace();
+    document.addEventListener('click', () => {
+      this.isMenuOpen = false;
+    });
   }
 }
 </script>

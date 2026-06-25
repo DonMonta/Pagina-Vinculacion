@@ -208,11 +208,13 @@
 
                         <div class="team-social d-flex justify-content-center gap-2">
                             <button class="btn btn-light btn-light-outline-0 rounded-circle"
-                                @click="abrirModal('Descripción del Rol: '+miembro.rol , miembro.detalle)" title="Ver Descripción">
+                                @click="abrirModal('Descripción del Rol: ' + miembro.rol, miembro.detalle)"
+                                title="Ver Descripción">
                                 <i class="fas fa-info-circle"></i>
                             </button>
                             <button class="btn btn-light btn-light-outline-0 rounded-circle"
-                                @click="abrirModal('Funciones del Rol: '+miembro.rol, miembro.funciones)" title="Ver Funciones">
+                                @click="abrirModal('Funciones del Rol: ' + miembro.rol, miembro.funciones)"
+                                title="Ver Funciones">
                                 <i class="fas fa-briefcase"></i>
                             </button>
                         </div>
@@ -220,9 +222,10 @@
                 </div>
 
                 <div class="d-flex align-items-center justify-content-center mt-5">
-                    <a class="btn btn-light btn-light-outline-0 rounded-pill py-3 px-5 me-4 leer" href="#">
+                    <router-link :to="{ path: '/equipo' }"
+                        class="btn btn-light btn-light-outline-0 rounded-pill py-3 px-5 me-4 leer">
                         Ver más Información sobre nuestro Equipo
-                    </a>
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -249,7 +252,7 @@
                                 <i class="fas fa-envelope fa-2x text-primary me-4"></i>
                                 <div>
                                     <h4>E-mail</h4>
-                                    <p class="mb-0">info@example.com</p>
+                                    <p class="mb-0">vinculacion@utelvt.edu.ec</p>
                                 </div>
                             </div>
                         </div>
