@@ -11,8 +11,8 @@
                                     d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z" />
                             </svg>
                         </button>
-                        <input type="text" placeholder="Ingresa el nombre del pei a buscar..." v-model="searchQuery"
-                            @input="debouncedFilter"
+                        <input type="text" placeholder="Ingresa el código del proyecto a buscar..."
+                            v-model="searchQuery" @input="debouncedFilter"
                             class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 xl:w-[430px]" />
                     </div>
                 </form>
@@ -74,17 +74,29 @@
                             </div>
                         </td>
                         <td class="py-3 px-4 text-right">
-                            <button @click="abrirDetallesProyecto(post.proyect_id)"
-                                class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                title="Ver Detalles">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </button>
+                            <div class="flex justify-end gap-2">
+                                <button @click="abrirEdicion(post.proyect_id)"
+                                    class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                                    title="Editar Proyecto">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
+                                </button>
+                                <button @click="abrirDetallesProyecto(post.proyect_id)"
+                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Ver Detalles">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </td>
+
                     </tr>
                 </tbody>
             </table>
@@ -183,7 +195,8 @@
                                 <div v-if="modoNuevo || (formInt.reemplazado == 1)"
                                     class="mb-6 flex gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-blue-100 shadow-sm">
                                     <div class="flex-1">
-                                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Buscar por
+                                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Buscar
+                                            por
                                             Cédula</label>
                                         <input type="text" v-model="cedulaBusqueda" placeholder="Ej: 08xxxxxxx"
                                             class="w-full border rounded-lg p-2 text-sm focus:ring-2 ring-blue-200 outline-none">
@@ -221,7 +234,8 @@
                                         <label class="block text-[10px] font-bold mb-1">Carrera</label>
                                         <select v-model="formInt.idCarr"
                                             class="w-full border rounded-lg p-2 text-sm bg-white dark:bg-gray-800 max-w-full overflow-hidden truncate">
-                                            <option v-for="c in carreras" :key="c.idCarr" :value="c.idCarr">{{ c.NombCarr }}
+                                            <option v-for="c in carreras" :key="c.idCarr" :value="c.idCarr">{{
+                                                c.NombCarr }}
                                             </option>
                                         </select>
                                     </div>
@@ -232,9 +246,10 @@
                                             class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
                                             :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
                                             <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                <svg v-if="!archivoPreviewName" class="w-8 h-8 mb-3 text-gray-400" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <svg v-if="!archivoPreviewName" class="w-8 h-8 mb-3 text-gray-400"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
                                                         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                                 </svg>
                                                 <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor"
@@ -245,12 +260,15 @@
                                                 </svg>
 
                                                 <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                                                    <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para
+                                                    <span class="font-semibold" v-if="!archivoPreviewName">Haga clic
+                                                        para
                                                         cargar</span>
-                                                    <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName
+                                                    <span class="font-semibold text-brand-600" v-else>{{
+                                                        archivoPreviewName
                                                     }}</span>
                                                 </p>
-                                                <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
+                                                <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx.
+                                                    10MB)</p>
                                             </div>
 
                                             <input type="file" ref="fileFoto" class="hidden" accept="application/pdf"
@@ -280,26 +298,29 @@
                                         <div v-if="continuarEnProyecto"
                                             class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-xl bg-gray-50 animate-fadeIn">
                                             <div>
-                                                <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
+                                                <label
+                                                    class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
                                                     Función para el integrante saliente</label>
                                                 <select v-model="formInt.id_funcion_reemplazado"
                                                     @change="calcularHorasReemplazo"
                                                     class="w-full border rounded-lg p-2 text-sm bg-white">
                                                     <option :value="null">Seleccione nueva función</option>
-                                                    <option v-for="f in funcionesFiltradasSinDireccion" :key="f.id_funcion"
-                                                        :value="f.id_funcion">
+                                                    <option v-for="f in funcionesFiltradasSinDireccion"
+                                                        :key="f.id_funcion" :value="f.id_funcion">
                                                         {{ f.nombre_funcion }}
                                                     </option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nuevas
+                                                <label
+                                                    class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nuevas
                                                     Horas</label>
                                                 <input type="number" v-model="formInt.horas_reemplazado" disabled
                                                     class="w-full border rounded-lg p-2 text-sm">
                                             </div>
                                             <div class="md:col-span-2">
-                                                <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
+                                                <label
+                                                    class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
                                                     Carrera (Opcional)</label>
                                                 <select v-model="formInt.idCarr_reemplazado"
                                                     class="w-full border rounded-lg p-2 text-sm bg-white">
@@ -559,6 +580,475 @@
                 </div>
             </div>
         </div>
+        <div v-if="showEditModal"
+            class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 z-[99999] transition-all duration-300">
+            <div
+                class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col border border-gray-100 dark:border-gray-800 transform scale-100 transition-transform duration-300">
+
+                <div
+                    class="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-850">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <svg class="text-brand-500" width="22" height="22" fill="none" stroke="currentColor"
+                                stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                            Gestión y Edición del Proyecto
+                        </h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Modifica la información estructural del proyecto y su
+                            alineación
+                            estratégica.</p>
+                    </div>
+                    <button @click="cerrarEdicion"
+                        class="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div
+                    class="flex border-b border-gray-100 dark:border-gray-800 px-6 pt-3 bg-gray-50/50 dark:bg-gray-900 gap-2">
+                    <button @click="activeTab = 'generales'"
+                        :class="activeTab === 'generales'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">1</span>
+                        Datos Generales
+                    </button>
+                </div>
+
+                <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-gray-900">
+                    <div v-if="cargandoEdicion" class="flex flex-col justify-center items-center py-20 gap-3">
+                        <span
+                            class="animate-spin h-10 w-10 border-4 border-brand-500 border-t-transparent rounded-full"></span>
+                        <p class="text-sm text-gray-500 font-medium">Sincronizando información del PEI...</p>
+                    </div>
+
+                    <div v-else-if="activeTab === 'generales'" class="space-y-6 progress-fade">
+
+                        <div
+                            class="bg-gray-50/60 dark:bg-gray-800/30 p-4 rounded-xl border border-gray-100 dark:border-gray-800/60">
+                            <div class="flex items-start gap-2.5 mb-4">
+                                <span class="p-1 rounded-md bg-blue-50 text-blue-600 mt-0.5">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M11.25 11.25l.041-.02a.75.75 0 111.063 1.06l-.042.02a.75.75 0 01-1.063-1.06zm0 0a8.25 8.25 0 11-16.5 0 8.25 8.25 0 0116.5 0zM12 7h.008v.008H12V7z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Identificación
+                                        del
+                                        Proyecto</h4>
+                                    <p class="text-xs text-gray-500">Asegúrate de que los títulos coincidan
+                                        rigurosamente con la
+                                        documentación oficial aprobada.</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                                <div class="group flex flex-col">
+                                    <label
+                                        class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 transition-colors group-focus-within:text-brand-600">
+                                        Nombre del Proyecto (ES)
+                                    </label>
+                                    <textarea v-model="editForm.proyect_nombre" @input="yaTraducido = false" rows="4"
+                                        class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 p-3 text-sm text-gray-800 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all duration-200 outline-none resize-none"
+                                        placeholder="Escribe el nombre del proyecto..."></textarea>
+                                    <p class="mt-2 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
+                                        <span class="font-semibold text-gray-600 dark:text-gray-300">Guía:</span> Se
+                                        refiere a
+                                        un término más informal o distintivo que se utiliza para identificar el proyecto
+                                        de
+                                        manera única. Puede ser más creativo y no necesariamente describir el contenido
+                                        del
+                                        proyecto de manera detallada.
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-col">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">
+                                        Nombre del Proyecto (EN)
+                                    </label>
+                                    <textarea v-model="editForm.proyect_nombre_en" rows="4"
+                                        class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/50 p-3 text-sm text-gray-700 dark:text-gray-300 shadow-inner focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all duration-200 outline-none resize-none"
+                                        placeholder="Traducción automática o manual..."></textarea>
+                                    <p class="mt-2 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
+                                        <span class="font-semibold text-gray-600 dark:text-gray-300">Guía:</span>
+                                        Traducción al
+                                        inglés del nombre del proyecto. Debe mantener el tono distintivo e informal del
+                                        original.
+                                    </p>
+                                </div>
+
+                                <div class="group flex flex-col">
+                                    <label
+                                        class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 transition-colors group-focus-within:text-brand-600">
+                                        Título del proyecto (ES)
+                                    </label>
+                                    <textarea v-model="editForm.proyect_titulo" @input="yaTraducido = false" rows="3"
+                                        class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 p-3 text-sm text-gray-800 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all duration-200 outline-none resize-none"
+                                        placeholder="Escribe el Título del proyecto ..."></textarea>
+                                    <p class="mt-2 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
+                                        <span class="font-semibold text-gray-600 dark:text-gray-300">Guía:</span> Es una
+                                        frase
+                                        corta y descriptiva que resume el propósito o enfoque central del proyecto. El
+                                        título
+                                        proporciona una visión general y a menudo incluye palabras clave que destacan la
+                                        naturaleza y el alcance del proyecto.
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-col">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">
+                                        Título del proyecto (EN)
+                                    </label>
+                                    <textarea v-model="editForm.proyect_titulo_en" rows="3"
+                                        class="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/50 p-3 text-sm text-gray-700 dark:text-gray-300 shadow-inner focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all duration-200 outline-none resize-none"
+                                        placeholder="Traducción automática o manual..."></textarea>
+                                    <p class="mt-2 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
+                                        <span class="font-semibold text-gray-600 dark:text-gray-300">Guía:</span>
+                                        Traducción al
+                                        inglés del título técnico. Debe conservar las palabras clave y la descripción
+                                        precisa
+                                        del alcance establecidas en la versión en español.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/40 p-3.5 rounded-xl">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="text-amber-600 dark:text-amber-400 shrink-0">
+                                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                    <p class="text-xs text-amber-800 dark:text-amber-300 font-medium">
+                                        <span class="font-bold">Nota de Calidad:</span> Para garantizar la precisión
+                                        técnica,
+                                        verifique el resultado traducido antes de guardar los cambios finales.
+                                    </p>
+                                </div>
+                                <button @click="traducirTextos"
+                                    :disabled="yaTraducido || (!editForm.proyect_nombre && !editForm.proyect_titulo)"
+                                    :class="yaTraducido
+                                        ? 'bg-emerald-100 text-emerald-700 border border-emerald-200 cursor-not-allowed opacity-80'
+                                        : 'bg-gray-900 dark:bg-gray-800 text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:scale-95 shadow-md shadow-gray-900/10'"
+                                    class="text-xs px-4 py-2.5 font-semibold rounded-lg transition-all duration-200 flex items-center gap-2 shrink-0 w-full sm:w-auto justify-center">
+                                    <span v-if="yaTraducido"
+                                        class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    {{ yaTraducido ? '✓ Textos Traducidos' : 'Auto-Traducir Textos' }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-purple-50 text-purple-600 mt-0.5 dark:bg-purple-950/40 dark:text-purple-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Objetivos del
+                                        Plan
+                                        Estratégico Institucional</h4>
+                                    <p class="text-xs text-gray-500">Vincule los objetivos operativos de este proyecto
+                                        con las
+                                        metas globales del PEI vigente. Por defecto queda seleccionado el objetivo que
+                                        lleva
+                                        relación con la vinculción con la sociedad</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-gray-950">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                                    <thead class="bg-gray-50 dark:bg-gray-900/80">
+                                        <tr>
+                                            <th
+                                                class="px-5 py-3 text-left w-14 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                                Sel.</th>
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/4">
+                                                Subsistema</th>
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Detalle del Objetivo Estratégico</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                                        <tr v-for="obj in objetivosPeiDisponibles" :key="obj.id_obj_pei" :class="editForm.objetivos.includes(obj.id_obj_pei)
+                                            ? 'bg-brand-50/40 dark:bg-brand-950/20 transition-colors'
+                                            : 'hover:bg-gray-50/70 dark:hover:bg-gray-800/30 transition-colors'"
+                                            class="cursor-pointer" @click="toggleObjetivo(obj.id_obj_pei)">
+                                            <td class="px-5 py-4 text-center" @click.stop>
+                                                <input type="checkbox" :value="obj.id_obj_pei"
+                                                    v-model="editForm.objetivos"
+                                                    class="w-4 h-4 text-brand-600 rounded border-gray-300 dark:border-gray-700 focus:ring-brand-500/30 transition-all duration-150">
+                                            </td>
+                                            <td class="px-5 py-4 text-xs font-bold text-gray-700 dark:text-gray-300">
+                                                <span
+                                                    :class="obj.subsistemas_pei?.nombre_subsistema.toLowerCase().includes('vinculación') ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'"
+                                                    class="px-2.5 py-1 rounded-md tracking-wide">
+                                                    {{ obj.subsistemas_pei ? obj.subsistemas_pei.nombre_subsistema :
+                                                        'N/A' }}
+                                                </span>
+                                            </td>
+                                            <td
+                                                class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                                                <span
+                                                    class="font-mono text-xs text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50 px-1.5 py-0.5 rounded mr-1.5 font-bold">{{
+                                                        obj.cod_obj }}</span>
+                                                {{ obj.detalle_obj }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div v-if="editForm.objetivos.length === 0"
+                                class="flex items-center gap-2 text-red-500 dark:text-red-400 text-xs font-semibold p-1 animate-pulse">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Restricción: Es obligatorio seleccionar como mínimo un objetivo estratégico
+                                institucional.
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-emerald-50 text-emerald-600 mt-0.5 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Políticas del
+                                        Plan de Desarrollo para el Nuevo Ecuador (PLANDE)</h4>
+                                    <p class="text-xs text-gray-500">Vincule las políticas del PLANDE habilitado
+                                        vigentes que
+                                        dan soporte normativo y estratégico a las actividades del proyecto.</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-gray-950">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                                    <thead class="bg-gray-50 dark:bg-gray-900/80">
+                                        <tr>
+                                            <th
+                                                class="px-5 py-3 text-left w-14 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                                Sel.</th>
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/4">
+                                                Código Política</th>
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Detalle de la Política de Desarrollo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                                        <tr v-for="pol in politicasPlandeDisponibles" :key="pol.id_pol_pladne"
+                                            :class="editForm.politicas.includes(pol.id_pol_pladne) ? 'bg-brand-50/40 dark:bg-brand-950/20 transition-colors' : 'hover:bg-gray-50/70 dark:hover:bg-gray-800/30 transition-colors'"
+                                            class="cursor-pointer" @click="togglePolitica(pol.id_pol_pladne)">
+
+                                            <td class="px-5 py-4 text-center" @click.stop>
+                                                <input type="checkbox" :value="pol.id_pol_pladne"
+                                                    v-model="editForm.politicas"
+                                                    class="w-4 h-4 text-brand-600 rounded border-gray-300 dark:border-gray-700 focus:ring-brand-500/30 transition-all duration-150">
+                                            </td>
+                                            <td class="px-5 py-4 text-xs font-bold text-gray-700 dark:text-gray-300">
+                                                <span
+                                                    class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2.5 py-1 rounded-md tracking-wide font-mono">
+                                                    {{ pol.cod_pol }}
+                                                </span>
+                                            </td>
+                                            <td
+                                                class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                                                {{ pol.detalle_pol }}
+                                            </td>
+                                        </tr>
+                                        <tr v-if="politicasPlandeDisponibles.length === 0">
+                                            <td colspan="3" class="px-5 py-8 text-center text-sm text-gray-400">
+                                                No hay políticas disponibles para el PLANDE activo.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-emerald-50 text-emerald-600 mt-0.5 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3.6 9h16.8M3.6 15h16.8M12 3a16.5 16.5 0 00-4 18M12 3a16.5 16.5 0 014 18" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                        Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para
+                                        América Latina
+                                        y el Caribe
+                                    </h4>
+                                    <p class="text-xs text-gray-500">
+                                        Vincule los objetivos de la Agenda ODS que estén relacionados con su proyecto.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-gray-950">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                                    <thead class="bg-gray-50 dark:bg-gray-900/80">
+                                        <tr>
+                                            <th
+                                                class="px-5 py-3 text-left w-14 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                                Sel.</th>
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/4">
+                                                Código ODS</th>
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Detalle del ODS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                                        <tr v-for="ods in objetivosODSDisponibles" :key="ods.id_ods"
+                                            :class="editForm.ods.includes(ods.id_ods) ? 'bg-brand-50/40 dark:bg-brand-950/20 transition-colors' : 'hover:bg-gray-50/70 dark:hover:bg-gray-800/30 transition-colors'"
+                                            class="cursor-pointer" @click="toggleODS(ods.id_ods)">
+                                            <td class="px-5 py-4 text-center" @click.stop>
+                                                <input type="checkbox" :value="ods.id_ods" v-model="editForm.ods"
+                                                    class="w-4 h-4 text-brand-600 rounded border-gray-300 dark:border-gray-700 focus:ring-brand-500/30 transition-all duration-150">
+                                            </td>
+                                            <td class="px-5 py-4 text-xs font-bold text-gray-700 dark:text-gray-300">
+                                                <span
+                                                    class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2.5 py-1 rounded-md tracking-wide font-mono">
+                                                    {{ ods.cod_ods }}
+                                                </span>
+                                            </td>
+                                            <td
+                                                class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                                                {{ ods.detalle_ods }}
+                                            </td>
+                                        </tr>
+                                        <tr v-if="objetivosODSDisponibles.length === 0">
+                                            <td colspan="3" class="px-5 py-8 text-center text-sm text-gray-400">
+                                                No hay ODS disponibles para la Agenda ODS.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-blue-50 text-blue-600 mt-0.5 dark:bg-blue-950/40 dark:text-blue-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Objetivos del Plan de Desarrollo para el Nuevo Ecuador (PLANDE)</h4>
+                                    <p class="text-xs text-gray-500">Objetivos que corresponden a las políticas que ha
+                                        seleccionado previamente.</p>
+                                </div>
+                            </div>
+
+                            <div v-if="!editForm.politicas || editForm.politicas.length === 0"
+                                class="p-4 border border-blue-100 bg-blue-50/50 dark:border-blue-950/50 dark:bg-blue-950/20 rounded-xl flex items-center gap-3">
+                                <svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor"
+                                    stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p class="text-xs text-blue-700 dark:text-blue-400">
+                                    Debe seleccionar al menos una **Política del PlanDNE** en la sección anterior para
+                                    que
+                                    aparezcan sus objetivos correspondientes de forma automática.
+                                </p>
+                            </div>
+
+                            <div v-else
+                                class="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-gray-950">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                                    <thead class="bg-gray-50 dark:bg-gray-900/80">
+                                        <tr>
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/4">
+                                                Código Objetivo</th>
+                                            <th
+                                                class="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Detalle del Objetivo de la Política</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                                        <tr v-for="objPol in objetivosPoliticasDisponibles"
+                                            :key="objPol.id_obj_pol_pladne" class="bg-brand-50/10 dark:bg-brand-950/5">
+                                            <td class="px-5 py-4 text-xs font-bold text-gray-700 dark:text-gray-300">
+                                                <span
+                                                    class="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 px-2.5 py-1 rounded-md tracking-wide font-mono">
+                                                    {{ objPol.cod_obj_pol }}
+                                                </span>
+                                            </td>
+                                            <td
+                                                class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                                                {{ objPol.detalle_obj_pol }}
+                                            </td>
+                                        </tr>
+                                        <tr v-if="objetivosPoliticasDisponibles.length === 0">
+                                            <td colspan="2" class="px-5 py-8 text-center text-sm text-gray-400">
+                                                Las políticas seleccionadas no tienen objetivos registrados.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="p-5 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 bg-gray-50/50 dark:bg-gray-900/50">
+                    <button @click="cerrarEdicion"
+                        class="px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-750 active:scale-95 transition-all duration-150">
+                        Cancelar
+                    </button>
+                    <button @click="guardarEdicion" :disabled="guardando || editForm.objetivos.length === 0"
+                        class="px-6 py-2.5 text-sm font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 shadow-md shadow-brand-500/10 transition-all duration-150 flex items-center gap-2">
+                        <span v-if="guardando"
+                            class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                        {{ guardando ? 'Almacenando...' : 'Finalizar y Guardar Cambios' }}
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -632,8 +1122,36 @@ export default {
             archivoBajaName: '',
             cargandoBaja: false,
             enviando: false,
+            // Variables para el modal de edición de proyecto
+            showEditModal: false,
+            activeTab: 'generales',
+            cargandoEdicion: false,
+            guardando: false,
+            yaTraducido: false,
+            objetivosPeiDisponibles: [],
+            politicasPlandeDisponibles: [],
+            objetivosPoliticasDisponibles: [],
+            objetivosODSDisponibles: [],
+            proyectoEditandoId: null,
+            editForm: {
+                proyect_nombre: '',
+                proyect_titulo: '',
+                proyect_nombre_en: '',
+                proyect_titulo_en: '',
+                objetivos: [],
+                politicas: [],
+                ods: []
+            }
 
         };
+    },
+    watch: {
+        'editForm.politicas': {
+            handler(nuevosIdsSeleccionados) {
+                this.actualizarObjetivosPoliticas(nuevosIdsSeleccionados);
+            },
+            deep: true // deep: true asegura que detecte si se agregan/quitan elementos del array
+        }
     },
     created() {
         // Ahora sí puedes usar this.filterAndFetch
@@ -1059,6 +1577,148 @@ export default {
             } finally {
                 this.cargando = false;
             }
+        },
+        actualizarObjetivosPoliticas(politicasSeleccionadasIds) {
+            // Si el array está vacío o no existe, limpiamos los objetivos
+            if (!politicasSeleccionadasIds || politicasSeleccionadasIds.length === 0) {
+                this.objetivosPoliticasDisponibles = [];
+                return;
+            }
+
+            // Usamos un Map para evitar duplicados en caso de que 
+            // dos políticas apunten al mismo objetivo
+            const objetivosUnicos = new Map();
+
+            // Recorremos las políticas que cargamos desde el backend
+            this.politicasPlandeDisponibles.forEach(politica => {
+                // Si el ID de esta política está dentro de los seleccionados en el form...
+                if (politicasSeleccionadasIds.includes(politica.id_pol_pladne)) {
+                    // Y si la política trae su objeto de relación (objetivos_plandne)
+                    if (politica.objetivos_plandne) {
+                        const objetivo = politica.objetivos_plandne;
+                        // Lo agregamos al Map usando su ID como llave
+                        if (!objetivosUnicos.has(objetivo.id_obj_pol_pladne)) {
+                            objetivosUnicos.set(objetivo.id_obj_pol_pladne, objetivo);
+                        }
+                    }
+                }
+            });
+
+            // Finalmente, convertimos los valores únicos del Map a un Array
+            this.objetivosPoliticasDisponibles = Array.from(objetivosUnicos.values());
+        },
+        async abrirEdicion(id) {
+            this.proyectoEditandoId = id;
+            this.showEditModal = true;
+            this.cargandoEdicion = true;
+            this.activeTab = 'generales';
+            this.yaTraducido = false;
+
+            try {
+                // Asegúrate de crear esta ruta en tus routes/api.php de Laravel
+                const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
+                const data = response.data;
+
+                this.objetivosPeiDisponibles = data.objetivos_pei;
+                this.politicasPlandeDisponibles = data.politicas_plandne || [];
+                this.objetivosPoliticasDisponibles = data.objetivos_politicas_seleccionadas || [];
+                this.objetivosODSDisponibles = data.ods || [];
+
+                this.editForm = {
+                    proyect_nombre: data.proyecto.proyect_nombre || '',
+                    proyect_titulo: data.proyecto.proyect_titulo || '',
+                    proyect_nombre_en: data.proyecto.proyect_nombre_en || '',
+                    proyect_titulo_en: data.proyecto.proyect_titulo_en || '',
+                    objetivos: data.seleccionados || [],
+                    politicas: data.politicas_seleccionadas || [],
+                    ods: data.ods_seleccionadas || []
+                };
+            } catch (error) {
+                mostraralertas2('Error al cargar datos del proyecto', 'error');
+                this.cerrarEdicion();
+            } finally {
+                this.cargandoEdicion = false;
+            }
+        },
+        togglePolitica(id_pol) {
+            const index = this.editForm.politicas.indexOf(id_pol);
+            if (index > -1) {
+                this.editForm.politicas.splice(index, 1); // Deseleccionar
+            } else {
+                this.editForm.politicas.push(id_pol); // Seleccionar
+            }
+        },
+        toggleODS(id_ods) {
+            const index = this.editForm.ods.indexOf(id_ods);
+            if (index > -1) {
+                this.editForm.ods.splice(index, 1); // Deseleccionar
+            } else {
+                this.editForm.ods.push(id_ods); // Seleccionar
+            }
+        },
+        async traducirTextos() {
+            if (!this.editForm.proyect_nombre && !this.editForm.proyect_titulo) {
+                mostraralertas2('No hay textos para traducir', 'warning');
+                return;
+            }
+
+            mostraralertas2('Traduciendo textos...', 'info');
+
+            try {
+                // Traducción del Nombre del Proyecto
+                if (this.editForm.proyect_nombre) {
+                    const urlNombre = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=en&dt=t&q=${encodeURIComponent(this.editForm.proyect_nombre)}`;
+                    const resNombre = await fetch(urlNombre);
+                    const dataNombre = await resNombre.json();
+                    // Google retorna fragmentos en un array anidado. Los unimos por seguridad.
+                    this.editForm.proyect_nombre_en = dataNombre[0].map(item => item[0]).join('');
+                }
+
+                // Traducción del Título del Proyecto
+                if (this.editForm.proyect_titulo) {
+                    const urlTitulo = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=en&dt=t&q=${encodeURIComponent(this.editForm.proyect_titulo)}`;
+                    const resTitulo = await fetch(urlTitulo);
+                    const dataTitulo = await resTitulo.json();
+                    this.editForm.proyect_titulo_en = dataTitulo[0].map(item => item[0]).join('');
+                }
+                this.yaTraducido = true;
+                mostraralertas2('Traducción completada con éxito', 'success');
+            } catch (error) {
+                console.error("Error en traducción:", error);
+                mostraralertas2('Error al conectar con el servicio de traducción', 'error');
+            }
+        },
+
+        async guardarEdicion() {
+            if (this.editForm.objetivos.length === 0) return;
+
+            this.guardando = true;
+            try {
+                // Asegúrate de crear esta ruta (PUT/POST) en tus routes/api.php de Laravel
+                await API.put(`${this.baseUrl}/invi_proyectos/${this.proyectoEditandoId}`, this.editForm);
+
+                mostraralertas2('Proyecto actualizado correctamente', 'success');
+                this.cerrarEdicion();
+                this.actualizar(); // Refresca tu tabla principal
+            } catch (error) {
+                mostraralertas2('Error al guardar los cambios', 'error');
+            } finally {
+                this.guardando = false;
+            }
+        },
+        cerrarEdicion() {
+            this.showEditModal = false;
+            this.proyectoEditandoId = null;
+            this.yaTraducido = false;
+            this.editForm = {
+                proyect_nombre: '',
+                proyect_titulo: '',
+                nombre_en: '',
+                titulo_en: '',
+                objetivos: [],
+                politicas: [],
+                ods: []
+            };
         },
 
         filterAndFetch() {
