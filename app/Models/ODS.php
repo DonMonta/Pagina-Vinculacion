@@ -22,5 +22,9 @@ class ODS extends Model
     {
         return $this->belongsTo(Agenda_ODS::class, 'id_ag_ods');
     }
+    public function invi_detalle_ods_proyect()
+    {
+        return $this->hasMany(Invi_detalle_ods_proyect::class, 'id_ods');
+    }
 
 }

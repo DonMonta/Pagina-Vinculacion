@@ -17,6 +17,8 @@ class Invi_proyectos extends Model
         'proyect_cod',
         'proyect_nombre',
         'proyect_titulo',
+        'proyect_nombre_en',
+        'proyect_titulo_en',
         'fechainicio',
         'fechafin',
         'proyect_tipo',
@@ -28,6 +30,18 @@ class Invi_proyectos extends Model
     public function invi_detalle_fac_proy()
     {
         return $this->hasMany(Invi_detalle_fac_proy::class, 'proyect_id');
+    }
+    public function invi_detalle_obj_pro_pei()
+    {
+        return $this->hasMany(Invi_detalle_obj_pei::class, 'proyect_id');
+    }
+    public function invi_detalle_obj_pol_proyect()
+    {
+        return $this->hasMany(Invi_detalle_obj_pol_proyect::class, 'proyect_id');
+    }
+    public function invi_detalle_ods_proyect()
+    {
+        return $this->hasMany(Invi_detalle_ods_proyect::class, 'proyect_id');
     }
 
 

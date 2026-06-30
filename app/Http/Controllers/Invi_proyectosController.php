@@ -9,6 +9,16 @@ use App\Models\InformacionPersonalD;
 use App\Models\Invi_deta_inte;
 use App\Models\Invi_funcion;
 use App\Models\Invi_proyectos;
+use App\Models\Objetivos_pei;
+use App\Models\Pei;
+use App\Models\Subsistemas_pei;
+use App\Models\Invi_detalle_obj_pei;
+use App\Models\Plandne;
+use App\Models\Politicas_plandne;
+use App\Models\Invi_detalle_obj_pol_proyect;
+use App\Models\Agenda_ODS;
+use App\Models\ODS;
+use App\Models\Invi_detalle_ods_proyect;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -131,6 +141,88 @@ class Invi_proyectosController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+    /**
+     * Obtiene los datos para llenar el modal de edición.
+     */
+    public function getEdicionDatos(int $id)
+    {
+        $proyecto = Invi_proyectos::with('invi_detalle_obj_pro_pei', 'invi_detalle_obj_pol_proyect', 'invi_detalle_ods_proyect')->findOrFail($id);
+
+        // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
+        $peiActivo = Pei::where('estado_pei', 1)->first();
+
+        $objetivos = [];
+        $preseleccionados = [];
+
+        if ($peiActivo) {
+            // 2. Obtener los objetivos de este PEI con su subsistema
+            $objetivos = Objetivos_pei::with('subsistemas_pei')
+                ->whereHas('subsistemas_pei', function ($query) use ($peiActivo) {
+                    $query->where('id_pei', $peiActivo->id_pei);
+                })->get();
+
+            // 3. Buscar el objetivo de Vinculación para preseleccionarlo por defecto
+            foreach ($objetivos as $obj) {
+                $nombreSubsistema = strtolower($obj->subsistemas_pei->nombre_subsistema ?? '');
+
+                // Extraemos los que el proyecto YA tiene asignados
+                $asignadosIds = $proyecto->invi_detalle_obj_pro_pei->pluck('id_obj_pei')->toArray();
+
+                // Si el proyecto ya tiene objetivos, usamos esos. 
+                // Si está vacío, preseleccionamos el de vinculación.
+                if (empty($asignadosIds)) {
+                    if (str_contains($nombreSubsistema, 'vinculación') || str_contains($nombreSubsistema, 'vinculacion')) {
+                        $preseleccionados[] = $obj->id_obj_pei;
+                    }
+                } else {
+                    $preseleccionados = $asignadosIds;
+                }
+            }
+        }
+
+        $plandneActivo = Plandne::where('estado_plandne', 1)->first();
+        $politicas = [];
+        $politicasSeleccionadas = $proyecto->invi_detalle_obj_pol_proyect->pluck('id_pol_pladne')->toArray();
+        $objetivosPoliticasSeleccionadas = [];
+
+        if ($plandneActivo) {
+            // Obtenemos todas las políticas incluyendo su relación 'objetivos_plandne'
+            $politicas = Politicas_plandne::with('objetivos_plandne')
+                ->whereHas('objetivos_plandne', function ($query) use ($plandneActivo) {
+                    $query->where('id_pladne', $plandneActivo->id_pladne);
+                })->get();
+
+            // FILTRADO NUEVO: Si ya hay políticas seleccionadas en el proyecto, obtenemos sus objetivos únicos
+            if (!empty($politicasSeleccionadas)) {
+                $objetivosPoliticasSeleccionadas = Politicas_plandne::with('objetivos_plandne')
+                    ->whereIn('id_pol_pladne', $politicasSeleccionadas)
+                    ->get()
+                    ->pluck('objetivos_plandne')
+                    ->unique('id_obj_pol_pladne')
+                    ->values();
+            }
+        }
+        $agenda_odsactiva = Agenda_ODS::where('estado_ag_ods', 1)->first();
+        $ods = [];
+        $odsSeleccionadas = $proyecto->invi_detalle_ods_proyect->pluck('id_ods')->toArray();
+        if ($agenda_odsactiva) {
+            // Obtenemos todas las políticas cuyo objetivo pertenezca a la Agenda ODS activo
+            $ods = ODS::whereHas('agenda_ods', function ($query) use ($agenda_odsactiva) {
+                $query->where('id_ag_ods', $agenda_odsactiva->id_ag_ods);
+            })->get();
+        }
+
+        return response()->json([
+            'proyecto' => $proyecto,
+            'objetivos_pei' => $objetivos,
+            'seleccionados' => $preseleccionados,
+            'politicas_plandne' => $politicas,
+            'politicas_seleccionadas' => $politicasSeleccionadas,
+            'objetivos_politicas_seleccionadas' => $objetivosPoliticasSeleccionadas,
+            'ods' => $ods,
+            'ods_seleccionadas' => $odsSeleccionadas
+        ]);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -207,30 +299,56 @@ class Invi_proyectosController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = Invi_proyectos::find($id);
-        if (isset($res)) {
-            $res->proyect_cod = $request->proyect_cod;
-            $res->proyect_nombre = $request->proyect_nombre;
-            $res->proyect_titulo = $request->proyect_titulo;
-            $res->fechainicio = $request->fechainicio;
-            $res->fechafin = $request->fechafin;
-            $res->proyect_tipo = $request->proyect_tipo;
-            if ($res->save()) {
-                return response()->json([
-                    'data' => $res,
-                    'mensaje' => 'Actualizado con Éxito!!',
-                ]);
-            } else {
-                return response()->json([
-                    'error' => true,
-                    'mensaje' => 'Error al Actualizar',
-                ]);
+        DB::beginTransaction();
+        try {
+            $proyecto = Invi_proyectos::findOrFail($id);
+            $proyecto->proyect_nombre = $request->proyect_nombre;
+            $proyecto->proyect_titulo = $request->proyect_titulo;
+
+            // NOTA: Si agregas los campos en BD, los guardas así:
+            $proyecto->proyect_nombre_en = $request->proyect_nombre_en;
+            $proyecto->proyect_titulo_en = $request->proyect_titulo_en;
+
+            $proyecto->save();
+
+            // Actualizar la tabla detalle de objetivos
+            Invi_detalle_obj_pei::where('proyect_id', $id)->delete();
+
+            if ($request->has('objetivos') && is_array($request->objetivos)) {
+                foreach ($request->objetivos as $id_obj) {
+                    // OJO: Tu modelo tiene public $incrementing = false. 
+                    // Si la BD no tiene auto-increment en 'id_det_obj_pro_pei', 
+                    // deberás generar el ID manualmente aquí.
+                    Invi_detalle_obj_pei::insert([
+                        'proyect_id' => $id,
+                        'id_obj_pei' => $id_obj
+                    ]);
+                }
             }
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El proyecto con id: $id no Existe",
-            ]);
+            Invi_detalle_obj_pol_proyect::where('proyect_id', $id)->delete();
+            if ($request->has('politicas') && is_array($request->politicas)) {
+                foreach ($request->politicas as $id_pol) {
+                    Invi_detalle_obj_pol_proyect::insert([
+                        'proyect_id'   => $id,
+                        'id_pol_pladne' => $id_pol
+                    ]);
+                }
+            }
+            Invi_detalle_ods_proyect::where('proyect_id', $id)->delete();
+            if ($request->has('ods') && is_array($request->ods)) {
+                foreach ($request->ods as $id_ods) {
+                    Invi_detalle_ods_proyect::insert([
+                        'proyect_id'   => $id,
+                        'id_ods' => $id_ods
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Proyecto actualizado correctamente.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al actualizar: ' . $e->getMessage()], 500);
         }
     }
 
@@ -1095,7 +1213,7 @@ class Invi_proyectosController extends Controller
                     $nombresCompletos = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, "UTF-8");
                 }
 
-                 // 4. Obtener y formatear el Nombre de la Carrera
+                // 4. Obtener y formatear el Nombre de la Carrera
                 $nombreCarrera = 'No asignada';
                 if ($integrante->carreras) {
                     $nombreCarreraRaw = trim($integrante->carreras->NombCarr);
@@ -1148,8 +1266,8 @@ class Invi_proyectosController extends Controller
             $proyectos = Invi_proyectos::with([
                 'invi_detalle_fac_proy.facultades_priori.linea_investigacion.sub_linea_investigacion.carreras'
             ])
-            ->where('proyect_tipo', 'VINCULACION')
-            ->get();
+                ->where('proyect_tipo', 'VINCULACION')
+                ->get();
 
             $hoy = Carbon::now();
             $resultado = [];
@@ -1181,13 +1299,13 @@ class Invi_proyectosController extends Controller
                         $estadoProyecto = 'Vigente';
                         $mesesRestantes = $hoy->diffInMonths($fin);
                         $diasRestantes = $hoy->copy()->addMonths($mesesRestantes)->diffInDays($fin);
-                        
+
                         $textoRestante = [];
                         if ($mesesRestantes > 0) $textoRestante[] = "{$mesesRestantes} meses";
                         if ($diasRestantes > 0) $textoRestante[] = "{$diasRestantes} días";
-                        
-                        $tiempoRestanteTexto = !empty($textoRestante) 
-                            ? implode(' y ', $textoRestante) . ' restantes' 
+
+                        $tiempoRestanteTexto = !empty($textoRestante)
+                            ? implode(' y ', $textoRestante) . ' restantes'
                             : 'Finaliza hoy';
                     }
                 }
@@ -1199,24 +1317,23 @@ class Invi_proyectosController extends Controller
                 // Verificamos que tenga detalles y extraemos la facultad prioritaria (principal)
                 if ($proyecto->invi_detalle_fac_proy->isNotEmpty()) {
                     $detallePriori = $proyecto->invi_detalle_fac_proy->firstWhere('id_facultad_priori', '!=', null);
-                    
+
                     if ($detallePriori && $detallePriori->facultades_priori) {
                         $facultad = $detallePriori->facultades_priori;
                         $facultadPrincipal = $facultad->facultad . ' (' . $facultad->siglas . ')';
 
                         // Mapeamos las líneas de investigación de esa facultad
                         foreach ($facultad->linea_investigacion as $linea) {
-                            
+
                             // Mapeamos las sublíneas correspondientes a esta línea
-                            $sublineas = $linea->sub_linea_investigacion->map(function($sublinea) {
+                            $sublineas = $linea->sub_linea_investigacion->map(function ($sublinea) {
                                 $nombreCarreraLimpio = 'No asignada';
-                                
+
                                 if ($sublinea->carreras) {
                                     $nombreRaw = trim($sublinea->carreras->NombCarr);
                                     // Utilizamos preg_replace para eliminar un guion seguido de espacios opcionales y números al final
                                     // Ej: "Quimica -2020" o "Quimica - 2020" -> "Quimica"
                                     $nombreCarreraLimpio = trim(preg_replace('/-\s*\d+.*$/', '', $nombreRaw));
-                                    
                                 }
                                 return [
                                     'nombre_sublinea' => $sublinea->nombre_sublin,
@@ -1247,7 +1364,7 @@ class Invi_proyectosController extends Controller
                         'duracion_total'  => $duracionTotalTexto,
                         'tiempo_restante' => $tiempoRestanteTexto
                     ],
-                    'facultad_principal'=> $facultadPrincipal ?? 'No definida',
+                    'facultad_principal' => $facultadPrincipal ?? 'No definida',
                     'lineas_investigacion' => $lineasInvestigacion
                 ];
             }
@@ -1257,7 +1374,6 @@ class Invi_proyectosController extends Controller
                 'total'   => count($resultado),
                 'data'    => $resultado
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

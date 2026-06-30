@@ -101,6 +101,8 @@ Route::prefix('vin')->group(function () {
         Route::get('politicas_por_plandne/{id_pladne}', [Politicas_plandneController::class, 'listarPorPlandne']);
         //Definición de ruta endpoint para el recurso Invi_proyectos, perimitiendo operaciones CRUD
         Route::apiResource("invi_proyectos", Invi_proyectosController::class);
+        //Definición de endpoint para obtener datos para el modal de edición de proyectos
+        Route::get('getEdicionDatos/{id}', [Invi_proyectosController::class, 'getEdicionDatos']);
         //definción de ruta para el catalogo de integrantes
         Route::get('catalogos-integrantes', [Invi_proyectosController::class, 'catalogos']);
         Route::put('actualizar-integrante/{id}', [Invi_proyectosController::class, 'actualizarIntegrante']);

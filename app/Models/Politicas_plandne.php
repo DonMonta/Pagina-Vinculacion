@@ -22,5 +22,10 @@ class Politicas_plandne extends Model
     {
         return $this->belongsTo(Obj_pol_plandne::class , 'id_obj_pol_pladne');
     }
+    public function invi_detalle_obj_pol_proyect()
+    {
+        return $this->hasMany(Invi_detalle_obj_pol_proyect::class, 'id_pol_pladne');
+    }
+
 
 }
