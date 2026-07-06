@@ -19,9 +19,11 @@ class Invi_proyectos extends Model
         'proyect_titulo',
         'proyect_nombre_en',
         'proyect_titulo_en',
+        'proyect_multidis',
         'fechainicio',
         'fechafin',
         'proyect_tipo',
+        'id_convocatoria'
     ];
     public function invi_detalle_integrante()
     {
@@ -42,6 +44,18 @@ class Invi_proyectos extends Model
     public function invi_detalle_ods_proyect()
     {
         return $this->hasMany(Invi_detalle_ods_proyect::class, 'proyect_id');
+    }
+    public function invi_detalle_carr_proy()
+    {
+        return $this->hasMany(Invi_detalle_carr_proy::class, 'proyect_id');
+    }
+    public function invi_detalle_dom_hum()
+    {
+        return $this->hasMany(Invi_detalle_dom_hum::class, 'proyect_id');
+    }
+    public function invi_convocatoria()
+    {
+        return $this->hasOne(Invi_convocatoria::class, 'id_convocatoria');
     }
 
 

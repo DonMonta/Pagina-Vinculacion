@@ -78,6 +78,14 @@ class Carreras extends Model
     {
         return $this->hasMany(Invi_sub_linea_inves::class, 'idCarr');
     }
+    public function carreras_proyectos()
+    {
+        return $this->hasMany(Invi_detalle_carr_proy::class, 'id_carr');
+    }
+    public function carreras_priori_proyectos()
+    {
+        return $this->hasMany(Invi_detalle_carr_proy::class, 'id_carr_priori');
+    }
 
    
 }

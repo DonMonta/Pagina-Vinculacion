@@ -29,6 +29,7 @@ use App\Http\Controllers\PeriodoLectivoController;
 use App\Http\Controllers\Invi_equipo_departController;
 use App\Http\Controllers\Invi_equipo_rolesController;
 use App\Http\Controllers\Invi_responsableController;
+use App\Http\Controllers\Invi_convocatoriaController;
 
 
 /*
@@ -217,6 +218,7 @@ Route::prefix('vin')->group(function () {
         Route::delete('inhabilitar_equipo_depart/{id}', [Invi_equipo_departController::class, 'destroy']);
         //Definición de endpint para obtener a un docente por su cédula
         Route::get('getDocente/{cedula}', [InformacionPersonal_DController::class, 'getDocente']);
+        Route::get('getalldoce/{cedula}', [InformacionPersonal_DController::class, 'getAllDocente']);
         //Definición de endpoint para obtener los roles vinculacion
         Route::get('getRolesVinculacion', [Invi_equipo_departController::class, 'getRolesVinculacion']);
         /**
@@ -234,6 +236,23 @@ Route::prefix('vin')->group(function () {
         Route::post('subir_archivo_responsable', [Invi_responsableController::class, 'uploadArchivo']);
         //Definición de endpoint para obtener las facultades de Vinculación
         Route::get('getFacultadesVinculacion', [Invi_responsableController::class, 'getFacultadesVinculacion']);
+        Route::get('getCarrerasFacultad/{idfacultad}', [DirectorCarrerasController::class, 'ObtCarrerasFacultad']);
+        /**
+         * --------------------------------------------------------------------------
+         * Rutas de Gestión de Convocatorias (Invi_convocatoriaController)
+         * --------------------------------------------------------------------------
+         * Define los puntos de acceso (endpoints) para el ciclo de vida del recurso.
+         * Incluye operaciones CRUD estandarizadas, gestión de estados (activación/desactivación)
+         * y carga de archivos adjuntos al servidor.
+         */
+        // Registra de forma automática los endpoints CRUD para la API (index, store, show, update, destroy)
+        Route::apiResource("invi_convocatoria", Invi_convocatoriaController::class);
+        //Definición de endpoint para habilitar una convocatoria
+        Route::delete('habilitar_convocatoria/{id}', [Invi_convocatoriaController::class, 'habilitar']);
+        //Definición de endpoint para inhabilitar una convocatoria
+        Route::delete('inhabilitar_convocatoria/{id}', [Invi_convocatoriaController::class, 'destroy']);
+        //Definición de endpoint para subir un archivo
+        Route::post('subir_archivo_convocatoria', [Invi_convocatoriaController::class, 'uploadArchivo']);
         
         
     });

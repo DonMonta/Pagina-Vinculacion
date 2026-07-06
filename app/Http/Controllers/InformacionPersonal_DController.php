@@ -85,6 +85,26 @@ class InformacionPersonal_DController extends Controller
             'mensaje' => 'Encontrado con Éxito!!',
         ]);
     }
+    public function getAllDocente(Request $request)
+    {
+        $cedula = $request->cedula;
+        $docente = InformacionPersonalD::select(
+            'informacionpersonal_d.CIInfPer',
+            'informacionpersonal_d.ApellInfPer',
+            'informacionpersonal_d.ApellMatInfPer',
+            'informacionpersonal_d.NombInfPer'
+        )
+            ->where('CIInfPer', $cedula)
+            ->first();
+        if (! $docente) {
+            return response()->json(['message' => 'Docente no encontrado en la base de datos institucional.'], 404);
+        }
+
+        return response()->json([
+            'data' => $docente,
+            'mensaje' => 'Encontrado con Éxito!!',
+        ]);
+    }
     // 1. Extraer la fotografia
 
     /**

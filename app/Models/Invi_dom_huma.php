@@ -16,6 +16,10 @@ class Invi_dom_huma extends Model
     protected $fillable = [
         'detalle_dom_huma'
     ];
+    public function invi_detalle_dom_hum()
+    {
+        return $this->hasMany(Invi_detalle_dom_hum::class, 'id_dom_hum');
+    }
     
 
 }

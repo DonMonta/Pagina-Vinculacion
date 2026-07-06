@@ -19,6 +19,11 @@ use App\Models\Invi_detalle_obj_pol_proyect;
 use App\Models\Agenda_ODS;
 use App\Models\ODS;
 use App\Models\Invi_detalle_ods_proyect;
+use App\Models\Facultad;
+use App\Models\Invi_detalle_fac_proy;
+use App\Models\Invi_detalle_carr_proy;
+use App\Models\Invi_detalle_dom_hum;
+use App\Models\Invi_dom_huma;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -146,7 +151,14 @@ class Invi_proyectosController extends Controller
      */
     public function getEdicionDatos(int $id)
     {
-        $proyecto = Invi_proyectos::with('invi_detalle_obj_pro_pei', 'invi_detalle_obj_pol_proyect', 'invi_detalle_ods_proyect')->findOrFail($id);
+        $proyecto = Invi_proyectos::with(
+            'invi_detalle_obj_pro_pei',
+            'invi_detalle_obj_pol_proyect',
+            'invi_detalle_ods_proyect',
+            'invi_detalle_fac_proy',
+            'invi_detalle_carr_proy',
+            'invi_detalle_dom_hum'
+        )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
         $peiActivo = Pei::where('estado_pei', 1)->first();
@@ -211,6 +223,29 @@ class Invi_proyectosController extends Controller
                 $query->where('id_ag_ods', $agenda_odsactiva->id_ag_ods);
             })->get();
         }
+        // NUEVO: Obtener catálogo total de facultades disponibles en el sistema (reutilizando tu lógica de filtros)
+        $sedes_atraer = ['1', '2'];
+        $facultadesCatalogo = Facultad::whereIn('idsede', $sedes_atraer)
+            ->where('idfacultad', '!=', '6')
+            ->whereNotNull('decano')
+            ->get();
+
+        // NUEVO: Extraer datos de facultades ya guardadas para este proyecto
+        $facultadesSeleccionadas = $proyecto->invi_detalle_fac_proy->pluck('idfacultad')->toArray();
+
+        // La facultad prioritaria se extrae del primer registro (o mapeado de la tabla pivote)
+        $facultadPrioritaria = $proyecto->invi_detalle_fac_proy->first()
+            ? $proyecto->invi_detalle_fac_proy->first()->id_facultad_priori
+            : null;
+        // NUEVO: Extraer datos de carreras ya guardadas para este proyecto
+        $carrerasSeleccionadas = $proyecto->invi_detalle_carr_proy->pluck('id_carr')->toArray();
+
+        $carreraPrioritaria = $proyecto->invi_detalle_carr_proy->first()
+            ? $proyecto->invi_detalle_carr_proy->first()->id_carr_priori
+            : null;
+        // NUEVO: Extraer catálogo total de dominios humanísticos y los seleccionados por el proyecto
+        $dominiosCatalogo = Invi_dom_huma::all();
+        $dominiosSeleccionados = $proyecto->invi_detalle_dom_hum->pluck('id_dom_hum')->toArray();
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -220,7 +255,14 @@ class Invi_proyectosController extends Controller
             'politicas_seleccionadas' => $politicasSeleccionadas,
             'objetivos_politicas_seleccionadas' => $objetivosPoliticasSeleccionadas,
             'ods' => $ods,
-            'ods_seleccionadas' => $odsSeleccionadas
+            'ods_seleccionadas' => $odsSeleccionadas,
+            'facultades_catalogo' => $facultadesCatalogo,
+            'facultades_seleccionadas' => $facultadesSeleccionadas,
+            'id_facultad_priori' => $facultadPrioritaria,
+            'carreras_seleccionadas' => $carrerasSeleccionadas,
+            'id_carr_priori' => $carreraPrioritaria,
+            'dominios_catalogo' => $dominiosCatalogo,
+            'dominios_seleccionados' => $dominiosSeleccionados
         ]);
     }
 
@@ -304,10 +346,10 @@ class Invi_proyectosController extends Controller
             $proyecto = Invi_proyectos::findOrFail($id);
             $proyecto->proyect_nombre = $request->proyect_nombre;
             $proyecto->proyect_titulo = $request->proyect_titulo;
-
-            // NOTA: Si agregas los campos en BD, los guardas así:
             $proyecto->proyect_nombre_en = $request->proyect_nombre_en;
             $proyecto->proyect_titulo_en = $request->proyect_titulo_en;
+            $proyecto->proyect_multidis = $request->proyect_multidis;
+
 
             $proyecto->save();
 
@@ -340,6 +382,68 @@ class Invi_proyectosController extends Controller
                     Invi_detalle_ods_proyect::insert([
                         'proyect_id'   => $id,
                         'id_ods' => $id_ods
+                    ]);
+                }
+            }
+            // NUEVO: --- Persistencia de Facultades (invi_detalle_fac_proy) ---
+            Invi_detalle_fac_proy::where('proyect_id', $id)->delete();
+
+            // Prioridad determinada por el cliente
+            $idFacultadPriori = $request->id_facultad_priori;
+
+            if ($request->proyect_multidis == 1) {
+                // Caso Multidisciplinario: Múltiples registros apuntando al mismo id_facultad_priori
+                if ($request->has('facultades') && is_array($request->facultades)) {
+                    foreach ($request->facultades as $id_fac) {
+                        Invi_detalle_fac_proy::insert([
+                            'proyect_id'         => $id,
+                            'idfacultad'         => $id_fac,
+                            'id_facultad_priori' => $idFacultadPriori
+                        ]);
+                    }
+                }
+            } else {
+                // Caso Disciplinar Estándar: Un único registro donde la facultad es a su vez la prioritaria
+                if ($idFacultadPriori) {
+                    Invi_detalle_fac_proy::insert([
+                        'proyect_id'         => $id,
+                        'idfacultad'         => $idFacultadPriori,
+                        'id_facultad_priori' => $idFacultadPriori
+                    ]);
+                }
+            }
+            // NUEVO: --- Persistencia de Carreras (invi_detalle_carr_proy) ---
+            Invi_detalle_carr_proy::where('proyect_id', $id)->delete();
+            $idCarrPriori = $request->id_carr_priori;
+
+            if ($request->proyect_multidis == 1) {
+                // Caso Multidisciplinario: Múltiples carreras apuntando al mismo id_carr_priori
+                if ($request->has('carreras') && is_array($request->carreras)) {
+                    foreach ($request->carreras as $id_carr) {
+                        // OJO: Si tu base de datos no tiene autoincrementable en id_det_carr, generarlo aquí manualmente.
+                        Invi_detalle_carr_proy::insert([
+                            'proyect_id'     => $id,
+                            'id_carr'        => $id_carr,
+                            'id_carr_priori' => $idCarrPriori
+                        ]);
+                    }
+                }
+            } else {
+                // Caso Disciplinar Estándar: Un único registro donde id_carr es a su vez la prioritaria
+                if ($idCarrPriori) {
+                    Invi_detalle_carr_proy::insert([
+                        'proyect_id'     => $id,
+                        'id_carr'        => $idCarrPriori,
+                        'id_carr_priori' => $idCarrPriori
+                    ]);
+                }
+            }
+            Invi_detalle_dom_hum::where('proyect_id', $id)->delete();
+            if ($request->has('dominios_humanisticos') && is_array($request->dominios_humanisticos)) {
+                foreach ($request->dominios_humanisticos as $id_dom) {
+                    Invi_detalle_dom_hum::insert([
+                        'proyect_id' => $id,
+                        'id_dom_hum' => $id_dom
                     ]);
                 }
             }
