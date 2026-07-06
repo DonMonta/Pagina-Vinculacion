@@ -975,7 +975,9 @@
                                     </svg>
                                 </span>
                                 <div>
-                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Objetivos del Plan de Desarrollo para el Nuevo Ecuador (PLANDE)</h4>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Objetivos del
+                                        Plan de
+                                        Desarrollo para el Nuevo Ecuador (PLANDE)</h4>
                                     <p class="text-xs text-gray-500">Objetivos que corresponden a las políticas que ha
                                         seleccionado previamente.</p>
                                 </div>
@@ -1029,6 +1031,465 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-indigo-50 text-indigo-600 mt-0.5 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Enfoque del
+                                        Proyecto</h4>
+                                    <p class="text-xs text-gray-500">Determine si la naturaleza de la investigación
+                                        requiere la
+                                        intervención de múltiples áreas del conocimiento.</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
+                                <label
+                                    class="block text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                                    ¿El proyecto es multidisciplinario?
+                                </label>
+
+                                <div class="flex flex-wrap gap-6">
+                                    <label
+                                        class="flex items-center gap-2 cursor-pointer group text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        <input type="radio" :value="1" v-model="editForm.proyect_multidis"
+                                            class="w-4 h-4 text-brand-600 border-gray-300 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-900 transition-all">
+                                        <span class="group-hover:text-brand-600 transition-colors">Sí, es
+                                            multidisciplinario</span>
+                                    </label>
+
+                                    <label
+                                        class="flex items-center gap-2 cursor-pointer group text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        <input type="radio" :value="0" v-model="editForm.proyect_multidis"
+                                            class="w-4 h-4 text-brand-600 border-gray-300 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-900 transition-all">
+                                        <span class="group-hover:text-brand-600 transition-colors">No, pertenece a una
+                                            sola
+                                            disciplina</span>
+                                    </label>
+                                </div>
+
+                                <div class="transition-all duration-300">
+                                    <div v-if="editForm.proyect_multidis === 1"
+                                        class="p-4 border border-emerald-100 bg-emerald-50/40 dark:border-emerald-950/40 dark:bg-emerald-950/10 rounded-xl space-y-2">
+                                        <div
+                                            class="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 font-semibold text-xs">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>Configuración multidisciplinaria activa</span>
+                                        </div>
+                                        <p class="text-xs text-emerald-700 dark:text-emerald-400/90 leading-relaxed">
+                                            Has seleccionado que **sí**. Eso significa que tu proyecto trabajará en
+                                            conjunto con
+                                            varias facultades y carreras.
+                                        </p>
+                                        <div
+                                            class="pt-1 text-[11px] text-gray-500 dark:text-gray-400 italic border-t border-emerald-200/40 dark:border-emerald-900/40">
+                                            **¿Qué implica?** Los proyectos multidisciplinarios integran metodologías,
+                                            marcos
+                                            teóricos y herramientas de distintas áreas profesionales para resolver un
+                                            problema
+                                            complejo común, enriqueciendo los resultados desde diferentes perspectivas
+                                            académicas.
+                                        </div>
+                                    </div>
+
+                                    <div v-else-if="editForm.proyect_multidis === 0"
+                                        class="p-4 border border-gray-200 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-900/30 rounded-xl space-y-2">
+                                        <div
+                                            class="flex items-center gap-2 text-gray-700 dark:text-gray-400 font-semibold text-xs">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>Enfoque disciplinar estándar</span>
+                                        </div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                                            El proyecto **solo pertenece a una facultad y una carrera en específica**.
+                                            El
+                                            desarrollo metodológico y operativo se concentrará de forma interna en su
+                                            propia
+                                            área técnica de estudios.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-purple-50 text-purple-600 mt-0.5 dark:bg-purple-950/40 dark:text-purple-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Facultades
+                                        Participantes
+                                    </h4>
+                                    <p class="text-xs text-gray-500">Gestione la filiación de las facultades asociadas
+                                        directamente a la ejecución del proyecto.</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-5">
+
+                                <div v-if="editForm.proyect_multidis === 1" class="space-y-5 animate-fadeIn">
+                                    <div class="space-y-2">
+                                        <label
+                                            class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                            1. Seleccione la Facultad Prioritaria (A la que pertenece el proyecto) <span
+                                                class="text-red-500">*</span>
+                                        </label>
+                                        <div
+                                            class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                            <div v-for="fac in facultadesCatalogo" :key="'priori-' + fac.idfacultad"
+                                                class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all"
+                                                :class="editForm.id_facultad_priori === fac.idfacultad ? 'border-brand-500 bg-brand-50/10 dark:border-brand-900/30 ring-2 ring-brand-500/20' : 'border-gray-200 dark:border-gray-800'">
+                                                <div class="flex items-center h-5">
+                                                    <input type="radio" :id="'priori-' + fac.idfacultad"
+                                                        name="facultad_prioritaria" :value="fac.idfacultad"
+                                                        v-model="editForm.id_facultad_priori"
+                                                        @change="handleFacultadPrioriChange"
+                                                        class="w-4 h-4 text-brand-600 border-gray-300 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900">
+                                                </div>
+                                                <label :for="'priori-' + fac.idfacultad"
+                                                    class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full">
+                                                    <span class="block font-semibold"
+                                                        :class="editForm.id_facultad_priori === fac.idfacultad ? 'text-brand-600 dark:text-brand-400' : ''">
+                                                        {{ fac.facultad }} ({{ fac.siglas }})
+                                                        <small v-if="editForm.id_facultad_priori === fac.idfacultad"
+                                                            class="ml-1 text-[10px] bg-brand-100 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300 px-1.5 py-0.5 rounded font-bold">Principal</small>
+                                                    </span>
+                                                    <span class="text-[11px] text-gray-400 block mt-0.5">Decano: {{
+                                                        fac.decano
+                                                        || 'No asignado' }}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div v-if="editForm.id_facultad_priori"
+                                        class="space-y-3 pt-2 border-t border-gray-100 dark:border-gray-800">
+                                        <label
+                                            class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                            2. Seleccione las otras Facultades que participan en conjunto:
+                                        </label>
+
+                                        <div
+                                            class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                            <div v-for="fac in facultadesCatalogo" :key="fac.idfacultad"
+                                                class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all"
+                                                :class="editForm.id_facultad_priori === fac.idfacultad ? 'border-brand-200 bg-brand-50/10 dark:border-brand-900/30' : 'border-gray-200 dark:border-gray-800'">
+                                                <div class="flex items-center h-5">
+                                                    <input type="checkbox" :id="'fac-' + fac.idfacultad"
+                                                        :value="fac.idfacultad" v-model="editForm.facultades"
+                                                        :disabled="editForm.id_facultad_priori === fac.idfacultad"
+                                                        class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900">
+                                                </div>
+                                                <label :for="'fac-' + fac.idfacultad"
+                                                    class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                                                    <span class="block font-semibold"
+                                                        :class="editForm.id_facultad_priori === fac.idfacultad ? 'text-brand-600 dark:text-brand-400' : ''">
+                                                        {{ fac.facultad }} ({{ fac.siglas }})
+                                                        <small v-if="editForm.id_facultad_priori === fac.idfacultad"
+                                                            class="ml-1 text-[10px] bg-brand-100 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300 px-1.5 py-0.5 rounded font-bold">Principal</small>
+                                                    </span>
+                                                    <span class="text-[11px] text-gray-400 block mt-0.5">Decano: {{
+                                                        fac.decano
+                                                        || 'No asignado' }}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-else class="space-y-3 animate-fadeIn">
+                                    <label
+                                        class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        Seleccione la Facultad Única a la que pertenece el proyecto <span
+                                            class="text-red-500">*</span>
+                                    </label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                        <div v-for="fac in facultadesCatalogo" :key="'unica-' + fac.idfacultad"
+                                            class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all"
+                                            :class="editForm.id_facultad_priori === fac.idfacultad ? 'border-brand-500 bg-brand-50/10 dark:border-brand-900/30 ring-2 ring-brand-500/20' : 'border-gray-200 dark:border-gray-800'">
+                                            <div class="flex items-center h-5">
+                                                <input type="radio" :id="'unica-' + fac.idfacultad"
+                                                    name="facultad_unica" :value="fac.idfacultad"
+                                                    v-model="editForm.id_facultad_priori"
+                                                    class="w-4 h-4 text-brand-600 border-gray-300 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+                                            <label :for="'unica-' + fac.idfacultad"
+                                                class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full">
+                                                <span class="block font-semibold"
+                                                    :class="editForm.id_facultad_priori === fac.idfacultad ? 'text-brand-600 dark:text-brand-400' : ''">
+                                                    {{ fac.facultad }} ({{ fac.siglas }})
+                                                    <small v-if="editForm.id_facultad_priori === fac.idfacultad"
+                                                        class="ml-1 text-[10px] bg-brand-100 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300 px-1.5 py-0.5 rounded font-bold">Seleccionada</small>
+                                                </span>
+                                                <span class="text-[11px] text-gray-400 block mt-0.5">Decano: {{
+                                                    fac.decano ||
+                                                    'No asignado' }}</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <p class="text-[11px] text-gray-400 italic">
+                                        * Nota: Al no ser un proyecto multidisciplinario, la facultad seleccionada se
+                                        definirá
+                                        automáticamente como el núcleo prioritario y único del desarrollo de la
+                                        investigación.
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-indigo-50 text-indigo-600 mt-0.5 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 14l9-5-9-5-9 5 9 5z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Carreras
+                                        Participantes
+                                    </h4>
+                                    <p class="text-xs text-gray-500">Gestione la filiación de las carreras asociadas
+                                        directamente a la ejecución del proyecto.</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-5">
+
+                                <div v-if="editForm.proyect_multidis === 1" class="space-y-5 animate-fadeIn">
+                                    <div class="space-y-2">
+                                        <label
+                                            class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                            1. Seleccione la Carrera Prioritaria (Debe pertenecer a la facultad
+                                            prioritaria)
+                                            <span class="text-red-500">*</span>
+                                        </label>
+                                        <div
+                                            class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                            <div v-for="carr in carrerasCatalogo.filter(c => c.facultad?.id == editForm.id_facultad_priori)"
+                                                :key="'carr-priori-' + carr.id_carrera"
+                                                class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all"
+                                                :class="editForm.id_carr_priori === carr.id_carrera ? 'border-brand-500 bg-brand-50/10 dark:border-brand-900/30 ring-2 ring-brand-500/20' : 'border-gray-200 dark:border-gray-800'">
+                                                <div class="flex items-center h-5">
+                                                    <input type="radio" :id="'carr-priori-' + carr.id_carrera"
+                                                        name="carrera_prioritaria" :value="carr.id_carrera"
+                                                        v-model="editForm.id_carr_priori"
+                                                        @change="handleCarreraPrioriChange"
+                                                        class="w-4 h-4 text-brand-600 border-gray-300 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900">
+                                                </div>
+                                                <label :for="'carr-priori-' + carr.id_carrera"
+                                                    class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full">
+                                                    <span class="block font-semibold"
+                                                        :class="editForm.id_carr_priori === carr.id_carrera ? 'text-brand-600 dark:text-brand-400' : ''">
+                                                        {{ carr.nombre_carrera }}
+                                                        <small v-if="editForm.id_carr_priori === carr.id_carrera"
+                                                            class="ml-1 text-[10px] bg-brand-100 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300 px-1.5 py-0.5 rounded font-bold">Principal</small>
+                                                    </span>
+                                                    <span class="text-[11px] text-gray-400 block mt-0.5">Director: {{
+                                                        carr.director_procesado
+                                                    }}</span>
+                                                </label>
+                                            </div>
+                                            <div v-if="carrerasCatalogo.filter(c => c.facultad?.id == editForm.id_facultad_priori).length === 0"
+                                                class="col-span-2 text-xs text-gray-400 italic p-2">
+                                                No hay carreras cargadas. Por favor, seleccione una facultad prioritaria
+                                                primero.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div v-if="editForm.id_carr_priori"
+                                        class="space-y-3 pt-2 border-t border-gray-100 dark:border-gray-800">
+                                        <label
+                                            class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                            2. Seleccione las otras Carreras que participan en conjunto:
+                                        </label>
+                                        <div
+                                            class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                            <div v-for="carr in carrerasCatalogo" :key="carr.id_carrera"
+                                                class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all"
+                                                :class="editForm.id_carr_priori === carr.id_carrera ? 'border-brand-200 bg-brand-50/10 dark:border-brand-900/30' : 'border-gray-200 dark:border-gray-800'">
+                                                <div class="flex items-center h-5">
+                                                    <input type="checkbox" :id="'carr-' + carr.id_carrera"
+                                                        :value="carr.id_carrera" v-model="editForm.carreras"
+                                                        :disabled="editForm.id_carr_priori === carr.id_carrera"
+                                                        class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900">
+                                                </div>
+                                                <label :for="'carr-' + carr.id_carrera"
+                                                    class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                                                    <span class="block font-semibold"
+                                                        :class="editForm.id_carr_priori === carr.id_carrera ? 'text-brand-600 dark:text-brand-400' : ''">
+                                                        {{ carr.nombre_carrera }}
+                                                        <small v-if="editForm.id_carr_priori === carr.id_carrera"
+                                                            class="ml-1 text-[10px] bg-brand-100 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300 px-1.5 py-0.5 rounded font-bold">Principal</small>
+                                                    </span>
+                                                    <span class="text-[11px] text-gray-400 block mt-0.5">Director: {{
+                                                        carr.director_procesado
+                                                    }}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-else class="space-y-3 animate-fadeIn">
+                                    <label
+                                        class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        Seleccione la Carrera Única a la que pertenece el proyecto <span
+                                            class="text-red-500">*</span>
+                                    </label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                        <div v-for="carr in carrerasCatalogo" :key="'unica-carr-' + carr.id_carrera"
+                                            class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all"
+                                            :class="editForm.id_carr_priori === carr.id_carrera ? 'border-brand-500 bg-brand-50/10 dark:border-brand-900/30 ring-2 ring-brand-500/20' : 'border-gray-200 dark:border-gray-800'">
+                                            <div class="flex items-center h-5">
+                                                <input type="radio" :id="'unica-carr-' + carr.id_carrera"
+                                                    name="carrera_unica" :value="carr.id_carrera"
+                                                    v-model="editForm.id_carr_priori"
+                                                    class="w-4 h-4 text-brand-600 border-gray-300 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+                                            <label :for="'unica-carr-' + carr.id_carrera"
+                                                class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full">
+                                                <span class="block font-semibold"
+                                                    :class="editForm.id_carr_priori === carr.id_carrera ? 'text-brand-600 dark:text-brand-400' : ''">
+                                                    {{ carr.nombre_carrera }}
+                                                    <small v-if="editForm.id_carr_priori === carr.id_carrera"
+                                                        class="ml-1 text-[10px] bg-brand-100 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300 px-1.5 py-0.5 rounded font-bold">Seleccionada</small>
+                                                </span>
+                                                <span class="text-[11px] text-gray-400 block mt-0.5">Director: {{
+                                                    carr.director_procesado
+                                                }}</span>
+                                            </label>
+                                        </div>
+                                        <div v-if="carrerasCatalogo.length === 0"
+                                            class="col-span-2 text-xs text-gray-400 italic p-2">
+                                            No hay carreras disponibles. Asegúrese de haber seleccionado la Facultad.
+                                        </div>
+                                    </div>
+                                    <p class="text-[11px] text-gray-400 italic">
+                                        * Nota: Al no ser un proyecto multidisciplinario, la carrera seleccionada se
+                                        definirá
+                                        automáticamente como el núcleo prioritario y único del desarrollo de la
+                                        investigación.
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-amber-50 text-amber-600 mt-0.5 dark:bg-amber-950/40 dark:text-amber-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Dominios
+                                        Humanísticos
+                                    </h4>
+                                    <p class="text-xs text-gray-500">
+                                        Los dominios humanísticos representan áreas del conocimiento enfocadas en el
+                                        desarrollo
+                                        social, ético y cultural. En vinculación, guían el impacto del proyecto hacia el
+                                        bienestar comunitario y la transformación del entorno social.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
+
+                                <div v-if="dominiosCatalogo.length > 0"
+                                    class="p-3 bg-gradient-to-r from-indigo-50 to-brand-50/30 dark:from-indigo-950/20 dark:to-transparent rounded-lg border border-indigo-100/50 dark:border-indigo-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div class="space-y-0.5">
+                                        <span
+                                            class="text-[10px] font-bold tracking-wider text-indigo-600 dark:text-indigo-400 uppercase block">Asistente
+                                            Inteligente</span>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">¿No está seguro de qué
+                                            dominios
+                                            elegir? Analice la información de su proyecto.</p>
+                                    </div>
+                                    <button type="button" @click="recomendarDominio"
+                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors shrink-0 gap-1.5">
+                                        <svg class="w-3.5 h-3.5 animate-pulse" fill="none" stroke="currentColor"
+                                            stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M9.813 15.904L9 21l8.982-8.982M18 12a6 6 0 11-12 0 6 6 0 0112 0z" />
+                                        </svg>
+                                        Recomendar Dominio
+                                    </button>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <label
+                                        class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        Seleccione uno o más Dominios Humanísticos aplicables: <span
+                                            class="text-red-500">*</span>
+                                    </label>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                        <div v-for="dom in dominiosCatalogo" :key="'dom-' + dom.id_dom_huma"
+                                            class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
+                                            :class="editForm.dominios_humanisticos.includes(dom.id_dom_huma) ? 'border-amber-500 bg-amber-50/10 dark:border-amber-900/30 ring-1 ring-amber-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                            @click="toggleDominio(dom.id_dom_huma)">
+
+                                            <div class="flex items-center h-5" @click.stop>
+                                                <input type="checkbox" :id="'dom-check-' + dom.id_dom_huma"
+                                                    :value="dom.id_dom_huma" v-model="editForm.dominios_humanisticos"
+                                                    class="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+
+                                            <label :for="'dom-check-' + dom.id_dom_huma"
+                                                class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full"
+                                                @click.stop="toggleDominio(dom.id_dom_huma)">
+                                                <span class="block font-semibold"
+                                                    :class="editForm.dominios_humanisticos.includes(dom.id_dom_huma) ? 'text-amber-700 dark:text-amber-400' : ''">
+                                                    {{ dom.detalle_dom_huma }}
+                                                </span>
+                                                <span v-if="dominioRecomendadoId === dom.id_dom_huma"
+                                                    class="inline-block mt-1 text-[9px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 font-bold px-1.5 py-0.5 rounded">
+                                                    ⭐ Sugerido para este Proyecto
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div v-if="dominiosCatalogo.length === 0"
+                                            class="col-span-2 text-xs text-gray-400 italic p-2 text-center">
+                                            Cargando catálogo de dominios...
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1132,15 +1593,24 @@ export default {
             politicasPlandeDisponibles: [],
             objetivosPoliticasDisponibles: [],
             objetivosODSDisponibles: [],
+            facultadesCatalogo: [],
+            carrerasCatalogo: [],
+            dominiosCatalogo: [],
             proyectoEditandoId: null,
             editForm: {
                 proyect_nombre: '',
                 proyect_titulo: '',
                 proyect_nombre_en: '',
                 proyect_titulo_en: '',
+                proyect_multidis: 0,
                 objetivos: [],
                 politicas: [],
-                ods: []
+                ods: [],
+                facultades: [],
+                id_facultad_priori: '',
+                carreras: [],
+                id_carr_priori: '',
+                dominios_humanisticos: []
             }
 
         };
@@ -1151,6 +1621,34 @@ export default {
                 this.actualizarObjetivosPoliticas(nuevosIdsSeleccionados);
             },
             deep: true // deep: true asegura que detecte si se agregan/quitan elementos del array
+        },
+        'editForm.proyect_multidis'(nuevoValor) {
+            if (nuevoValor === 0) {
+                this.editForm.facultades = [];
+                this.editForm.carreras = [];
+            } else if (nuevoValor === 1) {
+                if (this.editForm.id_facultad_priori && !this.editForm.facultades.includes(this.editForm.id_facultad_priori)) {
+                    this.editForm.facultades.push(this.editForm.id_facultad_priori);
+                }
+                if (this.editForm.id_carr_priori && !this.editForm.carreras.includes(this.editForm.id_carr_priori)) {
+                    this.editForm.carreras.push(this.editForm.id_carr_priori);
+                }
+            }
+            this.obtenerCarrerasPorFacultades();
+        },
+        'editForm.id_facultad_priori'(nuevoId, viejoId) {
+            // Evitamos borrar las carreras durante la carga inicial de abrirEdicion
+            if (!this.cargandoEdicion && viejoId) {
+                this.editForm.id_carr_priori = '';
+                this.editForm.carreras = [];
+            }
+            this.obtenerCarrerasPorFacultades();
+        },
+        'editForm.facultades': {
+            handler() {
+                this.obtenerCarrerasPorFacultades();
+            },
+            deep: true
         }
     },
     created() {
@@ -1578,6 +2076,57 @@ export default {
                 this.cargando = false;
             }
         },
+        handleFacultadPrioriChange() {
+            if (this.editForm.proyect_multidis === 1 && this.editForm.id_facultad_priori) {
+                // Si no existe dentro del array de facultades, la añadimos
+                if (!this.editForm.facultades.includes(this.editForm.id_facultad_priori)) {
+                    this.editForm.facultades.push(this.editForm.id_facultad_priori);
+                }
+            }
+        },
+        handleCarreraPrioriChange() {
+            if (this.editForm.proyect_multidis === 1 && this.editForm.id_carr_priori) {
+                if (!this.editForm.carreras.includes(this.editForm.id_carr_priori)) {
+                    this.editForm.carreras.push(this.editForm.id_carr_priori);
+                }
+            }
+        },
+        async obtenerCarrerasPorFacultades() {
+            let facultadesIds = [];
+
+            if (this.editForm.proyect_multidis === 1) {
+                facultadesIds = [...this.editForm.facultades];
+            } else if (this.editForm.id_facultad_priori) {
+                facultadesIds = [this.editForm.id_facultad_priori];
+            }
+
+            if (facultadesIds.length === 0) {
+                this.carrerasCatalogo = [];
+                return;
+            }
+
+            try {
+                // Genera promesas dinámicas usando el endpoint existente
+                const promesas = facultadesIds.map(id => API.get(`${this.baseUrl}/getCarrerasFacultad/${id}`));
+
+                const respuestas = await Promise.all(promesas);
+
+                let unificado = [];
+                respuestas.forEach(res => {
+                    if (res.data && res.data.data) {
+                        unificado = [...unificado, ...res.data.data];
+                        console.log(res.data.data);
+                    }
+                });
+
+                // Evitar posibles duplicados por idCarr
+                this.carrerasCatalogo = unificado.filter((item, index, self) =>
+                    index === self.findIndex((t) => t.id_carrera === item.id_carrera)
+                );
+            } catch (error) {
+                console.error("Error cargando el catálogo de carreras:", error);
+            }
+        },
         actualizarObjetivosPoliticas(politicasSeleccionadasIds) {
             // Si el array está vacío o no existe, limpiamos los objetivos
             if (!politicasSeleccionadasIds || politicasSeleccionadasIds.length === 0) {
@@ -1623,21 +2172,37 @@ export default {
                 this.politicasPlandeDisponibles = data.politicas_plandne || [];
                 this.objetivosPoliticasDisponibles = data.objetivos_politicas_seleccionadas || [];
                 this.objetivosODSDisponibles = data.ods || [];
+                this.facultadesCatalogo = data.facultades_catalogo || [];
+                this.dominiosCatalogo = data.dominios_catalogo || [];
 
                 this.editForm = {
                     proyect_nombre: data.proyecto.proyect_nombre || '',
                     proyect_titulo: data.proyecto.proyect_titulo || '',
                     proyect_nombre_en: data.proyecto.proyect_nombre_en || '',
                     proyect_titulo_en: data.proyecto.proyect_titulo_en || '',
+                    proyect_multidis: data.proyecto.proyect_multidis,
                     objetivos: data.seleccionados || [],
                     politicas: data.politicas_seleccionadas || [],
-                    ods: data.ods_seleccionadas || []
+                    ods: data.ods_seleccionadas || [],
+                    facultades: data.facultades_seleccionadas || [],
+                    id_facultad_priori: data.id_facultad_priori || '',
+                    carreras: data.carreras_seleccionadas || [],
+                    id_carr_priori: data.id_carr_priori || '',
+                    dominios_humanisticos: data.dominios_seleccionados || []
                 };
             } catch (error) {
                 mostraralertas2('Error al cargar datos del proyecto', 'error');
                 this.cerrarEdicion();
             } finally {
                 this.cargandoEdicion = false;
+            }
+        },
+        toggleObjetivo(id_obj) {
+            const index = this.editForm.objetivos.indexOf(id_obj);
+            if (index > -1) {
+                this.editForm.objetivos.splice(index, 1); // Deseleccionar
+            } else {
+                this.editForm.objetivos.push(id_obj); // Seleccionar
             }
         },
         togglePolitica(id_pol) {
@@ -1654,6 +2219,72 @@ export default {
                 this.editForm.ods.splice(index, 1); // Deseleccionar
             } else {
                 this.editForm.ods.push(id_ods); // Seleccionar
+            }
+        },
+        toggleDominio(id) {
+            const index = this.editForm.dominios_humanisticos.indexOf(id);
+            if (index > -1) {
+                this.editForm.dominios_humanisticos.splice(index, 1);
+            } else {
+                this.editForm.dominios_humanisticos.push(id);
+            }
+        },
+        recomendarDominio() {
+            if (this.dominiosCatalogo.length === 0) return;
+
+            // Concatenamos el contexto lingüístico del proyecto actual
+            const textoProyecto = `${this.editForm.proyect_titulo} ${this.editForm.proyect_nombre}`.toLowerCase();
+
+            // Mapeo básico nativo de palabras clave por carreras seleccionadas para robustecer la búsqueda
+            // (por ejemplo, si tiene carreras de salud o educación, asocia tokens humanísticos)
+            let palabrasAdicionales = "";
+            this.editForm.carreras.forEach(carrId => {
+                const carreraObj = this.carrerasCatalogo.find(c => c.id_carrera === carrId);
+                if (carreraObj) palabrasAdicionales += ` ${carreraObj.nombre_carrera.toLowerCase()}`;
+            });
+
+            const contextoCompleto = (textoProyecto + palabrasAdicionales);
+
+            let mejorDominioId = null;
+            let maxCoincidencias = -1;
+
+            // Analizamos cada dominio del catálogo buscando la mayor densidad de coincidencia léxica
+            this.dominiosCatalogo.forEach(dom => {
+                const detalle = dom.detalle_dom_huma.toLowerCase();
+                
+                // Dividimos el nombre del dominio en palabras clave ignorando conectores cortos (< 4 letras)
+                const palabrasClave = detalle.split(/\s+/).filter(palabra => palabra.length > 4);
+                
+                let coincidencias = 0;
+                palabrasClave.forEach(palabra => {
+                    // Quitamos sufijos comunes para una coincidencia flexible (por ejemplo: "educación" -> "educac")
+                    const raiz = palabra.substring(0, palabra.length - 2);
+                    if (contextoCompleto.includes(raiz)) {
+                        coincidencias++;
+                    }
+                });
+
+                if (coincidencias > maxCoincidencias && coincidencias > 0) {
+                    maxCoincidencias = coincidencias;
+                    mejorDominioId = dom.id_dom_huma;
+                }
+            });
+
+            if (mejorDominioId) {
+                this.dominioRecomendadoId = mejorDominioId;
+                
+                // Si el usuario no lo tiene seleccionado, lo agregamos automáticamente
+                if (!this.editForm.dominios_humanisticos.includes(mejorDominioId)) {
+                    this.editForm.dominios_humanisticos.push(mejorDominioId);
+                }
+                mostraralertas2('Se ha sugerido y marcado el dominio más compatible con el proyecto.', 'success');
+            } else {
+                // Fallback genérico si es muy abstracto: sugerir el primer dominio del catálogo
+                this.dominioRecomendadoId = this.dominiosCatalogo[0].id_dom_huma;
+                if (!this.editForm.dominios_humanisticos.includes(this.dominioRecomendadoId)) {
+                    this.editForm.dominios_humanisticos.push(this.dominioRecomendadoId);
+                }
+                mostraralertas2('Dominio sugerido basándose en el alcance social estándar.', 'success');
             }
         },
         async traducirTextos() {
@@ -1691,6 +2322,18 @@ export default {
 
         async guardarEdicion() {
             if (this.editForm.objetivos.length === 0) return;
+            if (!this.editForm.id_facultad_priori) {
+                mostraralertas2('Debe seleccionar una facultad prioritaria obligatoriamente.', 'error');
+                return;
+            }
+            if (!this.editForm.id_carr_priori) {
+                mostraralertas2('Debe seleccionar una carrera prioritaria obligatoriamente.', 'error');
+                return;
+            }
+            if (this.editForm.dominios_humanisticos.length === 0) {
+                mostraralertas2('Debe seleccionar al menos un dominio humanístico.', 'error');
+                return;
+            }
 
             this.guardando = true;
             try {
@@ -1717,7 +2360,12 @@ export default {
                 titulo_en: '',
                 objetivos: [],
                 politicas: [],
-                ods: []
+                ods: [],
+                facultades: [],
+                id_facultad_priori: '',
+                carreras: [],
+                id_carr_priori: '',
+                dominios_humanisticos: []
             };
         },
 

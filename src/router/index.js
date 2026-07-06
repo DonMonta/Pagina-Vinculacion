@@ -18,6 +18,7 @@ import EmpresaAllView from '../views/Admin/Mantenimiento/Op_Empresa/EmpresaAllVi
 import RolesEquipoAllView from '../views/Admin/Equipo/RolesEquipoAllView.vue'
 import EquipoAllView from '../views/Admin/Equipo/EquipoAllView.vue'
 import ResponsableVinAllView from '../views/Admin/Equipo/ResponsableVinAllView.vue'
+import ConvocatoriaView from '../views/Admin/Proyectos/Convocatoria/ConvocatoriaView.vue'
 
 
 const routes = [
@@ -115,7 +116,12 @@ const routes = [
     path: '/site-admin/responsables_vin',
     name: 'site-admin-responsables_vin',
     component: ResponsableVinAllView
-  }
+  },
+  {
+    path: '/site-admin/proyectos/convocatoria', 
+    name: 'site-admin-proyectos-convocatoria',  
+    component: ConvocatoriaView   
+  },
 ]
 
 const router = createRouter({

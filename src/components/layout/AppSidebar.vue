@@ -230,6 +230,7 @@ const menuData = [
         icon: PlateIcon,
         name: "Proyectos",
         subItems: [
+          { name: "Convocatorias", path: "/site-admin/proyectos/convocatoria", pro: false },
           { name: "Lista de Proyectos", path: "/site-admin/proyectos", pro: false },
         ],
       },
