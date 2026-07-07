@@ -27,6 +27,10 @@ class Invi_sub_linea_inves extends Model
     {
         return $this->belongsTo(Carreras::class, 'idCarr');
     }
+    public function detalle_sublineas_investigacion()
+    {
+        return $this->hasMany(Invi_detalle_lin_inves::class, 'id_sublin_investiga');
+    }
     
 
 }

@@ -24,6 +24,12 @@ use App\Models\Invi_detalle_fac_proy;
 use App\Models\Invi_detalle_carr_proy;
 use App\Models\Invi_detalle_dom_hum;
 use App\Models\Invi_dom_huma;
+use App\Models\Invi_convocatoria;
+use App\Models\Invi_linea_investigacion;
+use App\Models\Invi_sub_linea_inves;
+use App\Models\Invi_detalle_lin_inves;
+use App\Models\SubareaUnesco;
+use App\Models\Invi_detalle_area_unesco;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -157,7 +163,9 @@ class Invi_proyectosController extends Controller
             'invi_detalle_ods_proyect',
             'invi_detalle_fac_proy',
             'invi_detalle_carr_proy',
-            'invi_detalle_dom_hum'
+            'invi_detalle_dom_hum',
+            'invi_detalle_lin_inves',
+            'invi_detalle_area_unesco'
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -246,6 +254,40 @@ class Invi_proyectosController extends Controller
         // NUEVO: Extraer catálogo total de dominios humanísticos y los seleccionados por el proyecto
         $dominiosCatalogo = Invi_dom_huma::all();
         $dominiosSeleccionados = $proyecto->invi_detalle_dom_hum->pluck('id_dom_hum')->toArray();
+        $convocatoriasCatalogo = Invi_convocatoria::where('estado', 1)->get();
+        $lineasCatalogo = Invi_linea_investigacion::where('estado_lin_investiga', 1)->get();
+        $sublineasCatalogo = Invi_sub_linea_inves::all();
+        // NUEVO: Sublíneas que el proyecto ya tiene guardadas
+        $sublineasSeleccionadas = $proyecto->invi_detalle_lin_inves->pluck('id_sublin_investiga')->toArray();
+        // NUEVO: Obtener y transformar catálogo completo de la UNESCO reutilizando la lógica de tu método index
+        $unescoCatalogoRaw = SubareaUnesco::all();
+        $unescoCatalogo = $unescoCatalogoRaw->map(function ($item) {
+            $id = trim($item->sau_id);
+            $pdid = trim($item->sau_pdid ?? '');
+            $descripcion = mb_convert_encoding($item->sau_descripcion, 'ISO-8859-1', 'UTF-8');
+            $descripcion_limpia = preg_replace('/^' . preg_quote($id, '/') . '\s*/', '', $descripcion);
+
+            $longitud_id = strlen($id);
+            $tipo = 'Desconocido';
+
+            if (empty($pdid) && $longitud_id === 2) {
+                $tipo = 'Área de conocimiento';
+            } elseif (strlen($pdid) === 2 || $longitud_id === 3) {
+                $tipo = 'Subárea de conocimiento';
+            } elseif (strlen($pdid) >= 3 || $longitud_id >= 4) {
+                $tipo = 'Área específica de conocimiento';
+            }
+
+            return [
+                'sau_id'          => $id,
+                'sau_pdid'        => $pdid,
+                'sau_descripcion' => trim($descripcion_limpia),
+                'tipo_area'       => $tipo
+            ];
+        });
+
+        // NUEVO: Extraer los ids que el proyecto ya tiene guardados en `invi_detalle_area_unesco`
+        $unescoSeleccionadas = $proyecto->invi_detalle_area_unesco->pluck('id_subarea_unesco')->toArray();
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -262,7 +304,13 @@ class Invi_proyectosController extends Controller
             'carreras_seleccionadas' => $carrerasSeleccionadas,
             'id_carr_priori' => $carreraPrioritaria,
             'dominios_catalogo' => $dominiosCatalogo,
-            'dominios_seleccionados' => $dominiosSeleccionados
+            'dominios_seleccionados' => $dominiosSeleccionados,
+            'convocatorias_catalogo' => $convocatoriasCatalogo,
+            'lineas_catalogo' => $lineasCatalogo,
+            'sublineas_catalogo' => $sublineasCatalogo,
+            'sublineas_seleccionadas' => $sublineasSeleccionadas,
+            'unesco_catalogo' => $unescoCatalogo,
+            'unesco_seleccionadas' => $unescoSeleccionadas
         ]);
     }
 
@@ -349,6 +397,7 @@ class Invi_proyectosController extends Controller
             $proyecto->proyect_nombre_en = $request->proyect_nombre_en;
             $proyecto->proyect_titulo_en = $request->proyect_titulo_en;
             $proyecto->proyect_multidis = $request->proyect_multidis;
+            $proyecto->id_convocatoria = $request->id_convocatoria;
 
 
             $proyecto->save();
@@ -444,6 +493,28 @@ class Invi_proyectosController extends Controller
                     Invi_detalle_dom_hum::insert([
                         'proyect_id' => $id,
                         'id_dom_hum' => $id_dom
+                    ]);
+                }
+            }
+            Invi_detalle_lin_inves::where('proyect_id', $id)->delete();
+
+            if ($request->has('sublineas_investigacion') && is_array($request->sublineas_investigacion)) {
+                foreach ($request->sublineas_investigacion as $id_sublin) {
+                    // Asegúrate de generar ID manual si tu PK no es auto-increment
+                    Invi_detalle_lin_inves::insert([
+                        'proyect_id'          => $id,
+                        'id_sublin_investiga' => $id_sublin
+                    ]);
+                }
+            }
+            Invi_detalle_area_unesco::where('proyect_id', $id)->delete();
+            if ($request->has('unesco_areas') && is_array($request->unesco_areas)) {
+                foreach ($request->unesco_areas as $id_unesco) {
+                    // Al ser public $incrementing = false y no poseer clave primaria autoincremental en el modelo,
+                    // usamos insert directo sobre las columnas fillable.
+                    Invi_detalle_area_unesco::insert([
+                        'proyect_id'        => $id,
+                        'id_subarea_unesco' => $id_unesco
                     ]);
                 }
             }

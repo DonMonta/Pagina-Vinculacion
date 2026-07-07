@@ -17,6 +17,10 @@ class SubareaUnesco extends Model
         'sau_pdid',
         'sau_descripcion',
     ];
+    public function detalle_area_unesco()
+    {
+        return $this->hasMany(Invi_detalle_area_unesco::class, 'id_subarea_unesco');
+    }
    
 
 }

@@ -183,7 +183,7 @@ class Invi_convocatoriaController extends Controller
             if ($request->estado == 1) {
                 // Verifica si existe OTRA convocatoria activa que difiera de la que se está editando actualmente
                 $otroActivo = Invi_convocatoria::where('estado', 1)
-                    ->where('id_pei', '!=', $id)
+                    ->where('id_convocatoria', '!=', $id)
                     ->exists();
 
                 if ($otroActivo) {

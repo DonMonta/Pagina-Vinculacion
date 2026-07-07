@@ -23,7 +23,8 @@ class Invi_proyectos extends Model
         'fechainicio',
         'fechafin',
         'proyect_tipo',
-        'id_convocatoria'
+        'id_convocatoria',
+        'id_tip_invi_proy'
     ];
     public function invi_detalle_integrante()
     {
@@ -56,6 +57,18 @@ class Invi_proyectos extends Model
     public function invi_convocatoria()
     {
         return $this->hasOne(Invi_convocatoria::class, 'id_convocatoria');
+    }
+    public function invi_detalle_lin_inves()
+    {
+        return $this->hasMany(Invi_detalle_lin_inves::class, 'proyect_id');
+    }
+    public function invi_detalle_area_unesco()
+    {
+        return $this->hasMany(Invi_detalle_area_unesco::class, 'proyect_id');
+    }
+    public function invi_tip_proyectos()
+    {
+        return $this->hasOne(Invi_tip_proyect::class, 'id_tip_invi_proy');
     }
 
 
