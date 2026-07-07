@@ -33,119 +33,171 @@
         </div>
       </div>
     </div>
-    <div class="max-w-full overflow-x-auto custom-scrollbar">
-      <table class="min-w-full">
-        <thead>
-          <tr class="border-t border-gray-100 dark:border-gray-800">
-            <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">ID</p>
+    <div
+      class="max-w-full overflow-x-auto rounded-xl border border-gray-100 shadow-sm custom-scrollbar dark:border-gray-800">
+      <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+        <thead class="bg-gray-50/70 dark:bg-gray-900/50">
+          <tr>
+            <th class="py-4 px-4 text-left w-16">
+              <p class="font-bold text-gray-500 text-xs tracking-wider uppercase dark:text-gray-400">ID</p>
             </th>
-            <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Num_Conv / Título / Elaboración /
-                resolución</p>
+            <th class="py-4 px-4 text-left">
+              <p class="font-bold text-gray-500 text-xs tracking-wider uppercase dark:text-gray-400">Detalles de la
+                Convocatoria</p>
             </th>
-            <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Fecha Inicio / Fin</p>
+            <th class="py-4 px-4 text-left w-48">
+              <p class="font-bold text-gray-500 text-xs tracking-wider uppercase dark:text-gray-400">Vigencia (Inicio /
+                Fin)</p>
             </th>
-
-            <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Estado</p>
+            <th class="py-4 px-4 text-left w-32">
+              <p class="font-bold text-gray-500 text-xs tracking-wider uppercase dark:text-gray-400">Estado</p>
             </th>
-            <th class="py-5 px-4 text-left">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Archivo</p>
+            <th class="py-4 px-4 text-left w-32">
+              <p class="font-bold text-gray-500 text-xs tracking-wider uppercase dark:text-gray-400">Documento</p>
             </th>
-            <th class="py-5 px-4 text-right">
-              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Acciones</p>
+            <th class="py-4 px-4 text-right w-36">
+              <p class="font-bold text-gray-500 text-xs tracking-wider uppercase dark:text-gray-400">Acciones</p>
             </th>
           </tr>
         </thead>
-        <tbody>
-          <tr class="border-t border-gray-100 dark:border-gray-800" v-if="cargando">
-            <td class="px-5 py-6" colspan="5">
-              <div class="flex justify-center items-center gap-2">
-                <span class="animate-spin h-5 w-5 border-2 border-brand-500 border-t-transparent rounded-full"></span>
-                <h3 class="text-gray-500 font-medium">Cargando datos...</h3>
+        <tbody class="divide-y divide-gray-100 bg-white dark:bg-gray-950 dark:divide-gray-800">
+
+          <tr v-if="cargando">
+            <td class="px-5 py-12" colspan="6">
+              <div class="flex flex-col justify-center items-center gap-3">
+                <span class="animate-spin h-8 w-8 border-4 border-brand-500 border-t-transparent rounded-full"></span>
+                <h3 class="text-gray-500 font-medium text-sm dark:text-gray-400">Cargando registros...</h3>
               </div>
             </td>
           </tr>
+
           <tr v-else v-for="post in filteredarray" :key="post.id_convocatoria"
-            class="border-t border-gray-100 hover:bg-gray-50/50 dark:border-gray-800 dark:hover:bg-white/[0.02] transition-colors">
+            class="hover:bg-gray-50/60 dark:hover:bg-white/[0.01] transition-colors group">
 
-            <td class="py-5 px-4 whitespace-nowrap">
-              <p class="text-gray-600 text-sm font-medium dark:text-gray-400">{{ post.id_convocatoria }}</p>
+            <td class="py-4 px-4 whitespace-nowrap align-top">
+              <span class="text-gray-400 text-sm font-semibold dark:text-gray-600">#{{ post.id_convocatoria }}</span>
             </td>
 
-            <td class="py-5 px-4 whitespace-nowrap">
-              <div>
-                <p class="font-bold text-gray-800 text-base dark:text-white/90">
-                  {{ post.num_convocatoria }}
-                </p>
-                <p class="text-xs text-gray-500 mt-0.5 italic">Título: {{ post.titulo_convocatoria }}</p>
-                <p class="text-xs text-gray-500 mt-0.5 italic">Elaboración: {{ post.elaboracion }}</p>
-                <p class="text-xs text-gray-500 mt-0.5 italic">Resolución: {{ post.num_resolucion }}</p>
+            <td class="py-4 px-4 align-top">
+              <div class="max-w-xl flex flex-col gap-2">
+
+                <div>
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400 border border-brand-100 dark:border-brand-500/20">
+                    Convocatoria: {{ post.num_convocatoria }}
+                  </span>
+                </div>
+
+                <h4
+                  class="text-sm font-semibold text-gray-900 leading-snug dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                  {{ post.titulo_convocatoria }}
+                </h4>
+
+                <div
+                  class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 mt-1 pt-2 border-t border-gray-100 dark:border-gray-900 text-xs text-gray-500 dark:text-gray-400">
+
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-medium text-gray-400">Elaborado por:</span>
+
+                    <span v-if="post.cargandoDocente" class="flex items-center gap-1 text-gray-400 italic">
+                      <span
+                        class="animate-spin h-3 w-3 border-2 border-brand-500 border-t-transparent rounded-full"></span>
+                      Buscando...
+                    </span>
+
+                    <span v-else-if="post.docente"
+                      class="font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded"
+                      :title="`Cédula: ${post.elaboracion}`">
+                      {{ post.docente.nombre_formateado }}
+                    </span>
+
+                    <span v-else-if="post.errorDocente" class="text-red-500 font-medium" :title="post.errorDocente">
+                      {{ post.elaboracion }} <span class="text-[10px] text-red-400">(No verificado)</span>
+                    </span>
+
+                    <span v-else class="italic font-medium text-gray-700 dark:text-gray-300">
+                      {{ post.elaboracion }}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-medium text-gray-400">Resolución:</span>
+                    <span
+                      class="font-mono text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 px-1.5 py-0.5 rounded border border-gray-100 dark:border-gray-800">
+                      {{ post.num_resolucion || 'N/A' }}
+                    </span>
+                  </div>
+
+                </div>
               </div>
             </td>
-            <td class="py-5 px-4">
-              <div class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full w-fit">
-                  {{ post.fecha_inicio }} Subsistemas
-                </span>
-                <span class="text-xs font-medium text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-full w-fit">
-                  {{ post.fecha_fin }} Objetivos
-                </span>
+
+            <td class="py-4 px-4 align-top whitespace-nowrap">
+              <div class="flex flex-col gap-1.5">
+                <div
+                  class="flex items-center gap-1.5 text-xs font-medium text-purple-700 bg-purple-50 dark:bg-purple-500/10 dark:text-purple-400 px-2 py-1 rounded-lg w-fit">
+                  <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                  <span>Inicia: {{ post.fecha_inicio }}</span>
+                </div>
+                <div
+                  class="flex items-center gap-1.5 text-xs font-medium text-cyan-700 bg-cyan-50 dark:bg-cyan-500/10 dark:text-cyan-400 px-2 py-1 rounded-lg w-fit">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                  <span>Finaliza: {{ post.fecha_fin }}</span>
+                </div>
               </div>
             </td>
-            <td class="py-5 px-4 whitespace-nowrap">
+
+            <td class="py-4 px-4 align-top whitespace-nowrap">
               <span :class="{
-                'rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-wider': true,
-                'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado === 1,
-                'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado === 0
+                'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide uppercase': true,
+                'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400': post.estado === 1,
+                'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400': post.estado === 0
               }">
+                <span class="w-1.5 h-1.5 rounded-full"
+                  :class="post.estado === 1 ? 'bg-emerald-500' : 'bg-amber-500'"></span>
                 {{ post.estado === 1 ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
 
-            <td class="py-5 px-4">
+            <td class="py-4 px-4 align-top whitespace-nowrap">
               <div v-if="post.archivo">
                 <a :href="`http://vinculacionbackend.test/Documentos/Vinculación/Convocatorias/${post.num_convocatoria}/${post.archivo}`"
                   target="_blank"
-                  class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors dark:bg-red-500/10 dark:text-red-400">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 rounded-lg hover:bg-rose-100 transition-all border border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
-                    <line x1="16" y1="13" x2="8" y2="13" />
-                    <line x1="16" y1="17" x2="8" y2="17" />
-                    <polyline points="10 9 9 9 8 9" />
                   </svg>
-                  <span>PDF</span>
+                  <span>Ver PDF</span>
                 </a>
               </div>
               <span v-else class="text-xs text-gray-400 italic">Sin documento</span>
             </td>
 
-            <!-- Acciones de Edición y Eliminación -->
-            <td class="py-3 text-right whitespace-nowrap">
-              <div class="flex justify-end gap-2">
+            <td class="py-4 px-4 align-top text-right whitespace-nowrap">
+              <div class="flex justify-end gap-1">
                 <button @click="abrirModalEdicion(post)"
-                  class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  class="p-1.5 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10 rounded-lg transition-colors"
+                  title="Editar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
 
                 <button @click="eliminar(post.id_convocatoria, post.num_convocatoria)" v-if="post.estado === 1"
-                  class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  class="p-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                  title="Deshabilitar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
                 </button>
+
                 <button @click="habilitar(post.id_convocatoria, post.num_convocatoria)" v-if="post.estado === 0"
-                  class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:bg-white/10"
-                  title="Refrescar lista">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
+                  class="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 rounded-lg transition-colors"
+                  title="Habilitar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M23 4v6h-6"></path>
                     <path d="M1 20v-6h6"></path>
                     <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
@@ -191,24 +243,24 @@
 
           <div class="px-2 mb-6">
             <h4 class="mb-2 text-2xl font-semibold text-gray-800">
-              {{ isEditMode ? 'Editar Convocatoria' : 'AgregarConvocatoria' }}
+              {{ isEditMode ? 'Editar Convocatoria' : 'Agregar Convocatoria' }}
             </h4>
             <p class="text-sm text-gray-500">Complete los datos de la convocatoria.</p>
           </div>
 
           <form class="flex flex-col gap-5 px-2" @submit.prevent>
             <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+              <div class="lg:col-span-2">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700">Título</label>
+                <textarea v-model="formulario.titulo_convocatoria" rows="3"
+                  class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm outline-none focus:border-brand-500 resize-none"
+                  placeholder="Ingrese el título completo de la convocatoria"></textarea>
+              </div>
               <div>
                 <label class="mb-1.5 block text-sm font-medium text-gray-700">Número de Convocatoria</label>
                 <input v-model="formulario.num_convocatoria" type="text"
                   class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm outline-none focus:border-brand-500"
-                  placeholder="Ej: CONV-2026-01" />
-              </div>
-              <div>
-                <label class="mb-1.5 block text-sm font-medium text-gray-700">Título</label>
-                <input v-model="formulario.titulo_convocatoria" type="text"
-                  class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm outline-none focus:border-brand-500"
-                  placeholder="Título de la convocatoria" />
+                  placeholder="Ej: UTELVT-CONV-PROY-2024" />
               </div>
               <div>
                 <label class="mb-1.5 block text-sm font-medium text-gray-700">Fecha Inicio</label>
@@ -223,7 +275,8 @@
               <div>
                 <label class="mb-1.5 block text-sm font-medium text-gray-700">Número de Resolución</label>
                 <input v-model="formulario.num_resolucion" type="text"
-                  class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm outline-none focus:border-brand-500" />
+                  class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm outline-none focus:border-brand-500"
+                  placeholder="Ej: UTLVTE-060-2024" />
               </div>
 
               <div class="flex flex-col justify-center">
@@ -238,57 +291,109 @@
                   </span>
                 </label>
               </div>
+
+
             </div>
 
             <hr class="my-2 border-gray-100">
 
             <div v-for="campo in camposResponsables" :key="campo.id"
-              class="p-4 bg-gray-50 rounded-xl border border-gray-100">
-              <div class="flex items-center justify-between mb-4">
-                <label class="text-sm font-bold text-gray-800 capitalize">{{ campo.label }}</label>
+              class="p-5 bg-gray-50/60 rounded-2xl border border-gray-100 dark:bg-gray-900/40 dark:border-gray-800 transition-all">
 
-                <div class="flex p-1 bg-gray-200 rounded-lg">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-1.5 h-4 bg-brand-500 rounded-full"></div>
+                  <label class="text-sm font-bold text-gray-800 dark:text-gray-200 capitalize tracking-wide">
+                    {{ campo.label }}
+                  </label>
+                </div>
+
+                <div class="flex p-1 bg-gray-200/70 rounded-xl dark:bg-gray-800/80 w-fit self-end sm:self-auto">
                   <button type="button" @click="campo.tipo = 'persona'"
-                    :class="{ 'bg-white shadow-sm text-brand-600 font-semibold': campo.tipo === 'persona', 'text-gray-500': campo.tipo !== 'persona' }"
-                    class="px-3 py-1 text-xs rounded-md transition-all">Persona</button>
+                    :class="{ 'bg-white shadow-sm text-brand-600 font-bold dark:bg-gray-700 dark:text-brand-400': campo.tipo === 'persona', 'text-gray-500 dark:text-gray-400': campo.tipo !== 'persona' }"
+                    class="px-4 py-1.5 text-xs rounded-lg transition-all duration-200">
+                    Persona
+                  </button>
                   <button type="button" @click="campo.tipo = 'departamento'"
-                    :class="{ 'bg-white shadow-sm text-brand-600 font-semibold': campo.tipo === 'departamento', 'text-gray-500': campo.tipo !== 'departamento' }"
-                    class="px-3 py-1 text-xs rounded-md transition-all">Departamento</button>
+                    :class="{ 'bg-white shadow-sm text-brand-600 font-bold dark:bg-gray-700 dark:text-brand-400': campo.tipo === 'departamento', 'text-gray-500 dark:text-gray-400': campo.tipo !== 'departamento' }"
+                    class="px-4 py-1.5 text-xs rounded-lg transition-all duration-200">
+                    Departamento
+                  </button>
                 </div>
               </div>
 
-              <div v-if="campo.tipo === 'persona'" class="flex flex-col gap-3">
-                <div class="flex gap-2">
+              <div v-if="campo.tipo === 'persona'" class="flex flex-col gap-3.5">
+
+                <div class="relative flex items-center group">
+                  <div
+                    class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400 dark:text-gray-500">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  </div>
                   <input v-model="campo.cedula" @input="validarNumeros(campo)" type="text" maxlength="10"
-                    placeholder="Ingrese 10 dígitos de la Cédula"
-                    class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none focus:border-brand-500" />
+                    placeholder="Ingrese los 10 dígitos de la cédula..."
+                    class="w-full rounded-xl border border-gray-300 bg-white pl-10 pr-28 py-3 text-sm outline-none transition-all focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:focus:border-brand-500" />
+
                   <button @click="buscarDocente(campo)" type="button"
-                    class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 transition-colors whitespace-nowrap">
+                    class="absolute right-1.5 top-1.5 bottom-1.5 bg-gray-900 text-white px-5 rounded-lg text-xs font-semibold hover:bg-gray-800 transition-all active:scale-95 dark:bg-brand-500 dark:hover:bg-brand-600 shadow-sm">
                     Buscar
                   </button>
                 </div>
+
+                <div v-if="campo.error"
+                  class="flex items-center gap-1.5 text-xs text-red-500 font-medium px-1 animate-fadeIn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <span>{{ campo.error }}</span>
+                </div>
+
                 <div v-if="campo.docente"
-                  class="flex items-center gap-4 bg-white p-3 rounded-lg border border-green-100 shadow-sm mt-1">
+                  class="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm dark:bg-gray-950 dark:border-gray-800/60 animate-fadeIn">
+
                   <div
-                    class="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 border-2 border-gray-300 overflow-hidden flex items-center justify-center">
-                    <img :src="getPhotoUrl(campo.docente.CIInfPer)"
-                                            class="w-full h-full object-cover animate-fadeIn" alt="Foto de perfil" />
-                    
+                    class="w-14 h-14 rounded-full bg-gray-100 flex-shrink-0 border-2 border-gray-200 dark:border-gray-800 dark:bg-gray-900 overflow-hidden flex items-center justify-center shadow-inner relative group/avatar">
+                    <img :src="getPhotoUrl(campo.docente.CIInfPer)" @error="handleImgError"
+                      class="w-full h-full object-cover" alt="Foto de perfil" />
                   </div>
-                  <div>
-                    <p class="text-sm font-semibold text-gray-800">{{ campo.docente.NombInfPer }} {{
-                      campo.docente.ApellInfPer }} {{ campo.docente.ApellMatInfPer }}</p>
-                    <p class="text-xs text-gray-500">C.I: {{ campo.docente.CIInfPer }} | Género: {{
-                      campo.docente.GeneroPer }}</p>
+
+                  <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+                    <h5 class="text-sm font-bold text-gray-900 dark:text-white truncate">
+                      {{ campo.docente.nombre_formateado || (campo.docente.NombInfPer + ' ' + campo.docente.ApellInfPer)
+                      }}
+                    </h5>
+
+                    <div class="flex flex-wrap items-center gap-2 mt-1">
+                      <span
+                        class="inline-flex items-center text-[11px] font-mono font-medium text-gray-500 bg-gray-100 dark:bg-gray-900 dark:text-gray-400 px-2 py-0.5 rounded">
+                        C.I: {{ campo.docente.CIInfPer }}
+                      </span>
+                      <span v-if="campo.docente.GeneroPer"
+                        class="inline-flex items-center text-[11px] font-medium text-brand-600 bg-brand-50/60 dark:bg-brand-500/10 dark:text-brand-400 px-2 py-0.5 rounded">
+                        {{ campo.docente.GeneroPer }}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <p v-if="campo.error" class="text-xs text-red-500">{{ campo.error }}</p>
               </div>
 
-              <div v-else>
-                <input v-model="campo.texto" type="text"
-                  :placeholder="`Nombre del departamento encargado de la ${campo.label}`"
-                  class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none focus:border-brand-500" />
+              <div v-else class="animate-fadeIn">
+                <div class="relative flex items-center">
+                  <div
+                    class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400 dark:text-gray-500">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                  </div>
+                  <input v-model="campo.texto" type="text"
+                    :placeholder="`Nombre del departamento encargado de la ${campo.label}...`"
+                    class="w-full rounded-xl border border-gray-300 bg-white pl-10 pr-4 py-3 text-sm outline-none transition-all focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:focus:border-brand-500" />
+                </div>
               </div>
             </div>
 
@@ -533,6 +638,9 @@ export default {
       // Usamos el timestamp para evitar problemas de caché al cambiar de integrante
       return `${baseURL2}/vin/getFotoDocente/${ci}?t=${new Date().getTime()}`;
     },
+    handleImgError(e) {
+      e.target.src = '/favicon.ico';
+    },
     async uploadArchivo(num_convocatoria, oldFilename = null) {
       if (!this.archivoSeleccionado) return null; // nada que subir
       try {
@@ -570,12 +678,30 @@ export default {
       try {
         const params = {
           page: page,
-          search_query: searchQuery // Parámetro para búsqueda
+          search_query: searchQuery
         };
         const response = await API.get(`${this.baseUrl}/invi_convocatoria`, { params });
 
         const data = response.data?.data || [];
-        this.filteredarray = data;
+
+        // Mapeamos los datos iniciales agregando propiedades reactivas para el docente
+        this.filteredarray = data.map(item => ({
+          ...item,
+          docente: null,
+          cargandoDocente: false,
+          errorDocente: ''
+        }));
+
+        // Ejecutamos la búsqueda de docentes solo para los registros que tengan una cédula válida
+        this.filteredarray.forEach(post => {
+          // Validamos si "elaboracion" contiene exactamente 10 números
+          const esCedula = /^\d{10}$/.test(post.elaboracion);
+
+          if (esCedula) {
+            this.cargarDocenteParaPost(post);
+          }
+        });
+
         const pagination = response.data?.pagination || {};
         this.currentPage = pagination.current_page || 1;
         this.lastPage = pagination.last_page || 1;
@@ -586,6 +712,22 @@ export default {
         this.lastPage = 1;
       } finally {
         this.cargando = false;
+      }
+    },
+    async cargarDocenteParaPost(post) {
+      post.cargandoDocente = true;
+      try {
+        const resp = await API.get(`${this.baseUrl}/getalldoce/${post.elaboracion}`);
+        if (resp.data && resp.data.data) {
+          // Guardamos la información del docente dentro del mismo objeto de la convocatoria
+          post.docente = resp.data.data;
+        } else {
+          post.errorDocente = 'Docente no encontrado.';
+        }
+      } catch (e) {
+        post.errorDocente = 'Error al buscar docente.';
+      } finally {
+        post.cargandoDocente = false;
       }
     },
 
@@ -641,7 +783,7 @@ export default {
         console.error("Error:", error);
       }
     },
-    
+
     limpiarFormulario() {
       this.formulario = { id_convocatoria: null, num_convocatoria: "", titulo_convocatoria: "", fecha_inicio: "", fecha_fin: "", num_resolucion: "", estado: 1 };
       this.estadoBool = true;

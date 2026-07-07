@@ -265,7 +265,7 @@
                                                         cargar</span>
                                                     <span class="font-semibold text-brand-600" v-else>{{
                                                         archivoPreviewName
-                                                    }}</span>
+                                                        }}</span>
                                                 </p>
                                                 <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx.
                                                     10MB)</p>
@@ -557,7 +557,7 @@
                                     <span class="font-semibold" v-if="!archivoBajaName">Haga clic para
                                         cargar</span>
                                     <span class="font-semibold text-brand-600" v-else>{{ archivoBajaName
-                                        }}</span>
+                                    }}</span>
                                 </p>
                                 <p class="text-xs text-gray-400" v-if="!archivoBajaName">PDF (Máx. 10MB)</p>
                             </div>
@@ -1315,7 +1315,7 @@
                                                     </span>
                                                     <span class="text-[11px] text-gray-400 block mt-0.5">Director: {{
                                                         carr.director_procesado
-                                                    }}</span>
+                                                        }}</span>
                                                 </label>
                                             </div>
                                             <div v-if="carrerasCatalogo.filter(c => c.facultad?.id == editForm.id_facultad_priori).length === 0"
@@ -1353,7 +1353,7 @@
                                                     </span>
                                                     <span class="text-[11px] text-gray-400 block mt-0.5">Director: {{
                                                         carr.director_procesado
-                                                    }}</span>
+                                                        }}</span>
                                                 </label>
                                             </div>
                                         </div>
@@ -1386,7 +1386,7 @@
                                                 </span>
                                                 <span class="text-[11px] text-gray-400 block mt-0.5">Director: {{
                                                     carr.director_procesado
-                                                }}</span>
+                                                    }}</span>
                                             </label>
                                         </div>
                                         <div v-if="carrerasCatalogo.length === 0"
@@ -1461,20 +1461,20 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
                                         <div v-for="dom in dominiosCatalogo" :key="'dom-' + dom.id_dom_huma"
                                             class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
-                                            :class="editForm.dominios_humanisticos.includes(dom.id_dom_huma) ? 'border-amber-500 bg-amber-50/10 dark:border-amber-900/30 ring-1 ring-amber-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                            :class="editForm.dominios_humanisticos.includes(dom.id_dom_huma) ? 'border-emerald-500 bg-emerald-50/10 dark:border-emerald-900/30 ring-1 ring-emerald-500/30' : 'border-gray-200 dark:border-gray-800'"
                                             @click="toggleDominio(dom.id_dom_huma)">
 
                                             <div class="flex items-center h-5" @click.stop>
                                                 <input type="checkbox" :id="'dom-check-' + dom.id_dom_huma"
                                                     :value="dom.id_dom_huma" v-model="editForm.dominios_humanisticos"
-                                                    class="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500 dark:border-gray-700 dark:bg-gray-900">
+                                                    class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 dark:border-gray-700 dark:bg-gray-900">
                                             </div>
 
                                             <label :for="'dom-check-' + dom.id_dom_huma"
                                                 class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full"
                                                 @click.stop="toggleDominio(dom.id_dom_huma)">
                                                 <span class="block font-semibold"
-                                                    :class="editForm.dominios_humanisticos.includes(dom.id_dom_huma) ? 'text-amber-700 dark:text-amber-400' : ''">
+                                                    :class="editForm.dominios_humanisticos.includes(dom.id_dom_huma) ? 'text-emerald-700 dark:text-emerald-400' : ''">
                                                     {{ dom.detalle_dom_huma }}
                                                 </span>
                                                 <span v-if="dominioRecomendadoId === dom.id_dom_huma"
@@ -1489,6 +1489,186 @@
                                             Cargando catálogo de dominios...
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-blue-50 text-blue-600 mt-0.5 dark:bg-blue-950/40 dark:text-blue-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Convocatoria del
+                                        Proyecto
+                                    </h4>
+                                    <p class="text-xs text-gray-500">
+                                        Seleccione el número de la convocatoria activa bajo la cual se rige el
+                                        desarrollo del
+                                        proyecto.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
+                                <div class="space-y-2">
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        Seleccione la Convocatoria: <span class="text-red-500">*</span>
+                                    </label>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                        <div v-for="conv in convocatoriasCatalogo" :key="'conv-' + conv.id_convocatoria"
+                                            class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
+                                            :class="editForm.id_convocatoria === conv.id_convocatoria ? 'border-green-500 bg-green-50/10 dark:border-green-900/30 ring-1 ring-green-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                            @click="editForm.id_convocatoria = conv.id_convocatoria">
+
+                                            <div class="flex items-center h-5" @click.stop>
+                                                <input type="radio" :id="'conv-radio-' + conv.id_convocatoria"
+                                                    :value="conv.id_convocatoria" v-model="editForm.id_convocatoria"
+                                                    class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+
+                                            <label :for="'conv-radio-' + conv.id_convocatoria"
+                                                class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full"
+                                                @click.stop="editForm.id_convocatoria = conv.id_convocatoria">
+                                                <span class="block font-semibold"
+                                                    :class="editForm.id_convocatoria === conv.id_convocatoria ? 'text-green-700 dark:text-green-400' : ''">
+                                                    Nº {{ conv.num_convocatoria }}
+                                                </span>
+                                                <span class="block text-[11px] text-gray-500 dark:text-gray-400 font-normal mt-0.5 line-clamp-2">
+                                                    {{ conv.titulo_convocatoria }}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div v-if="convocatoriasCatalogo.length === 0"
+                                            class="col-span-2 text-xs text-gray-400 italic p-2 text-center">
+                                            No hay convocatorias activas disponibles en el sistema...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span class="p-1 rounded-md bg-indigo-50 text-indigo-600 mt-0.5 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Investigación</h4>
+                                    <p class="text-xs text-gray-500">Líneas y sublíneas vinculadas al proyecto.</p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
+                                <div class="flex p-3 text-sm text-amber-800 rounded-lg bg-amber-50 dark:bg-gray-800 dark:text-amber-300" role="alert">
+                                    <svg aria-hidden="true" class="flex-shrink-0 inline w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <div>
+                                        <span class="font-medium">Selección Automática:</span> 
+                                        Estos campos se asignan de manera automática basándose en la <strong>Facultad Prioritaria</strong> y 
+                                        <strong>Carrera Prioritaria</strong>. 
+                                        Modifique dichos parámetros arriba si desea cambiar las líneas.
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="p-3 border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 rounded-lg opacity-80">
+                                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                                            Líneas de Investigación (Facultad)
+                                        </label>
+                                        <ul v-if="lineasFiltradas.length > 0" class="space-y-1">
+                                            <li v-for="lin in lineasFiltradas" :key="lin.id_lin_investiga" class="flex items-start text-xs text-gray-600 dark:text-gray-400 font-medium">
+                                                <span class="text-indigo-500 mr-1.5">✓</span> {{ lin.nombre_lin }}
+                                            </li>
+                                        </ul>
+                                        <div v-else class="text-xs text-gray-400 italic">No hay líneas disponibles para esta facultad...</div>
+                                    </div>
+
+                                    <div class="p-3 border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 rounded-lg opacity-80">
+                                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                                            Sublíneas de Investigación (Carrera)
+                                        </label>
+                                        <ul v-if="sublineasFiltradas.length > 0" class="space-y-1">
+                                            <li v-for="sub in sublineasFiltradas" :key="sub.id_sublin_investiga" class="flex items-start text-xs text-gray-600 dark:text-gray-400 font-medium">
+                                                <span class="text-indigo-500 mr-1.5">✓</span> {{ sub.nombre_sublin }}
+                                            </li>
+                                        </ul>
+                                        <div v-else class="text-xs text-gray-400 italic">No hay sublíneas disponibles para esta carrera...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span class="p-1 rounded-md bg-emerald-50 text-emerald-600 mt-0.5 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Clasificación UNESCO</h4>
+                                    <p class="text-xs text-gray-500">Áreas, Subáreas y Áreas específicas de conocimiento vinculadas.</p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    
+                                    <div class="p-3 border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 rounded-lg">
+                                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                                            1. Áreas de Conocimiento
+                                        </label>
+                                        <div class="max-h-48 overflow-y-auto space-y-1.5 pr-1 structure-scrollbar">
+                                            <label v-for="area in unescoAreasPadre" :key="area.sau_id" class="flex items-start gap-2 p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer text-xs">
+                                                <input type="checkbox" 
+                                                    :value="area.sau_id" 
+                                                    v-model="editForm.unesco_areas"
+                                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-0.5">
+                                                <span class="text-gray-700 dark:text-gray-300 font-medium">({{ area.sau_id }}) {{ area.sau_descripcion }}</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 rounded-lg">
+                                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                                            2. Subáreas de Conocimiento
+                                        </label>
+                                        <div v-if="unescoSubareasFiltradas.length > 0" class="max-h-48 overflow-y-auto space-y-1.5 pr-1 structure-scrollbar">
+                                            <label v-for="subarea in unescoSubareasFiltradas" :key="subarea.sau_id" class="flex items-start gap-2 p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer text-xs">
+                                                <input type="checkbox" 
+                                                    :value="subarea.sau_id" 
+                                                    v-model="editForm.unesco_areas"
+                                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-0.5">
+                                                <span class="text-gray-600 dark:text-gray-400">({{ subarea.sau_id }}) {{ subarea.sau_descripcion }}</span>
+                                            </label>
+                                        </div>
+                                        <div v-else class="text-xs text-gray-400 italic p-2">Seleccione un Área para desplegar sus subáreas...</div>
+                                    </div>
+
+                                    <div class="p-3 border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 rounded-lg">
+                                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                                            3. Áreas Específicas
+                                        </label>
+                                        <div v-if="unescoEspecificasFiltradas.length > 0" class="max-h-48 overflow-y-auto space-y-1.5 pr-1 structure-scrollbar">
+                                            <label v-for="esp in unescoEspecificasFiltradas" :key="esp.sau_id" class="flex items-start gap-2 p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer text-xs">
+                                                <input type="checkbox" 
+                                                    :value="esp.sau_id" 
+                                                    v-model="editForm.unesco_areas"
+                                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-0.5">
+                                                <span class="text-gray-600 dark:text-gray-400">({{ esp.sau_id }}) {{ esp.sau_descripcion }}</span>
+                                            </label>
+                                        </div>
+                                        <div v-else class="text-xs text-gray-400 italic p-2">Seleccione una Subárea para desplegar sus áreas específicas...</div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -1596,6 +1776,11 @@ export default {
             facultadesCatalogo: [],
             carrerasCatalogo: [],
             dominiosCatalogo: [],
+            convocatoriasCatalogo: [],
+            dominioRecomendadoId: '',
+            lineasCatalogo: [],
+            sublineasCatalogo: [],
+            unescoCatalogo: [],
             proyectoEditandoId: null,
             editForm: {
                 proyect_nombre: '',
@@ -1610,7 +1795,10 @@ export default {
                 id_facultad_priori: '',
                 carreras: [],
                 id_carr_priori: '',
-                dominios_humanisticos: []
+                dominios_humanisticos: [],
+                id_convocatoria: '',
+                sublineas_investigacion: [],
+                unesco_areas: []
             }
 
         };
@@ -1649,6 +1837,14 @@ export default {
                 this.obtenerCarrerasPorFacultades();
             },
             deep: true
+        },
+        sublineasFiltradas: {
+            handler(nuevasSublineas) {
+                // Extrae solo los IDs de las sublíneas y los guarda en el form
+                this.editForm.sublineas_investigacion = nuevasSublineas.map(sub => sub.id_sublin_investiga);
+            },
+            deep: true,
+            immediate: true
         }
     },
     created() {
@@ -1676,6 +1872,32 @@ export default {
                 return !nombre.includes('DIRECTOR');
             });
         },
+        lineasFiltradas() {
+            if (!this.editForm.id_facultad_priori) return [];
+            return this.lineasCatalogo.filter(lin => String(lin.idfacultad) === String(this.editForm.id_facultad_priori));
+        },
+        // Filtra las sublíneas basadas en la Carrera Prioritaria seleccionada
+        sublineasFiltradas() {
+            if (!this.editForm.id_carr_priori) return [];
+            return this.sublineasCatalogo.filter(sub => String(sub.idCarr) === String(this.editForm.id_carr_priori));
+        },
+        unescoAreasPadre() {
+            return this.unescoCatalogo.filter(item => item.tipo_area === 'Área de conocimiento');
+        },
+        // Muestra las subáreas cuyos padres (sau_pdid) estén seleccionados en el formulario
+        unescoSubareasFiltradas() {
+            return this.unescoCatalogo.filter(item => {
+                return item.tipo_area === 'Subárea de conocimiento' && 
+                       this.editForm.unesco_areas.includes(item.sau_pdid);
+            });
+        },
+        // Muestra las áreas específicas cuyas subáreas de procedencia (sau_pdid) estén seleccionadas en el formulario
+        unescoEspecificasFiltradas() {
+            return this.unescoCatalogo.filter(item => {
+                return item.tipo_area === 'Área específica de conocimiento' && 
+                       this.editForm.unesco_areas.includes(item.sau_pdid);
+            });
+        }
     },
     methods: {
         formatDate(date) {
@@ -2174,6 +2396,10 @@ export default {
                 this.objetivosODSDisponibles = data.ods || [];
                 this.facultadesCatalogo = data.facultades_catalogo || [];
                 this.dominiosCatalogo = data.dominios_catalogo || [];
+                this.convocatoriasCatalogo = data.convocatorias_catalogo || [];
+                this.lineasCatalogo = data.lineas_catalogo || [];
+                this.sublineasCatalogo = data.sublineas_catalogo || [];
+                this.unescoCatalogo = data.unesco_catalogo || [];
 
                 this.editForm = {
                     proyect_nombre: data.proyecto.proyect_nombre || '',
@@ -2188,7 +2414,10 @@ export default {
                     id_facultad_priori: data.id_facultad_priori || '',
                     carreras: data.carreras_seleccionadas || [],
                     id_carr_priori: data.id_carr_priori || '',
-                    dominios_humanisticos: data.dominios_seleccionados || []
+                    dominios_humanisticos: data.dominios_seleccionados || [],
+                    id_convocatoria: data.proyecto.id_convocatoria || '',
+                    sublineas_investigacion: [],
+                    unesco_areas: data.unesco_seleccionadas || []
                 };
             } catch (error) {
                 mostraralertas2('Error al cargar datos del proyecto', 'error');
@@ -2251,10 +2480,10 @@ export default {
             // Analizamos cada dominio del catálogo buscando la mayor densidad de coincidencia léxica
             this.dominiosCatalogo.forEach(dom => {
                 const detalle = dom.detalle_dom_huma.toLowerCase();
-                
+
                 // Dividimos el nombre del dominio en palabras clave ignorando conectores cortos (< 4 letras)
                 const palabrasClave = detalle.split(/\s+/).filter(palabra => palabra.length > 4);
-                
+
                 let coincidencias = 0;
                 palabrasClave.forEach(palabra => {
                     // Quitamos sufijos comunes para una coincidencia flexible (por ejemplo: "educación" -> "educac")
@@ -2272,7 +2501,7 @@ export default {
 
             if (mejorDominioId) {
                 this.dominioRecomendadoId = mejorDominioId;
-                
+
                 // Si el usuario no lo tiene seleccionado, lo agregamos automáticamente
                 if (!this.editForm.dominios_humanisticos.includes(mejorDominioId)) {
                     this.editForm.dominios_humanisticos.push(mejorDominioId);
@@ -2334,6 +2563,10 @@ export default {
                 mostraralertas2('Debe seleccionar al menos un dominio humanístico.', 'error');
                 return;
             }
+            if (!this.editForm.id_convocatoria) {
+                mostraralertas2('Debe seleccionar una convocatoria obligatoriamente.', 'error');
+                return;
+            }
 
             this.guardando = true;
             try {
@@ -2353,6 +2586,7 @@ export default {
             this.showEditModal = false;
             this.proyectoEditandoId = null;
             this.yaTraducido = false;
+            this.unescoCatalogo = [];
             this.editForm = {
                 proyect_nombre: '',
                 proyect_titulo: '',
@@ -2365,7 +2599,10 @@ export default {
                 id_facultad_priori: '',
                 carreras: [],
                 id_carr_priori: '',
-                dominios_humanisticos: []
+                dominios_humanisticos: [],
+                id_convocatoria: '',
+                sublineas_investigacion: [],
+                unesco_areas: []
             };
         },
 
