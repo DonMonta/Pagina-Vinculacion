@@ -30,6 +30,7 @@ use App\Http\Controllers\Invi_equipo_departController;
 use App\Http\Controllers\Invi_equipo_rolesController;
 use App\Http\Controllers\Invi_responsableController;
 use App\Http\Controllers\Invi_convocatoriaController;
+use App\Http\Controllers\Invi_tip_proyectController;
 
 
 /*
@@ -253,6 +254,15 @@ Route::prefix('vin')->group(function () {
         Route::delete('inhabilitar_convocatoria/{id}', [Invi_convocatoriaController::class, 'destroy']);
         //Definición de endpoint para subir un archivo
         Route::post('subir_archivo_convocatoria', [Invi_convocatoriaController::class, 'uploadArchivo']);
+        /**
+         * --------------------------------------------------------------------------
+         * Rutas de Gestión de Tipos de Proyectos (Invi_tip_proyectController)
+         * --------------------------------------------------------------------------
+         * Define los puntos de acceso (endpoints) para el ciclo de vida del recurso.
+         * Incluye operaciones CRUD estandarizadas..
+         */
+        // Registra de forma automática los endpoints CRUD para la API (index, store, show, update)
+        Route::apiResource("invi_tipo_proyecto", Invi_tip_proyectController::class);
         
         
     });

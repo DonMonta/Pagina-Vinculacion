@@ -30,6 +30,7 @@ use App\Models\Invi_sub_linea_inves;
 use App\Models\Invi_detalle_lin_inves;
 use App\Models\SubareaUnesco;
 use App\Models\Invi_detalle_area_unesco;
+use App\Models\Invi_tip_proyect;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -288,6 +289,7 @@ class Invi_proyectosController extends Controller
 
         // NUEVO: Extraer los ids que el proyecto ya tiene guardados en `invi_detalle_area_unesco`
         $unescoSeleccionadas = $proyecto->invi_detalle_area_unesco->pluck('id_subarea_unesco')->toArray();
+        $tip_proyectCatalogo = Invi_tip_proyect::all();
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -310,7 +312,8 @@ class Invi_proyectosController extends Controller
             'sublineas_catalogo' => $sublineasCatalogo,
             'sublineas_seleccionadas' => $sublineasSeleccionadas,
             'unesco_catalogo' => $unescoCatalogo,
-            'unesco_seleccionadas' => $unescoSeleccionadas
+            'unesco_seleccionadas' => $unescoSeleccionadas,
+            'tip_proyect_catalogo' => $tip_proyectCatalogo
         ]);
     }
 
@@ -398,6 +401,7 @@ class Invi_proyectosController extends Controller
             $proyecto->proyect_titulo_en = $request->proyect_titulo_en;
             $proyecto->proyect_multidis = $request->proyect_multidis;
             $proyecto->id_convocatoria = $request->id_convocatoria;
+            $proyecto->id_tip_invi_proy = $request->id_tip_invi_proy;
 
 
             $proyecto->save();
