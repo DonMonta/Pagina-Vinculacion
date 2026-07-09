@@ -19,6 +19,7 @@ import RolesEquipoAllView from '../views/Admin/Equipo/RolesEquipoAllView.vue'
 import EquipoAllView from '../views/Admin/Equipo/EquipoAllView.vue'
 import ResponsableVinAllView from '../views/Admin/Equipo/ResponsableVinAllView.vue'
 import ConvocatoriaView from '../views/Admin/Proyectos/Convocatoria/ConvocatoriaView.vue'
+import TipoProyectoView from '../views/Admin/Proyectos/Tipos_Proyect_Vinc/Tipo_Proyect_VincView.vue'
 
 
 const routes = [
@@ -121,6 +122,11 @@ const routes = [
     path: '/site-admin/proyectos/convocatoria', 
     name: 'site-admin-proyectos-convocatoria',  
     component: ConvocatoriaView   
+  },
+  {
+    path: '/site-admin/proyectos/tipo_proyecto_vin', 
+    name: 'site-admin-proyectos-tipo_proyecto_vin',  
+    component: TipoProyectoView   
   },
 ]
 

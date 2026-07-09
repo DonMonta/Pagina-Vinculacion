@@ -231,6 +231,7 @@ const menuData = [
         name: "Proyectos",
         subItems: [
           { name: "Convocatorias", path: "/site-admin/proyectos/convocatoria", pro: false },
+          { name: "Tipos de Proyectos de Vinculación", path: "/site-admin/proyectos/tipo_proyecto_vin", pro: false },
           { name: "Lista de Proyectos", path: "/site-admin/proyectos", pro: false },
         ],
       },

@@ -620,13 +620,22 @@
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">1</span>
                         Datos Generales
                     </button>
+                    <button @click="activeTab = 'cobertura'"
+                        :class="activeTab === 'cobertura'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">2</span>
+                        Cobertura y Localización
+                    </button>
                 </div>
 
                 <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-gray-900">
                     <div v-if="cargandoEdicion" class="flex flex-col justify-center items-center py-20 gap-3">
                         <span
                             class="animate-spin h-10 w-10 border-4 border-brand-500 border-t-transparent rounded-full"></span>
-                        <p class="text-sm text-gray-500 font-medium">Sincronizando información del PEI...</p>
+                        <p class="text-sm text-gray-500 font-medium">Sincronizando información del Proyecto...</p>
                     </div>
 
                     <div v-else-if="activeTab === 'generales'" class="space-y-6 progress-fade">
@@ -1672,6 +1681,64 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span
+                                    class="p-1 rounded-md bg-blue-50 text-blue-600 mt-0.5 dark:bg-blue-950/40 dark:text-blue-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Tipo de proyecto de vinculación
+                                    </h4>
+                                    <p class="text-xs text-gray-500">
+                                        Seleccione el tipo de proyecto de vinculación que se rige en el proyecto.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
+                                <div class="space-y-2">
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        Seleccione el tipo de proyecto de vinculación: <span class="text-red-500">*</span>
+                                    </label>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                        <div v-for="conv in tip_proyectCatalogo" :key="'conv-' + conv.id_tip_invi_proy"
+                                            class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
+                                            :class="editForm.id_tip_invi_proy === conv.id_tip_invi_proy ? 'border-green-500 bg-green-50/10 dark:border-green-900/30 ring-1 ring-green-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                            @click="editForm.id_tip_invi_proy = conv.id_tip_invi_proy">
+
+                                            <div class="flex items-center h-5" @click.stop>
+                                                <input type="radio" :id="'conv-radio-' + conv.id_tip_invi_proy"
+                                                    :value="conv.id_tip_invi_proy" v-model="editForm.id_tip_invi_proy"
+                                                    class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+
+                                            <label :for="'conv-radio-' + conv.id_tip_invi_proy"
+                                                class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full"
+                                                @click.stop="editForm.id_tip_invi_proy = conv.id_tip_invi_proy">
+                                                <span class="block font-semibold"
+                                                    :class="editForm.id_tip_invi_proy === conv.id_tip_invi_proy ? 'text-green-700 dark:text-green-400' : ''">
+                                                    {{ conv.detalle_invi_proyect }}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div v-if="tip_proyectCatalogo.length === 0"
+                                            class="col-span-2 text-xs text-gray-400 italic p-2 text-center">
+                                            No hay tipos de proyecto de vinculación disponibles en el sistema...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="activeTab === 'cobertura'" class="space-y-6 progress-fade">
+                        
                     </div>
                 </div>
 
@@ -1781,6 +1848,7 @@ export default {
             lineasCatalogo: [],
             sublineasCatalogo: [],
             unescoCatalogo: [],
+            tip_proyectCatalogo: [],
             proyectoEditandoId: null,
             editForm: {
                 proyect_nombre: '',
@@ -1798,7 +1866,8 @@ export default {
                 dominios_humanisticos: [],
                 id_convocatoria: '',
                 sublineas_investigacion: [],
-                unesco_areas: []
+                unesco_areas: [],
+                id_tip_invi_proy: ''
             }
 
         };
@@ -2400,6 +2469,7 @@ export default {
                 this.lineasCatalogo = data.lineas_catalogo || [];
                 this.sublineasCatalogo = data.sublineas_catalogo || [];
                 this.unescoCatalogo = data.unesco_catalogo || [];
+                this.tip_proyectCatalogo = data.tip_proyect_catalogo || [];
 
                 this.editForm = {
                     proyect_nombre: data.proyecto.proyect_nombre || '',
@@ -2417,7 +2487,8 @@ export default {
                     dominios_humanisticos: data.dominios_seleccionados || [],
                     id_convocatoria: data.proyecto.id_convocatoria || '',
                     sublineas_investigacion: [],
-                    unesco_areas: data.unesco_seleccionadas || []
+                    unesco_areas: data.unesco_seleccionadas || [],
+                    id_tip_invi_proy: data.proyecto.id_tip_invi_proy || ''
                 };
             } catch (error) {
                 mostraralertas2('Error al cargar datos del proyecto', 'error');
@@ -2567,6 +2638,10 @@ export default {
                 mostraralertas2('Debe seleccionar una convocatoria obligatoriamente.', 'error');
                 return;
             }
+            if (!this.editForm.id_tip_invi_proy) {
+                mostraralertas2('Debe seleccionar un tipo de proyecto de vinculación obligatoriamente.', 'error');
+                return;
+            }
 
             this.guardando = true;
             try {
@@ -2587,6 +2662,7 @@ export default {
             this.proyectoEditandoId = null;
             this.yaTraducido = false;
             this.unescoCatalogo = [];
+            this.tip_proyectCatalogo = [];
             this.editForm = {
                 proyect_nombre: '',
                 proyect_titulo: '',
@@ -2602,7 +2678,8 @@ export default {
                 dominios_humanisticos: [],
                 id_convocatoria: '',
                 sublineas_investigacion: [],
-                unesco_areas: []
+                unesco_areas: [],
+                id_tip_invi_proy: ''
             };
         },
 
