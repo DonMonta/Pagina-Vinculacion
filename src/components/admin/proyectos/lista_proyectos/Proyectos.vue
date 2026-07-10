@@ -637,9 +637,7 @@
                             class="animate-spin h-10 w-10 border-4 border-brand-500 border-t-transparent rounded-full"></span>
                         <p class="text-sm text-gray-500 font-medium">Sincronizando información del Proyecto...</p>
                     </div>
-
                     <div v-else-if="activeTab === 'generales'" class="space-y-6 progress-fade">
-
                         <div
                             class="bg-gray-50/60 dark:bg-gray-800/30 p-4 rounded-xl border border-gray-100 dark:border-gray-800/60">
                             <div class="flex items-start gap-2.5 mb-4">
@@ -760,7 +758,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="space-y-3">
                             <div class="flex items-start gap-2.5">
                                 <span
@@ -1682,55 +1679,53 @@
                             </div>
                         </div>
                         <div class="space-y-3 mt-6">
-                            <div class="flex items-start gap-2.5">
-                                <span
-                                    class="p-1 rounded-md bg-blue-50 text-blue-600 mt-0.5 dark:bg-blue-950/40 dark:text-blue-400">
-                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
-                                    </svg>
-                                </span>
-                                <div>
-                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Tipo de proyecto de vinculación
-                                    </h4>
-                                    <p class="text-xs text-gray-500">
-                                        Seleccione el tipo de proyecto de vinculación que se rige en el proyecto.
-                                    </p>
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-2.5">
+                                    <span class="p-1 rounded-md bg-blue-50 text-blue-600 mt-0.5 dark:bg-blue-950/40 dark:text-blue-400">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Tipo de proyecto de vinculación</h4>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            Seleccione la modalidad o categoría específica que regirá el desarrollo del proyecto. Esta clasificación es fundamental ya que determina los lineamientos normativos, el formato de los informes técnicos y los criterios institucionales de evaluación aplicables.
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
-                                <div class="space-y-2">
-                                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                        Seleccione el tipo de proyecto de vinculación: <span class="text-red-500">*</span>
-                                    </label>
+                                <div class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
+                                    <div class="space-y-2">
+                                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                            Seleccione el tipo de proyecto de vinculación: <span class="text-red-500">*</span>
+                                        </label>
 
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
-                                        <div v-for="conv in tip_proyectCatalogo" :key="'conv-' + conv.id_tip_invi_proy"
-                                            class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
-                                            :class="editForm.id_tip_invi_proy === conv.id_tip_invi_proy ? 'border-green-500 bg-green-50/10 dark:border-green-900/30 ring-1 ring-green-500/30' : 'border-gray-200 dark:border-gray-800'"
-                                            @click="editForm.id_tip_invi_proy = conv.id_tip_invi_proy">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                            <div v-for="conv in tip_proyectCatalogo" :key="'conv-' + conv.id_tip_invi_proy"
+                                                class="flex items-start p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
+                                                :class="editForm.id_tip_invi_proy === conv.id_tip_invi_proy ? 'border-green-500 bg-green-50/10 dark:border-green-900/30 ring-1 ring-green-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                                @click="editForm.id_tip_invi_proy = conv.id_tip_invi_proy">
 
-                                            <div class="flex items-center h-5" @click.stop>
-                                                <input type="radio" :id="'conv-radio-' + conv.id_tip_invi_proy"
-                                                    :value="conv.id_tip_invi_proy" v-model="editForm.id_tip_invi_proy"
-                                                    class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900">
+                                                <div class="flex items-center h-5" @click.stop>
+                                                    <input type="radio" :id="'conv-radio-' + conv.id_tip_invi_proy"
+                                                        :value="conv.id_tip_invi_proy" v-model="editForm.id_tip_invi_proy"
+                                                        class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900">
+                                                </div>
+
+                                                <label :for="'conv-radio-' + conv.id_tip_invi_proy"
+                                                    class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full"
+                                                    @click.stop="editForm.id_tip_invi_proy = conv.id_tip_invi_proy">
+                                                    <span class="block font-semibold"
+                                                        :class="editForm.id_tip_invi_proy === conv.id_tip_invi_proy ? 'text-green-700 dark:text-green-400' : ''">
+                                                        {{ conv.detalle_invi_proyect }}
+                                                    </span>
+                                                </label>
                                             </div>
 
-                                            <label :for="'conv-radio-' + conv.id_tip_invi_proy"
-                                                class="ml-3 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer w-full"
-                                                @click.stop="editForm.id_tip_invi_proy = conv.id_tip_invi_proy">
-                                                <span class="block font-semibold"
-                                                    :class="editForm.id_tip_invi_proy === conv.id_tip_invi_proy ? 'text-green-700 dark:text-green-400' : ''">
-                                                    {{ conv.detalle_invi_proyect }}
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div v-if="tip_proyectCatalogo.length === 0"
-                                            class="col-span-2 text-xs text-gray-400 italic p-2 text-center">
-                                            No hay tipos de proyecto de vinculación disponibles en el sistema...
+                                            <div v-if="tip_proyectCatalogo.length === 0"
+                                                class="col-span-2 text-xs text-gray-400 italic p-2 text-center">
+                                                No hay tipos de proyecto de vinculación disponibles en el sistema...
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1738,7 +1733,132 @@
                         </div>
                     </div>
                     <div v-else-if="activeTab === 'cobertura'" class="space-y-6 progress-fade">
-                        
+                        <div class="space-y-3 mt-6">
+                            <div class="flex items-start gap-2.5">
+                                <span class="p-1 rounded-md bg-blue-50 text-blue-600 mt-0.5 dark:bg-blue-950/40 dark:text-blue-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A11.952 11.952 0 0 1 12 16.5c-2.998 0-5.74-1.1-7.843-2.918m0 0A8.959 8.959 0 0 1 3 12c0-.778.099-1.533.284-2.253" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Cobertura y localización</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        Especifique el alcance territorial y la delimitación geográfica del impacto del proyecto. Esto permite clasificar el radio de acción de las actividades y la vinculación de los beneficiarios mapeados.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
+                                <div class="space-y-2">
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        Seleccione la cobertura del proyecto: <span class="text-red-500">*</span>
+                                    </label>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                                        <div v-for="cob in ['Local', 'Regional', 'Nacional', 'Internacional']" :key="'cob-' + cob"
+                                            class="flex items-center p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
+                                            :class="editForm.proyect_cobertura === cob ? 'border-green-500 bg-green-50/10 dark:border-green-900/30 ring-1 ring-green-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                            @click="editForm.proyect_cobertura = cob">
+
+                                            <div class="flex items-center h-5" @click.stop>
+                                                <input type="radio" :id="'cob-radio-' + cob"
+                                                    :value="cob" v-model="editForm.proyect_cobertura"
+                                                    class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+
+                                            <label :for="'cob-radio-' + cob"
+                                                class="ml-3 text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer w-full"
+                                                @click.stop="editForm.proyect_cobertura = cob">
+                                                <span :class="editForm.proyect_cobertura === cob ? 'text-green-700 dark:text-green-400' : ''">
+                                                    {{ cob }}
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-6 mt-4">
+    
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Delimitación Territorial Específica</h4>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Seleccione la jerarquía geográfica. Puede marcar múltiples provincias, cantones y parroquias.</p>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">1. Zona de Planificación</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <label v-for="zona in zonasCatalogo" :key="zona.id_zona_plan" 
+                                        class="cursor-pointer transition-all border rounded-lg px-3 py-1.5 text-xs font-medium"
+                                        :class="editForm.id_zona_plan === zona.id_zona_plan ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300'">
+                                        <input type="radio" :value="zona.id_zona_plan" v-model="editForm.id_zona_plan" @change="alCambiarZona" class="hidden">
+                                        {{ zona.nombre_zona }}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div v-if="editForm.id_zona_plan" class="space-y-2 pt-3 border-t border-gray-100 dark:border-gray-800 animate-fade-in-up">
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">2. Provincias <span class="text-[10px] text-gray-400 font-normal ml-1">(Puede seleccionar varias)</span></label>
+                                <div class="flex flex-wrap gap-2">
+                                    <label v-for="prov in provinciasDisponibles" :key="prov.id_provincia" 
+                                        class="cursor-pointer transition-all border rounded-lg px-3 py-1.5 text-xs font-medium flex items-center gap-1.5"
+                                        :class="editForm.provincias.includes(prov.id_provincia) ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300'">
+                                        <input type="checkbox" :value="prov.id_provincia" v-model="editForm.provincias" @change="alCambiarProvincia" class="hidden">
+                                        <svg v-if="editForm.provincias.includes(prov.id_provincia)" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                        {{ prov.detalle }}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div v-if="editForm.provincias.length > 0" class="space-y-2 pt-3 border-t border-gray-100 dark:border-gray-800 animate-fade-in-up">
+                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">3. Cantones</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <label v-for="can in cantonesDisponibles" :key="can.id_canton" 
+                                        class="cursor-pointer transition-all border rounded-lg px-3 py-1.5 text-xs font-medium flex items-center gap-1.5"
+                                        :class="editForm.cantones.includes(can.id_canton) ? 'bg-teal-600 text-white border-teal-600 shadow-md' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300'">
+                                        <input type="checkbox" :value="can.id_canton" v-model="editForm.cantones" @change="alCambiarCanton" class="hidden">
+                                        <svg v-if="editForm.cantones.includes(can.id_canton)" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                        {{ can.detalle }}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div v-if="editForm.cantones.length > 0" class="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-800 animate-fade-in-up">
+                                
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <label class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">4. Parroquias</label>
+                                    
+                                    <div class="relative w-full sm:w-64">
+                                        <svg class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                        <input type="text" v-model="busquedaParroquia" placeholder="Buscar parroquia..." 
+                                            class="w-full pl-9 pr-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-200">
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2 mb-2">
+                                    <button v-for="prov in provinciasSeleccionadasObj" :key="'all-' + prov.id_provincia" type="button"
+                                        @click="seleccionarTodasLasParroquiasDeProvincia(prov.id_provincia)"
+                                        class="px-2.5 py-1 bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 rounded text-[11px] font-semibold transition-colors">
+                                        Marcar TODAS en {{ prov.detalle }}
+                                    </button>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2 max-h-60 overflow-y-auto p-1">
+                                    <label v-for="par in parroquiasFiltradas" :key="par.idparroquia" 
+                                        class="cursor-pointer transition-all border rounded-lg px-2.5 py-1 text-[11px] font-medium flex items-center gap-1"
+                                        :class="editForm.parroquias.includes(par.idparroquia) ? 'bg-purple-600 text-white border-purple-600 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:bg-gray-950 dark:border-gray-800 dark:text-gray-400'">
+                                        <input type="checkbox" :value="par.idparroquia" v-model="editForm.parroquias" class="hidden">
+                                        <svg v-if="editForm.parroquias.includes(par.idparroquia)" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                        {{ par.parroquia }}
+                                        <span class="opacity-60 text-[9px] ml-1">({{ par.tipoparroquia }})</span>
+                                    </label>
+                                    
+                                    <div v-if="parroquiasFiltradas.length === 0" class="text-xs text-gray-400 italic">
+                                        No se encontraron parroquias para la búsqueda o cantones actuales.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1849,7 +1969,13 @@ export default {
             sublineasCatalogo: [],
             unescoCatalogo: [],
             tip_proyectCatalogo: [],
+            zonasCatalogo: [],
+            detallesZonasCatalogo: [],
+            provinciasCatalogo: [],
+            cantonesCatalogo: [],
+            parroquiasCatalogo: [],
             proyectoEditandoId: null,
+            busquedaParroquia: '',
             editForm: {
                 proyect_nombre: '',
                 proyect_titulo: '',
@@ -1867,7 +1993,12 @@ export default {
                 id_convocatoria: '',
                 sublineas_investigacion: [],
                 unesco_areas: [],
-                id_tip_invi_proy: ''
+                id_tip_invi_proy: '',
+                proyect_cobertura: '',
+                id_zona_plan: '',
+                provincias: [], // Arreglo de id_provincia
+                cantones: [],   // Arreglo de id_canton
+                parroquias: []  // Arreglo de idparroquia
             }
 
         };
@@ -1966,6 +2097,46 @@ export default {
                 return item.tipo_area === 'Área específica de conocimiento' && 
                        this.editForm.unesco_areas.includes(item.sau_pdid);
             });
+        },
+        // 1. Filtrar Provincias según la Zona única
+        provinciasDisponibles() {
+            if (!this.editForm.id_zona_plan) return [];
+            const provinciasIds = this.detallesZonasCatalogo
+                .filter(d => d.id_zona_plan == this.editForm.id_zona_plan)
+                .map(d => d.id_provincia);
+            return this.provinciasCatalogo.filter(p => provinciasIds.includes(p.id_provincia));
+        },
+        // 2. Objetos de las provincias actualmente marcadas (útil para los botones)
+        provinciasSeleccionadasObj() {
+            return this.provinciasCatalogo.filter(p => this.editForm.provincias.includes(p.id_provincia));
+        },
+        // 3. Filtrar Cantones según las Provincias marcadas
+        cantonesDisponibles() {
+            if (this.editForm.provincias.length === 0) return [];
+            const provinciasMarcadasObj = this.provinciasCatalogo.filter(p => this.editForm.provincias.includes(p.id_provincia));
+            const codigosProvincias = provinciasMarcadasObj.map(p => p.codigo);
+            // Aquí relacionamos el ID de la provincia seleccionada con 'codigoprovincia' del cantón
+            // NOTA: Verifica en tu base de datos si Canton se enlaza con ID o con código. Asumo que es codigoprovincia = id_provincia según tu modelo
+            return this.cantonesCatalogo.filter(c => codigosProvincias.includes(c.codigoprovincia));
+        },
+        // 4. Filtrar Parroquias resolviendo el BUG del código + Búsqueda de texto
+        parroquiasFiltradas() {
+            if (this.editForm.cantones.length === 0) return [];
+            
+            // a) Obtener los OBJETOS de los cantones seleccionados para extraer su "codigo" (no su id)
+            const cantonesMarcadosObj = this.cantonesCatalogo.filter(c => this.editForm.cantones.includes(c.id_canton));
+            const codigosCantones = cantonesMarcadosObj.map(c => c.codigo); // <-- ¡LA CLAVE AQUÍ!
+
+            // b) Filtrar las parroquias cuyo 'codigocanton' coincida con los códigos extraídos
+            let filtradas = this.parroquiasCatalogo.filter(p => codigosCantones.includes(p.codigocanton));
+
+            // c) Aplicar búsqueda de texto si el usuario escribió algo
+            if (this.busquedaParroquia.trim() !== '') {
+                const search = this.busquedaParroquia.toLowerCase();
+                filtradas = filtradas.filter(p => p.parroquia.toLowerCase().includes(search));
+            }
+
+            return filtradas;
         }
     },
     methods: {
@@ -2406,7 +2577,6 @@ export default {
                 respuestas.forEach(res => {
                     if (res.data && res.data.data) {
                         unificado = [...unificado, ...res.data.data];
-                        console.log(res.data.data);
                     }
                 });
 
@@ -2457,6 +2627,7 @@ export default {
             try {
                 // Asegúrate de crear esta ruta en tus routes/api.php de Laravel
                 const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
+                console.log(response);
                 const data = response.data;
 
                 this.objetivosPeiDisponibles = data.objetivos_pei;
@@ -2470,6 +2641,11 @@ export default {
                 this.sublineasCatalogo = data.sublineas_catalogo || [];
                 this.unescoCatalogo = data.unesco_catalogo || [];
                 this.tip_proyectCatalogo = data.tip_proyect_catalogo || [];
+                this.zonasCatalogo = data.zonas_catalogo || [];
+                this.detallesZonasCatalogo = data.detalles_zonas_catalogo || [];
+                this.provinciasCatalogo = data.provincias_catalogo || [];
+                this.cantonesCatalogo = data.cantones_catalogo || [];
+                this.parroquiasCatalogo = data.parroquias_catalogo || [];
 
                 this.editForm = {
                     proyect_nombre: data.proyecto.proyect_nombre || '',
@@ -2488,10 +2664,16 @@ export default {
                     id_convocatoria: data.proyecto.id_convocatoria || '',
                     sublineas_investigacion: [],
                     unesco_areas: data.unesco_seleccionadas || [],
-                    id_tip_invi_proy: data.proyecto.id_tip_invi_proy || ''
+                    id_tip_invi_proy: data.proyecto.id_tip_invi_proy || '',
+                    proyect_cobertura: data.proyecto.proyect_cobertura || '',
+                    id_zona_plan: data.cobertura_guardada?.id_zona_plan || '',
+                    provincias:   data.cobertura_guardada?.provincias || [],
+                    cantones:     data.cobertura_guardada?.cantones || [],
+                    parroquias:   data.cobertura_guardada?.parroquias || []
                 };
             } catch (error) {
                 mostraralertas2('Error al cargar datos del proyecto', 'error');
+                console.error(error);
                 this.cerrarEdicion();
             } finally {
                 this.cargandoEdicion = false;
@@ -2618,6 +2800,54 @@ export default {
                 console.error("Error en traducción:", error);
                 mostraralertas2('Error al conectar con el servicio de traducción', 'error');
             }
+        },
+        alCambiarZona() {
+            // Si cambian la zona, se debe resetear lo de abajo porque ya no pertenecen
+            this.editForm.provincias = [];
+            this.editForm.cantones = [];
+            this.editForm.parroquias = [];
+        },
+        alCambiarProvincia() {
+            // Limpiar cantones y parroquias que ya no pertenezcan a las provincias seleccionadas
+            const cantonesValidos = this.cantonesDisponibles.map(c => c.id_canton);
+            this.editForm.cantones = this.editForm.cantones.filter(id => cantonesValidos.includes(id));
+            this.alCambiarCanton(); // Disparar revisión de parroquias
+        },
+        alCambiarCanton() {
+            // Extraer códigos válidos para limpiar parroquias "huerfanas"
+            const cantonesMarcadosObj = this.cantonesCatalogo.filter(c => this.editForm.cantones.includes(c.id_canton));
+            const codigosValidos = cantonesMarcadosObj.map(c => c.codigo);
+            const parroquiasValidas = this.parroquiasCatalogo
+                .filter(p => codigosValidos.includes(p.codigocanton))
+                .map(p => p.idparroquia);
+            
+            this.editForm.parroquias = this.editForm.parroquias.filter(id => parroquiasValidas.includes(id));
+        },
+
+        // EL BOTÓN MÁGICO: Marcar TODAS las parroquias (rurales y urbanas) de una provincia
+        seleccionarTodasLasParroquiasDeProvincia(idProvincia) {
+            // 1. Encontrar todos los cantones de esa provincia
+            const cantonesDeLaProvincia = this.cantonesCatalogo.filter(c => c.codigoprovincia == idProvincia);
+            
+            // 2. Extraer sus IDs para marcarlos visualmente en la sección de Cantones
+            const idsCantones = cantonesDeLaProvincia.map(c => c.id_canton);
+            
+            // Agregarlos sin duplicar al arreglo form
+            idsCantones.forEach(id => {
+                if (!this.editForm.cantones.includes(id)) this.editForm.cantones.push(id);
+            });
+
+            // 3. Extraer los CÓDIGOS de esos cantones para buscar sus parroquias
+            const codigosCantones = cantonesDeLaProvincia.map(c => c.codigo);
+            
+            // 4. Encontrar todas las parroquias y sumarlas al arreglo de parroquias seleccionadas
+            const parroquiasASeleccionar = this.parroquiasCatalogo.filter(p => codigosCantones.includes(p.codigocanton));
+            
+            parroquiasASeleccionar.forEach(p => {
+                if (!this.editForm.parroquias.includes(p.idparroquia)) {
+                    this.editForm.parroquias.push(p.idparroquia);
+                }
+            });
         },
 
         async guardarEdicion() {
