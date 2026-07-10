@@ -25,5 +25,9 @@ class Detalle_zona_planificacion extends Model
     {
         return $this->belongsTo(Provincia::class, 'id_provincia');
     }
+    public function invi_detalle_cobe()
+    {
+        return $this->hasMany(Invi_detalle_cobe::class, 'id_detalle_zona_plan');
+    }
 
 }

@@ -31,6 +31,12 @@ use App\Models\Invi_detalle_lin_inves;
 use App\Models\SubareaUnesco;
 use App\Models\Invi_detalle_area_unesco;
 use App\Models\Invi_tip_proyect;
+use App\Models\Zona_planificacion;
+use App\Models\Detalle_zona_planificacion;
+use App\Models\Provincia;
+use App\Models\Canton;
+use App\Models\Parroquia;
+use App\Models\Invi_detalle_cobe;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -166,7 +172,8 @@ class Invi_proyectosController extends Controller
             'invi_detalle_carr_proy',
             'invi_detalle_dom_hum',
             'invi_detalle_lin_inves',
-            'invi_detalle_area_unesco'
+            'invi_detalle_area_unesco',
+            'invi_detalle_cobe',
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -290,6 +297,38 @@ class Invi_proyectosController extends Controller
         // NUEVO: Extraer los ids que el proyecto ya tiene guardados en `invi_detalle_area_unesco`
         $unescoSeleccionadas = $proyecto->invi_detalle_area_unesco->pluck('id_subarea_unesco')->toArray();
         $tip_proyectCatalogo = Invi_tip_proyect::all();
+        $zonasCatalogo = Zona_planificacion::all();
+        $detallesZonasCatalogo = Detalle_zona_planificacion::all();
+        $provinciasCatalogo = Provincia::all();
+        $cantonesCatalogo = Canton::all();
+        $parroquiasCatalogo = Parroquia::all();
+
+        // NUEVO: Estructuramos los datos de cobertura guardada en arreglos planos y valores únicos
+        $id_zona_plan_guardada = '';
+        $provincias_guardadas = [];
+        $cantones_guardados = [];
+        $parroquias_guardadas = [];
+
+        foreach ($proyecto->invi_detalle_cobe as $cobe) {
+            // Obtenemos la zona (solo necesitamos hacerlo una vez ya que es selección única)
+            if (empty($id_zona_plan_guardada) && $cobe->id_provincia) {
+                $detalleZona = Detalle_zona_planificacion::where('id_provincia', $cobe->id_provincia)->first();
+                if ($detalleZona) {
+                    $id_zona_plan_guardada = $detalleZona->id_zona_plan;
+                }
+            }
+
+            // Agrupamos IDs únicos
+            if ($cobe->id_provincia && !in_array($cobe->id_provincia, $provincias_guardadas)) {
+                $provincias_guardadas[] = $cobe->id_provincia;
+            }
+            if ($cobe->id_canton && !in_array($cobe->id_canton, $cantones_guardados)) {
+                $cantones_guardados[] = $cobe->id_canton;
+            }
+            if ($cobe->idparroquia && !in_array($cobe->idparroquia, $parroquias_guardadas)) {
+                $parroquias_guardadas[] = $cobe->idparroquia;
+            }
+        }
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -313,7 +352,20 @@ class Invi_proyectosController extends Controller
             'sublineas_seleccionadas' => $sublineasSeleccionadas,
             'unesco_catalogo' => $unescoCatalogo,
             'unesco_seleccionadas' => $unescoSeleccionadas,
-            'tip_proyect_catalogo' => $tip_proyectCatalogo
+            'tip_proyect_catalogo' => $tip_proyectCatalogo,
+            'zonas_catalogo' => $zonasCatalogo,
+            'detalles_zonas_catalogo' => $detallesZonasCatalogo,
+            'provincias_catalogo' => $provinciasCatalogo,
+            'cantones_catalogo' => $cantonesCatalogo,
+            'parroquias_catalogo' => $parroquiasCatalogo,
+            
+            // NUEVO: Devolvemos la estructura plana
+            'cobertura_guardada' => [
+                'id_zona_plan' => $id_zona_plan_guardada,
+                'provincias'   => $provincias_guardadas,
+                'cantones'     => $cantones_guardados,
+                'parroquias'   => $parroquias_guardadas,
+            ]
         ]);
     }
 
@@ -402,6 +454,7 @@ class Invi_proyectosController extends Controller
             $proyecto->proyect_multidis = $request->proyect_multidis;
             $proyecto->id_convocatoria = $request->id_convocatoria;
             $proyecto->id_tip_invi_proy = $request->id_tip_invi_proy;
+            $proyecto->proyect_cobertura = $request->proyect_cobertura;
 
 
             $proyecto->save();
@@ -520,6 +573,71 @@ class Invi_proyectosController extends Controller
                         'proyect_id'        => $id,
                         'id_subarea_unesco' => $id_unesco
                     ]);
+                }
+            }
+            Invi_detalle_cobe::where('proyect_id', $id)->delete();
+
+            $idZona = $request->id_zona_plan;
+            $provincias = $request->provincias ?? [];
+            $cantones = $request->cantones ?? [];
+            $parroquias = $request->parroquias ?? [];
+
+            if ($idZona && count($provincias) > 0) {
+                // Obtener datos maestros para armar las relaciones inversas
+                $cantonesDB = Canton::whereIn('id_canton', $cantones)->get()->keyBy('id_canton');
+                $parroquiasDB = Parroquia::whereIn('idparroquia', $parroquias)->get();
+
+                foreach ($provincias as $idProv) {
+                    // Buscamos el ID intermedio de la zona
+                    $detalleZona = Detalle_zona_planificacion::where('id_zona_plan', $idZona)
+                        ->where('id_provincia', $idProv)->first();
+                    $idDetalleZona = $detalleZona ? $detalleZona->id_detalle_zona_plan : null;
+
+                    // Buscar qué cantones de los seleccionados pertenecen a ESTA provincia
+                    $cantonesDeEstaProv = $cantonesDB->filter(function ($c) use ($idProv) {
+                        return $c->codigoprovincia == $idProv;
+                    });
+
+                    if ($cantonesDeEstaProv->isEmpty()) {
+                        // El usuario marcó la provincia, pero NO marcó ningún cantón dentro de ella
+                        Invi_detalle_cobe::insert([
+                            'proyect_id'           => $id,
+                            'id_detalle_zona_plan' => $idDetalleZona,
+                            'id_provincia'         => $idProv,
+                            'id_canton'            => null,
+                            'idparroquia'          => null,
+                        ]);
+                    } else {
+                        foreach ($cantonesDeEstaProv as $catObj) {
+                            // Buscar qué parroquias seleccionadas pertenecen a ESTE cantón
+                            // OJO: Comparamos con el $catObj->codigo como descubrimos en el bug
+                            $parroquiasDeEsteCanton = $parroquiasDB->filter(function ($p) use ($catObj) {
+                                return $p->codigocanton == $catObj->codigo;
+                            });
+
+                            if ($parroquiasDeEsteCanton->isEmpty()) {
+                                // Marcó el cantón, pero no sus parroquias específicas
+                                Invi_detalle_cobe::insert([
+                                    'proyect_id'           => $id,
+                                    'id_detalle_zona_plan' => $idDetalleZona,
+                                    'id_provincia'         => $idProv,
+                                    'id_canton'            => $catObj->id_canton,
+                                    'idparroquia'          => null,
+                                ]);
+                            } else {
+                                // Nivel de profundidad máximo: guardar la parroquia
+                                foreach ($parroquiasDeEsteCanton as $parrObj) {
+                                    Invi_detalle_cobe::insert([
+                                        'proyect_id'           => $id,
+                                        'id_detalle_zona_plan' => $idDetalleZona,
+                                        'id_provincia'         => $idProv,
+                                        'id_canton'            => $catObj->id_canton,
+                                        'idparroquia'          => $parrObj->idparroquia,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
                 }
             }
 

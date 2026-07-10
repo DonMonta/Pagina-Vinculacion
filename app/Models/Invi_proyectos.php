@@ -24,7 +24,8 @@ class Invi_proyectos extends Model
         'fechafin',
         'proyect_tipo',
         'id_convocatoria',
-        'id_tip_invi_proy'
+        'id_tip_invi_proy',
+        'proyect_cobertura',
     ];
     public function invi_detalle_integrante()
     {
@@ -69,6 +70,10 @@ class Invi_proyectos extends Model
     public function invi_tip_proyectos()
     {
         return $this->hasOne(Invi_tip_proyect::class, 'id_tip_invi_proy');
+    }
+    public function invi_detalle_cobe()
+    {
+        return $this->hasMany(Invi_detalle_cobe::class, 'proyect_id');
     }
 
 

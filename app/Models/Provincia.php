@@ -22,5 +22,13 @@ class Provincia extends Model
     {
         return $this->hasMany(Detalle_zona_planificacion::class, 'id_provincia');
     }
+    public function invi_detalle_cobe()
+    {
+        return $this->hasMany(Invi_detalle_cobe::class, 'id_provincia');
+    }
+    public function cantones()
+    {
+        return $this->hasMany(Canton::class, 'codigo');
+    }
 
 }
