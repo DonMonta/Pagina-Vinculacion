@@ -37,6 +37,12 @@ use App\Models\Provincia;
 use App\Models\Canton;
 use App\Models\Parroquia;
 use App\Models\Invi_detalle_cobe;
+use App\Models\Invi_Obj_Proy;
+use App\Models\Invi_indicadores;
+use App\Models\Invi_metas;
+use App\Models\Invi_supuestos;
+use App\Models\Invi_medios_verificacion;
+use App\Models\Invi_prod_verificables;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -174,6 +180,11 @@ class Invi_proyectosController extends Controller
             'invi_detalle_lin_inves',
             'invi_detalle_area_unesco',
             'invi_detalle_cobe',
+            'invi_obj_proyectos.invi_indicadores',
+            'invi_obj_proyectos.invi_metas',
+            'invi_obj_proyectos.invi_supuestos',
+            'invi_obj_proyectos.invi_medios_verificacion',
+            'invi_obj_proyectos.invi_prod_verificables',
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -640,6 +651,77 @@ class Invi_proyectosController extends Controller
                     }
                 }
             }
+            if ($request->has('objetivos_marco_logico') && is_array($request->objetivos_marco_logico)) {
+                
+                $ids_objetivos_recibidos = [];
+
+                foreach ($request->objetivos_marco_logico as $objData) {
+                    // 1. Crear o Actualizar el Objetivo
+                    $objetivo = Invi_Obj_Proy::updateOrCreate(
+                        [
+                            'id_obj_proy' => $objData['id_obj_proy'] ?? null, 
+                            'proyect_id'  => $id
+                        ],
+                        [
+                            'detalle_obj_proy' => $objData['detalle_obj_proy'],
+                            'tipo_obj_proy'    => $objData['tipo_obj_proy'], // 'general', 'fin', 'especifico'
+                        ]
+                    );
+
+                    $ids_objetivos_recibidos[] = $objetivo->id_obj_proy;
+
+                    // 2. Limpiar e Insertar Componentes Anidados (Indicadores)
+                    $objetivo->invi_indicadores()->delete();
+                    if (!empty($objData['indicadores'])) {
+                        $indicadoresInsert = array_map(function($item) use ($objetivo) {
+                            return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_indicador' => $item['detalle_indicador']];
+                        }, $objData['indicadores']);
+                        Invi_indicadores::insert($indicadoresInsert);
+                    }
+
+                    // 3. Limpiar e Insertar Metas
+                    $objetivo->invi_metas()->delete();
+                    if (!empty($objData['metas'])) {
+                        $metasInsert = array_map(function($item) use ($objetivo) {
+                            return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_metas' => $item['detalle_metas']];
+                        }, $objData['metas']);
+                        Invi_metas::insert($metasInsert);
+                    }
+
+                    // 4. Limpiar e Insertar Supuestos
+                    $objetivo->invi_supuestos()->delete();
+                    if (!empty($objData['supuestos'])) {
+                        $supuestosInsert = array_map(function($item) use ($objetivo) {
+                            return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_supuestos' => $item['detalle_supuestos']];
+                        }, $objData['supuestos']);
+                        Invi_supuestos::insert($supuestosInsert);
+                    }
+
+                    // 5. Limpiar e Insertar Medios de Verificación
+                    $objetivo->invi_medios_verificacion()->delete();
+                    if (!empty($objData['medios_verificacion'])) {
+                        $mediosInsert = array_map(function($item) use ($objetivo) {
+                            return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_medio_verifica' => $item['detalle_medio_verifica']];
+                        }, $objData['medios_verificacion']);
+                        Invi_medios_verificacion::insert($mediosInsert);
+                    }
+
+                    // 6. Limpiar e Insertar Productos Verificables (Solo para Específicos)
+                    $objetivo->invi_prod_verificables()->delete();
+                    if ($objData['tipo_obj_proy'] === 'especifico' && !empty($objData['prod_verificables'])) {
+                        $prodInsert = array_map(function($item) use ($objetivo) {
+                            return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_prod_verif' => $item['detalle_prod_verif']];
+                        }, $objData['prod_verificables']);
+                        Invi_prod_verificables::insert($prodInsert);
+                    }
+                }
+
+                // Eliminar objetivos que fueron borrados desde el Frontend
+                Invi_Obj_Proy::where('proyect_id', $id)
+                    ->whereNotIn('id_obj_proy', $ids_objetivos_recibidos)
+                    ->delete();
+            }
+
 
             DB::commit();
             return response()->json(['message' => 'Proyecto actualizado correctamente.']);

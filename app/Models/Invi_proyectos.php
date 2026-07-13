@@ -75,6 +75,8 @@ class Invi_proyectos extends Model
     {
         return $this->hasMany(Invi_detalle_cobe::class, 'proyect_id');
     }
-
-
+    public function invi_obj_proyectos()
+    {
+        return $this->hasMany(Invi_Obj_Proy::class, 'proyect_id');
+    }
 }
