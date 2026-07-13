@@ -629,6 +629,15 @@
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">2</span>
                         Cobertura y Localización
                     </button>
+                    <button @click="activeTab = 'objetivos'"
+                        :class="activeTab === 'objetivos'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">3</span>
+                        Objetivos del Proyecto
+                    </button>
                 </div>
 
                 <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-gray-900">
@@ -1860,6 +1869,247 @@
                             </div>
                         </div>
                     </div>
+                    <div v-else-if="activeTab === 'objetivos'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Matriz de Marco Lógico</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Configure los niveles de objetivos del proyecto, sus indicadores, metas y supuestos.</p>
+                        </div>
+
+                        <div class="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Nivel Superior</span>
+                                        <h4 class="text-base font-bold text-gray-800 dark:text-gray-100">Fin del Proyecto</h4>
+                                    </div>
+                                    
+                                    <div v-if="obtenerObjetivo('fin')" class="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                                        <p class="mb-3 font-medium">{{ obtenerObjetivo('fin').detalle_obj_proy }}</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> {{ obtenerObjetivo('fin').indicadores?.length || 0 }} Indicadores</span>
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> {{ obtenerObjetivo('fin').metas?.length || 0 }} Metas</span>
+                                        </div>
+                                    </div>
+                                    <div v-else class="text-sm text-gray-400 italic mt-2">
+                                        Aún no se ha definido el Fin del proyecto.
+                                    </div>
+                                </div>
+                                
+                                <button v-if="!obtenerObjetivo('fin')" @click="abrirModalMarcoLogico('fin')" class="shrink-0 inline-flex items-center gap-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Definir Fin
+                                </button>
+                                <button v-else @click="abrirModalMarcoLogico('fin', 0)" class="shrink-0 inline-flex items-center gap-2 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.14l-2.81.93.93-2.81a4.5 4.5 0 011.14-1.89l8.93-8.94z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 7.125L22.125 9.375"/></svg> Editar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Nivel Principal</span>
+                                        <h4 class="text-base font-bold text-gray-800 dark:text-gray-100">Objetivo General</h4>
+                                    </div>
+                                    
+                                    <div v-if="obtenerObjetivo('general')" class="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                                        <p class="mb-3 font-medium">{{ obtenerObjetivo('general').detalle_obj_proy }}</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> {{ obtenerObjetivo('general').indicadores?.length || 0 }} Indicadores</span>
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> {{ obtenerObjetivo('general').metas?.length || 0 }} Metas</span>
+                                        </div>
+                                    </div>
+                                    <div v-else class="text-sm text-gray-400 italic mt-2">
+                                        Aún no se ha definido el Objetivo General.
+                                    </div>
+                                </div>
+                                
+                                <button v-if="!obtenerObjetivo('general')" @click="abrirModalMarcoLogico('general')" class="shrink-0 inline-flex items-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Añadir General
+                                </button>
+                                <button v-else @click="abrirModalMarcoLogico('general', 0)" class="shrink-0 inline-flex items-center gap-2 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.14l-2.81.93.93-2.81a4.5 4.5 0 011.14-1.89l8.93-8.94z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 7.125L22.125 9.375"/></svg> Editar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                            
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-gray-100 dark:border-gray-800">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Nivel Operativo</span>
+                                        <h4 class="text-base font-bold text-gray-800 dark:text-gray-100">Objetivos Específicos</h4>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500">Agregue hasta 4 objetivos específicos y sus productos verificables.</p>
+                                </div>
+                                
+                                <button v-if="obtenerEspecificos().length < 4" @click="abrirModalMarcoLogico('especifico')" class="shrink-0 inline-flex items-center gap-2 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20 px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Añadir Específico ({{ obtenerEspecificos().length }}/4)
+                                </button>
+                            </div>
+
+                            <div v-if="obtenerEspecificos().length === 0" class="text-center py-6 text-sm text-gray-400 italic">
+                                No se han agregado objetivos específicos.
+                            </div>
+                            
+                            <div v-else class="space-y-4">
+                                <div v-for="(esp, index) in obtenerEspecificos()" :key="'esp-'+index" 
+                                    class="group p-4 bg-gray-50/50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800 rounded-xl transition-all hover:shadow-sm relative">
+                                    
+                                    <div class="flex justify-between gap-4">
+                                        <div class="flex-1">
+                                            <div class="flex items-start gap-2">
+                                                <span class="flex items-center justify-center w-5 h-5 mt-0.5 rounded-full bg-amber-200 dark:bg-amber-900 text-amber-800 dark:text-amber-300 text-xs font-bold">{{ index + 1 }}</span>
+                                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ esp.detalle_obj_proy }}</p>
+                                            </div>
+                                            
+                                            <div class="flex flex-wrap gap-2 mt-3 ml-7">
+                                                <span class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-950 px-2 py-1 rounded border border-gray-200 dark:border-gray-800">
+                                                    {{ esp.indicadores?.length || 0 }} Indicadores
+                                                </span>
+                                                <span class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-950 px-2 py-1 rounded border border-gray-200 dark:border-gray-800">
+                                                    {{ esp.metas?.length || 0 }} Metas
+                                                </span>
+                                                <span class="text-[10px] font-semibold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded border border-brand-200 dark:border-brand-800">
+                                                    {{ esp.prod_verificables?.length || 0 }} Prod. Verificables
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-col sm:flex-row gap-2 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                            <button @click="abrirModalMarcoLogico('especifico', index, esp)" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-800 rounded transition-colors" title="Editar">
+                                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.14l-2.81.93.93-2.81a4.5 4.5 0 011.14-1.89l8.93-8.94z"/></svg>
+                                            </button>
+                                            <button @click="eliminarObjetivo(esp)" class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 rounded transition-colors" title="Eliminar">
+                                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25a2.25 2.25 0 01-2.244 2.077H8.244a2.25 2.25 0 01-2.244-2.077L4.5 8.25m15 0a2.25 2.25 0 00-2.25-2.25h-13.5A2.25 2.25 0 002.25 8.25m15 0V4.5A2.25 2.25 0 0013.5 2.25h-3a2.25 2.25 0 00-2.25 2.25v3m6.75 0h-1.5"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="showModalMarcoLogico" class="fixed inset-0 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm z-[99999] p-4 sm:p-6 transition-all">
+                            <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-full flex flex-col border border-gray-200 dark:border-gray-800 animate-zoom-in">
+                                
+                                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-t-2xl shrink-0">
+                                    <div>
+                                        <h2 class="text-lg font-bold text-gray-800 dark:text-white uppercase tracking-wide">
+                                            Configurar: <span class="text-brand-600">{{ modalFormML.tipo_obj_proy }}</span>
+                                        </h2>
+                                        <p class="text-xs text-gray-500">Defina la descripción y los atributos correspondientes al nivel del marco lógico.</p>
+                                    </div>
+                                    <button @click="showModalMarcoLogico = false" class="p-2 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+
+                                <div class="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-6 bg-white dark:bg-gray-950">
+                                    
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                            Detalle / Enunciado del <span class="capitalize">{{ modalFormML.tipo_obj_proy }}</span> <span class="text-red-500">*</span>
+                                        </label>
+                                        <textarea v-model="modalFormML.detalle_obj_proy" rows="2" 
+                                            class="w-full p-3 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none transition-shadow" 
+                                            placeholder="Ej: Contribuir a la mejora de la calidad de vida de las comunidades vulnerables..."></textarea>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                                        
+                                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-900/30 overflow-hidden flex flex-col h-64">
+                                            <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-900 shrink-0">
+                                                <span class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Indicadores</span>
+                                                <button @click="agregarAtributoML('indicadores')" class="text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
+                                            </div>
+                                            <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
+                                                <div v-for="(item, i) in modalFormML.indicadores" :key="'ind'+i" class="flex gap-2 animate-fade-in-up">
+                                                    <span class="text-xs font-bold text-gray-400 mt-2">{{ i + 1 }}.</span>
+                                                    <input v-model="item.detalle_indicador" type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Escriba el indicador...">
+                                                    <button @click="eliminarAtributoML('indicadores', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                </div>
+                                                <div v-if="modalFormML.indicadores.length === 0" class="text-center text-xs text-gray-400 italic py-4">Sin indicadores registrados.</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-900/30 overflow-hidden flex flex-col h-64">
+                                            <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-900 shrink-0">
+                                                <span class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Metas</span>
+                                                <button @click="agregarAtributoML('metas')" class="text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
+                                            </div>
+                                            <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
+                                                <div v-for="(item, i) in modalFormML.metas" :key="'met'+i" class="flex gap-2 animate-fade-in-up">
+                                                    <span class="text-xs font-bold text-gray-400 mt-2">{{ i + 1 }}.</span>
+                                                    <input v-model="item.detalle_metas" type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Escriba la meta...">
+                                                    <button @click="eliminarAtributoML('metas', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                </div>
+                                                <div v-if="modalFormML.metas.length === 0" class="text-center text-xs text-gray-400 italic py-4">Sin metas registradas.</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-900/30 overflow-hidden flex flex-col h-64">
+                                            <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-900 shrink-0">
+                                                <span class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Supuestos</span>
+                                                <button @click="agregarAtributoML('supuestos')" class="text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
+                                            </div>
+                                            <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
+                                                <div v-for="(item, i) in modalFormML.supuestos" :key="'sup'+i" class="flex gap-2 animate-fade-in-up">
+                                                    <span class="text-xs font-bold text-gray-400 mt-2">{{ i + 1 }}.</span>
+                                                    <input v-model="item.detalle_supuestos" type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Escriba el supuesto...">
+                                                    <button @click="eliminarAtributoML('supuestos', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                </div>
+                                                <div v-if="modalFormML.supuestos.length === 0" class="text-center text-xs text-gray-400 italic py-4">Sin supuestos registrados.</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-900/30 overflow-hidden flex flex-col h-64">
+                                            <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-900 shrink-0">
+                                                <span class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Medios Verificación</span>
+                                                <button @click="agregarAtributoML('medios_verificacion')" class="text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
+                                            </div>
+                                            <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
+                                                <div v-for="(item, i) in modalFormML.medios_verificacion" :key="'med'+i" class="flex gap-2 animate-fade-in-up">
+                                                    <span class="text-xs font-bold text-gray-400 mt-2">{{ i + 1 }}.</span>
+                                                    <input v-model="item.detalle_medio_verifica" type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Escriba el medio de verificación...">
+                                                    <button @click="eliminarAtributoML('medios_verificacion', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                </div>
+                                                <div v-if="modalFormML.medios_verificacion.length === 0" class="text-center text-xs text-gray-400 italic py-4">Sin medios registrados.</div>
+                                            </div>
+                                        </div>
+
+                                        <div v-if="modalFormML.tipo_obj_proy === 'especifico'" class="lg:col-span-2 border border-brand-200 dark:border-brand-900/30 rounded-xl bg-brand-50/30 dark:bg-brand-900/10 overflow-hidden flex flex-col max-h-64">
+                                            <div class="flex items-center justify-between px-3 py-2 border-b border-brand-100 dark:border-brand-900/30 bg-brand-50 dark:bg-brand-900/20 shrink-0">
+                                                <span class="text-xs font-bold text-brand-700 dark:text-brand-400 uppercase tracking-wider">Productos Verificables <span class="text-red-500">*</span></span>
+                                                <button @click="agregarAtributoML('prod_verificables')" class="text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
+                                            </div>
+                                            <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
+                                                <div v-for="(item, i) in modalFormML.prod_verificables" :key="'prod'+i" class="flex gap-2 animate-fade-in-up">
+                                                    <span class="text-xs font-bold text-brand-400 mt-2">{{ i + 1 }}.</span>
+                                                    <input v-model="item.detalle_prod_verif" type="text" class="w-full p-2 text-xs border border-brand-200 dark:border-brand-800 rounded-lg dark:bg-gray-900 focus:border-brand-500 focus:ring-1 focus:ring-brand-500" placeholder="Escriba el producto esperado...">
+                                                    <button @click="eliminarAtributoML('prod_verificables', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                </div>
+                                                <div v-if="modalFormML.prod_verificables.length === 0" class="text-center text-xs text-brand-500 italic py-4">Los objetivos específicos requieren obligatoriamente de productos verificables.</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-b-2xl shrink-0 flex justify-end gap-3">
+                                    <button @click="showModalMarcoLogico = false" class="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors">Cancelar</button>
+                                    <button @click="guardarMarcoLogico" class="px-5 py-2.5 text-sm font-semibold text-white bg-brand-600 rounded-xl shadow-md shadow-brand-500/20 hover:bg-brand-700 transition-colors">
+                                        Guardar Configuración
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
                 <div
@@ -1976,6 +2226,8 @@ export default {
             parroquiasCatalogo: [],
             proyectoEditandoId: null,
             busquedaParroquia: '',
+            showModalMarcoLogico: false,
+            indiceEditandoML: null,
             editForm: {
                 proyect_nombre: '',
                 proyect_titulo: '',
@@ -1998,7 +2250,18 @@ export default {
                 id_zona_plan: '',
                 provincias: [], // Arreglo de id_provincia
                 cantones: [],   // Arreglo de id_canton
-                parroquias: []  // Arreglo de idparroquia
+                parroquias: [],  // Arreglo de idparroquia
+                objetivos_marco_logico: [],
+            },
+            modalFormML: {
+                id_obj_proy: null,
+                tipo_obj_proy: '',
+                detalle_obj_proy: '',
+                indicadores: [],
+                metas: [],
+                supuestos: [],
+                medios_verificacion: [],
+                prod_verificables: []
             }
 
         };
@@ -2627,7 +2890,6 @@ export default {
             try {
                 // Asegúrate de crear esta ruta en tus routes/api.php de Laravel
                 const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
-                console.log(response);
                 const data = response.data;
 
                 this.objetivosPeiDisponibles = data.objetivos_pei;
@@ -2646,7 +2908,17 @@ export default {
                 this.provinciasCatalogo = data.provincias_catalogo || [];
                 this.cantonesCatalogo = data.cantones_catalogo || [];
                 this.parroquiasCatalogo = data.parroquias_catalogo || [];
-
+                let mapeoObjetivos = data.proyecto.invi_obj_proyectos.map(obj => ({
+                    id_obj_proy: obj.id_obj_proy,
+                    tipo_obj_proy: obj.tipo_obj_proy,
+                    detalle_obj_proy: obj.detalle_obj_proy,
+                    // Aseguramos que siempre sean arrays (mapeando con las propiedades exactas de tu Base de Datos)
+                    indicadores: obj.invi_indicadores || [],
+                    metas: obj.invi_metas || [],
+                    supuestos: obj.invi_supuestos || [],
+                    medios_verificacion: obj.invi_medios_verificacion || [],
+                    prod_verificables: obj.invi_prod_verificables || [],
+                }));
                 this.editForm = {
                     proyect_nombre: data.proyecto.proyect_nombre || '',
                     proyect_titulo: data.proyecto.proyect_titulo || '',
@@ -2669,7 +2941,8 @@ export default {
                     id_zona_plan: data.cobertura_guardada?.id_zona_plan || '',
                     provincias:   data.cobertura_guardada?.provincias || [],
                     cantones:     data.cobertura_guardada?.cantones || [],
-                    parroquias:   data.cobertura_guardada?.parroquias || []
+                    parroquias:   data.cobertura_guardada?.parroquias || [],
+                    objetivos_marco_logico: mapeoObjetivos
                 };
             } catch (error) {
                 mostraralertas2('Error al cargar datos del proyecto', 'error');
@@ -2678,6 +2951,99 @@ export default {
             } finally {
                 this.cargandoEdicion = false;
             }
+        },
+        obtenerObjetivo(tipo) {
+            return this.editForm.objetivos_marco_logico.find(o => o.tipo_obj_proy === tipo);
+        },
+        obtenerEspecificos() {
+            return this.editForm.objetivos_marco_logico.filter(o => o.tipo_obj_proy === 'especifico');
+        },
+        eliminarObjetivo(objRef) {
+            if(confirm("¿Estás seguro de eliminar este objetivo específico?")) {
+                this.editForm.objetivos_marco_logico = this.editForm.objetivos_marco_logico.filter(o => o !== objRef);
+            }
+        },
+        abrirModalMarcoLogico(tipo, index = null, objExistente = null) {
+            this.indiceEditandoML = index;
+            
+            // Si vamos a editar
+            if (index !== null) {
+                let objOriginal = tipo === 'especifico' ? objExistente : this.obtenerObjetivo(tipo);
+                // Clonamos profundamente para no afectar el array original hasta darle a "Guardar"
+                this.modalFormML = JSON.parse(JSON.stringify(objOriginal));
+            } else {
+                // Si es nuevo
+                this.modalFormML = {
+                    id_obj_proy: null,
+                    tipo_obj_proy: tipo,
+                    detalle_obj_proy: '',
+                    indicadores: [{ detalle_indicador: '' }],
+                    metas: [{ detalle_metas: '' }],
+                    supuestos: [{ detalle_supuestos: '' }],
+                    medios_verificacion: [{ detalle_medio_verifica: '' }],
+                    prod_verificables: tipo === 'especifico' ? [{ detalle_prod_verif: '' }] : []
+                };
+            }
+            this.showModalMarcoLogico = true;
+        },
+        agregarAtributoML(campo) {
+            const modelosVios = {
+                indicadores: { detalle_indicador: '' },
+                metas: { detalle_metas: '' },
+                supuestos: { detalle_supuestos: '' },
+                medios_verificacion: { detalle_medio_verifica: '' },
+                prod_verificables: { detalle_prod_verif: '' }
+            };
+            this.modalFormML[campo].push({ ...modelosVios[campo] });
+        },
+        eliminarAtributoML(campo, index) {
+            this.modalFormML[campo].splice(index, 1);
+        },
+        guardarMarcoLogico() {
+            // Validaciones básicas
+            if (!this.modalFormML.detalle_obj_proy.trim()) {
+                mostraralertas2("El detalle principal no puede estar vacío", "warning");
+                return;
+            }
+            if (this.modalFormML.tipo_obj_proy === 'especifico') {
+                let tieneProds = this.modalFormML.prod_verificables.some(p => p.detalle_prod_verif.trim() !== '');
+                if (!tieneProds) {
+                    mostraralertas2("Los objetivos específicos requieren al menos un Producto Verificable", "warning");
+                    return;
+                }
+            }
+
+            // Guardar en el editForm (el array que viaja a Laravel)
+            if (this.indiceEditandoML !== null) {
+                // Actualizar existente
+                if (this.modalFormML.tipo_obj_proy === 'especifico') {
+                    // Encontrar el índice global real en el array
+                    let realIndex = this.editForm.objetivos_marco_logico.findIndex(o => o.id_obj_proy === this.modalFormML.id_obj_proy && o.detalle_obj_proy === this.modalFormML.detalle_obj_proy);
+                    if(realIndex !== -1) {
+                         this.editForm.objetivos_marco_logico[realIndex] = JSON.parse(JSON.stringify(this.modalFormML));
+                    } else {
+                        // Respaldo por si es nuevo y aún no tiene ID
+                        let indexLocal = 0;
+                        for(let i=0; i<this.editForm.objetivos_marco_logico.length; i++) {
+                            if(this.editForm.objetivos_marco_logico[i].tipo_obj_proy === 'especifico') {
+                                if(indexLocal === this.indiceEditandoML) {
+                                    this.editForm.objetivos_marco_logico[i] = JSON.parse(JSON.stringify(this.modalFormML));
+                                    break;
+                                }
+                                indexLocal++;
+                            }
+                        }
+                    }
+                } else {
+                    let i = this.editForm.objetivos_marco_logico.findIndex(o => o.tipo_obj_proy === this.modalFormML.tipo_obj_proy);
+                    this.editForm.objetivos_marco_logico[i] = JSON.parse(JSON.stringify(this.modalFormML));
+                }
+            } else {
+                // Es nuevo
+                this.editForm.objetivos_marco_logico.push(JSON.parse(JSON.stringify(this.modalFormML)));
+            }
+            
+            this.showModalMarcoLogico = false;
         },
         toggleObjetivo(id_obj) {
             const index = this.editForm.objetivos.indexOf(id_obj);
