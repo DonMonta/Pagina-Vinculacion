@@ -638,6 +638,24 @@
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">3</span>
                         Objetivos del Proyecto
                     </button>
+                    <button @click="activeTab = 'antecedentes_justifi'"
+                        :class="activeTab === 'antecedentes_justifi'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">4</span>
+                        Antecedentes y Justificación
+                    </button>
+                    <button @click="activeTab = 'instituciones'"
+                        :class="activeTab === 'instituciones'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">5</span>
+                        Instituciones y Organismos participantes
+                    </button>
                 </div>
 
                 <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-gray-900">
@@ -1887,8 +1905,18 @@
                                     <div v-if="obtenerObjetivo('fin')" class="text-sm text-gray-600 dark:text-gray-300 mt-2">
                                         <p class="mb-3 font-medium">{{ obtenerObjetivo('fin').detalle_obj_proy }}</p>
                                         <div class="flex flex-wrap gap-2">
-                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> {{ obtenerObjetivo('fin').indicadores?.length || 0 }} Indicadores</span>
-                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> {{ obtenerObjetivo('fin').metas?.length || 0 }} Metas</span>
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> 
+                                            {{ obtenerObjetivo('fin').indicadores?.length || 0 }} Indicadores</span>
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> 
+                                            {{ obtenerObjetivo('fin').supuestos?.length || 0 }} Supuestos</span>
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md">                                            
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> 
+                                            {{ obtenerObjetivo('fin').medios_verificacion?.length || 0 }} Medios de Verificación</span>
                                         </div>
                                     </div>
                                     <div v-else class="text-sm text-gray-400 italic mt-2">
@@ -1917,8 +1945,22 @@
                                     <div v-if="obtenerObjetivo('general')" class="text-sm text-gray-600 dark:text-gray-300 mt-2">
                                         <p class="mb-3 font-medium">{{ obtenerObjetivo('general').detalle_obj_proy }}</p>
                                         <div class="flex flex-wrap gap-2">
-                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> {{ obtenerObjetivo('general').indicadores?.length || 0 }} Indicadores</span>
-                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> {{ obtenerObjetivo('general').metas?.length || 0 }} Metas</span>
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> 
+                                            {{ obtenerObjetivo('general').indicadores?.length || 0 }} Indicadores</span>
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> 
+                                            {{ obtenerObjetivo('general').metas?.length || 0 }} Metas</span>
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> 
+                                            {{ obtenerObjetivo('general').supuestos?.length || 0 }} Supuestos</span>
+                                            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-1 rounded-md">                                            
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> 
+                                            {{ obtenerObjetivo('general').medios_verificacion?.length || 0 }} Medios de Verificación</span>
                                         </div>
                                     </div>
                                     <div v-else class="text-sm text-gray-400 italic mt-2">
@@ -1974,6 +2016,12 @@
                                                 <span class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-950 px-2 py-1 rounded border border-gray-200 dark:border-gray-800">
                                                     {{ esp.metas?.length || 0 }} Metas
                                                 </span>
+                                                <span class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-950 px-2 py-1 rounded border border-gray-200 dark:border-gray-800">
+                                                    {{ esp.supuestos?.length || 0 }} Supuestos
+                                                </span>
+                                                <span class="text-[10px] font-semibold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded border border-brand-200 dark:border-brand-800">
+                                                    {{ esp.medios_verificacion?.length || 0 }} Medios Verificación
+                                                </span>
                                                 <span class="text-[10px] font-semibold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded border border-brand-200 dark:border-brand-800">
                                                     {{ esp.prod_verificables?.length || 0 }} Prod. Verificables
                                                 </span>
@@ -1993,7 +2041,7 @@
                             </div>
                         </div>
 
-                        <div v-if="showModalMarcoLogico" class="fixed inset-0 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm z-[99999] p-4 sm:p-6 transition-all">
+                        <div v-if="showModalMarcoLogico" id="modalMarcoLogico" class="fixed inset-0 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm z-[99999] p-4 sm:p-6 transition-all">
                             <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-full flex flex-col border border-gray-200 dark:border-gray-800 animate-zoom-in">
                                 
                                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-t-2xl shrink-0">
@@ -2004,19 +2052,27 @@
                                         <p class="text-xs text-gray-500">Defina la descripción y los atributos correspondientes al nivel del marco lógico.</p>
                                     </div>
                                     <button @click="showModalMarcoLogico = false" class="p-2 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
-                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
                                     </button>
                                 </div>
 
                                 <div class="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-6 bg-white dark:bg-gray-950">
                                     
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                            Detalle / Enunciado del <span class="capitalize">{{ modalFormML.tipo_obj_proy }}</span> <span class="text-red-500">*</span>
-                                        </label>
-                                        <textarea v-model="modalFormML.detalle_obj_proy" rows="2" 
-                                            class="w-full p-3 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none transition-shadow" 
-                                            placeholder="Ej: Contribuir a la mejora de la calidad de vida de las comunidades vulnerables..."></textarea>
+                                    <div class="flex flex-col gap-5">
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                                Detalle / Enunciado del <span class="capitalize">{{ modalFormML.tipo_obj_proy }}</span> <span class="text-red-500">*</span>
+                                            </label>
+                                            <textarea 
+                                                v-model="modalFormML.detalle_obj_proy" 
+                                                rows="1" 
+                                                @input="ajustarAlturaTextarea"
+                                                class="w-full p-3 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden transition-shadow" 
+                                                placeholder="Ej: Contribuir a la mejora de la calidad de vida de las comunidades vulnerables..."
+                                            ></textarea>
+                                        </div>
                                     </div>
 
                                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -2027,25 +2083,45 @@
                                                 <button @click="agregarAtributoML('indicadores')" class="text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
                                             </div>
                                             <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
-                                                <div v-for="(item, i) in modalFormML.indicadores" :key="'ind'+i" class="flex gap-2 animate-fade-in-up">
+                                                <div v-for="(item, i) in modalFormML.indicadores" :key="'ind'+i" class="flex gap-2 items-start animate-fade-in-up">
                                                     <span class="text-xs font-bold text-gray-400 mt-2">{{ i + 1 }}.</span>
-                                                    <input v-model="item.detalle_indicador" type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Escriba el indicador...">
-                                                    <button @click="eliminarAtributoML('indicadores', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                    <textarea 
+                                                        v-model="item.detalle_indicador" 
+                                                        rows="1" 
+                                                        @input="ajustarAlturaTextarea"
+                                                        class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" 
+                                                        placeholder="Los indicadores a nivel de Fin miden el impacto general que tendrá el... "
+                                                    />
+                                                    <button @click="eliminarAtributoML('indicadores', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/>
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                                 <div v-if="modalFormML.indicadores.length === 0" class="text-center text-xs text-gray-400 italic py-4">Sin indicadores registrados.</div>
                                             </div>
                                         </div>
 
-                                        <div class="border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-900/30 overflow-hidden flex flex-col h-64">
+                                        <div v-if="modalFormML.tipo_obj_proy !== 'fin'" class="border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-900/30 overflow-hidden flex flex-col h-64">
                                             <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-900 shrink-0">
                                                 <span class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Metas</span>
                                                 <button @click="agregarAtributoML('metas')" class="text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
                                             </div>
                                             <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
-                                                <div v-for="(item, i) in modalFormML.metas" :key="'met'+i" class="flex gap-2 animate-fade-in-up">
+                                                <div v-for="(item, i) in modalFormML.metas" :key="'met'+i" class="flex gap-2 items-start animate-fade-in-up">
                                                     <span class="text-xs font-bold text-gray-400 mt-2">{{ i + 1 }}.</span>
-                                                    <input v-model="item.detalle_metas" type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Escriba la meta...">
-                                                    <button @click="eliminarAtributoML('metas', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                    <textarea 
+                                                        v-model="item.detalle_metas" 
+                                                        rows="1" 
+                                                        @input="ajustarAlturaTextarea"
+                                                        class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" 
+                                                        placeholder="Escriba la meta..."
+                                                    />
+                                                    <button @click="eliminarAtributoML('metas', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/>
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                                 <div v-if="modalFormML.metas.length === 0" class="text-center text-xs text-gray-400 italic py-4">Sin metas registradas.</div>
                                             </div>
@@ -2057,10 +2133,20 @@
                                                 <button @click="agregarAtributoML('supuestos')" class="text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
                                             </div>
                                             <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
-                                                <div v-for="(item, i) in modalFormML.supuestos" :key="'sup'+i" class="flex gap-2 animate-fade-in-up">
+                                                <div v-for="(item, i) in modalFormML.supuestos" :key="'sup'+i" class="flex gap-2 items-start animate-fade-in-up">
                                                     <span class="text-xs font-bold text-gray-400 mt-2">{{ i + 1 }}.</span>
-                                                    <input v-model="item.detalle_supuestos" type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Escriba el supuesto...">
-                                                    <button @click="eliminarAtributoML('supuestos', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                    <textarea 
+                                                        v-model="item.detalle_supuestos" 
+                                                        rows="1" 
+                                                        @input="ajustarAlturaTextarea"
+                                                        class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" 
+                                                        placeholder="Los supuestos indican los eventos, las condiciones o las decisiones..."
+                                                    />
+                                                    <button @click="eliminarAtributoML('supuestos', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/>
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                                 <div v-if="modalFormML.supuestos.length === 0" class="text-center text-xs text-gray-400 italic py-4">Sin supuestos registrados.</div>
                                             </div>
@@ -2072,10 +2158,20 @@
                                                 <button @click="agregarAtributoML('medios_verificacion')" class="text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
                                             </div>
                                             <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
-                                                <div v-for="(item, i) in modalFormML.medios_verificacion" :key="'med'+i" class="flex gap-2 animate-fade-in-up">
+                                                <div v-for="(item, i) in modalFormML.medios_verificacion" :key="'med'+i" class="flex gap-2 items-start animate-fade-in-up">
                                                     <span class="text-xs font-bold text-gray-400 mt-2">{{ i + 1 }}.</span>
-                                                    <input v-model="item.detalle_medio_verifica" type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Escriba el medio de verificación...">
-                                                    <button @click="eliminarAtributoML('medios_verificacion', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                    <textarea 
+                                                        v-model="item.detalle_medio_verifica" 
+                                                        rows="1" 
+                                                        @input="ajustarAlturaTextarea"
+                                                        class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" 
+                                                        placeholder="Los medios de verificación son las fuentes de información..."
+                                                    />
+                                                    <button @click="eliminarAtributoML('medios_verificacion', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/>
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                                 <div v-if="modalFormML.medios_verificacion.length === 0" class="text-center text-xs text-gray-400 italic py-4">Sin medios registrados.</div>
                                             </div>
@@ -2087,10 +2183,20 @@
                                                 <button @click="agregarAtributoML('prod_verificables')" class="text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white px-2 py-1 rounded shadow-sm transition-colors">+ Añadir</button>
                                             </div>
                                             <div class="p-3 overflow-y-auto custom-scrollbar flex-1 space-y-2">
-                                                <div v-for="(item, i) in modalFormML.prod_verificables" :key="'prod'+i" class="flex gap-2 animate-fade-in-up">
+                                                <div v-for="(item, i) in modalFormML.prod_verificables" :key="'prod'+i" class="flex gap-2 items-start animate-fade-in-up">
                                                     <span class="text-xs font-bold text-brand-400 mt-2">{{ i + 1 }}.</span>
-                                                    <input v-model="item.detalle_prod_verif" type="text" class="w-full p-2 text-xs border border-brand-200 dark:border-brand-800 rounded-lg dark:bg-gray-900 focus:border-brand-500 focus:ring-1 focus:ring-brand-500" placeholder="Escriba el producto esperado...">
-                                                    <button @click="eliminarAtributoML('prod_verificables', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/></svg></button>
+                                                    <textarea 
+                                                        v-model="item.detalle_prod_verif" 
+                                                        rows="1" 
+                                                        @input="ajustarAlturaTextarea"
+                                                        class="w-full p-2 text-xs border border-brand-200 dark:border-brand-800 rounded-lg dark:bg-gray-900 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 resize-none overflow-hidden" 
+                                                        placeholder="Escriba el producto esperado..."
+                                                    />
+                                                    <button @click="eliminarAtributoML('prod_verificables', i)" class="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-1.5 14.25H6l-1.5-14.25M15 4.5h3M6 4.5H3m6-2.25h6m-6 0v2.25m6-2.25v2.25"/>
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                                 <div v-if="modalFormML.prod_verificables.length === 0" class="text-center text-xs text-brand-500 italic py-4">Los objetivos específicos requieren obligatoriamente de productos verificables.</div>
                                             </div>
@@ -2109,6 +2215,126 @@
                             </div>
                         </div>
 
+                    </div>
+                    <div v-else-if="activeTab === 'antecedentes_justifi'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Antecedentes y Justificacionnes</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Detalle los antecedentes y justificaciones de su proyecto</p>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <!-- Tarjeta de Antecedentes -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Antecedentes <span class="text-red-500">*</span>
+                                </label>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 text-justify">
+                                    Hacer referencia a las investigaciones realizadas sobre el tema, incluyendo los resultados de proyectos de vinculación o investigación anteriores realizados en la UTLVTE.
+                                </p>
+                                <textarea 
+                                    ref="antecedentesTextarea"
+                                    v-model="editForm.proyect_antecedentes" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Deben incluirse todos los aspectos y circunstancias que motivaron la identificación y preparación del proyecto, básicamente debe contener información referente a ciertos indicadores cualitativos y cuantitativos que apoyen su comprensión."
+                                    rows="4"
+                                ></textarea>
+                                <!-- Contador de palabras -->
+                                <div class="flex justify-between items-center mt-2 text-sm font-semibold transition-colors" :class="colorContadorAntecedentes">
+                                    <span>Mínimo: 500 / Máximo: 800 palabras</span>
+                                    <span>{{ palabrasAntecedentes }} palabras</span>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta de Justificación -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Justificación <span class="text-red-500">*</span>
+                                </label>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 text-justify">
+                                    Indicar por qué es necesario este proyecto argumentando desde la legislación vigente, con datos objetivos y/o peticiones realizadas por las instituciones (copaternales), las cuales financian el proyecto.
+                                </p>
+                                <textarea 
+                                    ref="justificacionTextarea"
+                                    v-model="editForm.proyect_justificacion" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Argumento que apoya o sustenta la idea. En otras palabras, es una forma de explicar algo que sirve como complemento o aclaración de una afirmación previa."
+                                    rows="4"
+                                ></textarea>
+                                <!-- Contador de palabras -->
+                                <div class="flex justify-between items-center mt-2 text-sm font-semibold transition-colors" :class="colorContadorJustificacion">
+                                    <span>Mínimo: 600 / Máximo: 800 palabras</span>
+                                    <span>{{ palabrasJustificacion }} palabras</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div v-else-if="activeTab === 'instituciones'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Instituciones Involucradas Que Brindan Financiamiento Interno Y Externo</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Busque las instituciones que apoyen o financian el proyecto, así como las que reciben financiamiento.</p>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                <label class="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">
+                                    Buscar Institución / Empresa (Por RUC o Nombre)
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        v-model="searchEmpresaQuery" 
+                                        @input="ejecutarBusquedaEmpresa"
+                                        placeholder="Ej: 0991234567001 o Nombre de la Empresa..." 
+                                        class="w-full p-3 pl-10 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                                    >
+                                    <div class="absolute left-3 top-3.5 text-gray-400">
+                                        <svg v-if="!buscandoEmpresa" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                        <svg v-else class="animate-spin h-5 w-5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    </div>
+                                </div>
+
+                                <div v-if="empresaNoEncontrada" class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 rounded">
+                                    <p class="font-semibold">La empresa ingresada no existe.</p>
+                                    <p class="text-sm mt-1">Comunícate con alguien de la dirección de vinculación para que añadan los datos de la empresa a la base de datos. O si estás con el rol de analista de vinculación puedes dirigirte a <strong>Mantenimiento > Empresas Registradas</strong> y registrarla.</p>
+                                </div>
+                                
+                                <div v-if="empresaBuscada && !empresaNoEncontrada" class="mt-4 border border-brand-200 dark:border-brand-700 rounded-lg p-4 bg-brand-50 dark:bg-brand-900/20">
+                                    <h4 class="font-bold text-lg text-brand-700 dark:text-brand-300 mb-4">{{ empresaBuscada.empresacorta }}</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
+                                        <p><strong>Representante:</strong> {{ empresaBuscada.representante || 'N/A' }}</p>
+                                        <p><strong>C.I. Representante:</strong> {{ empresaBuscada.ci_representante || 'N/A' }}</p>
+                                        <p><strong>Teléfonos:</strong> {{ empresaBuscada.telefono || 'N/A' }}</p>
+                                        <p><strong>Correo Electrónico:</strong> {{ empresaBuscada.email || 'N/A' }}</p>
+                                        <p><strong>Dirección:</strong> {{ empresaBuscada.direccion || 'N/A' }}</p>
+                                        <p><strong>Página Web:</strong> <a v-if="empresaBuscada.url" :href="empresaBuscada.url" target="_blank" class="text-blue-500 hover:underline">{{ empresaBuscada.url }}</a><span v-else>N/A</span></p>
+                                        <p class="md:col-span-2"><strong>Órgano Ejecutor:</strong> Dirección de Vinculación UTLVTE</p>
+                                    </div>
+                                    <div class="mt-4 flex justify-end">
+                                        <button @click="agregarEmpresaSeleccionada" type="button" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow transition-colors">
+                                            Añadir Institución
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="empresasAgregadas.length > 0" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                                <div class="p-4 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                                    <h4 class="font-bold text-gray-800 dark:text-gray-200">Instituciones Añadidas al Proyecto</h4>
+                                </div>
+                                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <li v-for="(empresa, index) in empresasAgregadas" :key="empresa.idempresa" class="p-4 flex flex-col md:flex-row justify-between md:items-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                        <div class="mb-2 md:mb-0">
+                                            <p class="font-bold text-gray-800 dark:text-white">{{ empresa.empresacorta }} <span class="text-xs font-normal text-gray-500 ml-2">RUC: {{ empresa.ruc }}</span></p>
+                                            <p class="text-sm text-gray-600 dark:text-gray-400">Rep: {{ empresa.representante }} | Órgano Ejecutor: Dirección de Vinculación UTLVTE</p>
+                                        </div>
+                                        <button @click="quitarEmpresa(index)" type="button" class="px-3 py-1 bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 rounded-lg text-sm font-semibold transition-colors">
+                                            Quitar
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2228,6 +2454,11 @@ export default {
             busquedaParroquia: '',
             showModalMarcoLogico: false,
             indiceEditandoML: null,
+            searchEmpresaQuery: '',
+            empresaBuscada: null,
+            empresaNoEncontrada: false,
+            buscandoEmpresa: false,
+            empresasAgregadas: [],
             editForm: {
                 proyect_nombre: '',
                 proyect_titulo: '',
@@ -2252,6 +2483,9 @@ export default {
                 cantones: [],   // Arreglo de id_canton
                 parroquias: [],  // Arreglo de idparroquia
                 objetivos_marco_logico: [],
+                proyect_antecedentes: '',
+                proyect_justificacion: '',
+                empresas: [],
             },
             modalFormML: {
                 id_obj_proy: null,
@@ -2308,6 +2542,14 @@ export default {
             },
             deep: true,
             immediate: true
+        },
+        activeTab(newTab) {
+            // Cuando el usuario cambie a la pestaña de antecedentes, recalculamos la altura
+            if (newTab === 'antecedentes_justifi') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
         }
     },
     created() {
@@ -2400,6 +2642,24 @@ export default {
             }
 
             return filtradas;
+        },
+        palabrasAntecedentes() {
+            return this.contarPalabras(this.editForm.proyect_antecedentes);
+        },
+        palabrasJustificacion() {
+            return this.contarPalabras(this.editForm.proyect_justificacion);
+        },
+        colorContadorAntecedentes() {
+            const total = this.palabrasAntecedentes;
+            if (total === 0) return 'text-gray-500 dark:text-gray-400';
+            if (total < 500 || total > 800) return 'text-red-500';
+            return 'text-green-600 dark:text-green-400';
+        },
+        colorContadorJustificacion() {
+            const total = this.palabrasJustificacion;
+            if (total === 0) return 'text-gray-500 dark:text-gray-400';
+            if (total < 600 || total > 800) return 'text-red-500';
+            return 'text-green-600 dark:text-green-400';
         }
     },
     methods: {
@@ -2880,6 +3140,94 @@ export default {
             // Finalmente, convertimos los valores únicos del Map a un Array
             this.objetivosPoliticasDisponibles = Array.from(objetivosUnicos.values());
         },
+        ejecutarBusquedaEmpresa() {
+            const query = this.searchEmpresaQuery.trim();
+            
+            if (query.length < 3) {
+                // Reiniciar si se borra el texto o es muy corto
+                this.empresaBuscada = null;
+                this.empresaNoEncontrada = false;
+                return;
+            }
+
+            this.buscandoEmpresa = true;
+            this.empresaNoEncontrada = false;
+            
+            // Llamamos a la función debounced
+            this.debouncedBuscarEmpresa(query);
+        },
+        debouncedBuscarEmpresa: debounce(async function(query) {
+            try {
+                // Modifica esta ruta para que coincida con la que creaste en web.php / api.php
+                const response = await API.get(`${this.baseUrl}/buscar_empresa?q=${encodeURIComponent(query)}`);
+                
+                if (response.data && response.data.idempresa) {
+                    this.empresaBuscada = response.data;
+                    this.empresaNoEncontrada = false;
+                } else {
+                    this.empresaBuscada = null;
+                    this.empresaNoEncontrada = true;
+                }
+            } catch (error) {
+                console.error("Error buscando empresa:", error);
+                this.empresaBuscada = null;
+                this.empresaNoEncontrada = true; 
+            } finally {
+                this.buscandoEmpresa = false;
+            }
+        }, 600),
+        agregarEmpresaSeleccionada() {
+            if (!this.empresaBuscada) return;
+
+            // Validar si ya existe para no duplicarla
+            const existe = this.empresasAgregadas.some(emp => emp.idempresa === this.empresaBuscada.idempresa);
+            
+            if (existe) {
+                mostraralertas2('Esta institución ya ha sido añadida al proyecto.', 'warning');
+                return;
+            }
+
+            // Agregamos al arreglo de visualización
+            this.empresasAgregadas.push(this.empresaBuscada);
+            
+            // Limpiamos el buscador
+            this.searchEmpresaQuery = '';
+            this.empresaBuscada = null;
+            this.empresaNoEncontrada = false;
+            
+            mostraralertas2('Institución añadida correctamente.', 'success');
+        },
+
+        // 4. Quitar empresa de la tabla
+        quitarEmpresa(index) {
+            this.empresasAgregadas.splice(index, 1);
+        },
+        contarPalabras(texto) {
+            if (!texto) return 0;
+            // Quitamos espacios extra y saltos de línea para contar palabras reales
+            return texto.trim().split(/\s+/).filter(word => word.length > 0).length;
+        },
+        recalcularAlturasCargadas() {
+            // Añadimos un pequeño retraso mínimo por las animaciones de transición de Tailwind
+            setTimeout(() => {
+                const antTextarea = this.$refs.antecedentesTextarea;
+                const jusTextarea = this.$refs.justificacionTextarea;
+
+                if (antTextarea) {
+                    antTextarea.style.height = 'auto';
+                    antTextarea.style.height = antTextarea.scrollHeight + 'px';
+                }
+                if (jusTextarea) {
+                    jusTextarea.style.height = 'auto';
+                    jusTextarea.style.height = jusTextarea.scrollHeight + 'px';
+                }
+            }, 50); // 50ms bastan para que el DOM se dibuje tras la transición v-else-if
+        },
+        ajustarAlturaTextarea(event) {
+            const el = event.target;
+            el.style.height = 'auto'; // Resetea la altura para recalcular correctamente
+            el.style.height = el.scrollHeight + 'px';
+        },
         async abrirEdicion(id) {
             this.proyectoEditandoId = id;
             this.showEditModal = true;
@@ -2890,8 +3238,8 @@ export default {
             try {
                 // Asegúrate de crear esta ruta en tus routes/api.php de Laravel
                 const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
+                console.log(response);
                 const data = response.data;
-
                 this.objetivosPeiDisponibles = data.objetivos_pei;
                 this.politicasPlandeDisponibles = data.politicas_plandne || [];
                 this.objetivosPoliticasDisponibles = data.objetivos_politicas_seleccionadas || [];
@@ -2908,6 +3256,7 @@ export default {
                 this.provinciasCatalogo = data.provincias_catalogo || [];
                 this.cantonesCatalogo = data.cantones_catalogo || [];
                 this.parroquiasCatalogo = data.parroquias_catalogo || [];
+
                 let mapeoObjetivos = data.proyecto.invi_obj_proyectos.map(obj => ({
                     id_obj_proy: obj.id_obj_proy,
                     tipo_obj_proy: obj.tipo_obj_proy,
@@ -2919,6 +3268,7 @@ export default {
                     medios_verificacion: obj.invi_medios_verificacion || [],
                     prod_verificables: obj.invi_prod_verificables || [],
                 }));
+                this.empresasAgregadas = data.empresas_seleccionadas || [];
                 this.editForm = {
                     proyect_nombre: data.proyecto.proyect_nombre || '',
                     proyect_titulo: data.proyecto.proyect_titulo || '',
@@ -2942,7 +3292,10 @@ export default {
                     provincias:   data.cobertura_guardada?.provincias || [],
                     cantones:     data.cobertura_guardada?.cantones || [],
                     parroquias:   data.cobertura_guardada?.parroquias || [],
-                    objetivos_marco_logico: mapeoObjetivos
+                    objetivos_marco_logico: mapeoObjetivos,
+                    proyect_antecedentes: data.proyecto.proyect_antecedentes || '',
+                    proyect_justificacion: data.proyecto.proyect_justificacion || '',
+                    empresas: [...this.empresasAgregadas]
                 };
             } catch (error) {
                 mostraralertas2('Error al cargar datos del proyecto', 'error');
@@ -2985,6 +3338,13 @@ export default {
                 };
             }
             this.showModalMarcoLogico = true;
+            this.$nextTick(() => {
+                const textareas = document.querySelectorAll('#modalMarcoLogico textarea');
+                textareas.forEach(el => {
+                        el.style.height = 'auto';
+                        el.style.height = el.scrollHeight + 'px';
+                });
+            });
         },
         agregarAtributoML(campo) {
             const modelosVios = {
@@ -3238,11 +3598,26 @@ export default {
                 mostraralertas2('Debe seleccionar un tipo de proyecto de vinculación obligatoriamente.', 'error');
                 return;
             }
+            const cantAnt = this.palabrasAntecedentes;
+            const cantJus = this.palabrasJustificacion;
+
+            if (cantAnt < 500 || cantAnt > 800) {
+                mostraralertas2(`Los antecedentes deben tener entre 500 y 800 palabras. Actualmente tienes ${cantAnt}.`, 'error');
+                return;
+            }
+            if (cantJus < 600 || cantJus > 800) {
+                mostraralertas2(`La justificación debe tener entre 600 y 800 palabras. Actualmente tienes ${cantJus}.`, 'error');
+                return;
+            }
 
             this.guardando = true;
             try {
-                // Asegúrate de crear esta ruta (PUT/POST) en tus routes/api.php de Laravel
-                await API.put(`${this.baseUrl}/invi_proyectos/${this.proyectoEditandoId}`, this.editForm);
+                const payload = {
+                    ...this.editForm,
+                    empresas: this.empresasAgregadas.map(emp => emp.idempresa)
+                };
+
+                await API.put(`${this.baseUrl}/invi_proyectos/${this.proyectoEditandoId}`, payload);
 
                 mostraralertas2('Proyecto actualizado correctamente', 'success');
                 this.cerrarEdicion();
@@ -3275,7 +3650,10 @@ export default {
                 id_convocatoria: '',
                 sublineas_investigacion: [],
                 unesco_areas: [],
-                id_tip_invi_proy: ''
+                id_tip_invi_proy: '',
+                proyect_antecedentes: '',
+                proyect_justificacion: '',
+                empresas: []
             };
         },
 
