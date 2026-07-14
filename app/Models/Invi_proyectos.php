@@ -26,6 +26,8 @@ class Invi_proyectos extends Model
         'id_convocatoria',
         'id_tip_invi_proy',
         'proyect_cobertura',
+        'proyect_antecedentes',
+        'proyect_justificacion',
     ];
     public function invi_detalle_integrante()
     {
@@ -79,4 +81,8 @@ class Invi_proyectos extends Model
     {
         return $this->hasMany(Invi_Obj_Proy::class, 'proyect_id');
     }
+    public function invi_detalle_inst_proy()
+    {
+        return $this->hasMany(Invi_detalle_inst_proy::class, 'proyect_id');
+    }   
 }

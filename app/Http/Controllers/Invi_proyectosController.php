@@ -43,6 +43,8 @@ use App\Models\Invi_metas;
 use App\Models\Invi_supuestos;
 use App\Models\Invi_medios_verificacion;
 use App\Models\Invi_prod_verificables;
+use App\Models\Praempresa;
+use App\Models\Invi_detalle_inst_proy;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -185,6 +187,7 @@ class Invi_proyectosController extends Controller
             'invi_obj_proyectos.invi_supuestos',
             'invi_obj_proyectos.invi_medios_verificacion',
             'invi_obj_proyectos.invi_prod_verificables',
+            'invi_detalle_inst_proy.praempresas'
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -340,6 +343,9 @@ class Invi_proyectosController extends Controller
                 $parroquias_guardadas[] = $cobe->idparroquia;
             }
         }
+        $empresasSeleccionadas = $proyecto->invi_detalle_inst_proy->map(function ($detalle) {
+            return $detalle->praempresas;
+        })->filter()->values()->toArray();
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -376,7 +382,8 @@ class Invi_proyectosController extends Controller
                 'provincias'   => $provincias_guardadas,
                 'cantones'     => $cantones_guardados,
                 'parroquias'   => $parroquias_guardadas,
-            ]
+            ],
+            'empresas_seleccionadas' => $empresasSeleccionadas,
         ]);
     }
 
@@ -466,6 +473,8 @@ class Invi_proyectosController extends Controller
             $proyecto->id_convocatoria = $request->id_convocatoria;
             $proyecto->id_tip_invi_proy = $request->id_tip_invi_proy;
             $proyecto->proyect_cobertura = $request->proyect_cobertura;
+            $proyecto->proyect_antecedentes = $request->proyect_antecedentes;
+            $proyecto->proyect_justificacion = $request->proyect_justificacion;
 
 
             $proyecto->save();
@@ -720,6 +729,22 @@ class Invi_proyectosController extends Controller
                 Invi_Obj_Proy::where('proyect_id', $id)
                     ->whereNotIn('id_obj_proy', $ids_objetivos_recibidos)
                     ->delete();
+            }
+            Invi_detalle_inst_proy::where('proyect_id', $id)->delete();
+            
+            if ($request->has('empresas') && is_array($request->empresas)) {
+                foreach ($request->empresas as $empresa) {
+                    // SOLUCIÓN BACKEND: Tolerancia a fallos de tipos.
+                    // Si viene un array/objeto del frontend extrae 'idempresa', de lo contrario usa el valor directo.
+                    $id_empresa = is_array($empresa) ? ($empresa['idempresa'] ?? null) : $empresa;
+
+                    if ($id_empresa) {
+                        Invi_detalle_inst_proy::insert([
+                            'proyect_id' => $id,
+                            'idempresa'  => $id_empresa
+                        ]);
+                    }
+                }
             }
 
 

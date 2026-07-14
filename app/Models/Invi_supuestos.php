@@ -15,7 +15,6 @@ class Invi_supuestos extends Model
 
     protected $fillable = [
         'id_obj_proy',
-        'cod_supuestos',
         'detalle_supuestos'
     ];
     public function invi_obj_proyectos()

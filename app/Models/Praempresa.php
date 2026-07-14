@@ -23,6 +23,7 @@ class Praempresa extends Model
         'tipo',
         'titulo',
         'representante',
+        'ci_representante',
         'cargo',
         'actividad',
         'fechafin',
@@ -37,5 +38,9 @@ class Praempresa extends Model
         'archivo'
     ];
     protected $hidden = ['imagen'];
+    public function invi_detalle_inst_proy()
+    {
+        return $this->hasMany(Invi_detalle_inst_proy::class, 'idempresa');
+    }
 
 }

@@ -15,7 +15,6 @@ class Invi_indicadores extends Model
 
     protected $fillable = [
         'id_obj_proy',
-        'cod_indicator',
         'detalle_indicador'
     ];
     public function invi_obj_proyectos()

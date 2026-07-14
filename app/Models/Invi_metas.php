@@ -15,7 +15,6 @@ class Invi_metas extends Model
 
     protected $fillable = [
         'id_obj_proy',
-        'cod_metas',
         'detalle_metas'
     ];
     public function invi_obj_proyectos()

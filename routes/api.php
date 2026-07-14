@@ -199,6 +199,8 @@ Route::prefix('vin')->group(function () {
         Route::delete('habilitar_empresa/{id}', [PraempresaController::class, 'habilitar']);
         //Definición de endpoint para inhabilitar un empresa
         Route::delete('inhabilitar_empresa/{id}', [PraempresaController::class, 'destroy']);
+        //Definición de endpoint para buscar una empresa
+        Route::get('buscar_empresa', [PraempresaController::class, 'buscarEmpresa']);
         //Definición de endpoint para obtener las estadísticas de graduados por periodo
         Route::get('getGraduadosPorPeriodo/{id_periodo}', [GraduadosController::class, 'getGraduadosPorPeriodo']);
         //Definición de endpoint para obtener las estadísticas de preguntas de un formulario

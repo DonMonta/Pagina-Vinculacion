@@ -15,7 +15,6 @@ class Invi_medios_verificacion extends Model
 
     protected $fillable = [
         'id_obj_proy',
-        'cod_medio_verifi',
         'detalle_medio_verifica'
     ];
     public function invi_obj_proyectos()

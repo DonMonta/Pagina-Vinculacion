@@ -151,6 +151,22 @@ class PraempresaController extends Controller
             ]);
         }
     }
+    public function buscarEmpresa(Request $request)
+    {
+        $termino = $request->query('q');
+        
+        if (empty($termino)) {
+            return response()->json(null);
+        }
+
+        // Busca por RUC, nombre de empresa o empresa corta
+        $empresa = Praempresa::where('ruc', 'LIKE', "%{$termino}%")
+            ->orWhere('empresa', 'LIKE', "%{$termino}%")
+            ->orWhere('empresacorta', 'LIKE', "%{$termino}%")
+            ->first();
+
+        return response()->json($empresa); // Retorna la primera que coincida o null
+    }
 
     /**
      * Update the specified resource in storage.
