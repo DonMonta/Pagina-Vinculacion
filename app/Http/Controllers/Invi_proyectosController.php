@@ -45,6 +45,9 @@ use App\Models\Invi_medios_verificacion;
 use App\Models\Invi_prod_verificables;
 use App\Models\Praempresa;
 use App\Models\Invi_detalle_inst_proy;
+use App\Models\Invi_detalle_presu_proy;
+use App\Models\Invi_aportesutlvt;
+use App\Models\Invi_aportesinst;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -187,7 +190,9 @@ class Invi_proyectosController extends Controller
             'invi_obj_proyectos.invi_supuestos',
             'invi_obj_proyectos.invi_medios_verificacion',
             'invi_obj_proyectos.invi_prod_verificables',
-            'invi_detalle_inst_proy.praempresas'
+            'invi_detalle_inst_proy.praempresas',
+            'invi_detalle_presu_proy.invi_aportesutlvt',
+            'invi_detalle_presu_proy.invi_aportesinst.praempresa'
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -347,6 +352,40 @@ class Invi_proyectosController extends Controller
             return $detalle->praempresas;
         })->filter()->values()->toArray();
 
+        $empresasSeleccionadas2 = $proyecto->invi_detalle_inst_proy->map(function ($detalle) {
+            return $detalle->praempresas;
+        })->filter(function ($empresa) {
+            return $empresa && $empresa->ruc !== '0860000830001';
+        })->values()->toArray();
+        $aportesUtlvt = [];
+        $aportesInst = [];
+
+        if ($proyecto->invi_detalle_presu_proy) {
+            foreach ($proyecto->invi_detalle_presu_proy as $detallePresu) {
+                // Aportes de la Universidad (UTLVT)
+                if ($detallePresu->id_aportes_utlvt && $detallePresu->invi_aportesutlvt) {
+                    $aportesUtlvt[] = [
+                        'id_det_presupuesto' => $detallePresu->id_det_presupuesto,
+                        'actividad' => $detallePresu->invi_aportesutlvt->actividad,
+                        'valor' => $detallePresu->invi_aportesutlvt->valor,
+                    ];
+                }
+                // Aportes de Instituciones Externas
+                if ($detallePresu->id_aportes_inst && $detallePresu->invi_aportesinst) {
+                    $empresa = $detallePresu->invi_aportesinst->praempresa;
+                    // Excluimos la empresa con el RUC indicado
+                    if ($empresa && $empresa->ruc !== '0860000830001') {
+                        $aportesInst[] = [
+                            'id_det_presupuesto' => $detallePresu->id_det_presupuesto,
+                            'idempresa' => $detallePresu->invi_aportesinst->idempresa,
+                            'actividad' => $detallePresu->invi_aportesinst->actividad,
+                            'valor' => $detallePresu->invi_aportesinst->valor,
+                        ];
+                    }
+                }
+            }
+        }
+
         return response()->json([
             'proyecto' => $proyecto,
             'objetivos_pei' => $objetivos,
@@ -375,7 +414,7 @@ class Invi_proyectosController extends Controller
             'provincias_catalogo' => $provinciasCatalogo,
             'cantones_catalogo' => $cantonesCatalogo,
             'parroquias_catalogo' => $parroquiasCatalogo,
-            
+
             // NUEVO: Devolvemos la estructura plana
             'cobertura_guardada' => [
                 'id_zona_plan' => $id_zona_plan_guardada,
@@ -384,6 +423,9 @@ class Invi_proyectosController extends Controller
                 'parroquias'   => $parroquias_guardadas,
             ],
             'empresas_seleccionadas' => $empresasSeleccionadas,
+            'empresas_seleccionadas2' => $empresasSeleccionadas2,
+            'aportes_utlvt' => $aportesUtlvt,
+            'aportes_inst' => $aportesInst,
         ]);
     }
 
@@ -661,14 +703,14 @@ class Invi_proyectosController extends Controller
                 }
             }
             if ($request->has('objetivos_marco_logico') && is_array($request->objetivos_marco_logico)) {
-                
+
                 $ids_objetivos_recibidos = [];
 
                 foreach ($request->objetivos_marco_logico as $objData) {
                     // 1. Crear o Actualizar el Objetivo
                     $objetivo = Invi_Obj_Proy::updateOrCreate(
                         [
-                            'id_obj_proy' => $objData['id_obj_proy'] ?? null, 
+                            'id_obj_proy' => $objData['id_obj_proy'] ?? null,
                             'proyect_id'  => $id
                         ],
                         [
@@ -682,7 +724,7 @@ class Invi_proyectosController extends Controller
                     // 2. Limpiar e Insertar Componentes Anidados (Indicadores)
                     $objetivo->invi_indicadores()->delete();
                     if (!empty($objData['indicadores'])) {
-                        $indicadoresInsert = array_map(function($item) use ($objetivo) {
+                        $indicadoresInsert = array_map(function ($item) use ($objetivo) {
                             return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_indicador' => $item['detalle_indicador']];
                         }, $objData['indicadores']);
                         Invi_indicadores::insert($indicadoresInsert);
@@ -691,7 +733,7 @@ class Invi_proyectosController extends Controller
                     // 3. Limpiar e Insertar Metas
                     $objetivo->invi_metas()->delete();
                     if (!empty($objData['metas'])) {
-                        $metasInsert = array_map(function($item) use ($objetivo) {
+                        $metasInsert = array_map(function ($item) use ($objetivo) {
                             return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_metas' => $item['detalle_metas']];
                         }, $objData['metas']);
                         Invi_metas::insert($metasInsert);
@@ -700,7 +742,7 @@ class Invi_proyectosController extends Controller
                     // 4. Limpiar e Insertar Supuestos
                     $objetivo->invi_supuestos()->delete();
                     if (!empty($objData['supuestos'])) {
-                        $supuestosInsert = array_map(function($item) use ($objetivo) {
+                        $supuestosInsert = array_map(function ($item) use ($objetivo) {
                             return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_supuestos' => $item['detalle_supuestos']];
                         }, $objData['supuestos']);
                         Invi_supuestos::insert($supuestosInsert);
@@ -709,7 +751,7 @@ class Invi_proyectosController extends Controller
                     // 5. Limpiar e Insertar Medios de Verificación
                     $objetivo->invi_medios_verificacion()->delete();
                     if (!empty($objData['medios_verificacion'])) {
-                        $mediosInsert = array_map(function($item) use ($objetivo) {
+                        $mediosInsert = array_map(function ($item) use ($objetivo) {
                             return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_medio_verifica' => $item['detalle_medio_verifica']];
                         }, $objData['medios_verificacion']);
                         Invi_medios_verificacion::insert($mediosInsert);
@@ -718,7 +760,7 @@ class Invi_proyectosController extends Controller
                     // 6. Limpiar e Insertar Productos Verificables (Solo para Específicos)
                     $objetivo->invi_prod_verificables()->delete();
                     if ($objData['tipo_obj_proy'] === 'especifico' && !empty($objData['prod_verificables'])) {
-                        $prodInsert = array_map(function($item) use ($objetivo) {
+                        $prodInsert = array_map(function ($item) use ($objetivo) {
                             return ['id_obj_proy' => $objetivo->id_obj_proy, 'detalle_prod_verif' => $item['detalle_prod_verif']];
                         }, $objData['prod_verificables']);
                         Invi_prod_verificables::insert($prodInsert);
@@ -731,7 +773,7 @@ class Invi_proyectosController extends Controller
                     ->delete();
             }
             Invi_detalle_inst_proy::where('proyect_id', $id)->delete();
-            
+
             if ($request->has('empresas') && is_array($request->empresas)) {
                 foreach ($request->empresas as $empresa) {
                     // SOLUCIÓN BACKEND: Tolerancia a fallos de tipos.
@@ -746,6 +788,75 @@ class Invi_proyectosController extends Controller
                     }
                 }
             }
+            $detallesPresuAnteriores = Invi_detalle_presu_proy::where('proyect_id', $id)->get();
+            $utlvtIdsParaEliminar = $detallesPresuAnteriores->pluck('id_aportes_utlvt')->filter()->toArray();
+            $instIdsParaEliminar = $detallesPresuAnteriores->pluck('id_aportes_inst')->filter()->toArray();
+
+            // Eliminamos la tabla pivote de detalle presupuesto
+            Invi_detalle_presu_proy::where('proyect_id', $id)->delete();
+
+            // Eliminamos los registros huérfanos correspondientes en las tablas de aportes
+            if (!empty($utlvtIdsParaEliminar)) {
+                Invi_aportesutlvt::whereIn('id_aportes_utlvt', $utlvtIdsParaEliminar)->delete();
+            }
+            if (!empty($instIdsParaEliminar)) {
+                Invi_aportesinst::whereIn('id_aportes_inst', $instIdsParaEliminar)->delete();
+            }
+            $totalGeneralAcumulado = 0;
+            // 3. Guardar Nuevos Aportes UTLVT (Universidad)
+            if ($request->has('aportes_utlvt') && is_array($request->aportes_utlvt)) {
+                foreach ($request->aportes_utlvt as $aporte) {
+                    $actividad = $aporte['actividad'] ?? '';
+                    $valor = $this->parseMoney($aporte['valor'] ?? 0);
+
+                    if (!empty($actividad)) {
+                        $totalGeneralAcumulado += $valor; // Acumulamos el valor
+
+                        $nuevoAporteUtlvt = Invi_aportesutlvt::create([
+                            'actividad' => $actividad,
+                            'valor' => $valor
+                        ]);
+
+                        Invi_detalle_presu_proy::create([
+                            'proyect_id' => $id,
+                            'id_aportes_utlvt' => $nuevoAporteUtlvt->id_aportes_utlvt,
+                            'id_aportes_inst' => null,
+                            'total_presupuesto' => $valor
+                        ]);
+                    }
+                }
+            }
+
+            // 4. Guardar Nuevos Aportes Institucionales
+            if ($request->has('aportes_inst') && is_array($request->aportes_inst)) {
+                foreach ($request->aportes_inst as $aporte) {
+                    $idempresa = $aporte['idempresa'] ?? null;
+                    $actividad = $aporte['actividad'] ?? '';
+                    $valor = $this->parseMoney($aporte['valor'] ?? 0);
+
+                    if ($idempresa && !empty($actividad)) {
+                        // Verificación extra en backend de RUC de la empresa
+                        $empresa = Praempresa::find($idempresa);
+                        if ($empresa && $empresa->ruc !== '0860000830001') {
+
+                            $totalGeneralAcumulado += $valor; // Acumulamos el valor
+
+                            $nuevoAporteInst = Invi_aportesinst::create([
+                                'idempresa' => $idempresa,
+                                'actividad' => $actividad,
+                                'valor' => $valor
+                            ]);
+
+                            Invi_detalle_presu_proy::create([
+                                'proyect_id' => $id,
+                                'id_aportes_utlvt' => null,
+                                'id_aportes_inst' => $nuevoAporteInst->id_aportes_inst,
+                                'total_presupuesto' => $valor
+                            ]);
+                        }
+                    }
+                }
+            }
 
 
             DB::commit();
@@ -754,6 +865,16 @@ class Invi_proyectosController extends Controller
             DB::rollBack();
             return response()->json(['error' => 'Error al actualizar: ' . $e->getMessage()], 500);
         }
+    }
+    private function parseMoney($value)
+    {
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+        // Quita puntos de miles y cambia la coma decimal por un punto
+        $clean = str_replace('.', '', $value);
+        $clean = str_replace(',', '.', $clean);
+        return (float) $clean;
     }
 
     /**

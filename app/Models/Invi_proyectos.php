@@ -84,5 +84,9 @@ class Invi_proyectos extends Model
     public function invi_detalle_inst_proy()
     {
         return $this->hasMany(Invi_detalle_inst_proy::class, 'proyect_id');
-    }   
+    }
+    public function invi_detalle_presu_proy()
+    {
+        return $this->hasMany(Invi_detalle_presu_proy::class, 'proyect_id');
+    }
 }

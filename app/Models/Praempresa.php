@@ -42,5 +42,9 @@ class Praempresa extends Model
     {
         return $this->hasMany(Invi_detalle_inst_proy::class, 'idempresa');
     }
+    public function invi_aportesinst()
+    {
+        return $this->hasMany(Invi_aportesinst::class, 'idempresa');
+    }
 
 }
