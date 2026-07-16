@@ -656,6 +656,15 @@
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">5</span>
                         Instituciones y Organismos participantes
                     </button>
+                    <button @click="activeTab = 'presupuesto_inst'"
+                        :class="activeTab === 'presupuesto_inst'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">6</span>
+                        Presupuesto Institucional
+                    </button>
                 </div>
 
                 <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-gray-900">
@@ -2336,6 +2345,172 @@
                             </div>
                         </div>
                     </div>
+                    <div v-else-if="activeTab === 'presupuesto_inst'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4 p-4 bg-blue-50 dark:bg-gray-800 rounded-lg border-l-4 border-blue-500">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Presupuesto Institucional</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                Defina detalladamente las actividades y los montos de financiamiento del proyecto divididos por la Universidad (UTLVT) y las Entidades Cooperantes autorizadas.
+                            </p>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="px-5 py-4 bg-gray-50 dark:bg-gray-850 border-b border-gray-200 dark:border-gray-700">
+                                <h4 class="text-sm font-bold tracking-wider text-blue-600 dark:text-blue-400 uppercase">
+                                    APORTES UNIVERSIDAD TÉCNICA “LUIS VARGAS TORRES” DE ESMERALDAS
+                                </h4>
+                            </div>
+                            <div class="p-4">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 uppercase">
+                                            <th class="py-3 px-4 w-2/3">Actividad</th>
+                                            <th class="py-3 px-4 w-1/4 text-right">Valor ($)</th>
+                                            <th class="py-3 px-4 w-12 text-center">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(aporte, index) in editForm.aportes_utlvt" :key="'utlvt-' + index" class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                                            <td class="py-2 px-4">
+                                                <input 
+                                                    v-model="aporte.actividad" 
+                                                    type="text" 
+                                                    placeholder="Escriba la actividad o rubro..." 
+                                                    class="w-full bg-transparent border-0 focus:ring-0 text-sm text-gray-800 dark:text-gray-200"
+                                                />
+                                            </td>
+                                            <td class="py-2 px-4 text-right">
+                                                <input 
+                                                    v-model="aporte.valor" 
+                                                    @input="validarMonto(aporte, 'valor')"
+                                                    type="text" 
+                                                    placeholder="0,00" 
+                                                    class="w-full bg-transparent border-0 focus:ring-0 text-sm text-right text-gray-800 dark:text-gray-200 font-medium"
+                                                />
+                                            </td>
+                                            <td class="py-2 px-4 text-center">
+                                                <button 
+                                                    @click="eliminarAporteUtlvt(index)" 
+                                                    type="button" 
+                                                    class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="editForm.aportes_utlvt.length === 0">
+                                            <td colspan="3" class="py-6 text-center text-sm text-gray-400 italic">No hay actividades registradas. Haga clic en Agregar Actividad.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <div class="mt-4 flex justify-start">
+                                    <button 
+                                        @click="agregarAporteUtlvt" 
+                                        type="button" 
+                                        class="inline-flex items-center px-4 py-2 border border-blue-500 text-sm font-semibold rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Agregar Actividad UTLVT
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-for="empresa in cooperadoresFiltrados" :key="empresa.idempresa" class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="px-5 py-4 bg-gray-50 dark:bg-gray-850 border-b border-gray-200 dark:border-gray-700">
+                                <h4 class="text-sm font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
+                                    APORTES ENTIDAD COOPERANTE: {{ empresa.empresacorta }}
+                                </h4>
+                            </div>
+                            <div class="p-4">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 uppercase">
+                                            <th class="py-3 px-4 w-2/3">Actividad</th>
+                                            <th class="py-3 px-4 w-1/4 text-right">Valor ($)</th>
+                                            <th class="py-3 px-4 w-12 text-center">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template v-for="(aporte, index) in editForm.aportes_inst" :key="'inst-' + index">
+        
+                                            <tr 
+                                                v-if="aporte.idempresa === empresa.idempresa"
+                                                class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-gray-800/30"
+                                            >
+                                                <td class="py-2 px-4">
+                                                    <textarea 
+                                                        v-model="aporte.actividad" 
+                                                        @input="ajustarAlturaTextarea"
+                                                        rows="1"
+                                                        placeholder="Escriba la actividad o rubro..." 
+                                                        class="w-full bg-transparent border-0 focus:ring-0 text-sm text-gray-800 dark:text-gray-200 resize-none overflow-hidden"
+                                                        style="min-height: 38px;"
+                                                    ></textarea>
+                                                </td>
+                                                <td class="py-2 px-4 text-right align-top">
+                                                    <input 
+                                                        v-model="aporte.valor" 
+                                                        @input="validarMonto(aporte, 'valor')"
+                                                        type="text" 
+                                                        placeholder="0,00" 
+                                                        class="w-full bg-transparent border-0 focus:ring-0 text-sm text-right text-gray-800 dark:text-gray-200 font-medium"
+                                                    />
+                                                </td>
+                                                <td class="py-2 px-4 text-center align-top">
+                                                    <button 
+                                                        @click="eliminarAporteInst(index)" 
+                                                        type="button" 
+                                                        class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors mt-1"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </template>
+
+                                        <tr v-if="obtenerCantidadAportesEmpresa(empresa.idempresa) === 0">
+                                            <td colspan="3" class="py-6 text-center text-sm text-gray-400 italic">No hay actividades registradas para esta institución.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <div class="mt-4 flex justify-start">
+                                    <button 
+                                        @click="agregarAporteInst(empresa.idempresa)" 
+                                        type="button" 
+                                        class="inline-flex items-center px-4 py-2 border border-emerald-500 text-sm font-semibold rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Agregar Actividad Cooperante
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="cooperadoresFiltrados.length === 0" class="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-500 text-sm">
+                            No existen Entidades Cooperantes seleccionadas en este proyecto (RUC 0860037590001 excluido).
+                        </div>
+
+                        <div class="bg-gray-900 dark:bg-gray-800 text-white rounded-xl p-6 shadow-md flex flex-col md:flex-row justify-between items-center">
+                            <div class="mb-4 md:mb-0">
+                                <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase block">Resumen del Financiamiento</span>
+                                <span class="text-lg font-bold">Consolidación General de Presupuesto</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase block">TOTAL DEL PROYECTO ($)</span>
+                                <span class="text-3xl font-extrabold text-blue-400">{{ formatearMonedaVisual(totalProyecto) }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div
@@ -2459,6 +2634,7 @@ export default {
             empresaNoEncontrada: false,
             buscandoEmpresa: false,
             empresasAgregadas: [],
+            empresasAgregadas2: [],
             editForm: {
                 proyect_nombre: '',
                 proyect_titulo: '',
@@ -2486,6 +2662,8 @@ export default {
                 proyect_antecedentes: '',
                 proyect_justificacion: '',
                 empresas: [],
+                aportes_utlvt: [],
+                aportes_inst: [],
             },
             modalFormML: {
                 id_obj_proy: null,
@@ -2660,6 +2838,21 @@ export default {
             if (total === 0) return 'text-gray-500 dark:text-gray-400';
             if (total < 600 || total > 800) return 'text-red-500';
             return 'text-green-600 dark:text-green-400';
+        },
+        cooperadoresFiltrados() {
+            console.log(this.empresasAgregadas2);
+            return this.empresasAgregadas2.filter(emp => emp && emp.ruc !== '0860000830001');
+        },
+        // Calcula dinámicamente la suma del presupuesto del proyecto en tiempo real
+        totalProyecto() {
+            let total = 0;
+            this.editForm.aportes_utlvt.forEach(a => {
+                total += this.limpiarYConvertirAFloat(a.valor);
+            });
+            this.editForm.aportes_inst.forEach(a => {
+                total += this.limpiarYConvertirAFloat(a.valor);
+            });
+            return total;
         }
     },
     methods: {
@@ -3228,6 +3421,62 @@ export default {
             el.style.height = 'auto'; // Resetea la altura para recalcular correctamente
             el.style.height = el.scrollHeight + 'px';
         },
+        agregarAporteUtlvt() {
+            this.editForm.aportes_utlvt.push({
+                actividad: '',
+                valor: ''
+            });
+        },
+        eliminarAporteUtlvt(index) {
+            this.editForm.aportes_utlvt.splice(index, 1);
+        },
+        agregarAporteInst(idempresa) {
+            this.editForm.aportes_inst.push({
+                idempresa: idempresa,
+                actividad: '',
+                valor: ''
+            });
+        },
+        eliminarAporteInst(index) {
+            this.editForm.aportes_inst.splice(index, 1);
+        },
+        obtenerCantidadAportesEmpresa(idempresa) {
+            return this.editForm.aportes_inst.filter(a => a.idempresa === idempresa).length;
+        },
+        validarMonto(objeto, propiedad) {
+            let val = objeto[propiedad];
+            // Reemplaza cualquier carácter que no sea dígito, punto o coma
+            val = val.replace(/[^0-9.,]/g, '');
+            objeto[propiedad] = val;
+        },
+        limpiarYConvertirAFloat(valor) {
+           if (valor === null || valor === undefined || valor === '') return 0;
+            
+            // Si ya es un número traído directamente de la API, lo usamos tal cual
+            if (typeof valor === 'number') return valor;
+            
+            let limpio = String(valor).trim();
+            
+            // Si el texto contiene una coma (ej: 1.250,50 -> Ingresado por el usuario)
+            if (limpio.includes(',')) {
+                // Quitamos los puntos de miles y cambiamos la coma por punto decimal
+                limpio = limpio.replace(/\./g, '').replace(',', '.');
+            } else {
+                // Si no tiene coma, asumimos que es formato estándar con decimal (ej: 1250.50)
+                // Quitamos solo posibles comas de miles gringas por precaución
+                limpio = limpio.replace(/,/g, '');
+            }
+            
+            let num = parseFloat(limpio);
+            return isNaN(num) ? 0 : num;
+        },
+        formatearMonedaVisual(valor) {
+            return new Intl.NumberFormat('es-EC', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2
+            }).format(valor);
+        },
         async abrirEdicion(id) {
             this.proyectoEditandoId = id;
             this.showEditModal = true;
@@ -3269,6 +3518,7 @@ export default {
                     prod_verificables: obj.invi_prod_verificables || [],
                 }));
                 this.empresasAgregadas = data.empresas_seleccionadas || [];
+                this.empresasAgregadas2 = data.empresas_seleccionadas2 || [];
                 this.editForm = {
                     proyect_nombre: data.proyecto.proyect_nombre || '',
                     proyect_titulo: data.proyecto.proyect_titulo || '',
@@ -3295,7 +3545,9 @@ export default {
                     objetivos_marco_logico: mapeoObjetivos,
                     proyect_antecedentes: data.proyecto.proyect_antecedentes || '',
                     proyect_justificacion: data.proyecto.proyect_justificacion || '',
-                    empresas: [...this.empresasAgregadas]
+                    empresas: [...this.empresasAgregadas],
+                    aportes_utlvt: data.aportes_utlvt || [],
+                    aportes_inst: data.aportes_inst || []
                 };
             } catch (error) {
                 mostraralertas2('Error al cargar datos del proyecto', 'error');
