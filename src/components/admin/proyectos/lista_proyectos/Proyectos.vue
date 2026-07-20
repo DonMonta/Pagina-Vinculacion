@@ -610,12 +610,12 @@
                 </div>
 
                 <div
-                    class="flex border-b border-gray-100 dark:border-gray-800 px-6 pt-3 bg-gray-50/50 dark:bg-gray-900 gap-2">
+                    class="flex-shrink-0 flex border-b border-gray-100 dark:border-gray-800 px-6 pt-3 pb-2 bg-gray-50/50 dark:bg-gray-900 gap-2 overflow-x-auto flex-nowrap">
                     <button @click="activeTab = 'generales'"
                         :class="activeTab === 'generales'
                             ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
                             : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
-                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
                         <span
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">1</span>
                         Datos Generales
@@ -624,7 +624,7 @@
                         :class="activeTab === 'cobertura'
                             ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
                             : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
-                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
                         <span
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">2</span>
                         Cobertura y Localización
@@ -633,7 +633,7 @@
                         :class="activeTab === 'objetivos'
                             ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
                             : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
-                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
                         <span
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">3</span>
                         Objetivos del Proyecto
@@ -642,7 +642,7 @@
                         :class="activeTab === 'antecedentes_justifi'
                             ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
                             : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
-                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
                         <span
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">4</span>
                         Antecedentes y Justificación
@@ -651,7 +651,7 @@
                         :class="activeTab === 'instituciones'
                             ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
                             : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
-                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
                         <span
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">5</span>
                         Instituciones y Organismos participantes
@@ -660,10 +660,37 @@
                         :class="activeTab === 'presupuesto_inst'
                             ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
                             : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
-                        class="pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
                         <span
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">6</span>
                         Presupuesto Institucional
+                    </button>
+                    <button @click="activeTab = 'plazo_ejecucion'"
+                        :class="activeTab === 'plazo_ejecucion'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">7</span>
+                        Plazo de Ejecución 
+                    </button>
+                    <button @click="activeTab = 'personalproyect'"
+                        :class="activeTab === 'personalproyect'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">8</span>
+                        Personal del proyecto 
+                    </button>
+                    <button @click="activeTab = 'diagnostico_prob'"
+                        :class="activeTab === 'diagnostico_prob'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">9</span>
+                        Diagnóstico y Problema
                     </button>
                 </div>
 
@@ -2226,9 +2253,13 @@
 
                     </div>
                     <div v-else-if="activeTab === 'antecedentes_justifi'" class="space-y-8 animate-fade-in-up">
-                        <div class="mb-4">
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Antecedentes y Justificacionnes</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Detalle los antecedentes y justificaciones de su proyecto</p>
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Antecedentes y Justificacionnes</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Detalle los antecedentes y justificaciones de su proyecto
+                                </p>
+                            </div>
                         </div>
                         <div class="space-y-3 mt-6">
                             <!-- Tarjeta de Antecedentes -->
@@ -2346,7 +2377,7 @@
                         </div>
                     </div>
                     <div v-else-if="activeTab === 'presupuesto_inst'" class="space-y-8 animate-fade-in-up">
-                        <div class="mb-4 p-4 bg-blue-50 dark:bg-gray-800 rounded-lg border-l-4 border-blue-500">
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white">Presupuesto Institucional</h3>
                             <p class="text-sm text-gray-600 dark:text-gray-400">
                                 Defina detalladamente las actividades y los montos de financiamiento del proyecto divididos por la Universidad (UTLVT) y las Entidades Cooperantes autorizadas.
@@ -2511,6 +2542,210 @@
                             </div>
                         </div>
                     </div>
+                    <div v-else-if="activeTab === 'plazo_ejecucion'" class="space-y-6 animate-fade-in-up">
+    
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                            <svg class="text-green-500 w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Plazo de Ejecución del Proyecto</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    La duración debe estar obligatoriamente en un rango de <strong>3 a 5 años (36 a 60 meses)</strong>. La fecha de inicio no puede ser anterior a la presentación.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                            <!-- Fecha de Presentación -->
+                            <div class="space-y-1">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Presentación <span class="text-red-500">*</span></label>
+                                <input type="date" 
+                                    v-model="editForm.proyect_fecha_pres" 
+                                    @change="validarFechas"
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none transition">
+                            </div>
+
+                            <!-- Estado del Proyecto (Diseño Intuitivo tipo Tarjetas) -->
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Estado del Proyecto <span class="text-red-500">*</span></label>
+                                
+                                <div class="grid grid-cols-3 gap-3">
+                                    <!-- Opcion 1: Nuevo -->
+                                    <button type="button" 
+                                        @click="editForm.proyect_estado = 'Nuevo'"
+                                        :class="editForm.proyect_estado === 'Nuevo' 
+                                            ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 ring-1 ring-brand-500 shadow-sm' 
+                                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'"
+                                        class="flex items-center justify-center py-2 px-3 border rounded-xl transition-all duration-200 outline-none">
+                                        <div class="flex items-center gap-2">
+                                            <svg v-if="editForm.proyect_estado === 'Nuevo'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            <span class="font-semibold text-sm">Nuevo</span>
+                                        </div>
+                                    </button>
+
+                                    <!-- Opcion 2: En ejecución -->
+                                    <button type="button" 
+                                        @click="editForm.proyect_estado = 'En ejecución'"
+                                        :class="editForm.proyect_estado === 'En ejecución' 
+                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 ring-1 ring-blue-500 shadow-sm' 
+                                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'"
+                                        class="flex items-center justify-center py-2 px-3 border rounded-xl transition-all duration-200 outline-none">
+                                        <div class="flex items-center gap-2">
+                                            <svg v-if="editForm.proyect_estado === 'En ejecución'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            <span class="font-semibold text-sm">En ejecución</span>
+                                        </div>
+                                    </button>
+
+                                    <!-- Opcion 3: Continuación -->
+                                    <button type="button" 
+                                        @click="editForm.proyect_estado = 'Continuación'"
+                                        :class="editForm.proyect_estado === 'Continuación' 
+                                            ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 ring-1 ring-purple-500 shadow-sm' 
+                                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'"
+                                        class="flex items-center justify-center py-2 px-3 border rounded-xl transition-all duration-200 outline-none">
+                                        <div class="flex items-center gap-2">
+                                            <svg v-if="editForm.proyect_estado === 'Continuación'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            <span class="font-semibold text-sm text-center leading-tight">Continuación</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Fecha de Inicio (Mínimo: Fecha de Presentación) -->
+                            <div class="space-y-1">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Inicio <span class="text-red-500">*</span></label>
+                                <input type="date" 
+                                    v-model="editForm.fechainicio" 
+                                    :min="editForm.proyect_fecha_pres"
+                                    @change="validarFechas"
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none transition">
+                            </div>
+
+                            <!-- Fecha de Fin (Restringida por Vue de 3 a 5 años) -->
+                            <div class="space-y-1">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Finalización <span class="text-red-500">*</span></label>
+                                <input type="date" 
+                                    v-model="editForm.fechafin" 
+                                    :min="limitesFechaFin.min"
+                                    :max="limitesFechaFin.max"
+                                    :disabled="!editForm.fechainicio"
+                                    @change="validarFechas"
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span v-if="!editForm.fechainicio" class="text-xs text-orange-500">Seleccione primero la fecha de inicio</span>
+                            </div>
+
+                            <!-- Duración en Meses (Automático y de solo lectura) -->
+                            <div class="space-y-1 md:col-span-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Duración del Proyecto (Meses)</label>
+                                <div class="relative">
+                                    <input type="number" 
+                                        v-model="editForm.proyect_duracion_mes" 
+                                        readonly
+                                        class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white font-bold text-lg focus:outline-none shadow-inner cursor-not-allowed text-center">
+                                    
+                                    <!-- Indicador visual de si cumple la regla -->
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                                        <span v-if="editForm.proyect_duracion_mes >= 36 && editForm.proyect_duracion_mes <= 60" class="flex items-center gap-1 text-sm text-green-600 bg-green-100 px-2 py-1 rounded-lg">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            Plazo Correcto
+                                        </span>
+                                        <span v-else-if="editForm.proyect_duracion_mes > 0" class="flex items-center gap-1 text-sm text-red-600 bg-red-100 px-2 py-1 rounded-lg">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            Debe ser 3 a 5 años
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="activeTab === 'personalproyect'" class="space-y-6 animate-fade-in-up">
+                       <div class="mb-4 p-5 bg-green-50 dark:bg-gray-800/80 rounded-xl border-l-4 border-green-500 flex flex-col sm:flex-row gap-5 items-start sm:items-center shadow-sm">
+        
+                            <!-- Ícono actualizado a "Usuarios/Equipo" para mayor coherencia visual -->
+                            <div class="p-3 bg-green-100 dark:bg-green-900/40 rounded-full flex-shrink-0">
+                                <svg class="text-green-600 dark:text-green-400 w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            
+                            <!-- Texto informativo y Botón de acción -->
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Gestión del Personal Responsable</h3>
+                                
+                                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed text-justify">
+                                    En esta sección podrá administrar y supervisar a todo el equipo de trabajo involucrado en la ejecución del proyecto. Es fundamental mantener actualizado el registro de los responsables, asignando roles estratégicos como el director, subdirector y demás participantes, para garantizar el correcto desarrollo, seguimiento y cumplimiento de los objetivos establecidos.
+                                </p>
+                                
+                                <button type="button" 
+                                    @click="abrirDetallesProyecto(editForm.proyect_id)"
+                                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white text-sm font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 focus:outline-none">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    Registrar o monitorear integrantes
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div v-else-if="activeTab === 'diagnostico_prob'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                           
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Diagnóstico y Problemas</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Describa la si situación actual para contribuir a la satisfacción de necesidades y la solución de problemáticas del entorno desde el ámbito académico e investigativo.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <!-- Tarjeta de Descripción de Situación Actual -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Descripción de la situación actual <span class="text-red-500">*</span>
+                                </label>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 text-justify">
+                                    Descripción de la situación actual para contribuir a la satisfacción de necesidades y la solución de problemáticas del entorno desde el ámbito académico e investigativo
+                                </p>
+                                <textarea 
+                                    ref="descripcionTextarea"
+                                    v-model="editForm.proyect_desc_situ_act" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Descripción de la realidad existente de una zona determinada, problemas o necesidades de su población; que inciden en el lento o nulo desarrollo económico, social, cultural y ambiental; falta de integración física, comercial y social en pro del bienestar de sus habitantes."
+                                    rows="4"
+                                ></textarea>
+                                <!-- Contador de palabras -->
+                                <div class="flex justify-between items-center mt-2 text-sm font-semibold transition-colors" :class="colorContadorDescripcion">
+                                    <span>Mínimo: 550 / Máximo: 650 palabras</span>
+                                    <span>{{ palabrasDescrip }} palabras</span>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta de Identificación, descripción y diagnóstico del problema -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Identificación, descripción y diagnóstico del problema <span class="text-red-500">*</span>
+                                </label>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 text-justify">
+                                    Identificar el problema que impulsa el proyecto, con datos objetivos y/o peticiones realizadas por las instituciones (copaternales), las cuales financian el proyecto.
+                                </p>
+                                <textarea 
+                                    ref="diagnostico_problemaTextarea"
+                                    v-model="editForm.proyect_diag_probl" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="En los proyectos sociales el problema social se define como una carencia o déficits existentes que afecta a un segmento de la población de una determinado zona o lugar. En el proceso de identificación, descripción y diagnóstico del problema es fundamental realizar el análisis de participación de los/as involucrados/as con la finalidad que la comunidad beneficiaria en el futuro se involucre y comprometa en la implementación del proyecto"
+                                    rows="4"
+                                ></textarea>
+                                <!-- Contador de palabras -->
+                                <div class="flex justify-between items-center mt-2 text-sm font-semibold transition-colors" :class="colorContadorDiagnostico">
+                                    <span>Mínimo: 550 / Máximo: 650 palabras</span>
+                                    <span>{{ palabrasDiagnostico }} palabras</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
                 </div>
 
                 <div
@@ -2636,6 +2871,7 @@ export default {
             empresasAgregadas: [],
             empresasAgregadas2: [],
             editForm: {
+                proyect_id: '',
                 proyect_nombre: '',
                 proyect_titulo: '',
                 proyect_nombre_en: '',
@@ -2664,6 +2900,13 @@ export default {
                 empresas: [],
                 aportes_utlvt: [],
                 aportes_inst: [],
+                proyect_fecha_pres: '',
+                fechainicio: '',
+                fechafin: '',
+                proyect_duracion_mes: '',
+                proyect_estado: '',
+                proyect_desc_situ_act: '',
+                proyect_diag_probl: '',
             },
             modalFormML: {
                 id_obj_proy: null,
@@ -2724,6 +2967,11 @@ export default {
         activeTab(newTab) {
             // Cuando el usuario cambie a la pestaña de antecedentes, recalculamos la altura
             if (newTab === 'antecedentes_justifi') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
+            if (newTab === 'diagnostico_prob') {
                 this.$nextTick(() => {
                     this.recalcularAlturasCargadas();
                 });
@@ -2824,8 +3072,14 @@ export default {
         palabrasAntecedentes() {
             return this.contarPalabras(this.editForm.proyect_antecedentes);
         },
+        palabrasDescrip() {
+            return this.contarPalabras(this.editForm.proyect_desc_situ_act);
+        },
         palabrasJustificacion() {
             return this.contarPalabras(this.editForm.proyect_justificacion);
+        },
+        palabrasDiagnostico() {
+            return this.contarPalabras(this.editForm.proyect_diag_probl);
         },
         colorContadorAntecedentes() {
             const total = this.palabrasAntecedentes;
@@ -2833,10 +3087,22 @@ export default {
             if (total < 500 || total > 800) return 'text-red-500';
             return 'text-green-600 dark:text-green-400';
         },
+        colorContadorDescripcion() {
+            const total = this.palabrasDescrip;
+            if (total === 0) return 'text-gray-500 dark:text-gray-400';
+            if (total < 550 || total > 650) return 'text-red-500';
+            return 'text-green-600 dark:text-green-400';
+        },
         colorContadorJustificacion() {
             const total = this.palabrasJustificacion;
             if (total === 0) return 'text-gray-500 dark:text-gray-400';
             if (total < 600 || total > 800) return 'text-red-500';
+            return 'text-green-600 dark:text-green-400';
+        },
+        colorContadorDiagnostico() {
+            const total = this.palabrasDiagnostico;
+            if (total === 0) return 'text-gray-500 dark:text-gray-400';
+            if (total < 550 || total > 650) return 'text-red-500';
             return 'text-green-600 dark:text-green-400';
         },
         cooperadoresFiltrados() {
@@ -2853,6 +3119,23 @@ export default {
                 total += this.limpiarYConvertirAFloat(a.valor);
             });
             return total;
+        },
+        limitesFechaFin() {
+            if (!this.editForm.fechainicio) {
+                return { min: '', max: '' };
+            }
+            // Creamos objetos Date basados en la fecha de inicio
+            const minDate = new Date(this.editForm.fechainicio);
+            const maxDate = new Date(this.editForm.fechainicio);
+            
+            // Sumamos 3 años para el mínimo y 5 años para el máximo
+            minDate.setFullYear(minDate.getFullYear() + 3);
+            maxDate.setFullYear(maxDate.getFullYear() + 5);
+
+            return {
+                min: minDate.toISOString().split('T')[0], // Formato YYYY-MM-DD
+                max: maxDate.toISOString().split('T')[0]
+            };
         }
     },
     methods: {
@@ -3074,6 +3357,7 @@ export default {
                 this.funciones = resCat.data.funciones;
                 this.carreras = resCat.data.carreras;
                 this.showModalDetalles = true;
+                this.showEditModal = false;
             } catch (e) {
                 console.error(e);
             }
@@ -3405,6 +3689,8 @@ export default {
             setTimeout(() => {
                 const antTextarea = this.$refs.antecedentesTextarea;
                 const jusTextarea = this.$refs.justificacionTextarea;
+                const descriTextarea = this.$refs.descripcionTextarea;
+                const diagnTextarea = this.$refs.diagnostico_problemaTextarea;
 
                 if (antTextarea) {
                     antTextarea.style.height = 'auto';
@@ -3413,6 +3699,14 @@ export default {
                 if (jusTextarea) {
                     jusTextarea.style.height = 'auto';
                     jusTextarea.style.height = jusTextarea.scrollHeight + 'px';
+                }
+                if (descriTextarea) {
+                    descriTextarea.style.height = 'auto';
+                    descriTextarea.style.height = descriTextarea.scrollHeight + 'px';
+                }
+                if (diagnTextarea) {
+                    diagnTextarea.style.height = 'auto';
+                    diagnTextarea.style.height = diagnTextarea.scrollHeight + 'px';
                 }
             }, 50); // 50ms bastan para que el DOM se dibuje tras la transición v-else-if
         },
@@ -3477,6 +3771,39 @@ export default {
                 minimumFractionDigits: 2
             }).format(valor);
         },
+        validarFechas() {
+            // 1. Validar que el inicio no sea menor a la presentación
+            if (this.editForm.proyect_fecha_pres && this.editForm.fechainicio) {
+                if (this.editForm.fechainicio < this.editForm.proyect_fecha_pres) {
+                    mostraralertas2('La fecha de inicio no puede ser anterior a la presentación', 'warning');
+                    this.editForm.fechainicio = this.editForm.proyect_fecha_pres;
+                }
+            }
+
+            // 2. Calcular los meses basados estrictamente en AÑOS (Inclusivo)
+            if (this.editForm.fechainicio && this.editForm.fechafin) {
+                const f1 = new Date(this.editForm.fechainicio);
+                const f2 = new Date(this.editForm.fechafin);
+
+                // Validar que el año final no sea anterior al año inicial
+                if (f2.getFullYear() < f1.getFullYear()) {
+                    this.editForm.fechafin = '';
+                    this.editForm.proyect_duracion_mes = 0;
+                    return;
+                }
+
+                // Calculamos la diferencia de años y sumamos 1 para incluir el año de inicio
+                // Ejemplo: 2027 - 2025 = 2. Sumamos 1 = 3 años.
+                let aniosTotales = (f2.getFullYear() - f1.getFullYear()) + 1;
+                
+                // Convertimos los años a meses
+                let mesesTotales = aniosTotales * 12;
+
+                this.editForm.proyect_duracion_mes = mesesTotales;
+            } else {
+                this.editForm.proyect_duracion_mes = 0;
+            }
+        },
         async abrirEdicion(id) {
             this.proyectoEditandoId = id;
             this.showEditModal = true;
@@ -3487,7 +3814,6 @@ export default {
             try {
                 // Asegúrate de crear esta ruta en tus routes/api.php de Laravel
                 const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
-                console.log(response);
                 const data = response.data;
                 this.objetivosPeiDisponibles = data.objetivos_pei;
                 this.politicasPlandeDisponibles = data.politicas_plandne || [];
@@ -3520,6 +3846,7 @@ export default {
                 this.empresasAgregadas = data.empresas_seleccionadas || [];
                 this.empresasAgregadas2 = data.empresas_seleccionadas2 || [];
                 this.editForm = {
+                    proyect_id: data.proyecto.proyect_id,
                     proyect_nombre: data.proyecto.proyect_nombre || '',
                     proyect_titulo: data.proyecto.proyect_titulo || '',
                     proyect_nombre_en: data.proyecto.proyect_nombre_en || '',
@@ -3547,7 +3874,15 @@ export default {
                     proyect_justificacion: data.proyecto.proyect_justificacion || '',
                     empresas: [...this.empresasAgregadas],
                     aportes_utlvt: data.aportes_utlvt || [],
-                    aportes_inst: data.aportes_inst || []
+                    aportes_inst: data.aportes_inst || [],
+                    proyect_fecha_pres: data.proyecto.proyect_fecha_pres || '',
+                    fechainicio: data.proyecto.fechainicio || '',
+                    fechafin: data.proyecto.fechafin || '',
+                    proyect_duracion_mes: data.proyecto.proyect_duracion_mes || '',
+                    proyect_estado: data.proyecto.proyect_estado || '',
+                    proyect_desc_situ_act: data.proyecto.proyect_desc_situ_act || '',
+                    proyect_diag_probl: data.proyecto.proyect_diag_probl || '',
+                    
                 };
             } catch (error) {
                 mostraralertas2('Error al cargar datos del proyecto', 'error');
@@ -3861,6 +4196,16 @@ export default {
                 mostraralertas2(`La justificación debe tener entre 600 y 800 palabras. Actualmente tienes ${cantJus}.`, 'error');
                 return;
             }
+            if (!this.editForm.proyect_fecha_pres || !this.editForm.fechainicio || !this.editForm.fechafin || !this.editForm.proyect_estado) {
+                mostraralertas2('Debe completar todos los campos del Plazo de Ejecución.', 'error');
+                return;
+            }
+            
+            // 36 meses = 3 años | 60 meses = 5 años
+            if (this.editForm.proyect_duracion_mes < 36 || this.editForm.proyect_duracion_mes > 60) {
+                mostraralertas2('La duración del proyecto debe ser obligatoriamente entre 3 y 5 años (36 a 60 meses).', 'error');
+                return;
+            }
 
             this.guardando = true;
             try {
@@ -3889,8 +4234,9 @@ export default {
             this.editForm = {
                 proyect_nombre: '',
                 proyect_titulo: '',
-                nombre_en: '',
-                titulo_en: '',
+                proyect_nombre_en: '',
+                proyect_titulo_en: '',
+                proyect_multidis: 0,
                 objetivos: [],
                 politicas: [],
                 ods: [],
@@ -3903,9 +4249,25 @@ export default {
                 sublineas_investigacion: [],
                 unesco_areas: [],
                 id_tip_invi_proy: '',
+                proyect_cobertura: '',
+                id_zona_plan: '',
+                provincias: [], // Arreglo de id_provincia
+                cantones: [],   // Arreglo de id_canton
+                parroquias: [],  // Arreglo de idparroquia
+                objetivos_marco_logico: [],
                 proyect_antecedentes: '',
                 proyect_justificacion: '',
-                empresas: []
+                empresas: [],
+                aportes_utlvt: [],
+                aportes_inst: [],
+                proyect_fecha_pres: '',
+                fechainicio: '',
+                fechafin: '',
+                proyect_duracion_mes: '',
+                proyect_estado: '',
+                proyect_desc_situ_act: '',
+                proyect_diag_probl: '',
+
             };
         },
 
