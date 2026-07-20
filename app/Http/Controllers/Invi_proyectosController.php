@@ -517,7 +517,13 @@ class Invi_proyectosController extends Controller
             $proyecto->proyect_cobertura = $request->proyect_cobertura;
             $proyecto->proyect_antecedentes = $request->proyect_antecedentes;
             $proyecto->proyect_justificacion = $request->proyect_justificacion;
-
+            $proyecto->proyect_fecha_pres = $request->proyect_fecha_pres;
+            $proyecto->fechainicio = $request->fechainicio;
+            $proyecto->fechafin = $request->fechafin;
+            $proyecto->proyect_duracion_mes = $request->proyect_duracion_mes;
+            $proyecto->proyect_estado = $request->proyect_estado;
+            $proyecto->proyect_desc_situ_act = $request->proyect_desc_situ_act;
+            $proyecto->proyect_diag_probl = $request->proyect_diag_probl;
 
             $proyecto->save();
 

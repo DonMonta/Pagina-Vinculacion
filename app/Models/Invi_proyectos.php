@@ -9,7 +9,7 @@ class Invi_proyectos extends Model
 {
     protected $table = 'invi_proyectos';
     protected $primaryKey = 'proyect_id';
-    public $incrementing = false;
+    public $incrementing = true;
     protected $keyType = 'int';
     public $timestamps = false;
 
@@ -20,14 +20,19 @@ class Invi_proyectos extends Model
         'proyect_nombre_en',
         'proyect_titulo_en',
         'proyect_multidis',
-        'fechainicio',
-        'fechafin',
         'proyect_tipo',
         'id_convocatoria',
         'id_tip_invi_proy',
         'proyect_cobertura',
         'proyect_antecedentes',
         'proyect_justificacion',
+        'proyect_fecha_pres',
+        'fechainicio',
+        'fechafin',
+        'proyect_duracion_mes',
+        'proyect_estado',
+        'proyect_desc_situ_act',
+        'proyect_diag_probl',
     ];
     public function invi_detalle_integrante()
     {
