@@ -2743,6 +2743,173 @@
                                     <span>{{ palabrasDiagnostico }} palabras</span>
                                 </div>
                             </div>
+                            <!-- Tarjeta de Articulación del proyecto de vinculación con el programa de la carrera -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Articulación del proyecto de vinculación con el programa de la carrera <span class="text-red-500">*</span>
+                                </label>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 text-justify">
+                                    Contribución a la sociedad
+                                </p>
+                                <textarea 
+                                    ref="articulaTextarea"
+                                    v-model="editForm.proyect_contribucion_soci" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detalle como contribuye a la sociedad su proyecto de vinculación"
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="p-4 bg-green-50 dark:bg-gray-800 rounded-xl border-l-4 border-green-500 flex gap-4">
+                                <svg class="text-green-500 w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Articulación con Asignaturas</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        Seleccione las asignaturas de la carrera prioritaria que se articulan con este proyecto. Puede utilizar el buscador para encontrarlas rápidamente.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </div>
+                                <input type="text" 
+                                    v-model="searchAsignatura" 
+                                    placeholder="Buscar asignatura por nombre o código..." 
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 outline-none transition shadow-sm">
+                            </div>
+
+                            <!-- Lista de Asignaturas -->
+                            <div v-if="asignaturasDisponibles.length > 0" class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700 h-96 overflow-y-auto">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <label v-for="asig in filteredAsignaturas" :key="asig.Codigo_Asignatura" 
+                                        :class="{'border-green-500 bg-green-50 dark:bg-green-900/30 ring-1 ring-green-500': editForm.asignaturas.includes(asig.Codigo_Asignatura)}"
+                                        class="flex items-start p-3 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+                                        
+                                        <div class="flex items-center h-5">
+                                            <input type="checkbox" 
+                                                :value="asig.Codigo_Asignatura" 
+                                                v-model="editForm.asignaturas"
+                                                class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        </div>
+                                        <div class="ml-3 text-sm flex-1">
+                                            <span class="font-bold text-gray-900 dark:text-white block">{{ asig.Nombre_Asignatura }}</span>
+                                            <div class="flex justify-between items-center mt-1">
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">Cód: {{ asig.Codigo_Asignatura }}</span>
+                                                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                                                    Nivel {{ asig.Nivel_Asignatura }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div v-if="filteredAsignaturas.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    No se encontraron asignaturas que coincidan con "{{ searchAsignatura }}"
+                                </div>
+                            </div>
+
+                            <div v-else class="text-center py-8 px-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Sin asignaturas disponibles</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Verifique que haya seleccionado una carrera prioritaria en la pestaña de Datos Generales y guardado los cambios.</p>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Identificación y caracterización de la población objetiva beneficiarios (as)  <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="identPoblaobjTextarea"
+                                    v-model="editForm.proyec_ident_poblaobj" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Para determinar la población objetiva o beneficiaria, el/la director(a) debe realizar la siguiente división: 
+                                    Población de Referencia: Población total del área de intervención del proyecto.
+                                    Población Potencial: Parte de la población de referencia que necesita el bien o servicios, pero no necesariamente lo requerirá del proyecto.
+                                    Población Objetiva/beneficiaria directa: Población que necesita y requiere el bien o servicio ofrecido por el proyecto."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mt-6 transition-all hover:shadow-md">
+                                <div class="mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
+                                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                        Desglose Cuantitativo de Beneficiarios Directos
+                                    </h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Ingrese la cantidad de personas beneficiadas. El total se calculará automáticamente. Obtención de datos de página oficial del INEC censo 2022</p>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                                    
+                                    <!-- Hombres -->
+                                    <div class="space-y-1">
+                                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                            Número Directos Hombres
+                                        </label>
+                                        <input type="number" 
+                                            v-model.number="editForm.proyect_num_direct_hombres" 
+                                            @input="calcularTotalBeneficiarios"
+                                            min="0"
+                                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                            placeholder="Ej. 150">
+                                    </div>
+
+                                    <!-- Mujeres -->
+                                    <div class="space-y-1">
+                                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                            Número Directos Mujeres
+                                        </label>
+                                        <input type="number" 
+                                            v-model.number="editForm.proyect_num_direct_mujeres" 
+                                            @input="calcularTotalBeneficiarios"
+                                            min="0"
+                                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 outline-none transition"
+                                            placeholder="Ej. 180">
+                                    </div>
+
+                                    
+
+                                    <!-- Total (Solo Lectura) -->
+                                    <div class="space-y-1">
+                                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                            Total, Número Directos:
+                                        </label>
+                                        <input type="number" 
+                                            v-model="editForm.proyect_total_num_direct" 
+                                            readonly
+                                            class="w-full px-4 py-2.5 border border-indigo-200 dark:border-indigo-900/50 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 font-bold text-lg focus:outline-none shadow-inner cursor-not-allowed text-center"
+                                            placeholder="0">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2" title="Personas con Diversidad Funcional">
+                                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                            Total, Número Indirectos
+                                        </label>
+                                        <input type="number" 
+                                            v-model.number="editForm.proyect_total_num_indirect" 
+                                            min="0"
+                                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 outline-none transition"
+                                            placeholder="Ej. 15">
+                                    </div>
+
+                                    <!-- Personas con Diversidad Funcional -->
+                                    <div class="space-y-1">
+                                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2" title="Personas con Diversidad Funcional">
+                                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                            Personas con diversidad funcional (capacidades especiales)
+                                        </label>
+                                        <input type="number" 
+                                            v-model.number="editForm.proyect_num_personas_div_fun" 
+                                            min="0"
+                                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 outline-none transition"
+                                            placeholder="Ej. 15">
+                                    </div>
+
+                                </div>
+                            </div>
                             
                         </div>
                     </div>
@@ -2870,6 +3037,8 @@ export default {
             buscandoEmpresa: false,
             empresasAgregadas: [],
             empresasAgregadas2: [],
+            asignaturasDisponibles: [],
+            searchAsignatura: '',
             editForm: {
                 proyect_id: '',
                 proyect_nombre: '',
@@ -2907,6 +3076,14 @@ export default {
                 proyect_estado: '',
                 proyect_desc_situ_act: '',
                 proyect_diag_probl: '',
+                proyect_contribucion_soci: '',
+                asignaturas: [],
+                proyec_ident_poblaobj: '',
+                proyect_num_direct_hombres: '',
+                proyect_num_direct_mujeres: '',
+                proyect_total_num_direct: '',
+                proyect_num_personas_div_fun: '',
+                proyect_total_num_indirect: '',
             },
             modalFormML: {
                 id_obj_proy: null,
@@ -2972,6 +3149,16 @@ export default {
                 });
             }
             if (newTab === 'diagnostico_prob') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
+            if (newTab === 'articulaTextarea') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
+            if (newTab === 'identPoblaobjTextarea') {
                 this.$nextTick(() => {
                     this.recalcularAlturasCargadas();
                 });
@@ -3136,6 +3323,16 @@ export default {
                 min: minDate.toISOString().split('T')[0], // Formato YYYY-MM-DD
                 max: maxDate.toISOString().split('T')[0]
             };
+        },
+        filteredAsignaturas() {
+            if (!this.searchAsignatura) {
+                return this.asignaturasDisponibles;
+            }
+            const searchTerm = this.searchAsignatura.toLowerCase();
+            return this.asignaturasDisponibles.filter(asig => 
+                asig.Nombre_Asignatura.toLowerCase().includes(searchTerm) || 
+                asig.Codigo_Asignatura.toLowerCase().includes(searchTerm)
+            );
         }
     },
     methods: {
@@ -3691,6 +3888,8 @@ export default {
                 const jusTextarea = this.$refs.justificacionTextarea;
                 const descriTextarea = this.$refs.descripcionTextarea;
                 const diagnTextarea = this.$refs.diagnostico_problemaTextarea;
+                const artiTextarea = this.$refs.articulaTextarea;
+                const idenTextarea = this.$refs.identPoblaobjTextarea;
 
                 if (antTextarea) {
                     antTextarea.style.height = 'auto';
@@ -3708,7 +3907,22 @@ export default {
                     diagnTextarea.style.height = 'auto';
                     diagnTextarea.style.height = diagnTextarea.scrollHeight + 'px';
                 }
+                if (artiTextarea) {
+                    artiTextarea.style.height = 'auto';
+                    artiTextarea.style.height = artiTextarea.scrollHeight + 'px';
+                }
+                if (idenTextarea) {
+                    idenTextarea.style.height = 'auto';
+                    idenTextarea.style.height = idenTextarea.scrollHeight + 'px';
+                }
             }, 50); // 50ms bastan para que el DOM se dibuje tras la transición v-else-if
+        },
+        calcularTotalBeneficiarios() {
+            // Convertimos a entero asegurando que si está vacío se cuente como 0
+            const hombres = parseInt(this.editForm.proyect_num_direct_hombres) || 0;
+            const mujeres = parseInt(this.editForm.proyect_num_direct_mujeres) || 0;
+            
+            this.editForm.proyect_total_num_direct = hombres + mujeres;
         },
         ajustarAlturaTextarea(event) {
             const el = event.target;
@@ -3845,6 +4059,7 @@ export default {
                 }));
                 this.empresasAgregadas = data.empresas_seleccionadas || [];
                 this.empresasAgregadas2 = data.empresas_seleccionadas2 || [];
+                this.asignaturasDisponibles = data.asignaturas_disponibles || [];
                 this.editForm = {
                     proyect_id: data.proyecto.proyect_id,
                     proyect_nombre: data.proyecto.proyect_nombre || '',
@@ -3882,6 +4097,14 @@ export default {
                     proyect_estado: data.proyecto.proyect_estado || '',
                     proyect_desc_situ_act: data.proyecto.proyect_desc_situ_act || '',
                     proyect_diag_probl: data.proyecto.proyect_diag_probl || '',
+                    proyect_contribucion_soci: data.proyecto.proyect_contribucion_soci || '',
+                    asignaturas: data.asignaturas_seleccionadas || [],
+                    proyec_ident_poblaobj: data.proyecto.proyec_ident_poblaobj || '',
+                    proyect_num_direct_hombres: data.proyecto.proyect_num_direct_hombres || '',
+                    proyect_num_direct_mujeres: data.proyecto.proyect_num_direct_mujeres || '',
+                    proyect_total_num_direct: data.proyecto.proyect_total_num_direct || '',
+                    proyect_num_personas_div_fun: data.proyecto.proyect_num_personas_div_fun || '',
+                    proyect_total_num_indirect: data.proyecto.proyect_total_num_indirect || '',
                     
                 };
             } catch (error) {
@@ -4187,6 +4410,8 @@ export default {
             }
             const cantAnt = this.palabrasAntecedentes;
             const cantJus = this.palabrasJustificacion;
+            const cantdiag = this.palabrasDiagnostico;
+            const cantDesc = this.palabrasDescrip;
 
             if (cantAnt < 500 || cantAnt > 800) {
                 mostraralertas2(`Los antecedentes deben tener entre 500 y 800 palabras. Actualmente tienes ${cantAnt}.`, 'error');
@@ -4196,6 +4421,15 @@ export default {
                 mostraralertas2(`La justificación debe tener entre 600 y 800 palabras. Actualmente tienes ${cantJus}.`, 'error');
                 return;
             }
+            if (cantdiag < 550 || cantdiag > 650) {
+                mostraralertas2(`El diagnóstico debe tener entre 550 y 650 palabras. Actualmente tienes ${cantdiag}.`, 'error');
+                return;
+            }
+            if (cantDesc < 550 || cantDesc > 650) {
+                mostraralertas2(`La descripción debe tener entre 550 y 650 palabras. Actualmente tienes ${cantDesc}.`, 'error');
+                return;
+            }
+
             if (!this.editForm.proyect_fecha_pres || !this.editForm.fechainicio || !this.editForm.fechafin || !this.editForm.proyect_estado) {
                 mostraralertas2('Debe completar todos los campos del Plazo de Ejecución.', 'error');
                 return;
@@ -4231,6 +4465,8 @@ export default {
             this.yaTraducido = false;
             this.unescoCatalogo = [];
             this.tip_proyectCatalogo = [];
+            this.searchAsignatura = '';
+            this.asignaturasDisponibles = [];
             this.editForm = {
                 proyect_nombre: '',
                 proyect_titulo: '',
@@ -4267,6 +4503,7 @@ export default {
                 proyect_estado: '',
                 proyect_desc_situ_act: '',
                 proyect_diag_probl: '',
+                asignaturas: []
 
             };
         },
