@@ -48,6 +48,7 @@ use App\Models\Invi_detalle_inst_proy;
 use App\Models\Invi_detalle_presu_proy;
 use App\Models\Invi_aportesutlvt;
 use App\Models\Invi_aportesinst;
+use App\Models\Invi_detalle_articulacion;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -192,7 +193,8 @@ class Invi_proyectosController extends Controller
             'invi_obj_proyectos.invi_prod_verificables',
             'invi_detalle_inst_proy.praempresas',
             'invi_detalle_presu_proy.invi_aportesutlvt',
-            'invi_detalle_presu_proy.invi_aportesinst.praempresa'
+            'invi_detalle_presu_proy.invi_aportesinst.praempresa',
+            'invi_detalle_articulacion'
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -385,6 +387,34 @@ class Invi_proyectosController extends Controller
                 }
             }
         }
+        // Obtener las asignaturas guardadas para este proyecto
+        $asignaturasSeleccionadas = $proyecto->invi_detalle_articulacion->pluck('IdAsig')->toArray();
+
+        // Consulta SQL convertida a Query Builder para obtener las asignaturas de la malla
+        $asignaturasDisponibles = [];
+        if ($carreraPrioritaria) {
+            $asignaturasDisponibles = DB::table('carrera as c')
+                ->join('malla_carrera as m', 'c.idCarr', '=', 'm.idcarrera')
+                ->join('detalle_malla as dm', 'm.id', '=', 'dm.idmalla')
+                ->join('asignatura as a', 'dm.idasignatura', '=', 'a.IdAsig')
+                ->select(
+                    'c.idCarr as Codigo_Carrera',
+                    'c.NombCarr as Nombre_Carrera',
+                    'm.anio as Anio_Malla',
+                    'dm.nivel as Nivel_Asignatura',
+                    'a.IdAsig as Codigo_Asignatura',
+                    'a.NombAsig as Nombre_Asignatura'
+                )
+                ->where('c.StatusCarr', 1)
+                ->whereNotNull('c.codihicenter')
+                ->where('m.anio', '2020')
+                ->whereRaw("a.IdAsig NOT REGEXP '^[0-9]+$'")
+                ->where('c.idCarr', $carreraPrioritaria) // Filtramos por el ID de la carrera prioritaria
+                ->orderBy('c.NombCarr', 'asc')
+                ->orderBy('dm.nivel', 'asc')
+                ->orderBy('a.NombAsig', 'asc')
+                ->get();
+        }
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -426,6 +456,8 @@ class Invi_proyectosController extends Controller
             'empresas_seleccionadas2' => $empresasSeleccionadas2,
             'aportes_utlvt' => $aportesUtlvt,
             'aportes_inst' => $aportesInst,
+            'asignaturas_seleccionadas' => $asignaturasSeleccionadas,
+            'asignaturas_disponibles' => $asignaturasDisponibles
         ]);
     }
 
@@ -524,6 +556,21 @@ class Invi_proyectosController extends Controller
             $proyecto->proyect_estado = $request->proyect_estado;
             $proyecto->proyect_desc_situ_act = $request->proyect_desc_situ_act;
             $proyecto->proyect_diag_probl = $request->proyect_diag_probl;
+            $proyecto->proyect_contribucion_soci = $request->proyect_contribucion_soci;
+            $proyecto->proyec_ident_poblaobj = $request->proyec_ident_poblaobj;
+            $proyecto->proyect_num_direct_hombres = $request->proyect_num_direct_hombres;
+            $proyecto->proyect_num_direct_mujeres = $request->proyect_num_direct_mujeres;
+            $proyecto->proyect_total_num_direct = $request->proyect_total_num_direct;
+            $proyecto->proyect_total_num_indirect = $request->proyect_total_num_indirect;
+            $proyecto->proyect_num_personas_div_fun = $request->proyect_num_personas_div_fun;
+            $proyecto->proyect_num_doce_part = $request->proyect_num_doce_part;
+            $proyecto->proyect_num_doce_h = $request->proyect_num_doce_h;
+            $proyecto->proyect_num_doce_m = $request->proyect_num_doce_m;
+            $proyecto->proyect_num_est_part = $request->proyect_num_est_part;
+            $proyecto->proyect_num_est_h = $request->proyect_num_est_h;
+            $proyecto->proyect_num_est_m = $request->proyect_num_est_m;
+            $proyecto->proyect_fact_exito = $request->proyect_fact_exito;
+            $proyecto->proyect_rest_supu = $request->proyect_rest_supu;
 
             $proyecto->save();
 
@@ -861,6 +908,15 @@ class Invi_proyectosController extends Controller
                             ]);
                         }
                     }
+                }
+            }
+            Invi_detalle_articulacion::where('proyect_id', $id)->delete();
+            if ($request->has('asignaturas') && is_array($request->asignaturas)) {
+                foreach ($request->asignaturas as $idAsig) {
+                    Invi_detalle_articulacion::insert([
+                        'proyect_id' => $id,
+                        'IdAsig'     => $idAsig
+                    ]);
                 }
             }
 

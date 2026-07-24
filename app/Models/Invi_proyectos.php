@@ -33,6 +33,21 @@ class Invi_proyectos extends Model
         'proyect_estado',
         'proyect_desc_situ_act',
         'proyect_diag_probl',
+        'proyect_contribucion_soci',
+        'proyec_ident_poblaobj',
+        'proyect_num_direct_hombres',
+        'proyect_num_direct_mujeres',
+        'proyect_total_num_direct',
+        'proyect_total_num_indirect',
+        'proyect_num_personas_div_fun',
+        'proyect_num_doce_part',
+        'proyect_num_doce_h',
+        'proyect_num_doce_m',
+        'proyect_num_est_part',
+        'proyect_num_est_h',
+        'proyect_num_est_m',
+        'proyect_fact_exito',
+        'proyect_rest_supu'
     ];
     public function invi_detalle_integrante()
     {
@@ -93,5 +108,9 @@ class Invi_proyectos extends Model
     public function invi_detalle_presu_proy()
     {
         return $this->hasMany(Invi_detalle_presu_proy::class, 'proyect_id');
+    }
+    public function invi_detalle_articulacion()
+    {
+        return $this->hasMany(Invi_detalle_articulacion::class, 'proyect_id');
     }
 }
