@@ -56,6 +56,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class Invi_proyectosController extends Controller
 {
@@ -194,7 +195,10 @@ class Invi_proyectosController extends Controller
             'invi_detalle_inst_proy.praempresas',
             'invi_detalle_presu_proy.invi_aportesutlvt',
             'invi_detalle_presu_proy.invi_aportesinst.praempresa',
-            'invi_detalle_articulacion'
+            'invi_detalle_articulacion',
+            'invi_detalle_integrante.funciones',
+            'invi_detalle_integrante.informacionPersonalD',
+            'invi_detalle_integrante.informacionpersonal'
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -415,6 +419,64 @@ class Invi_proyectosController extends Controller
                 ->orderBy('a.NombAsig', 'asc')
                 ->get();
         }
+        $num_doce_h = 0;
+        $num_doce_m = 0;
+        $num_est_h  = 0;
+        $num_est_m  = 0;
+
+        $listaIntegrantesValidos = [];
+
+        foreach ($proyecto->invi_detalle_integrante as $integrante) {
+
+            // REGLAS DE ESTADO Y REEMPLAZO:
+            // Excluir a los que tienen estado 0 y reemplazado 1.
+            // Tomar todos los que tienen estado 1 (incluso si fueron reemplazados pero siguen activos).
+            if ($integrante->estado != 1) {
+                continue; // Saltamos a los que no tienen estado activo (1)
+            }
+
+            // Agregamos a la lista de integrantes que devolverá el método
+            $listaIntegrantesValidos[] = $integrante;
+
+            $nombreFuncion = trim($integrante->funciones->nombre_funcion ?? '');
+            $idFuncion = $integrante->id_funcion;
+
+            // 1. DOCENTES (Buscamos en informacionpersonal_d)
+            if ($integrante->informacionPersonalD) {
+                $tipoInf = strtoupper($integrante->informacionPersonalD->TipoInfPer ?? '');
+
+                // Excluimos personal administrativo (TipoInfPer == 'A' o id_funcion == 5)
+                if ($tipoInf !== 'A' && $idFuncion != 5) {
+
+                    // Validamos funciones de Docentes (Director, Subdirector, Docente, Técnico)
+                    // Usamos tanto el id_funcion como Str::startsWith para mayor seguridad
+                    if (Str::startsWith($nombreFuncion, ['Director', 'Subdirector', 'Docente', 'Técnico']) || in_array($idFuncion, [1, 2, 3, 4])) {
+                        $genero = strtoupper($integrante->informacionPersonalD->GeneroPer ?? '');
+                        if ($genero === 'M') {
+                            $num_doce_h++;
+                        } elseif ($genero === 'F') {
+                            $num_doce_m++;
+                        }
+                    }
+                }
+            }
+
+            // 2. ESTUDIANTES (Buscamos en informacionpersonal)
+            if ($integrante->informacionpersonal) {
+                // Validamos funciones de Estudiantes (id_funcion == 6 o empieza con "Estudiante")
+                if (Str::startsWith($nombreFuncion, ['Estudiante']) || $idFuncion == 6) {
+                    $genero = strtoupper($integrante->informacionpersonal->GeneroPer ?? '');
+                    if ($genero === 'H') {
+                        $num_est_h++;
+                    } elseif ($genero === 'M') {
+                        $num_est_m++;
+                    }
+                }
+            }
+        }
+
+        $num_doce_part = $num_doce_h + $num_doce_m;
+        $num_est_part  = $num_est_h + $num_est_m;
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -457,7 +519,16 @@ class Invi_proyectosController extends Controller
             'aportes_utlvt' => $aportesUtlvt,
             'aportes_inst' => $aportesInst,
             'asignaturas_seleccionadas' => $asignaturasSeleccionadas,
-            'asignaturas_disponibles' => $asignaturasDisponibles
+            'asignaturas_disponibles' => $asignaturasDisponibles,
+            'integrantes_activos'       => $listaIntegrantesValidos,
+            'calculo_integrantes'       => [
+                'docentes_h'        => $num_doce_h,
+                'docentes_m'        => $num_doce_m,
+                'docentes_total'    => $num_doce_part,
+                'estudiantes_h'     => $num_est_h,
+                'estudiantes_m'     => $num_est_m,
+                'estudiantes_total' => $num_est_part,
+            ]
         ]);
     }
 
