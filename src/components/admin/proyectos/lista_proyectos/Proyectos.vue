@@ -610,7 +610,14 @@
                 </div>
 
                 <div
-                    class="flex-shrink-0 flex border-b border-gray-100 dark:border-gray-800 px-6 pt-3 pb-2 bg-gray-50/50 dark:bg-gray-900 gap-2 overflow-x-auto flex-nowrap">
+                        ref="scrollContainer"
+                        @mousedown="startDrag"
+                        @mouseleave="stopDrag"
+                        @mouseup="stopDrag"
+                        @mousemove="doDrag"
+                        :class="isDragging ? 'cursor-grabbing' : 'cursor-grab'"
+                        class="custom-scrollbar flex-shrink-0 flex border-b border-gray-100 dark:border-gray-800 px-6 pt-3 pb-2 bg-gray-50/50 dark:bg-gray-900 gap-2 overflow-x-auto flex-nowrap"
+                    >
                     <button @click="activeTab = 'generales'"
                         :class="activeTab === 'generales'
                             ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
@@ -2907,10 +2914,184 @@
                                             class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 outline-none transition"
                                             placeholder="Ej. 15">
                                     </div>
+                                    
 
                                 </div>
                             </div>
-                            
+                            <div
+                                class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <div class="mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
+                                    <h3
+                                        class="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z">
+                                            </path>
+                                        </svg>
+                                        Participación de Docentes en el Proyecto
+                                    </h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Conteo de docentes
+                                        (Directores, Subdirectores y Docentes Participantes) registrados.</p>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                    <!-- Hombres Docentes -->
+                                    <div class="space-y-1">
+                                        <label
+                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                                </path>
+                                            </svg>
+                                            Docentes Hombres
+                                        </label>
+                                        <input type="number" v-model.number="editForm.proyect_num_doce_h"
+                                            @input="calcularTotalDocentes" min="0"
+                                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                            placeholder="0">
+                                    </div>
+
+                                    <!-- Mujeres Docentes -->
+                                    <div class="space-y-1">
+                                        <label
+                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                                </path>
+                                            </svg>
+                                            Docentes Mujeres
+                                        </label>
+                                        <input type="number" v-model.number="editForm.proyect_num_doce_m"
+                                            @input="calcularTotalDocentes" min="0"
+                                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                            placeholder="0">
+                                    </div>
+
+                                    <!-- Total Docentes -->
+                                    <div class="space-y-1">
+                                        <label
+                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                                </path>
+                                            </svg>
+                                            Total Docentes Participantes
+                                        </label>
+                                        <input type="number" v-model="editForm.proyect_num_doce_part" readonly
+                                            class="w-full px-4 py-2.5 border border-indigo-200 dark:border-indigo-900/50 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 font-bold text-lg text-center cursor-not-allowed"
+                                            placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BLOQUE: PARTICIPACIÓN DE ESTUDIANTES -->
+                            <div
+                                class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <div class="mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
+                                    <h3
+                                        class="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                                            </path>
+                                        </svg>
+                                        Participación de Estudiantes en el Proyecto
+                                    </h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Conteo de estudiantes
+                                        registrados que colaboran en el proyecto.</p>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                    <!-- Hombres Estudiantes -->
+                                    <div class="space-y-1">
+                                        <label
+                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                                </path>
+                                            </svg>
+                                            Estudiantes Hombres
+                                        </label>
+                                        <input type="number" v-model.number="editForm.proyect_num_est_h"
+                                            @input="calcularTotalEstudiantes" min="0"
+                                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition"
+                                            placeholder="0">
+                                    </div>
+
+                                    <!-- Mujeres Estudiantes -->
+                                    <div class="space-y-1">
+                                        <label
+                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                                </path>
+                                            </svg>
+                                            Estudiantes Mujeres
+                                        </label>
+                                        <input type="number" v-model.number="editForm.proyect_num_est_m"
+                                            @input="calcularTotalEstudiantes" min="0"
+                                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition"
+                                            placeholder="0">
+                                    </div>
+
+                                    <!-- Total Estudiantes -->
+                                    <div class="space-y-1">
+                                        <label
+                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                                </path>
+                                            </svg>
+                                            Total Estudiantes Participantes
+                                        </label>
+                                        <input type="number" v-model="editForm.proyect_num_est_part" readonly
+                                            class="w-full px-4 py-2.5 border border-emerald-200 dark:border-emerald-900/50 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 font-bold text-lg text-center cursor-not-allowed"
+                                            placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Factores críticos de éxito  <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="facExitTextarea"
+                                    v-model="editForm.proyect_fact_exito" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Los factores críticos de éxito son puntos clave que, cuando están bien ejecutados, definen y garantizan el desarrollo y ejecución del proyecto, logrando sus objetivos. Por el contrario, cuando estos mismos factores se pasan por alto o se ignoran, contribuyen al fracaso de la organización. ¿Qué recursos económicos, tecnológicos, talento humano, infraestructura física, etc., cuenta la institución para lograr el éxito del proyecto?"
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Restricciones/Supuestos  <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="restSupuTextarea"
+                                    v-model="editForm.proyect_rest_supu" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Identificar las circunstancias y eventos que deben ocurrir para que el proyecto sea exitoso e identificar los elementos que restringen, limitan o regulan la gestión del proyecto."
+                                    rows="4"
+                                ></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2940,11 +3121,37 @@ import Modal from '@/components/Modal/Modal.vue'
 const isProfileAddressModal = ref(false)
 const isEditModalOpen = ref(false)
 const showPassword = ref(false)
+const scrollContainer = ref(null);
+const isDragging = ref(false);
+const startX = ref(0);
+const scrollLeft = ref(0);
 // Creamos una función para que el bloque de abajo pueda cerrar el modal
 const cerrarModalDesdeAfuera = () => {
     isProfileAddressModal.value = false
 }
+const startDrag = (e) => {
+    isDragging.value = true;
+    // Calcula la posición inicial del clic relativa al contenedor
+    startX.value = e.pageX - scrollContainer.value.offsetLeft;
+    // Guarda la posición actual del scroll
+    scrollLeft.value = scrollContainer.value.scrollLeft;
+};
 
+const stopDrag = () => {
+    isDragging.value = false;
+};
+
+const doDrag = (e) => {
+    if (!isDragging.value) return;
+    e.preventDefault(); // Evita que se seleccione el texto accidentalmente
+    
+    // Calcula cuánto se ha movido el mouse
+    const x = e.pageX - scrollContainer.value.offsetLeft;
+    const walk = (x - startX.value) * 1.5; // Multiplicador para la velocidad de arrastre
+    
+    // Aplica el nuevo scroll
+    scrollContainer.value.scrollLeft = scrollLeft.value - walk;
+};
 // IMPORTANTE: Exponemos la variable y la función
 defineExpose({
     isProfileAddressModal,
@@ -3079,11 +3286,19 @@ export default {
                 proyect_contribucion_soci: '',
                 asignaturas: [],
                 proyec_ident_poblaobj: '',
-                proyect_num_direct_hombres: '',
-                proyect_num_direct_mujeres: '',
-                proyect_total_num_direct: '',
-                proyect_num_personas_div_fun: '',
-                proyect_total_num_indirect: '',
+                proyect_num_direct_hombres: 0,
+                proyect_num_direct_mujeres: 0,
+                proyect_total_num_direct: 0,
+                proyect_num_personas_div_fun: 0,
+                proyect_total_num_indirect: 0,
+                proyect_num_doce_part: 0,
+                proyect_num_doce_h: 0,
+                proyect_num_doce_m: 0,
+                proyect_num_est_part: 0,
+                proyect_num_est_h: 0,
+                proyect_num_est_m: 0,
+                proyect_fact_exito: '',
+                proyect_rest_supu: '',
             },
             modalFormML: {
                 id_obj_proy: null,
@@ -3159,6 +3374,16 @@ export default {
                 });
             }
             if (newTab === 'identPoblaobjTextarea') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
+            if (newTab === 'facExitTextarea') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
+            if (newTab === 'restSupuTextarea') {
                 this.$nextTick(() => {
                     this.recalcularAlturasCargadas();
                 });
@@ -3890,6 +4115,8 @@ export default {
                 const diagnTextarea = this.$refs.diagnostico_problemaTextarea;
                 const artiTextarea = this.$refs.articulaTextarea;
                 const idenTextarea = this.$refs.identPoblaobjTextarea;
+                const factTextarea = this.$refs.facExitTextarea;
+                const restsuTextarea = this.$refs.restSupuTextarea;
 
                 if (antTextarea) {
                     antTextarea.style.height = 'auto';
@@ -3914,6 +4141,14 @@ export default {
                 if (idenTextarea) {
                     idenTextarea.style.height = 'auto';
                     idenTextarea.style.height = idenTextarea.scrollHeight + 'px';
+                }
+                if (factTextarea) {
+                    factTextarea.style.height = 'auto';
+                    factTextarea.style.height = factTextarea.scrollHeight + 'px';
+                }
+                if (restsuTextarea) {
+                    restsuTextarea.style.height = 'auto';
+                    restsuTextarea.style.height = restsuTextarea.scrollHeight + 'px';
                 }
             }, 50); // 50ms bastan para que el DOM se dibuje tras la transición v-else-if
         },
@@ -4060,6 +4295,8 @@ export default {
                 this.empresasAgregadas = data.empresas_seleccionadas || [];
                 this.empresasAgregadas2 = data.empresas_seleccionadas2 || [];
                 this.asignaturasDisponibles = data.asignaturas_disponibles || [];
+                const calc = data.calculo_integrantes || {};
+                const inte = data.integrantes_activos
                 this.editForm = {
                     proyect_id: data.proyecto.proyect_id,
                     proyect_nombre: data.proyecto.proyect_nombre || '',
@@ -4105,8 +4342,20 @@ export default {
                     proyect_total_num_direct: data.proyecto.proyect_total_num_direct || '',
                     proyect_num_personas_div_fun: data.proyecto.proyect_num_personas_div_fun || '',
                     proyect_total_num_indirect: data.proyecto.proyect_total_num_indirect || '',
+                    proyect_num_doce_h: data.proyecto.proyect_num_doce_h ?? calc.docentes_h ?? 0,
+                    proyect_num_doce_m: data.proyecto.proyect_num_doce_m ?? calc.docentes_m ?? 0,
+                    proyect_num_doce_part: data.proyecto.proyect_num_doce_part ?? calc.docentes_total ?? 0,
+
+                    // Estudiantes (se usan los valores guardados en BD o se calculan automáticamente si están nulos)
+                    proyect_num_est_h: data.proyecto.proyect_num_est_h ?? calc.estudiantes_h ?? 0,
+                    proyect_num_est_m: data.proyecto.proyect_num_est_m ?? calc.estudiantes_m ?? 0,
+                    proyect_num_est_part: data.proyecto.proyect_num_est_part ?? calc.estudiantes_total ?? 0,
+                    proyect_fact_exito: data.proyecto.proyect_fact_exito || '',
+                    proyect_rest_supu: data.proyecto.proyect_rest_supu || '',
                     
                 };
+                this.calcularTotalDocentes();
+                this.calcularTotalEstudiantes();
             } catch (error) {
                 mostraralertas2('Error al cargar datos del proyecto', 'error');
                 console.error(error);
@@ -4114,6 +4363,17 @@ export default {
             } finally {
                 this.cargandoEdicion = false;
             }
+        },
+        calcularTotalDocentes() {
+            const h = parseInt(this.editForm.proyect_num_doce_h) || 0;
+            const m = parseInt(this.editForm.proyect_num_doce_m) || 0;
+            this.editForm.proyect_num_doce_part = h + m;
+        },
+
+        calcularTotalEstudiantes() {
+            const h = parseInt(this.editForm.proyect_num_est_h) || 0;
+            const m = parseInt(this.editForm.proyect_num_est_m) || 0;
+            this.editForm.proyect_num_est_part = h + m;
         },
         obtenerObjetivo(tipo) {
             return this.editForm.objetivos_marco_logico.find(o => o.tipo_obj_proy === tipo);
@@ -4533,3 +4793,29 @@ export default {
     },
 };
 </script>
+<style scoped>
+/* Estilos para navegadores basados en WebKit (Chrome, Safari, Edge) */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 6px; /* Altura más delgada y elegante */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent; /* Fondo invisible */
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1; /* Un gris sutil (tailwind slate-300) */
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8; /* Más oscuro al pasar el mouse */
+}
+
+/* Soporte para Firefox */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #ccf7d0 transparent;
+}
+</style>
