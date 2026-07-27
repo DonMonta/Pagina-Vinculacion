@@ -699,6 +699,15 @@
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">9</span>
                         Diagnóstico y Problema
                     </button>
+                    <button @click="activeTab = 'cronograma_act'"
+                        :class="activeTab === 'cronograma_act'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">9</span>
+                        Cronograma de Actividades
+                    </button>
                 </div>
 
                 <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-gray-900">
@@ -3094,6 +3103,376 @@
                             </div>
                         </div>
                     </div>
+                    <div v-else-if="activeTab === 'cronograma_act'" class="space-y-6 animate-fade-in-up">
+                        <!-- Encabezado Informativo -->
+                        <div class="p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex justify-between items-center gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Cronograma de Actividades</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Detalle las actividades que se realizarán para alcanzar los Objetivos Específicos.
+                                </p>
+                            </div>
+                            <!-- Indicador de Horas Totales -->
+                            <div class="flex items-center gap-4">
+                                <div class="text-right bg-white dark:bg-gray-900 px-4 py-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                    <span class="text-xs text-gray-500 uppercase font-bold block">Horas {{ anioSeleccionadoTab }}</span>
+                                    <span class="text-lg font-black" :class="totalHorasAnioSeleccionado > 240 ? 'text-red-600' : 'text-green-600'">
+                                        {{ totalHorasAnioSeleccionado }} / 240 hrs
+                                    </span>
+                                </div>
+                                <!-- BOTÓN GENERAR PDF -->
+                               <button 
+                                    @click="generarPDFCronograma" 
+                                    :disabled="isGeneratingPDF"
+                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold shadow flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title="Generar Anexo 2"
+                                >
+                                    <!-- Muestra el ícono normal si NO está cargando -->
+                                    <i v-if="!isGeneratingPDF" class="fas fa-file-pdf"></i>
+                                    <!-- Muestra el spinner girando si ESTÁ cargando -->
+                                    <i v-else class="fas fa-spinner fa-spin"></i>
+                                    
+                                    <!-- Cambia el texto dinámicamente -->
+                                    {{ isGeneratingPDF ? 'Generando...' : 'Generar PDF' }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Pestañas de Años del Proyecto -->
+                        <div class="flex border-b border-gray-200 dark:border-gray-700 gap-2 overflow-x-auto">
+                            <button 
+                                v-for="itemAnio in aniosProyecto" 
+                                :key="itemAnio.id"
+                                @click="anioSeleccionadoTab = itemAnio.id"
+                                :class="anioSeleccionadoTab === itemAnio.id 
+                                    ? 'border-green-600 text-green-600 font-bold border-b-2' 
+                                    : 'text-gray-500 hover:text-gray-700'"
+                                class="py-2 px-4 text-sm transition-all whitespace-nowrap"
+                            >
+                                {{ itemAnio.label }}
+                            </button>
+                        </div>
+
+                        <!-- Accion de Agregar Actividad -->
+                        <div class="flex justify-end gap-3">
+                            <button 
+                                @click="showModalDuplicar = true"
+                                class="px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-all"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+                                Duplicar Año
+                            </button>
+                            <button 
+                                @click="abrirModalActividad()"
+                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-all"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                Agregar Actividad a {{ anioSeleccionadoTab }}
+                            </button>
+                        </div>
+
+                        <!-- Listado de Actividades Organizadas por Objetivo Específico -->
+                        <div class="space-y-6">
+                            <div 
+                                v-for="obj in obtenerEspecificos()" 
+                                :key="obj.id_obj_proy" 
+                                class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm"
+                            >
+                                <!-- Objetivo Especifico Header -->
+                                <div class="bg-gray-50 dark:bg-gray-850 p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                    <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm">
+                                        <span class="text-green-600 dark:text-green-400">Objetivo Específico:</span> {{ obj.detalle_obj_proy }}
+                                    </h4>
+                                </div>
+
+                                <!-- Tabla de Actividades de este Objetivo -->
+                                <div class="p-4">
+                                    <div v-if="editForm.actividades.filter(a => a.id_obj_proy === obj.id_obj_proy && a.detalle_anio === anioSeleccionadoTab).length === 0" class="text-center py-6 text-gray-400 text-sm">
+                                        No hay actividades registradas para este objetivo en el {{ anioSeleccionadoTab }}.
+                                    </div>
+
+                                    <div v-else class="space-y-4">
+                                        <div 
+                                            v-for="(act, idx) in editForm.actividades" 
+                                            :key="idx" 
+                                            v-show="act.id_obj_proy === obj.id_obj_proy && act.detalle_anio === anioSeleccionadoTab"
+                                            class="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 space-y-3"
+                                        >
+                                            <!-- Titulo y Detalle de Actividad -->
+                                            <div class="flex justify-between items-start gap-4">
+                                                <div>
+                                                    <h5 class="font-bold text-base text-gray-900 dark:text-white">{{ act.nom_actividad }}</h5>
+                                                    <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+                                                        {{ act.horas }} Horas
+                                                    </span>
+                                                    <span class="text-xs text-gray-500">
+                                                        {{ act.fecha_desde }} al {{ act.fecha_hasta }}
+                                                    </span>
+                                                    <p class="text-xs text-gray-500">Responsables: {{ act.responsables || 'No asignado' }}</p>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <button @click="abrirModalActividad(act, idx)" class="text-blue-600 hover:text-blue-800 text-xs font-semibold ml-2">Editar</button>
+                                                    <button @click="eliminarActividad(idx)" class="text-red-600 hover:text-red-800 text-xs font-semibold">Eliminar</button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Subactividades -->
+                                            <div v-if="act.invi_subactividad && act.invi_subactividad.length > 0" class="pl-4 border-l-2 border-green-500 my-2 space-y-1">
+                                                <p class="text-xs font-bold text-gray-700 dark:text-gray-300">Subactividades:</p>
+                                                <div v-for="(sub, sIdx) in act.invi_subactividad" :key="sIdx" class="text-xs text-gray-600 dark:text-gray-400 flex justify-between">
+                                                    <span>• {{ sub.nom_sub_actv }} ({{ sub.fecha_desde }} / {{ sub.fecha_hasta }})</span>
+                                                    <span class="font-semibold">{{ sub.horas }} hrs</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Desglose de Atributos (Medios, Productos, Indicadores, Supuestos) -->
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs pt-2 border-t border-gray-200 dark:border-gray-800">
+                                                <div>
+                                                    <span class="font-bold text-gray-700 dark:text-gray-300">Indicadores:</span>
+                                                    <ul class="list-disc list-inside text-gray-500"><li v-for="(i, k) in act.invi_actindicadores" :key="k">{{ i.detalle_indicador }}</li></ul>
+                                                </div>
+                                                <div>
+                                                    <span class="font-bold text-gray-700 dark:text-gray-300">Productos:</span>
+                                                    <ul class="list-disc list-inside text-gray-500"><li v-for="(p, k) in act.invi_actprod_verificables" :key="k">{{ p.detalle_prod_verif }}</li></ul>
+                                                </div>
+                                                <div>
+                                                    <span class="font-bold text-gray-700 dark:text-gray-300">Medios Verificación:</span>
+                                                    <ul class="list-disc list-inside text-gray-500"><li v-for="(m, k) in act.invi_actmedios_verificacion" :key="k">{{ m.detalle_medio_verifica }}</li></ul>
+                                                </div>
+                                                <div>
+                                                    <span class="font-bold text-gray-700 dark:text-gray-300">Supuestos:</span>
+                                                    <ul class="list-disc list-inside text-gray-500"><li v-for="(s, k) in act.invi_actsupuestos" :key="k">{{ s.detalle_supuestos }}</li></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="showModalDuplicar" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+                        <div class="bg-white dark:bg-gray-850 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 animate-fade-in-up">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b pb-2">Duplicar Actividades</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Seleccione el año origen y el año destino. Se copiarán todas las actividades y las fechas se actualizarán automáticamente al nuevo año.</p>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold mb-1 dark:text-white">Año Origen</label>
+                                    <select v-model="anioOrigenDuplicar" class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white">
+                                        <option v-for="item in aniosProyecto" :key="item.id" :value="item.id">{{ item.label }}</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold mb-1 dark:text-white">Año Destino</label>
+                                    <select v-model="anioDestinoDuplicar" class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white">
+                                        <option v-for="item in aniosProyecto" :key="item.id" :value="item.id">{{ item.label }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-4 border-t">
+                                <button @click="showModalDuplicar = false" class="px-4 py-2 border rounded-lg text-sm text-gray-600 dark:text-gray-300">Cancelar</button>
+                                <button @click="ejecutarDuplicacion" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold">Duplicar Datos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="showModalActividad" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
+                    <div class="bg-white dark:bg-gray-850 rounded-xl shadow-xl max-w-3xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b pb-2">
+                            {{ indiceActividadEditando !== null ? 'Editar Actividad' : 'Registrar Actividad' }}
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <!-- Objetivo Especifico Relacionado -->
+                            <div class="md:col-span-2">
+                                <label class="block font-bold mb-2 dark:text-white">Objetivo Específico Relacionado</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                                    <div 
+                                        v-for="obj in obtenerEspecificos()" 
+                                        :key="obj.id_obj_proy"
+                                        @click="modalActividad.id_obj_proy = obj.id_obj_proy"
+                                        :class="[
+                                            'p-3 rounded-lg border-2 cursor-pointer transition-all flex items-start gap-3',
+                                            modalActividad.id_obj_proy === obj.id_obj_proy 
+                                                ? 'bg-green-50 border-green-500 shadow-sm dark:bg-green-900/20' 
+                                                : 'bg-white border-gray-200 hover:border-green-300 dark:bg-gray-800 dark:border-gray-700'
+                                        ]"
+                                    >
+                                        <!-- Custom Radio Button -->
+                                        <div :class="['w-5 h-5 mt-0.5 rounded-full border-2 flex-shrink-0 flex items-center justify-center', 
+                                            modalActividad.id_obj_proy === obj.id_obj_proy ? 'border-green-500' : 'border-gray-300 dark:border-gray-500']">
+                                            <div v-if="modalActividad.id_obj_proy === obj.id_obj_proy" class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                                        </div>
+                                        <span :class="['text-sm font-medium', modalActividad.id_obj_proy === obj.id_obj_proy ? 'text-green-800 dark:text-green-400' : 'text-gray-700 dark:text-gray-300']">
+                                            {{ obj.detalle_obj_proy }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Nombre de Actividad -->
+                            <div class="md:col-span-2">
+                                <label class="block font-bold mb-1">Nombre de la Actividad</label>
+                                <textarea v-model="modalActividad.nom_actividad"
+                                rows="1" 
+                                @input="ajustarAlturaTextarea" 
+                                type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" 
+                                placeholder="Ej: Talleres de Capacitación"></textarea>
+                            </div>
+
+                            <!-- Responsables -->
+                            <div>
+                                <label class="block font-bold mb-1">Responsables</label>
+                                <input v-model="modalActividad.responsables" type="text" class="w-full border rounded-lg p-2 dark:bg-gray-800">
+                            </div>
+
+                            <!-- Año del Cronograma -->
+                            <div>
+                                <label class="block font-bold mb-1">Año asignado</label>
+                                <select 
+                                    v-model="modalActividad.detalle_anio" 
+                                    @change="alCambiarAnioModal"
+                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                                    <option v-for="itemAnio in aniosProyecto" :key="itemAnio.id" :value="itemAnio.id">
+                                        {{ itemAnio.label }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Fechas y Horas -->
+                            <div>
+                                <label class="block font-bold mb-1 dark:text-white">Fecha Desde</label>
+                                <input 
+                                    v-model="modalActividad.fecha_desde" 
+                                    type="date" 
+                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1 dark:text-white">Fecha Hasta</label>
+                                <input 
+                                    v-model="modalActividad.fecha_hasta" 
+                                    type="date" 
+                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">Total de Horas</label>
+                                <input v-model.number="modalActividad.horas" type="number" min="1" max="240" class="w-full border rounded-lg p-2 dark:bg-gray-800">
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN DE SUBACTIVIDADES -->
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-bold text-sm">Subactividades</h4>
+                                <button @click="agregarItemActividad('invi_subactividad')" class="text-xs bg-blue-500 text-white px-2 py-1 rounded">+ Agregar Subactividad</button>
+                            </div>
+                            <div v-for="(sub, sIdx) in modalActividad.invi_subactividad" :key="sIdx" class="grid grid-cols-12 gap-2 mb-2 items-center">
+                                <textarea v-model="sub.nom_sub_actv"
+                                    rows="1" 
+                                    @input="ajustarAlturaTextarea"
+                                    type="text" placeholder="Nombre" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden"/>
+                                
+                                <input 
+                                    v-model="sub.fecha_desde" 
+                                    type="date" 
+                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                    class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                                <input 
+                                    v-model="sub.fecha_hasta" 
+                                    type="date" 
+                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                    class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                                
+                                <input v-model.number="sub.horas" type="number" placeholder="Hrs" class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600">
+                                <button @click="eliminarItemActividad('invi_subactividad', sIdx)" class="col-span-1 text-red-500 hover:text-red-700 font-bold text-center transition">✕</button>
+                            </div>
+                        </div>
+
+                        <!-- COMPONENTES DINÁMICOS (Indicadores, Productos, Medios, Supuestos) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 text-xs">
+                            <!-- Indicadores -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-bold">Indicadores</span>
+                                    <button @click="agregarItemActividad('invi_actindicadores')" class="text-blue-500">+ Agregar</button>
+                                </div>
+                                <div v-for="(item, k) in modalActividad.invi_actindicadores" :key="k" class="flex gap-1 mb-1">
+                                    <textarea 
+                                        v-model="item.detalle_indicador" 
+                                        rows="1" 
+                                        @input="ajustarAlturaTextarea"
+                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                    <button @click="eliminarItemActividad('invi_actindicadores', k)" class="text-red-500">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Productos Verificables -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-bold">Productos Verificables</span>
+                                    <button @click="agregarItemActividad('invi_actprod_verificables')" class="text-blue-500">+ Agregar</button>
+                                </div>
+                                <div v-for="(item, k) in modalActividad.invi_actprod_verificables" :key="k" class="flex gap-1 mb-1">
+                                    <textarea 
+                                        v-model="item.detalle_prod_verif" 
+                                        rows="1" 
+                                        @input="ajustarAlturaTextarea"
+                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                    <button @click="eliminarItemActividad('invi_actprod_verificables', k)" class="text-red-500">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Medios de Verificación -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-bold">Medios de Verificación</span>
+                                    <button @click="agregarItemActividad('invi_actmedios_verificacion')" class="text-blue-500">+ Agregar</button>
+                                </div>
+                                <div v-for="(item, k) in modalActividad.invi_actmedios_verificacion" :key="k" class="flex gap-1 mb-1">
+                                    <textarea
+                                        v-model="item.detalle_medio_verifica"
+                                        rows="1" 
+                                        @input="ajustarAlturaTextarea" 
+                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                    <button @click="eliminarItemActividad('invi_actmedios_verificacion', k)" class="text-red-500">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Supuestos -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-bold">Supuestos</span>
+                                    <button @click="agregarItemActividad('invi_actsupuestos')" class="text-blue-500">+ Agregar</button>
+                                </div>
+                                <div v-for="(item, k) in modalActividad.invi_actsupuestos" :key="k" class="flex gap-1 mb-1">
+                                    <textarea 
+                                        v-model="item.detalle_supuestos" 
+                                        rows="1" 
+                                        @input="ajustarAlturaTextarea"
+                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                    <button @click="eliminarItemActividad('invi_actsupuestos', k)" class="text-red-500">✕</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción del Modal -->
+                        <div class="flex justify-end gap-3 border-t pt-4">
+                            <button @click="showModalActividad = false" class="px-4 py-2 border rounded-lg text-gray-600">Cancelar</button>
+                            <button @click="guardarActividad" class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold">Guardar Actividad</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div
@@ -3165,6 +3544,8 @@ import { useRoute } from "vue-router";
 import debounce from 'lodash.debounce';
 import Modal from '@/components/Modal/Modal.vue'
 import { mostraralertas2, enviarsolig } from '@/assets/js/function/funciones';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default {
     data() {
@@ -3299,7 +3680,11 @@ export default {
                 proyect_num_est_m: 0,
                 proyect_fact_exito: '',
                 proyect_rest_supu: '',
+                actividades: [],
             },
+            anioSeleccionadoTab: 'Primer Año',
+            showModalActividad: false,
+            indiceActividadEditando: null,
             modalFormML: {
                 id_obj_proy: null,
                 tipo_obj_proy: '',
@@ -3309,7 +3694,26 @@ export default {
                 supuestos: [],
                 medios_verificacion: [],
                 prod_verificables: []
-            }
+            },
+            showModalDuplicar: false,
+            anioOrigenDuplicar: '',   // ej: '2025'
+            anioDestinoDuplicar: '',  // ej: '2026'
+            modalActividad: {
+                id_actividades: null,
+                id_obj_proy: '',
+                nom_actividad: '',
+                responsables: '',
+                fecha_desde: '',
+                fecha_hasta: '',
+                horas: 0,
+                detalle_anio: 'Primer Año',
+                invi_subactividad: [],
+                invi_actprod_verificables: [],
+                invi_actmedios_verificacion: [],
+                invi_actindicadores: [],
+                invi_actsupuestos: []
+            },
+            isGeneratingPDF: false
 
         };
     },
@@ -3558,6 +3962,39 @@ export default {
                 asig.Nombre_Asignatura.toLowerCase().includes(searchTerm) || 
                 asig.Codigo_Asignatura.toLowerCase().includes(searchTerm)
             );
+        },
+        aniosProyecto() {
+            if (!this.editForm.fechainicio || !this.editForm.fechafin) {
+                return [{ id: 'Primer Año', label: 'Primer Año', anio: new Date().getFullYear() }];
+            }
+
+            const anioInicio = new Date(this.editForm.fechainicio).getFullYear();
+            const anioFin = new Date(this.editForm.fechafin).getFullYear();
+            const anos = [];
+
+            const nombresAnio = ['Primer Año', 'Segundo Año', 'Tercer Año', 'Cuarto Año', 'Quinto Año'];
+
+            let index = 0;
+            for (let y = anioInicio; y <= anioFin; y++) {
+                const nombre = nombresAnio[index] || `Año ${index + 1}`;
+                anos.push({
+                    id: nombre,
+                    label: `${nombre} (${y})`,
+                    anio: y,
+                    fechaInicioMin: `${y}-01-01`,
+                    fechaFinMax: `${y}-12-31`
+                });
+                index++;
+            }
+            return anos;
+        },
+        actividadesDelAnio() {
+            return this.editForm.actividades.filter(a => a.detalle_anio === this.anioSeleccionadoTab);
+        },
+
+        // Suma total de horas del año activo
+        totalHorasAnioSeleccionado() {
+            return this.actividadesDelAnio.reduce((sum, act) => sum + (parseFloat(act.horas) || 0), 0);
         }
     },
     methods: {
@@ -4297,6 +4734,22 @@ export default {
                 this.asignaturasDisponibles = data.asignaturas_disponibles || [];
                 const calc = data.calculo_integrantes || {};
                 const inte = data.integrantes_activos
+                // Extraemos todas las actividades estructuradas
+                let actividadesExtraidas = [];
+                (data.proyecto.invi_obj_proyectos || []).forEach(obj => {
+                    if (obj.invi_actividades && obj.invi_actividades.length > 0) {
+                        obj.invi_actividades.forEach(act => {
+                            actividadesExtraidas.push({
+                                ...act,
+                                invi_subactividad: act.invi_subactividad || [],
+                                invi_actprod_verificables: act.invi_actprod_verificables || [],
+                                invi_actmedios_verificacion: act.invi_actmedios_verificacion || [],
+                                invi_actindicadores: act.invi_actindicadores || [],
+                                invi_actsupuestos: act.invi_actsupuestos || []
+                            });
+                        });
+                    }
+                });
                 this.editForm = {
                     proyect_id: data.proyecto.proyect_id,
                     proyect_nombre: data.proyecto.proyect_nombre || '',
@@ -4352,8 +4805,12 @@ export default {
                     proyect_num_est_part: data.proyecto.proyect_num_est_part ?? calc.estudiantes_total ?? 0,
                     proyect_fact_exito: data.proyecto.proyect_fact_exito || '',
                     proyect_rest_supu: data.proyecto.proyect_rest_supu || '',
+                    actividades: actividadesExtraidas
                     
                 };
+                if (this.aniosProyecto.length > 0) {
+                    this.anioSeleccionadoTab = this.aniosProyecto[0].id;
+                }
                 this.calcularTotalDocentes();
                 this.calcularTotalEstudiantes();
             } catch (error) {
@@ -4416,6 +4873,44 @@ export default {
                 });
             });
         },
+        abrirModalActividad(actividad = null, index = null) {
+            this.indiceActividadEditando = index;
+
+            if (actividad) {
+                this.modalActividad = JSON.parse(JSON.stringify(actividad));
+            } else {
+                this.modalActividad = {
+                    id_actividades: null,
+                    id_obj_proy: this.obtenerEspecificos()[0]?.id_obj_proy || '',
+                    nom_actividad: '',
+                    responsables: '',
+                    fecha_desde: '',
+                    fecha_hasta: '',
+                    horas: 0,
+                    detalle_anio: this.anioSeleccionadoTab, // Por defecto toma el año seleccionado
+                    invi_subactividad: [],
+                    invi_actprod_verificables: [{ detalle_prod_verif: '' }],
+                    invi_actmedios_verificacion: [{ detalle_medio_verifica: '' }],
+                    invi_actindicadores: [{ detalle_indicador: '' }],
+                    invi_actsupuestos: [{ detalle_supuestos: '' }]
+                };
+            }
+            this.showModalActividad = true;
+        },
+        agregarItemActividad(campo) {
+            const plantillas = {
+                invi_subactividad: { nom_sub_actv: '', fecha_desde: '', fecha_hasta: '', horas: 0 },
+                invi_actprod_verificables: { detalle_prod_verif: '' },
+                invi_actmedios_verificacion: { detalle_medio_verifica: '' },
+                invi_actindicadores: { detalle_indicador: '' },
+                invi_actsupuestos: { detalle_supuestos: '' }
+            };
+            this.modalActividad[campo].push({ ...plantillas[campo] });
+        },
+
+        eliminarItemActividad(campo, index) {
+            this.modalActividad[campo].splice(index, 1);
+        },
         agregarAtributoML(campo) {
             const modelosVios = {
                 indicadores: { detalle_indicador: '' },
@@ -4426,8 +4921,119 @@ export default {
             };
             this.modalFormML[campo].push({ ...modelosVios[campo] });
         },
+        obtenerAnioNumerico(idAnio) {
+            const item = this.aniosProyecto.find(a => a.id === idAnio);
+            return item ? item.anio : new Date().getFullYear();
+        },
+        reemplazarAnioEnFecha(fechaStr, nuevoAnioNumerico) {
+            if (!fechaStr) return '';
+            const partes = fechaStr.split('-');
+            // Si tiene formato X-MM-DD (donde X es el año previo o un texto corrupto)
+            if (partes.length === 3) {
+                const mes = partes[1].padStart(2, '0');
+                const dia = partes[2].padStart(2, '0');
+                return `${nuevoAnioNumerico}-${mes}-${dia}`;
+            }
+            return fechaStr;
+        },
+        alCambiarAnioModal() {
+            const anioNum = this.obtenerAnioNumerico(this.modalActividad.detalle_anio);
+            if (this.modalActividad.fecha_desde) {
+                this.modalActividad.fecha_desde = this.reemplazarAnioEnFecha(this.modalActividad.fecha_desde, anioNum);
+            }
+            if (this.modalActividad.fecha_hasta) {
+                this.modalActividad.fecha_hasta = this.reemplazarAnioEnFecha(this.modalActividad.fecha_hasta, anioNum);
+            }
+            if (this.modalActividad.invi_subactividad) {
+                this.modalActividad.invi_subactividad.forEach(sub => {
+                    if (sub.fecha_desde) sub.fecha_desde = this.reemplazarAnioEnFecha(sub.fecha_desde, anioNum);
+                    if (sub.fecha_hasta) sub.fecha_hasta = this.reemplazarAnioEnFecha(sub.fecha_hasta, anioNum);
+                });
+            }
+        },
         eliminarAtributoML(campo, index) {
             this.modalFormML[campo].splice(index, 1);
+        },
+        ejecutarDuplicacion() {
+            // Validaciones básicas
+            if (!this.anioOrigenDuplicar || !this.anioDestinoDuplicar) {
+                mostraralertas2('Debe seleccionar el año origen y destino para duplicar.', 'error');
+                return;
+            }
+            if (this.anioOrigenDuplicar === this.anioDestinoDuplicar) {
+                mostraralertas2('El año origen y destino no pueden ser iguales.', 'error');
+                return;
+            }
+
+            const objDestino = this.aniosProyecto.find(a => a.id === this.anioDestinoDuplicar);
+            if (!objDestino) {
+                mostraralertas2('El año destino no es válido.', 'error');
+                return;
+            }
+            const anioNumericoDestino = objDestino.anio;
+            
+            // Obtener actividades del año origen
+            const actividadesOrigen = this.editForm.actividades.filter(
+                act => act.detalle_anio === this.anioOrigenDuplicar
+            );
+
+            if (actividadesOrigen.length === 0) {
+                mostraralertas2('No hay actividades para duplicar.', 'error');
+                return;
+            }
+
+            // Duplicar y procesar cada actividad
+            const actividadesDuplicadas = actividadesOrigen.map(act => {
+                const actCopia = JSON.parse(JSON.stringify(act));
+                
+                // --- SOLUCIÓN: Limpiar correctamente las claves primarias ---
+                // La clave es id_actividades, no id. La forzamos a null para que Laravel cree una nueva.
+                delete actCopia.id_actividades; 
+                actCopia.id_actividades = null; 
+                
+                // 1. Conservar el texto en detalle_anio (ej: 'Segundo Año')
+                actCopia.detalle_anio = this.anioDestinoDuplicar;
+
+                // 2. Reemplazar solo el año numérico en las fechas (ej: '2026-03-03')
+                if (actCopia.fecha_desde) {
+                    actCopia.fecha_desde = this.reemplazarAnioEnFecha(actCopia.fecha_desde, anioNumericoDestino);
+                }
+                if (actCopia.fecha_hasta) {
+                    actCopia.fecha_hasta = this.reemplazarAnioEnFecha(actCopia.fecha_hasta, anioNumericoDestino);
+                }
+
+                // 3. Modificar fechas dentro de las subactividades
+                if (actCopia.invi_subactividad && actCopia.invi_subactividad.length > 0) {
+                    actCopia.invi_subactividad = actCopia.invi_subactividad.map(sub => {
+                        // Si las subactividades tienen un ID propio, también es buena práctica limpiarlo
+                        delete sub.id; 
+                        delete sub.id_subactividad; // Por si acaso se llama así
+                        
+                        if (sub.fecha_desde) {
+                            sub.fecha_desde = this.reemplazarAnioEnFecha(sub.fecha_desde, anioNumericoDestino);
+                        }
+                        if (sub.fecha_hasta) {
+                            sub.fecha_hasta = this.reemplazarAnioEnFecha(sub.fecha_hasta, anioNumericoDestino);
+                        }
+                        return sub;
+                    });
+                }
+
+                return actCopia;
+            });
+
+            // Insertar al array principal de actividades
+            this.editForm.actividades.push(...actividadesDuplicadas);
+
+            // Opcional: Cambiar la pestaña activa para ver las nuevas actividades
+            this.anioSeleccionadoTab = this.anioDestinoDuplicar;
+            this.showModalDuplicar = false;
+            
+            // Limpiar selects del modal
+            this.anioOrigenDuplicar = '';
+            this.anioDestinoDuplicar = '';
+
+            mostraralertas2(`Se duplicaron con éxito ${actividadesDuplicadas.length} actividades al año ${this.anioDestinoDuplicar}.`, "success");
         },
         guardarMarcoLogico() {
             // Validaciones básicas
@@ -4474,6 +5080,103 @@ export default {
             }
             
             this.showModalMarcoLogico = false;
+        },
+        guardarActividad() {
+            const form = this.modalActividad;
+
+            // 1. Validaciones básicas
+            if (!form.id_obj_proy) {
+                mostraralertas2("Debe seleccionar un objetivo específico.", "warning");
+                return;
+            }
+            if (!form.nom_actividad.trim()) {
+                mostraralertas2("Ingrese el nombre de la actividad.", "warning");
+                return;
+            }
+            if (!form.fecha_desde || !form.fecha_hasta) {
+                mostraralertas2("Seleccione el rango de fechas de la actividad.", "warning");
+                return;
+            }
+            // Validación de coherencia en fechas de la actividad (Inicio <= Fin)
+            if (form.fecha_desde > form.fecha_hasta) {
+                mostraralertas2("La fecha de inicio no puede ser posterior a la fecha de fin.", "warning");
+                return;
+            }
+
+            // 2. Validación: Evitar fechas repetidas/solapadas entre actividades del mismo año
+            const conflictoFecha = this.editForm.actividades.find((act, idx) => {
+                // Ignorar la misma actividad en caso de estar editando
+                if (this.indiceActividadEditando !== null && idx === this.indiceActividadEditando) {
+                    return false;
+                }
+
+                // Validar solo actividades correspondientes al mismo año
+                if (act.detalle_anio !== form.detalle_anio) {
+                    return false;
+                }
+
+                // Evaluar solapamiento de rangos de fechas
+                return act.fecha_desde <= form.fecha_hasta && act.fecha_hasta >= form.fecha_desde;
+            });
+
+            if (conflictoFecha) {
+                mostraralertas2(
+                    `El rango de fechas se traslapa con la actividad "${conflictoFecha.nom_actividad}" (${conflictoFecha.fecha_desde} al ${conflictoFecha.fecha_hasta}).`,
+                    "warning"
+                );
+                return;
+            }
+
+            // 3. Validación de Horas Máximas por Año (240 Horas)
+            const horasIngresadas = parseFloat(form.horas) || 0;
+            
+            // SOLUCIÓN: Usamos reduce directamente sobre el arreglo original para que 'idx' coincida perfectamente.
+            let totalActualAnio = this.editForm.actividades.reduce((sum, a, idx) => {
+                // Ignorar si no es del año seleccionado
+                if (a.detalle_anio !== form.detalle_anio) return sum;
+                
+                // Ignorar la misma actividad en caso de estar editando (usando el index global correcto)
+                if (this.indiceActividadEditando !== null && idx === this.indiceActividadEditando) return sum;
+                
+                return sum + (parseFloat(a.horas) || 0);
+            }, 0);
+
+            if (totalActualAnio + horasIngresadas > 240) {
+                mostraralertas2(`La suma total de horas para ${form.detalle_anio} excede el límite de 240 hrs. (Actualmente tienes ${totalActualAnio} hrs)`, "warning");
+                return;
+            }
+
+            // 4. Validación de Subactividades (Rangos de Fecha y Horas)
+            let sumaHorasSubactividades = 0;
+            for (let sub of form.invi_subactividad) {
+                if (sub.nom_sub_actv.trim() !== '') {
+                    // Validar fechas
+                    if (sub.fecha_desde < form.fecha_desde || sub.fecha_hasta > form.fecha_hasta) {
+                        mostraralertas2(`La subactividad "${sub.nom_sub_actv}" debe estar dentro del rango de fechas de la actividad (${form.fecha_desde} al ${form.fecha_hasta}).`, "warning");
+                        return;
+                    }
+                    sumaHorasSubactividades += parseFloat(sub.horas) || 0;
+                }
+            }
+
+            if (sumaHorasSubactividades > horasIngresadas) {
+                mostraralertas2(`La suma de horas de las subactividades (${sumaHorasSubactividades} hrs) no puede ser mayor a las horas de la actividad (${horasIngresadas} hrs).`, "warning");
+                return;
+            }
+
+            // 5. Guardar o Actualizar en el array principal
+            if (this.indiceActividadEditando !== null) {
+                this.editForm.actividades[this.indiceActividadEditando] = JSON.parse(JSON.stringify(form));
+            } else {
+                this.editForm.actividades.push(JSON.parse(JSON.stringify(form)));
+            }
+
+            this.showModalActividad = false;
+            mostraralertas2("Actividad agregada al cronograma correctamente.", "success");
+        },
+        eliminarActividad(index) {
+            this.editForm.actividades.splice(index, 1);
+            mostraralertas2("Actividad eliminada del cronograma.", "info");
         },
         toggleObjetivo(id_obj) {
             const index = this.editForm.objetivos.indexOf(id_obj);
@@ -4789,6 +5492,365 @@ export default {
             // Simplemente recarga la página actual de datos
             this.GetData(this.currentPage, this.searchQuery);
         },
+        async generarPDFCronograma() {
+            this.isGeneratingPDF = true;
+            try{
+                // 1. Validar que existan actividades
+                if (!this.editForm.actividades || this.editForm.actividades.length === 0) {
+                    mostraralertas2("No hay actividades registradas para generar el cronograma.", "warning");
+                    return;
+                }
+
+                // Inicializar documento en horizontal (landscape), milímetros, A4
+                const doc = new jsPDF('l', 'mm', 'a4');
+                let primeraPagina = true;
+
+                // Obtener los objetivos específicos usando tu función
+                const objetivosEspecificos = this.obtenerEspecificos();
+
+                // Obtener la lista de años únicos que tienen actividades
+                const añosPresentes = [...new Set(this.editForm.actividades.map(a => a.detalle_anio))];
+                const carrera = await this.ObtenerCarr(this.editForm.id_carr_priori);
+                const proyect_id = this.editForm.proyect_id;
+                const facultad_id = this.editForm.id_facultad_priori;
+                const resDocentes = await this.ObteneProDoc(proyect_id);
+                const resEstudiantes = await this.ObteneProEst(proyect_id);
+                const resDir = await this.ObteneProDir(proyect_id);
+                const resSubdir = await this.ObteneProSubDir(proyect_id);
+                const resResponsables = await this.ObteneRespVin(facultad_id);
+                const resDirectores = await this.ObteneDirVin(proyect_id);
+
+                añosPresentes.forEach((anioTexto, indexAnio) => {
+                    // Filtrar actividades de este año
+                    const actividadesAnio = this.editForm.actividades.filter(a => a.detalle_anio === anioTexto);
+                    const directorProy = (resDir.data?.data && resDir.data.data.length > 0) ? resDir.data.data[0].nombre_con_titulo : '';
+                    if (!primeraPagina) doc.addPage();
+                    primeraPagina = false;
+                    
+                    // Cargar Logos (Asegúrate de que las rutas relativas sean alcanzables desde tu vista)
+                    doc.addImage('/images.png', 'PNG', 15, 10, 22, 22);
+                    doc.addImage('/logovincusinfondo.png', 'PNG', 45, 10, 22, 22);
+
+                    doc.setFontSize(12);
+                    doc.setFont("helvetica", "bold");
+                    doc.text('UNIVERSIDAD TÉCNICA "LUIS VARGAS TORRES" DE ESMERALDAS', 75, 23);
+
+                    // Cuadro derecho "ANEXO 2"
+                    doc.rect(225, 10, 57, 15);
+                    doc.text('ANEXO 2', 245, 20);
+                    //.setFontSize(11);
+                    const textoAnio = anioTexto; 
+                    autoTable(doc, {
+                        startY: 35,
+                        margin: { left: 15, right: 15 }, // Márgenes fijos para igualar anchos
+                        theme: 'grid',
+                        styles: {
+                            lineColor: [0, 0, 0],
+                            lineWidth: 0.3,
+                            textColor: [0, 0, 0],
+                            fontSize: 9,
+                            valign: 'middle',
+                            fontStyle: 'bold'
+                        },
+                        columnStyles: {
+                            0: { cellWidth: 180 }, // Izquierda
+                            1: { cellWidth: 87, halign: 'center', fontSize: 11 } // Derecha (Año) -> Total = 267
+                        },
+                        body: [
+                            [
+                                { content: `CARRERA: ${carrera || ''}` },
+                                { content: textoAnio, rowSpan: 2 } // Ocupa las dos primeras filas
+                            ],
+                            [
+                                { content: `NOMBRE DEL PROYECTO: ${this.editForm.proyect_nombre || ''}` }
+                            ],
+                            [
+                                { content: `NOMBRE DEL DIRECTOR DEL PROYECTO: ${directorProy || ''}`, colSpan: 2 }
+                            ]
+                        ]
+                    });
+
+                    // ==========================================
+                    // CONSTRUCCIÓN DE FILAS DE LA TABLA (AGRUPADAS POR OBJETIVO)
+                    // ==========================================
+
+                    const rows = [];
+                    let totalHorasGlobal = 0;
+                    const colWidth2 = 272 / 5;
+                    // Iterar sobre los objetivos específicos
+                    objetivosEspecificos.forEach((obj, indexObj) => {
+                        // 1. Agregar la fila del Objetivo
+                        // Tomamos la descripción del objetivo (ajusta 'resumen_narrativo' al nombre real de tu campo)
+                        const nombreObjetivo = obj.detalle_obj_proy || `Objetivo ${indexObj + 1}`;
+                        rows.push([
+                            `Objetivo ${indexObj + 1}. ${nombreObjetivo}`,
+                            '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+                        ]);
+
+                        // 2. Filtrar las actividades que pertenecen a este objetivo
+                        // NOTA: Cambia 'id_objetivo' por la propiedad real que relaciona la actividad con el objetivo en tu BD.
+                        const actividadesDelObjetivo = actividadesAnio.filter(a => a.id_obj_proy === obj.id_obj_proy);
+
+                        actividadesDelObjetivo.forEach((act, indexAct) => {
+                            const productos = (act.invi_actprod_verificables || [])
+                                .map(p => p.detalle_prod_verif)
+                                .filter(Boolean)
+                                .join(', ');
+
+                            // Agregar la fila de la Actividad
+                            rows.push([
+                                `Actividad ${indexObj + 1}.${indexAct + 1} ${act.nom_actividad}`,
+                                act.fecha_desde || '',
+                                act.fecha_hasta || '',
+                                act.horas || 0,
+                                '', '', '', '', '', '', '', '', '', '', '', '', // 12 meses vacíos para colorear
+                                productos,
+                                act.responsables || ''
+                            ]);
+
+                            totalHorasGlobal += (parseFloat(act.horas) || 0);
+                        });
+                    });
+
+                    // Fila Final de Totales
+                    rows.push([
+                        'TOTAL HORAS:',
+                        '', '', totalHorasGlobal,
+                        '', '', '', '', '', '', '', '', '', '', '', '',
+                        '', ''
+                    ]);
+
+                    // ==========================================
+                    // GENERACIÓN DE LA TABLA (GANTT)
+                    // ==========================================
+
+                    autoTable(doc, {
+                        startY: doc.lastAutoTable.finalY + 2,
+                        margin: { left: 15, right: 10 },
+                        theme: 'grid',
+                        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.3, halign: 'center', fontSize: 7, fontStyle: 'bold' },
+                        bodyStyles: { lineColor: [0, 0, 0], lineWidth: 0.3, fontSize: 7 },
+                        head: [
+                            [
+                                { content: 'OBJETIVO/ ACTIVIDADES', rowSpan: 2 },
+                                { content: 'TIEMPO ESTIMADO', colSpan: 3 },
+                                { content: 'Primer semestre', colSpan: 6, styles: { fillColor: [0, 176, 80], textColor: [255, 255, 255] } },
+                                { content: 'Segundo semestre', colSpan: 6, styles: { fillColor: [0, 176, 80], textColor: [255, 255, 255] } },
+                                { content: 'PRODUCTOS / RESULTADOS, METAS CUANTIFICABLES', rowSpan: 2 },
+                                { content: 'RESPONSABLE', rowSpan: 2 }
+                            ],
+                            ['DESDE', 'HASTA', '# HORAS', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+                        ],
+                        body: rows,
+                        columnStyles: {
+                            0: { cellWidth: colWidth2 }, // Actividad
+                            1: { cellWidth: 16 }, // Desde
+                            2: { cellWidth: 16 }, // Hasta
+                            3: { cellWidth: 12, halign: 'center' }, // Horas
+                            // Meses dinámicos
+                            ...Array.from({ length: 12 }).reduce((acc, _, idx) => ({ ...acc, [idx + 4]: { cellWidth: 7 } }), {}),
+                            16: { cellWidth: colWidth2 }, // Productos
+                            17: { cellWidth: 30 }  // Responsable
+                        },
+
+                        // USAR didParseCell PARA PINTAR FONDOS (Asegura que jsPDF no lo sobrescriba al dibujar)
+                        didParseCell: function (data) {
+                            // 1. Dar estilo en negrita a las filas de los Objetivos y Totales
+                            if (data.section === 'body') {
+                                const textoCelda = data.row.raw[0] ? data.row.raw[0].toString() : '';
+                                if (textoCelda.startsWith('Objetivo') || textoCelda.startsWith('TOTAL HORAS')) {
+                                    data.cell.styles.fontStyle = 'bold';
+                                }
+                            }
+
+                            // 2. Colorear las celdas de los meses (columnas de la 4 a la 15)
+                            if (data.section === 'body' && data.column.index >= 4 && data.column.index <= 15) {
+                                const rowData = data.row.raw;
+                                
+                                const textoActividad = rowData[0] || '';
+                                if (textoActividad.startsWith('Objetivo') || textoActividad.startsWith('TOTAL HORAS')) return;
+
+                                const fechaDesde = rowData[1];
+                                const fechaHasta = rowData[2];
+
+                                if (fechaDesde && fechaHasta) {
+                                    const partesDesde = fechaDesde.split('-');
+                                    const partesHasta = fechaHasta.split('-');
+
+                                    if (partesDesde.length >= 2 && partesHasta.length >= 2) {
+                                        const mesInicio = parseInt(partesDesde[1], 10) - 1; 
+                                        const mesFin = parseInt(partesHasta[1], 10) - 1;
+                                        const mesColumna = data.column.index - 4; // Columna 4 equivale al mes 0 (Enero)
+
+                                        // Si el mes de la columna cae dentro del rango de la actividad
+                                        if (mesColumna >= mesInicio && mesColumna <= mesFin) {
+                                            data.cell.styles.fillColor = [112, 173, 71]; // Verde exacto
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+
+                    const docentes = resDocentes.data?.data || [];
+                    const estudiantes = resEstudiantes.data?.data || [];
+                    
+                    // Extraer strings puros de los arreglos/objetos
+                    
+                    const subdirectorProy = (resSubdir.data?.data && resSubdir.data.data.length > 0) ? resSubdir.data.data[0].nombre_con_titulo : '';
+                    const nombreCoordinador = resResponsables.data[0].nombre_completo || '';
+                    const nombreDirectorGen = resDirectores.data?.nombre_completo || '';
+
+                    const maxFilas = Math.max(docentes.length, estudiantes.length, 3);
+                    
+                    // ==========================================
+                    // GENERACIÓN DE LA TABLA DE RESPONSABLES
+                    // ==========================================
+                    let finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 1 : 150; 
+                    
+                    // Ancho total disponible en A4 Landscape = 297mm - 15(margen izq) - 10(margen der) = 272mm
+                    // Dividido en 5 columnas iguales para alinear tablas = 54.4mm por columna
+                    const colWidth = 272 / 5;
+
+                    let bodyResponsables = [];
+
+                    // 1. Fila 0: Subtítulos de Docentes/Estudiantes y las Celdas Combinadas de los responsables
+                    bodyResponsables.push([
+                        { content: 'NOMBRE DE DOCENTES\nTUTORES - PARTICIPANTES', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+                        { content: 'NOMBRE DE ESTUDIANTES\nPARTICIPANTES', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+                        { content: `${directorProy ? directorProy + '\n' : ''}Director/a de proyecto de vinculación\ncon la sociedad de la carrera`, rowSpan: maxFilas + 1, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+                        { content: `${subdirectorProy ? subdirectorProy + '\n' : ''}Subdirector/a de proyecto de vinculación\ncon la sociedad de la carrera`, rowSpan: maxFilas + 1, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+                        { content: `Docente integrante del\nproyecto`, rowSpan: maxFilas + 1, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } } // Queda genérico como solicitaste
+                    ]);
+
+                    // 2. Llenar filas restantes de Docentes y Estudiantes (Las celdas de la derecha son ignoradas por el rowSpan)
+                    for (let i = 0; i < maxFilas; i++) {
+                        let nombreDocente = docentes[i] ? docentes[i].nombre_con_titulo : '';
+                        let nombreEstudiante = estudiantes[i] ? estudiantes[i].nombres_apellidos : '';
+                        
+                        bodyResponsables.push([
+                            { content: nombreDocente, styles: { halign: 'center' } }, 
+                            { content: nombreEstudiante, styles: { halign: 'center' } }
+                        ]);
+                    }
+
+                    // TABLA 1: RESPONSABLES Y PRESENTADO POR
+                    autoTable(doc, {
+                        startY: finalY,
+                        margin: { left: 15, right: 10 },
+                        theme: 'grid',
+                        styles: { 
+                            fontSize: 7, 
+                            textColor: [0, 0, 0], 
+                            lineColor: [0, 0, 0], 
+                            lineWidth: 0.3 
+                        },
+                        headStyles: { 
+                            fillColor: [255, 255, 255], 
+                            fontStyle: 'bold',
+                            halign: 'center' 
+                        },
+                        head: [
+                            [
+                                { content: 'RESPONSABLES', colSpan: 2 },
+                                { content: 'PRESENTADO POR:', colSpan: 3 }
+                            ]
+                        ],
+                        body: bodyResponsables,
+                        columnStyles: {
+                            0: { cellWidth: colWidth },
+                            1: { cellWidth: colWidth },
+                            2: { cellWidth: colWidth },
+                            3: { cellWidth: colWidth },
+                            4: { cellWidth: colWidth }
+                        }
+                    });
+
+                    // TABLA 2: REVISADO POR E INFORME FAVORABLE 
+                    // (Se dibuja como una tabla separada justo debajo para que, si hace salto de página, no repita el título "PRESENTADO POR:")
+                    autoTable(doc, {
+                        startY: doc.lastAutoTable.finalY,
+                        margin: { left: 15, right: 10 },
+                        theme: 'grid',
+                        styles: { 
+                            fontSize: 7, 
+                            textColor: [0, 0, 0], 
+                            lineColor: [0, 0, 0], 
+                            lineWidth: 0.3 
+                        },
+                        body: [
+                            [
+                                { content: '', colSpan: 2, styles: { lineWidth: 0, fillColor: [255, 255, 255] } }, // Espacio vacío sin bordes a la izquierda
+                                { content: 'REVISADO POR:', colSpan: 2, styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+                                { content: 'INFORME FAVORABLE:', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } }
+                            ],
+                            [
+                                { content: '', colSpan: 2, styles: { lineWidth: 0, fillColor: [255, 255, 255] } },
+                                { 
+                                    content: `${nombreCoordinador}\nResponsable de vinculación de la Facultad`, 
+                                    colSpan: 2, 
+                                    styles: { minCellHeight: 25, valign: 'bottom', halign: 'center', fillColor: [255, 255, 255], fontStyle: 'bold' } 
+                                },
+                                { 
+                                    content: `${nombreDirectorGen}\nDirector(a) de vinculación`, 
+                                    styles: { minCellHeight: 25, valign: 'bottom', halign: 'center', fillColor: [255, 255, 255], fontStyle: 'bold' } 
+                                }
+                            ]
+                        ],
+                        columnStyles: {
+                            0: { cellWidth: colWidth },
+                            1: { cellWidth: colWidth },
+                            2: { cellWidth: colWidth },
+                            3: { cellWidth: colWidth },
+                            4: { cellWidth: colWidth }
+                        }
+                    });
+                });
+                
+
+                // Descargar el archivo PDF
+                doc.save('Anexo_2_Cronograma.pdf');
+
+            }catch (error) {
+                // Es buena práctica manejar el error por si las peticiones fallan
+                console.error('Error al generar el PDF:', error);
+                // Aquí podrías mostrar una alerta de error (ej: SweetAlert)
+            } finally {
+                // 4. Se ejecuta SIEMPRE al terminar (con o sin éxito), liberando el botón
+                this.isGeneratingPDF = false; 
+            }
+            
+        },
+        async ObtenerCarr(id){
+            const response = await API.get(`${this.baseUrl}/obtnercarreraindv/${id}`);
+            return response.data.nombre_carrera;
+        },
+        async ObteneProDoc(id){
+            const response = await API.get(`${this.baseUrl}/getDocentesIndProyectosVinculacion/${id}`);
+            return response;
+        },
+        async ObteneProEst(id){
+            const response = await API.get(`${this.baseUrl}/getEstudiantesIndProyectosVinculacion/${id}`);
+            return response;
+        },
+        async ObteneProDir(id){
+            const response = await API.get(`${this.baseUrl}/getDirectoresIndProyectosVinculacion/${id}`);
+            return response;
+        },
+        async ObteneProSubDir(id){
+            const response = await API.get(`${this.baseUrl}/getSubDirectoresIndProyectosVinculacion/${id}`);
+            return response;
+        },
+        async ObteneRespVin(id){
+            const response = await API.get(`${this.baseUrl}/getResponsablesIndInfo/${id}`);
+            return response;
+        },
+        async ObteneDirVin(id){
+            const response = await API.get(`${this.baseUrl}/getdirectvin`);
+            return response;
+        },
+
 
     },
 };
