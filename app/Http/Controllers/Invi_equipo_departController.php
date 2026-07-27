@@ -311,7 +311,8 @@ class Invi_equipo_departController extends Controller
             ])
                 ->whereHas('equipo_roles', function ($query) {
                     $query->where('nombre_rol', 'LIKE', '%Director%')
-                        ->where('estado_rol', 1);
+                        ->where('estado_rol', 1)
+                        ->where('tipo_rol', 'LIKE', '%VINCULACION%');
                 })
                 ->where('estado_equipo_dep', 1)
                 ->first();

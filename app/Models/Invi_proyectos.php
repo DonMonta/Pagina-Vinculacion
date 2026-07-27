@@ -113,4 +113,8 @@ class Invi_proyectos extends Model
     {
         return $this->hasMany(Invi_detalle_articulacion::class, 'proyect_id');
     }
+    public function invi_actividades()
+    {
+        return $this->hasMany(Invi_actividades::class, 'proyect_id');
+    }
 }

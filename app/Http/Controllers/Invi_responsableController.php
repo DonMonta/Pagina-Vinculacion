@@ -40,7 +40,7 @@ class Invi_responsableController extends Controller
 
             if ($searchQuery) { // Si se ha introducido un parámetro de búsqueda
                 $query->where(function ($q) use ($searchQuery) { // Se aplica la condición de búsqueda a la consulta
-                    $q->where('invi_responsable.ciinfper_doc', 'LIKE', '%'.$searchQuery.'%'); // Se aplica la condición de búsqueda a la consulta
+                    $q->where('invi_responsable.ciinfper_doc', 'LIKE', '%' . $searchQuery . '%'); // Se aplica la condición de búsqueda a la consulta
                 });
             }
             if ($request->has('all') && $request->all === 'true') { // Si se ha introducido el parámetro all y su valor es true
@@ -93,7 +93,7 @@ class Invi_responsableController extends Controller
         }
         // Se captura el error y se devuelve un mensaje de error
         catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
 
@@ -127,7 +127,7 @@ class Invi_responsableController extends Controller
             ], 201);
         } catch (\Exception $e) {
             // Se captura el error y se devuelve un mensaje de error
-            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
 
@@ -136,7 +136,7 @@ class Invi_responsableController extends Controller
      */
     public function show(string $id)
     {
-        //
+        
     }
 
     /**
@@ -191,10 +191,9 @@ class Invi_responsableController extends Controller
                     'mensaje' => 'Error al Guardar los cambios en la base de datos',
                 ], 500);
             }
-
         } catch (\Exception $e) {
             return response()->json([
-                'mensaje' => 'Error interno al actualizar: '.$e->getMessage(),
+                'mensaje' => 'Error interno al actualizar: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -283,10 +282,9 @@ class Invi_responsableController extends Controller
                     'mensaje' => 'Error al guardar los cambios en la base de datos',
                 ], 500);
             }
-
         } catch (\Exception $e) {
             return response()->json([
-                'mensaje' => 'Error interno al habilitar el responsable: '.$e->getMessage(),
+                'mensaje' => 'Error interno al habilitar el responsable: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -304,9 +302,9 @@ class Invi_responsableController extends Controller
     public function uploadArchivo(Request $request)
     {
         if ($request->hasFile('file')) { // Si el archivo existe
-            Log::info('Archivo detectado: '.$request->file('file')->getClientOriginalName()); // Se registra el nombre del archivo detectado
-            Log::info('Error de subida PHP: '.$request->file('file')->getError()); // Se registra el error de subida PHP
-            Log::info('Tamaño recibido: '.$request->file('file')->getSize()); // Se registra el tamaño del archivo recibido
+            Log::info('Archivo detectado: ' . $request->file('file')->getClientOriginalName()); // Se registra el nombre del archivo detectado
+            Log::info('Error de subida PHP: ' . $request->file('file')->getError()); // Se registra el error de subida PHP
+            Log::info('Tamaño recibido: ' . $request->file('file')->getSize()); // Se registra el tamaño del archivo recibido
         } else {
             // Se registra un error de subida si no se detectó ningún archivo en la petición
             Log::warning('No se detectó ningún archivo en la petición.');
@@ -349,7 +347,7 @@ class Invi_responsableController extends Controller
             $file->move($directory, $filename);
 
             // URL pública, para acceder al archivo desde fuera de la aplicación
-            $url = url('Documentos/Vinculación/AnexoResponsable/'.$ci.'/'.$filename);
+            $url = url('Documentos/Vinculación/AnexoResponsable/' . $ci . '/' . $filename);
 
             // Se devuelve un array con el mensaje de éxito y el nombre del archivo y la URL pública
             return response()->json([
@@ -415,7 +413,7 @@ class Invi_responsableController extends Controller
 
             return response()->json(['data' => $resultado]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al obtener facultades: '.$e->getMessage()], 500);
+            return response()->json(['error' => 'Error al obtener facultades: ' . $e->getMessage()], 500);
         }
     }
     /**
@@ -531,7 +529,119 @@ class Invi_responsableController extends Controller
             }
 
             return response()->json($resultado);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al procesar la solicitud de responsables',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function getResponsablesIndInfo(string $id): JsonResponse
+    {
+        try {
+            // 1. Buscamos a los responsables activos que sean del tipo VINCULACIÓN
+            $responsables = Invi_responsable::with([
+                'informacionpersonald.titulos.nivel',
+                'facultad',
+            ])
+                ->where('tipo_responsable', 'VINCULACIÓN')
+                ->where('estado_responsable', 1)
+                ->where('idfacultad', $id)
+                ->get();
 
+            $resultado = [];
+
+            foreach ($responsables as $responsable) {
+                $persona = $responsable->informacionpersonald;
+                $facultad = $responsable->facultad;
+
+                // Si falta la información personal básica, saltamos al siguiente registro
+                if (! $persona) {
+                    continue;
+                }
+
+                // 2. Lógica de Género orientada al cargo de Responsable
+                $esMujer = strtoupper($persona->GeneroPer) === 'F';
+
+                $labels = [
+                    'pronombre' => $esMujer ? 'Ella' : 'Él',
+                    'articulo' => $esMujer ? 'la' : 'el',
+                    'titulo_rol' => $esMujer ? 'Responsable de Vinculación' : 'Responsable de Vinculación',
+                ];
+
+                // 3. Procesar títulos académicos filtrando por nv_numnivel
+                $tituloGrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 3; // TERCER NIVEL
+                });
+
+                $tituloPosgrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 4; // CUARTO NIVEL
+                });
+
+                $prefijoNombre = '';
+                $sufijoNombre = '';
+
+                // A. Mapeo ampliado de PREFIJOS (3er Nivel)
+                if ($tituloGrado) {
+                    $textoGrado = mb_strtolower($tituloGrado->ad_titulo);
+
+                    if (str_contains($textoGrado, 'licencia') || str_contains($textoGrado, 'lcda.')) {
+                        $prefijoNombre = $esMujer ? 'Lcda.' : 'Lcdo.';
+                    } elseif (str_contains($textoGrado, 'ingenier') || str_contains($textoGrado, 'ing.')) {
+                        $prefijoNombre = $esMujer ? 'Ing.' : 'Ing.';
+                    } elseif (str_contains($textoGrado, 'econom') || str_contains($textoGrado, 'econ.')) {
+                        $prefijoNombre = $esMujer ? 'Econ.' : 'Econ.';
+                    } elseif (str_contains($textoGrado, 'abogad') || str_contains($textoGrado, 'abg.')) {
+                        $prefijoNombre = $esMujer ? 'Abg.' : 'Abg.';
+                    } elseif (str_contains($textoGrado, 'arquitect') || str_contains($textoGrado, 'arq.')) {
+                        $prefijoNombre = 'Arq.';
+                    } else {
+                        $prefijoNombre = 'Prof.';
+                    }
+                } else {
+                    $prefijoNombre = $esMujer ? 'Sra.' : 'Sr.';
+                }
+
+                // B. Definir el SUFIJO (4to Nivel)
+                if ($tituloPosgrado) {
+                    $textoPosgrado = mb_strtolower($tituloPosgrado->ad_titulo);
+
+                    if (str_contains($textoPosgrado, 'phd') || str_contains($textoPosgrado, 'doctorado') || str_contains($textoPosgrado, 'doctor')) {
+                        $sufijoNombre = ', PhD';
+                    } elseif (str_contains($textoPosgrado, 'msc') || str_contains($textoPosgrado, 'science') || str_contains($textoPosgrado, 'ciencias')) {
+                        $sufijoNombre = ', MSc.';
+                    } else {
+                        $sufijoNombre = ', Mgtr.';
+                    }
+                }
+
+                // Construcción del nombre formateado con sus títulos
+                $nombreCompletoConTitulo = "{$prefijoNombre} {$persona->NombInfPer} {$persona->ApellInfPer}{$sufijoNombre}";
+
+                // 4. Estructura del objeto final adaptado a la Facultad
+                $resultado[] = [
+                    'id_responsable' => $responsable->id_responsable,
+                    'ci' => $persona->CIInfPer,
+                    'nombre_completo' => $nombreCompletoConTitulo,
+                    'email' => $persona->mailInst ?? 'vinculacion@utelvt.edu.ec',
+                    'telefono' => $persona->Telf1InfPer ?? $persona->CelularInfPer ?? 'S/N',
+                    'evidencia_arch' => $responsable->evidencia_arch,
+                    'genero_labels' => $labels,
+                    'titulo_grado' => $tituloGrado ? $tituloGrado->ad_titulo : null,
+                    'titulo_posgrado' => $tituloPosgrado ? $tituloPosgrado->ad_titulo : null,
+
+                    // Información detallada de la facultad asignada
+                    'facultad' => $facultad ? [
+                        'idfacultad' => $facultad->idfacultad,
+                        'nombre' => mb_convert_encoding($facultad->facultad, 'UTF-8', 'UTF-8'),
+                        'siglas' => mb_convert_encoding($facultad->siglas, 'UTF-8', 'UTF-8'),
+                        'decano' => mb_convert_encoding($facultad->decano, 'UTF-8', 'UTF-8'),
+                        'secretario' => mb_convert_encoding($facultad->secretario, 'UTF-8', 'UTF-8'),
+                    ] : null,
+                ];
+            }
+
+            return response()->json($resultado);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Error al procesar la solicitud de responsables',

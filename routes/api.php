@@ -240,6 +240,7 @@ Route::prefix('vin')->group(function () {
         //Definición de endpoint para obtener las facultades de Vinculación
         Route::get('getFacultadesVinculacion', [Invi_responsableController::class, 'getFacultadesVinculacion']);
         Route::get('getCarrerasFacultad/{idfacultad}', [DirectorCarrerasController::class, 'ObtCarrerasFacultad']);
+        Route::get('obtnercarreraindv/{id}', [DirectorCarrerasController::class, 'obtnercarreraindv']);
         /**
          * --------------------------------------------------------------------------
          * Rutas de Gestión de Convocatorias (Invi_convocatoriaController)
@@ -265,7 +266,12 @@ Route::prefix('vin')->group(function () {
          */
         // Registra de forma automática los endpoints CRUD para la API (index, store, show, update)
         Route::apiResource("invi_tipo_proyecto", Invi_tip_proyectController::class);
-        
+        Route::get('getDirectoresIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getDirectoresiNDProyectosVinculacion']);
+        Route::get('getSubDirectoresIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getSubDireIndProyectosVinculacion']);
+        Route::get('getDocentesIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getDocentesIndProyectosVinculacion']);
+        Route::get('getEstudiantesIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getEstIndvProyectosVinculacion']);
+        Route::get('getResponsablesIndInfo/{id}', [Invi_responsableController::class, 'getResponsablesIndInfo']);
+        Route::get('getdirectvin', [Invi_equipo_departController::class, 'getDirectorInfo']);
         
     });
 }); 

@@ -91,6 +91,33 @@ class DirectorCarrerasController extends Controller
     {
         //
     }
+    public function obtnercarreraindv(string $id)
+    {
+        try {
+            $query = Carreras::select('idCarr', 'NombCarr', 'titulo', 'director', 'idfacultad')
+                ->where('StatusCarr', 1)
+                ->where('idCarr', $id)
+                ->with('facultades')
+                ->get();
+            if ($query->isEmpty()) {
+                return response()->json(['error' => 'No se encontraron datos'], 404);
+            }
+            $resultado = $query->first();
+            $nombreCarreraRaw = trim($resultado->NombCarr);
+            // 1. Quitamos el guión y los números/año del final (ej: " - 2020")
+            $carreraLimpia = preg_replace('/\s*-\s*\d+.*$/', '', $nombreCarreraRaw);
+
+            // 2. Convertimos de "INGENIERIA QUIMICA" a "Ingeniería Química" (Title Case)
+            $nombreCarreraFinal = mb_convert_case($carreraLimpia, MB_CASE_TITLE, "UTF-8");
+            return response()->json([
+                'data' => $resultado,
+                'nombre_carrera' => $nombreCarreraFinal,
+                'mensaje' => 'Encontrado con Éxito!!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+        }
+    }
 
     /**
      * Display the specified resource.

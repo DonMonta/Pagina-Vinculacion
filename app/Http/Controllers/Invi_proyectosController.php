@@ -49,6 +49,12 @@ use App\Models\Invi_detalle_presu_proy;
 use App\Models\Invi_aportesutlvt;
 use App\Models\Invi_aportesinst;
 use App\Models\Invi_detalle_articulacion;
+use App\Models\Invi_subactividad;
+use App\Models\Invi_actprod_verificables;
+use App\Models\Invi_actmedios_verificacion;
+use App\Models\Invi_actindicadores;
+use App\Models\Invi_actsupuestos;
+use App\Models\Invi_actividades;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -198,7 +204,12 @@ class Invi_proyectosController extends Controller
             'invi_detalle_articulacion',
             'invi_detalle_integrante.funciones',
             'invi_detalle_integrante.informacionPersonalD',
-            'invi_detalle_integrante.informacionpersonal'
+            'invi_detalle_integrante.informacionpersonal',
+            'invi_obj_proyectos.invi_actividades.invi_subactividad',
+            'invi_obj_proyectos.invi_actividades.invi_actprod_verificables',
+            'invi_obj_proyectos.invi_actividades.invi_actmedios_verificacion',
+            'invi_obj_proyectos.invi_actividades.invi_actindicadores',
+            'invi_obj_proyectos.invi_actividades.invi_actsupuestos',
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -990,6 +1001,87 @@ class Invi_proyectosController extends Controller
                     ]);
                 }
             }
+            if ($request->has('actividades') && is_array($request->actividades)) {
+                $ids_actividades_recibidas = [];
+
+                foreach ($request->actividades as $actData) {
+                    $actividad = Invi_actividades::updateOrCreate(
+                        [
+                            'id_actividades' => $actData['id_actividades'] ?? null,
+                            'proyect_id'     => $id
+                        ],
+                        [
+                            'id_obj_proy'   => $actData['id_obj_proy'],
+                            'nom_actividad' => $actData['nom_actividad'],
+                            'responsables'  => $actData['responsables'] ?? null,
+                            'fecha_desde'   => $actData['fecha_desde'] ?? null,
+                            'fecha_hasta'   => $actData['fecha_hasta'] ?? null,
+                            'horas'         => $actData['horas'] ?? 0,
+                            'detalle_anio'  => $actData['detalle_anio'] ?? 'Primer Año',
+                        ]
+                    );
+
+                    $ids_actividades_recibidas[] = $actividad->id_actividades;
+
+                    // Subactividades
+                    $actividad->invi_subactividad()->delete();
+                    if (!empty($actData['invi_subactividad'])) {
+                        $subData = array_map(fn($s) => [
+                            'id_actividades' => $actividad->id_actividades,
+                            'nom_sub_actv'   => $s['nom_sub_actv'],
+                            'fecha_desde'    => $s['fecha_desde'] ?? null,
+                            'fecha_hasta'    => $s['fecha_hasta'] ?? null,
+                            'horas'          => $s['horas'] ?? 0,
+                        ], $actData['invi_subactividad']);
+                        Invi_subactividad::insert($subData);
+                    }
+
+                    // Productos Verificables
+                    $actividad->invi_actprod_verificables()->delete();
+                    if (!empty($actData['invi_actprod_verificables'])) {
+                        $pvData = array_map(fn($pv) => [
+                            'id_actividades'     => $actividad->id_actividades,
+                            'detalle_prod_verif' => $pv['detalle_prod_verif'],
+                        ], $actData['invi_actprod_verificables']);
+                        Invi_actprod_verificables::insert($pvData);
+                    }
+
+                    // Medios de Verificación
+                    $actividad->invi_actmedios_verificacion()->delete();
+                    if (!empty($actData['invi_actmedios_verificacion'])) {
+                        $mvData = array_map(fn($mv) => [
+                            'id_actividades'         => $actividad->id_actividades,
+                            'detalle_medio_verifica' => $mv['detalle_medio_verifica'],
+                        ], $actData['invi_actmedios_verificacion']);
+                        Invi_actmedios_verificacion::insert($mvData);
+                    }
+
+                    // Indicadores
+                    $actividad->invi_actindicadores()->delete();
+                    if (!empty($actData['invi_actindicadores'])) {
+                        $indData = array_map(fn($ind) => [
+                            'id_actividades'    => $actividad->id_actividades,
+                            'detalle_indicador' => $ind['detalle_indicador'],
+                        ], $actData['invi_actindicadores']);
+                        Invi_actindicadores::insert($indData);
+                    }
+
+                    // Supuestos
+                    $actividad->invi_actsupuestos()->delete();
+                    if (!empty($actData['invi_actsupuestos'])) {
+                        $supData = array_map(fn($sup) => [
+                            'id_actividades'    => $actividad->id_actividades,
+                            'detalle_supuestos' => $sup['detalle_supuestos'],
+                        ], $actData['invi_actsupuestos']);
+                        Invi_actsupuestos::insert($supData);
+                    }
+                }
+
+                // Eliminar actividades removidas desde el frontend
+                Invi_actividades::where('proyect_id', $id)
+                    ->whereNotIn('id_actividades', $ids_actividades_recibidas)
+                    ->delete();
+            }
 
 
             DB::commit();
@@ -1541,6 +1633,150 @@ class Invi_proyectosController extends Controller
             ], 500);
         }
     }
+    public function getDirectoresiNDProyectosVinculacion(string $id): JsonResponse
+    {
+        try {
+            // 1. Consulta base utilizando Eager Loading para optimizar el rendimiento e incluir los títulos académicos
+            $integrantes = Invi_deta_inte::with([
+                'invi_proyectos',
+                'funciones',
+                'carreras.facultades',
+                'informacionPersonalD.titulos.nivel', // <-- Incluimos la relación anidada para evaluar los títulos
+            ])
+                // Integrantes en estado 1 (Activos)
+                ->where('estado', 1)
+                ->where('proyect_id', $id)
+                // Filtramos por el tipo de proyecto
+                ->whereHas('invi_proyectos', function ($query) {
+                    $query->where('proyect_tipo', 'VINCULACION');
+                })
+
+                // Filtramos de forma estricta para evitar "Subdirector"
+                ->whereHas('funciones', function ($query) {
+                    $query->where('tipo_funcion', 'VINCULACIÓN')
+                        ->where('nombre_funcion', 'LIKE', '%Director%')
+                        ->where('nombre_funcion', 'NOT LIKE', '%Subdirector%'); // <-- Excluimos explícitamente Subdirector
+                })
+                ->get();
+
+            $resultado = [];
+
+            foreach ($integrantes as $integrante) {
+                $persona = $integrante->informacionPersonalD;
+
+                if (! $persona) {
+                    continue; // Si el integrante no tiene registro de información de personal, pasamos al siguiente
+                }
+
+                // 2. Lógica de Género para Nombres y Cargos
+                $esMujer = strtoupper(trim($persona->GeneroPer)) === 'F';
+                $cargoFormateado = $esMujer ? 'Directora' : 'Director';
+
+                // 3. Procesar títulos académicos filtrando por nv_numnivel (Eager Loaded)
+                $tituloGrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 3; // TERCER NIVEL
+                });
+
+                $tituloPosgrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 4; // CUARTO NIVEL
+                });
+
+                $prefijoNombre = '';
+                $sufijoNombre = '';
+
+                // A. Mapeo ampliado de PREFIJOS (3er Nivel)
+                if ($tituloGrado) {
+                    $textoGrado = mb_strtolower($tituloGrado->ad_titulo);
+
+                    if (str_contains($textoGrado, 'licencia')) {
+                        $prefijoNombre = $esMujer ? 'Lcda.' : 'Lcdo.';
+                    } elseif (
+                        str_contains($textoGrado, 'ingenier') || str_contains($textoGrado, 'ing.') ||
+                        str_contains($textoGrado, 'ingeniería') || str_contains($textoGrado, 'tecnolog')
+                    ) {
+                        $prefijoNombre = 'Ing.';
+                    } elseif (str_contains($textoGrado, 'econom') || str_contains($textoGrado, 'econ.')) {
+                        $prefijoNombre = 'Econ.';
+                    } elseif (str_contains($textoGrado, 'abogad') || str_contains($textoGrado, 'abg.')) {
+                        $prefijoNombre = 'Abg.';
+                    } elseif (str_contains($textoGrado, 'arquitect') || str_contains($textoGrado, 'arq.')) {
+                        $prefijoNombre = 'Arq.';
+                    } else {
+                        $prefijoNombre = 'Prof.';
+                    }
+                } else {
+                    $prefijoNombre = $esMujer ? 'Sra.' : 'Sr.';
+                }
+
+                // B. Definir el SUFIJO (4to Nivel)
+                if ($tituloPosgrado) {
+                    $textoPosgrado = mb_strtolower($tituloPosgrado->ad_titulo);
+
+                    if (str_contains($textoPosgrado, 'phd') || str_contains($textoPosgrado, 'doctorado') || str_contains($textoPosgrado, 'doctor')) {
+                        $sufijoNombre = ', PhD';
+                    } elseif (str_contains($textoPosgrado, 'msc') || str_contains($textoPosgrado, 'science') || str_contains($textoPosgrado, 'ciencias')) {
+                        $sufijoNombre = ', MSc.';
+                    } else {
+                        $sufijoNombre = ', Mgtr.';
+                    }
+                }
+
+                // Formatear Nombres y Apellidos en formato Title Case
+                $nombreRaw = trim($persona->NombInfPer . ' ' . $persona->ApellInfPer . ' ' . $persona->ApellMatInfPer);
+                $nombresFormateados = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+
+                // Construcción del nombre con rango académico completo
+                $nombreCompletoConTitulo = trim("{$prefijoNombre} {$nombresFormateados}{$sufijoNombre}");
+
+                // 4. Obtener y formatear el Nombre de la Carrera
+                $nombreCarrera = 'No asignada';
+                if ($integrante->carreras) {
+                    $nombreCarreraRaw = trim($integrante->carreras->NombCarr);
+                    $nombreCarrera = mb_convert_case(mb_strtolower($nombreCarreraRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                }
+                $carreraLimpia = preg_replace('/\s*-\s*\d+.*$/', '', $nombreCarrera);
+
+                // 2. Convertimos de "INGENIERIA QUIMICA" a "Ingeniería Química" (Title Case)
+                $nombreCarreraFinal = mb_convert_case($carreraLimpia, MB_CASE_TITLE, "UTF-8");
+                // 5. Obtener la Facultad y sus Siglas
+                $nombreFacultad = 'No asignada';
+                $siglasFacultad = 'No asignada';
+                if ($integrante->carreras && $integrante->carreras->facultades->isNotEmpty()) {
+                    $facultadAsociada = $integrante->carreras->facultades->first();
+                    $nombreFacultad = mb_convert_case(mb_strtolower(trim($facultadAsociada->facultad), 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                    $siglasFacultad = trim($facultadAsociada->siglas);
+                }
+
+                // 6. Estructura del objeto individual
+                $resultado[] = [
+                    'cedula' => $persona->CIInfPer,
+                    'nombres_apellidos' => $nombresFormateados,      // Solo nombres limpios
+                    'nombre_con_titulo' => $nombreCompletoConTitulo, // Formato "Ing. Juan Perez, MSc."
+                    'funcion' => $integrante->funciones->nombre_funcion ?? 'Desconocida',
+                    'cargo_genero' => $cargoFormateado,         // Regresa "Director" o "Directora"
+                    'carrera' => $nombreCarreraFinal,
+                    'facultad' => $nombreFacultad,
+                    'siglas' => $siglasFacultad,
+                    'proyecto_nombre' => $integrante->invi_proyectos->proyect_nombre ?? 'No registrado',
+                    'titulo_grado' => $tituloGrado ? $tituloGrado->ad_titulo : null,
+                    'titulo_posgrado' => $tituloPosgrado ? $tituloPosgrado->ad_titulo : null,
+                ];
+            }
+
+            // 7. Retornar la respuesta JSON
+            return response()->json([
+                'success' => true,
+                'total' => count($resultado),
+                'data' => $resultado,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Ocurrió un error al consultar los directores de proyectos.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
     public function getSubDireProyectosVinculacion(Request $request): JsonResponse
     {
         try {
@@ -1554,6 +1790,149 @@ class Invi_proyectosController extends Controller
                 // Integrantes en estado 1 (Activos)
                 ->where('estado', 1)
 
+                // Filtramos por el tipo de proyecto
+                ->whereHas('invi_proyectos', function ($query) {
+                    $query->where('proyect_tipo', 'VINCULACION');
+                })
+
+                // Filtramos de forma estricta para evitar "Subdirector"
+                ->whereHas('funciones', function ($query) {
+                    $query->where('tipo_funcion', 'VINCULACIÓN')
+                        ->where('nombre_funcion', 'LIKE', '%Subdirector%'); // <-- Excluimos explícitamente Subdirector
+                })
+                ->get();
+
+            $resultado = [];
+
+            foreach ($integrantes as $integrante) {
+                $persona = $integrante->informacionPersonalD;
+
+                if (! $persona) {
+                    continue; // Si el integrante no tiene registro de información de personal, pasamos al siguiente
+                }
+
+                // 2. Lógica de Género para Nombres y Cargos
+                $esMujer = strtoupper(trim($persona->GeneroPer)) === 'F';
+                $cargoFormateado = $esMujer ? 'Subdirectora' : 'Subdirector';
+
+                // 3. Procesar títulos académicos filtrando por nv_numnivel (Eager Loaded)
+                $tituloGrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 3; // TERCER NIVEL
+                });
+
+                $tituloPosgrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 4; // CUARTO NIVEL
+                });
+
+                $prefijoNombre = '';
+                $sufijoNombre = '';
+
+                // A. Mapeo ampliado de PREFIJOS (3er Nivel)
+                if ($tituloGrado) {
+                    $textoGrado = mb_strtolower($tituloGrado->ad_titulo);
+
+                    if (str_contains($textoGrado, 'licencia')) {
+                        $prefijoNombre = $esMujer ? 'Lcda.' : 'Lcdo.';
+                    } elseif (
+                        str_contains($textoGrado, 'ingenier') || str_contains($textoGrado, 'ing.') ||
+                        str_contains($textoGrado, 'ingeniería') || str_contains($textoGrado, 'tecnolog')
+                    ) {
+                        $prefijoNombre = 'Ing.';
+                    } elseif (str_contains($textoGrado, 'econom') || str_contains($textoGrado, 'econ.')) {
+                        $prefijoNombre = 'Econ.';
+                    } elseif (str_contains($textoGrado, 'abogad') || str_contains($textoGrado, 'abg.')) {
+                        $prefijoNombre = 'Abg.';
+                    } elseif (str_contains($textoGrado, 'arquitect') || str_contains($textoGrado, 'arq.')) {
+                        $prefijoNombre = 'Arq.';
+                    } else {
+                        $prefijoNombre = 'Prof.';
+                    }
+                } else {
+                    $prefijoNombre = $esMujer ? 'Sra.' : 'Sr.';
+                }
+
+                // B. Definir el SUFIJO (4to Nivel)
+                if ($tituloPosgrado) {
+                    $textoPosgrado = mb_strtolower($tituloPosgrado->ad_titulo);
+
+                    if (str_contains($textoPosgrado, 'phd') || str_contains($textoPosgrado, 'doctorado') || str_contains($textoPosgrado, 'doctor')) {
+                        $sufijoNombre = ', PhD';
+                    } elseif (str_contains($textoPosgrado, 'msc') || str_contains($textoPosgrado, 'science') || str_contains($textoPosgrado, 'ciencias')) {
+                        $sufijoNombre = ', MSc.';
+                    } else {
+                        $sufijoNombre = ', Mgtr.';
+                    }
+                }
+
+                // Formatear Nombres y Apellidos en formato Title Case
+                $nombreRaw = trim($persona->NombInfPer . ' ' . $persona->ApellInfPer . ' ' . $persona->ApellMatInfPer);
+                $nombresFormateados = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+
+                // Construcción del nombre con rango académico completo
+                $nombreCompletoConTitulo = trim("{$prefijoNombre} {$nombresFormateados}{$sufijoNombre}");
+
+                // 4. Obtener y formatear el Nombre de la Carrera
+                $nombreCarrera = 'No asignada';
+                if ($integrante->carreras) {
+                    $nombreCarreraRaw = trim($integrante->carreras->NombCarr);
+                    $nombreCarrera = mb_convert_case(mb_strtolower($nombreCarreraRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                }
+                $carreraLimpia = preg_replace('/\s*-\s*\d+.*$/', '', $nombreCarrera);
+
+                // 2. Convertimos de "INGENIERIA QUIMICA" a "Ingeniería Química" (Title Case)
+                $nombreCarreraFinal = mb_convert_case($carreraLimpia, MB_CASE_TITLE, "UTF-8");
+                // 5. Obtener la Facultad y sus Siglas
+                $nombreFacultad = 'No asignada';
+                $siglasFacultad = 'No asignada';
+                if ($integrante->carreras && $integrante->carreras->facultades->isNotEmpty()) {
+                    $facultadAsociada = $integrante->carreras->facultades->first();
+                    $nombreFacultad = mb_convert_case(mb_strtolower(trim($facultadAsociada->facultad), 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                    $siglasFacultad = trim($facultadAsociada->siglas);
+                }
+
+                // 6. Estructura del objeto individual
+                $resultado[] = [
+                    'cedula' => $persona->CIInfPer,
+                    'nombres_apellidos' => $nombresFormateados,      // Solo nombres limpios
+                    'nombre_con_titulo' => $nombreCompletoConTitulo, // Formato "Ing. Juan Perez, MSc."
+                    'funcion' => $integrante->funciones->nombre_funcion ?? 'Desconocida',
+                    'cargo_genero' => $cargoFormateado,         // Regresa "Director" o "Directora"
+                    'carrera' => $nombreCarreraFinal,
+                    'facultad' => $nombreFacultad,
+                    'siglas' => $siglasFacultad,
+                    'proyecto_nombre' => $integrante->invi_proyectos->proyect_nombre ?? 'No registrado',
+                    'titulo_grado' => $tituloGrado ? $tituloGrado->ad_titulo : null,
+                    'titulo_posgrado' => $tituloPosgrado ? $tituloPosgrado->ad_titulo : null,
+                ];
+            }
+
+            // 7. Retornar la respuesta JSON
+            return response()->json([
+                'success' => true,
+                'total' => count($resultado),
+                'data' => $resultado,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Ocurrió un error al consultar los directores de proyectos.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function getSubDireIndProyectosVinculacion(string $id): JsonResponse
+    {
+        try {
+            // 1. Consulta base utilizando Eager Loading para optimizar el rendimiento e incluir los títulos académicos
+            $integrantes = Invi_deta_inte::with([
+                'invi_proyectos',
+                'funciones',
+                'carreras.facultades',
+                'informacionPersonalD.titulos.nivel', // <-- Incluimos la relación anidada para evaluar los títulos
+            ])
+                // Integrantes en estado 1 (Activos)
+                ->where('estado', 1)
+                ->where('proyect_id', $id)
                 // Filtramos por el tipo de proyecto
                 ->whereHas('invi_proyectos', function ($query) {
                     $query->where('proyect_tipo', 'VINCULACION');
@@ -1829,6 +2208,151 @@ class Invi_proyectosController extends Controller
             ], 500);
         }
     }
+    public function getDocentesIndProyectosVinculacion(string $id): JsonResponse
+    {
+        try {
+            // 1. Consulta base utilizando Eager Loading para optimizar el rendimiento e incluir los títulos académicos
+            $integrantes = Invi_deta_inte::with([
+                'invi_proyectos',
+                'funciones',
+                'carreras.facultades',
+                'informacionPersonalD.titulos.nivel', // <-- Incluimos la relación anidada para evaluar los títulos
+            ])
+                // Integrantes en estado 1 (Activos)
+                ->where('estado', 1)
+                ->where('proyect_id', $id)
+                // Filtramos por el tipo de proyecto
+                ->whereHas('invi_proyectos', function ($query) {
+                    $query->where('proyect_tipo', 'VINCULACION');
+                })
+
+                // Filtramos de forma estricta para evitar "Subdirector"
+                ->whereHas('funciones', function ($query) {
+                    $query->where('tipo_funcion', 'VINCULACIÓN')
+                        ->where('nombre_funcion', 'LIKE', '%Docente%')
+                        ->where('nombre_funcion', 'NOT LIKE', '%Director%')
+                        ->where('nombre_funcion', 'NOT LIKE', '%Subdirector%'); // <-- Excluimos explícitamente Subdirector
+                })
+                ->get();
+
+            $resultado = [];
+
+            foreach ($integrantes as $integrante) {
+                $persona = $integrante->informacionPersonalD;
+
+                if (! $persona) {
+                    continue; // Si el integrante no tiene registro de información de personal, pasamos al siguiente
+                }
+
+                // 2. Lógica de Género para Nombres y Cargos
+                $esMujer = strtoupper(trim($persona->GeneroPer)) === 'F';
+                $cargoFormateado = $esMujer ? 'Docente' : 'Docente';
+
+                // 3. Procesar títulos académicos filtrando por nv_numnivel (Eager Loaded)
+                $tituloGrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 3; // TERCER NIVEL
+                });
+
+                $tituloPosgrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 4; // CUARTO NIVEL
+                });
+
+                $prefijoNombre = '';
+                $sufijoNombre = '';
+
+                // A. Mapeo ampliado de PREFIJOS (3er Nivel)
+                if ($tituloGrado) {
+                    $textoGrado = mb_strtolower($tituloGrado->ad_titulo);
+
+                    if (str_contains($textoGrado, 'licencia')) {
+                        $prefijoNombre = $esMujer ? 'Lcda.' : 'Lcdo.';
+                    } elseif (
+                        str_contains($textoGrado, 'ingenier') || str_contains($textoGrado, 'ing.') ||
+                        str_contains($textoGrado, 'ingeniería') || str_contains($textoGrado, 'tecnolog')
+                    ) {
+                        $prefijoNombre = 'Ing.';
+                    } elseif (str_contains($textoGrado, 'econom') || str_contains($textoGrado, 'econ.')) {
+                        $prefijoNombre = 'Econ.';
+                    } elseif (str_contains($textoGrado, 'abogad') || str_contains($textoGrado, 'abg.')) {
+                        $prefijoNombre = 'Abg.';
+                    } elseif (str_contains($textoGrado, 'arquitect') || str_contains($textoGrado, 'arq.')) {
+                        $prefijoNombre = 'Arq.';
+                    } else {
+                        $prefijoNombre = 'Prof.';
+                    }
+                } else {
+                    $prefijoNombre = $esMujer ? 'Sra.' : 'Sr.';
+                }
+
+                // B. Definir el SUFIJO (4to Nivel)
+                if ($tituloPosgrado) {
+                    $textoPosgrado = mb_strtolower($tituloPosgrado->ad_titulo);
+
+                    if (str_contains($textoPosgrado, 'phd') || str_contains($textoPosgrado, 'doctorado') || str_contains($textoPosgrado, 'doctor')) {
+                        $sufijoNombre = ', PhD';
+                    } elseif (str_contains($textoPosgrado, 'msc') || str_contains($textoPosgrado, 'science') || str_contains($textoPosgrado, 'ciencias')) {
+                        $sufijoNombre = ', MSc.';
+                    } else {
+                        $sufijoNombre = ', Mgtr.';
+                    }
+                }
+
+                // Formatear Nombres y Apellidos en formato Title Case
+                $nombreRaw = trim($persona->NombInfPer . ' ' . $persona->ApellInfPer . ' ' . $persona->ApellMatInfPer);
+                $nombresFormateados = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+
+                // Construcción del nombre con rango académico completo
+                $nombreCompletoConTitulo = trim("{$prefijoNombre} {$nombresFormateados}{$sufijoNombre}");
+
+                // 4. Obtener y formatear el Nombre de la Carrera
+                $nombreCarrera = 'No asignada';
+                if ($integrante->carreras) {
+                    $nombreCarreraRaw = trim($integrante->carreras->NombCarr);
+                    $nombreCarrera = mb_convert_case(mb_strtolower($nombreCarreraRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                }
+                $carreraLimpia = preg_replace('/\s*-\s*\d+.*$/', '', $nombreCarrera);
+
+                // 2. Convertimos de "INGENIERIA QUIMICA" a "Ingeniería Química" (Title Case)
+                $nombreCarreraFinal = mb_convert_case($carreraLimpia, MB_CASE_TITLE, "UTF-8");
+                // 5. Obtener la Facultad y sus Siglas
+                $nombreFacultad = 'No asignada';
+                $siglasFacultad = 'No asignada';
+                if ($integrante->carreras && $integrante->carreras->facultades->isNotEmpty()) {
+                    $facultadAsociada = $integrante->carreras->facultades->first();
+                    $nombreFacultad = mb_convert_case(mb_strtolower(trim($facultadAsociada->facultad), 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                    $siglasFacultad = trim($facultadAsociada->siglas);
+                }
+
+                // 6. Estructura del objeto individual
+                $resultado[] = [
+                    'cedula' => $persona->CIInfPer,
+                    'nombres_apellidos' => $nombresFormateados,      // Solo nombres limpios
+                    'nombre_con_titulo' => $nombreCompletoConTitulo, // Formato "Ing. Juan Perez, MSc."
+                    'funcion' => $integrante->funciones->nombre_funcion ?? 'Desconocida',
+                    'cargo_genero' => $cargoFormateado,         // Regresa "Director" o "Directora"
+                    'carrera' => $nombreCarreraFinal,
+                    'facultad' => $nombreFacultad,
+                    'siglas' => $siglasFacultad,
+                    'proyecto_nombre' => $integrante->invi_proyectos->proyect_nombre ?? 'No registrado',
+                    'titulo_grado' => $tituloGrado ? $tituloGrado->ad_titulo : null,
+                    'titulo_posgrado' => $tituloPosgrado ? $tituloPosgrado->ad_titulo : null,
+                ];
+            }
+
+            // 7. Retornar la respuesta JSON
+            return response()->json([
+                'success' => true,
+                'total' => count($resultado),
+                'data' => $resultado,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Ocurrió un error al consultar los directores de proyectos.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
     public function getEstProyectosVinculacion(Request $request): JsonResponse
     {
         try {
@@ -1842,6 +2366,94 @@ class Invi_proyectosController extends Controller
                 // Integrantes en estado 1 (Activos)
                 ->where('estado', 1)
 
+                // Filtramos por el tipo de proyecto
+                ->whereHas('invi_proyectos', function ($query) {
+                    $query->where('proyect_tipo', 'VINCULACION');
+                })
+
+                // Filtramos de forma estricta para evitar "Subdirector"
+                ->whereHas('funciones', function ($query) {
+                    $query->where('tipo_funcion', 'VINCULACIÓN')
+                        ->where('nombre_funcion', 'LIKE', '%Estudiante%')
+                        ->where('nombre_funcion', 'NOT LIKE', '%Docente%')
+                        ->where('nombre_funcion', 'NOT LIKE', '%Director%')
+                        ->where('nombre_funcion', 'NOT LIKE', '%Subdirector%'); // <-- Excluimos explícitamente Subdirector
+                })
+                ->get();
+
+            $resultado = $integrantes->map(function ($integrante) {
+
+                // Los directores generalmente son docentes (informacionPersonalD), 
+                // pero validamos ambas relaciones por seguridad.
+                $persona = $integrante->informacionpersonal;
+
+                // Formatear Nombres y Apellidos (Title Case)
+                $nombresCompletos = 'Datos no registrados';
+                if ($persona) {
+                    $nombreRaw = trim($persona->NombInfPer . ' ' . $persona->ApellInfPer . ' ' . $persona->ApellMatInfPer);
+                    // Convertimos todo a minúscula primero y luego a Title Case
+                    $nombresCompletos = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, "UTF-8");
+                }
+
+                // 4. Obtener y formatear el Nombre de la Carrera
+                $nombreCarrera = 'No asignada';
+                if ($integrante->carreras) {
+                    $nombreCarreraRaw = trim($integrante->carreras->NombCarr);
+                    $nombreCarrera = mb_convert_case(mb_strtolower($nombreCarreraRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                }
+                $carreraLimpia = preg_replace('/\s*-\s*\d+.*$/', '', $nombreCarrera);
+
+                // 2. Convertimos de "INGENIERIA QUIMICA" a "Ingeniería Química" (Title Case)
+                $nombreCarreraFinal = mb_convert_case($carreraLimpia, MB_CASE_TITLE, "UTF-8");
+                // 5. Obtener la Facultad y sus Siglas
+                $nombreFacultad = 'No asignada';
+                $siglasFacultad = 'No asignada';
+                if ($integrante->carreras && $integrante->carreras->facultades->isNotEmpty()) {
+                    $facultadAsociada = $integrante->carreras->facultades->first();
+                    $nombreFacultad = mb_convert_case(mb_strtolower(trim($facultadAsociada->facultad), 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                    $siglasFacultad = trim($facultadAsociada->siglas);
+                }
+
+                // Retornamos el objeto estructurado
+                return [
+                    'nombres_apellidos' => $nombresCompletos,
+                    'funcion'           => $integrante->funciones->nombre_funcion ?? 'Desconocida',
+                    'carrera'           => $nombreCarreraFinal,
+                    'facultad'          => $nombreFacultad,
+                    'siglas'            => $siglasFacultad,
+                    // Agrego estos campos extra porque suelen ser muy útiles para el Frontend
+                    'proyecto_nombre'   => $integrante->invi_proyectos->proyect_nombre ?? 'No registrado',
+                    'cedula'            => $persona ? $persona->CIInfPer : null
+                ];
+            });
+
+            // 3. Retornar la respuesta JSON
+            return response()->json([
+                'success' => true,
+                'total'   => $resultado->count(),
+                'data'    => $resultado
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Ocurrió un error al consultar los directores de proyectos.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function getEstIndvProyectosVinculacion(string $id): JsonResponse
+    {
+        try {
+            // 1. Consulta base utilizando Eager Loading para optimizar el rendimiento e incluir los títulos académicos
+            $integrantes = Invi_deta_inte::with([
+                'invi_proyectos',
+                'funciones',
+                'carreras.facultades',
+                'informacionpersonal', // <-- Incluimos la relación anidada para evaluar los títulos
+            ])
+                // Integrantes en estado 1 (Activos)
+                ->where('estado', 1)
+                ->where('proyect_id', $id)
                 // Filtramos por el tipo de proyecto
                 ->whereHas('invi_proyectos', function ($query) {
                     $query->where('proyect_tipo', 'VINCULACION');

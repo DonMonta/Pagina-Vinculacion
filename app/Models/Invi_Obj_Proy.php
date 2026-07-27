@@ -42,4 +42,8 @@ class Invi_Obj_Proy extends Model
     {
         return $this->hasMany(Invi_prod_verificables::class, 'id_obj_proy');
     }
+    public function invi_actividades()
+    {
+        return $this->hasMany(Invi_actividades::class, 'id_obj_proy');
+    }
 }
