@@ -705,8 +705,44 @@
                             : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
                         class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
                         <span
-                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">9</span>
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">10</span>
                         Cronograma de Actividades
+                    </button>
+                    <button @click="activeTab = 'bienes_servi_proyec'"
+                        :class="activeTab === 'bienes_servi_proyec'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">11</span>
+                        Detalles de bienes y servicios 
+                    </button>
+                    <button @click="activeTab = 'metodologia'"
+                        :class="activeTab === 'metodologia'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">12</span>
+                        Metodología 
+                    </button>
+                    <button @click="activeTab = 'financia'"
+                        :class="activeTab === 'financia'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">13</span>
+                        Financiamiento 
+                    </button>
+                    <button @click="activeTab = 'viabiliadad_sos'"
+                        :class="activeTab === 'viabiliadad_sos'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">14</span>
+                        Viabilidad y Sostenibilidad
                     </button>
                 </div>
 
@@ -2297,7 +2333,7 @@
                                 <!-- Contador de palabras -->
                                 <div class="flex justify-between items-center mt-2 text-sm font-semibold transition-colors" :class="colorContadorAntecedentes">
                                     <span>Mínimo: 500 / Máximo: 800 palabras</span>
-                                    <span>{{ palabrasAntecedentes }} palabras</span>
+                                    <span>{{ palabrasMetodo }} palabras</span>
                                 </div>
                             </div>
 
@@ -3276,6 +3312,465 @@
                             </div>
                         </div>
                     </div>
+                    <div v-else-if="activeTab === 'bienes_servi_proyec'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                           
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Detalles de bienes y servicios proporcionados por proyecto</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Describa aquí los bienes y servicios proporcionados por el proyecto.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Bienes <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="bienesTextarea"
+                                    v-model="editForm.proyect_bienes" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detallar los bienes tangibles o intangibles que el proyecto generará durante la ejecución del proyecto (resultado/producto)."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Servicios <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="serviTextarea"
+                                    v-model="editForm.proyect_servicios" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detallar el servició que el proyecto generará durante la ejecución del proyecto (resultado/producto)."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Bienes y Servicios <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="servibienTextarea"
+                                    v-model="editForm.proyect_bienes_servicios" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Un bien y un servicio en conjunto se pueden considerar como una solución integral que ofrece tanto productos tangibles como intangibles para satisfacer una necesidad específica."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                    <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                        Detalle de adquisiciones del proyecto <span class="text-red-500">*</span>
+                                    </label>
+                                <div class="overflow-x-auto">
+                                    
+                                    <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
+                                        <thead class="text-xs text-gray-700 uppercase bg-gray-50/80 dark:bg-gray-800/80 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                                            <tr>
+                                                <th class="px-4 py-4 min-w-[210px] font-semibold">Tipo</th>
+                                                <th class="px-4 py-4 min-w-[220px] font-semibold">Detalle General</th>
+                                                <!-- Ampliado a 140px -->
+                                                <th class="px-4 py-4 min-w-[140px] font-semibold">% Nacional</th>
+                                                <th class="px-4 py-4 min-w-[220px] font-semibold">Detalle Nacional</th>
+                                                <!-- Ampliado a 140px -->
+                                                <th class="px-4 py-4 min-w-[140px] font-semibold">% Importado</th>
+                                                <th class="px-4 py-4 min-w-[220px] font-semibold">Detalle Importado</th>
+                                                <th class="px-4 py-4 text-center font-semibold">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                                            <tr v-if="editForm.adquisiciones.length === 0">
+                                                <td colspan="7" class="px-4 py-12 text-center">
+                                                    <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+                                                        <i class="fas fa-inbox text-3xl mb-3 text-gray-300 dark:text-gray-600"></i>
+                                                        <p>No hay adquisiciones registradas.</p>
+                                                        <p class="text-xs mt-1">Haz clic en "Agregar Adquisición" para comenzar.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr v-for="(item, index) in editForm.adquisiciones" :key="index" class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
+                                                
+                                                <!-- 1. TIPO -->
+                                                <td class="px-4 py-3 align-top">
+                                                    <div class="inline-flex p-1 bg-gray-100 dark:bg-gray-800/80 rounded-lg border border-gray-200 dark:border-gray-700 gap-0.5">
+                                                        <button type="button" @click="item.tipo_adqui = 'bien'" :class="item.tipo_adqui === 'bien' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm font-semibold border border-gray-200/50 dark:border-gray-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'" class="px-2.5 py-1.5 text-xs rounded-md transition-all whitespace-nowrap">Bien</button>
+                                                        <button type="button" @click="item.tipo_adqui = 'servicio'" :class="item.tipo_adqui === 'servicio' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm font-semibold border border-gray-200/50 dark:border-gray-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'" class="px-2.5 py-1.5 text-xs rounded-md transition-all whitespace-nowrap">Servicio</button>
+                                                        <button type="button" @click="item.tipo_adqui = 'bienes y servicios'" :class="item.tipo_adqui === 'bienes y servicios' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm font-semibold border border-gray-200/50 dark:border-gray-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'" class="px-2.5 py-1.5 text-xs rounded-md transition-all whitespace-nowrap">Ambos</button>
+                                                    </div>
+                                                </td>
+
+                                                <!-- 2. DETALLE GENERAL -->
+                                                <td class="px-4 py-3 align-top">
+                                                    <textarea ref="detallebTextarea" v-model="item.detalle" rows="2" @input="ajustarAlturaTextarea"
+                                                        class="w-full p-2.5 text-sm bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden transition-all shadow-inner text-gray-700 dark:text-gray-200 placeholder-gray-400" 
+                                                        placeholder="Ej. Equipos de cómputo..."></textarea>
+                                                </td>
+
+                                                <!-- 3. PORCENTAJE NACIONAL (Con disparador de actualización) -->
+                                                <td class="px-4 py-3 align-top">
+                                                    <div class="relative w-full">
+                                                        <input type="number" v-model="item.porcent_nacio" @input="actualizarPorcentajes(item)" min="0" max="100" step="0.01" 
+                                                            class="w-full pl-3 pr-7 py-2.5 bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner" 
+                                                            placeholder="0">
+                                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                            <span class="text-gray-400 dark:text-gray-500 font-bold">%</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <!-- 4. DETALLE NACIONAL -->
+                                                <td class="px-4 py-3 align-top">
+                                                    <textarea ref="detalleporcTextarea" v-model="item.detalle_iinsu_nac" rows="2" @input="ajustarAlturaTextarea"
+                                                        class="w-full p-2.5 text-sm bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden transition-all shadow-inner text-gray-700 dark:text-gray-200 placeholder-gray-400" 
+                                                        placeholder="Especificar detalle..."></textarea>
+                                                </td>
+
+                                                <!-- 5. PORCENTAJE IMPORTADO (Bloqueado/Solo lectura) -->
+                                                <td class="px-4 py-3 align-top">
+                                                    <div class="relative w-full">
+                                                        <input type="number" v-model="item.porcent_importado" readonly
+                                                            class="w-full pl-3 pr-7 py-2.5 bg-gray-100 dark:bg-gray-700/60 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 dark:text-gray-400 cursor-not-allowed transition-all shadow-inner" 
+                                                            placeholder="0">
+                                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                            <span class="text-gray-400 dark:text-gray-500 font-bold">%</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <!-- 6. DETALLE IMPORTADO (Bloqueo y estilos dinámicos) -->
+                                                <td class="px-4 py-3 align-top">
+                                                    <textarea ref="detalleimportTextarea" v-model="item.detalle_insu_import" rows="2" @input="ajustarAlturaTextarea"
+                                                        :disabled="item.porcent_importado <= 0"
+                                                        :class="item.porcent_importado <= 0 ? 'bg-gray-100 dark:bg-gray-700/60 cursor-not-allowed text-gray-500 opacity-80' : 'bg-white dark:bg-gray-800/50 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-inner text-gray-700 dark:text-gray-200'"
+                                                        class="w-full p-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg resize-none overflow-hidden transition-all placeholder-gray-400" 
+                                                        placeholder="Especificar detalle..."></textarea>
+                                                </td>
+
+                                                <!-- 7. ACCIÓN -->
+                                                <td class="px-4 py-3 text-center align-middle">
+                                                    <button @click="eliminarAdquisicion(index)" type="button" 
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-600 dark:hover:text-white transition-all focus:ring-2 focus:ring-red-500/40" 
+                                                        title="Eliminar ítem">
+                                                        <i class="fas fa-trash-alt text-sm"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- FOOTER DE LA TABLA CON BOTÓN -->
+                                <div class="p-4 bg-gray-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                                    <button @click="agregarAdquisicion" type="button" 
+                                        class="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/30 shadow-sm hover:shadow transition-all flex items-center gap-2">
+                                        <i class="fas fa-plus"></i> 
+                                        Agregar Adquisición
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                <span class="p-1 rounded-md bg-blue-50 text-blue-600 mt-0.5 dark:bg-blue-950/40 dark:text-blue-400">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A11.952 11.952 0 0 1 12 16.5c-2.998 0-5.74-1.1-7.843-2.918m0 0A8.959 8.959 0 0 1 3 12c0-.778.099-1.533.284-2.253" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Categorización del Proyecto</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        La categorización del proyecto es un indicador de la importancia que tiene para el proyecto en relación con la actividad económica y social del país. Este indicador se utiliza para clasificar el impacto del proyecto en la economía y la sociedad.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm bg-white dark:bg-gray-950 space-y-4">
+                                <div class="space-y-2">
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        Seleccione la categorización del proyecto: <span class="text-red-500">*</span>
+                                    </label>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                                        
+                                        <!-- Opción 1: Indispensable -->
+                                        <div class="flex items-center p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
+                                            :class="editForm.proyect_categorizacion === 'Indispensable' ? 'border-green-500 bg-green-50/10 dark:border-green-900/30 ring-1 ring-green-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                            @click="editForm.proyect_categorizacion = 'Indispensable'">
+                                            <div class="flex items-center h-5" @click.stop>
+                                                <input type="radio" id="cat-radio-indispensable" value="Indispensable" v-model="editForm.proyect_categorizacion"
+                                                    class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+                                            <label for="cat-radio-indispensable" class="ml-3 text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer w-full"
+                                                @click.stop="editForm.proyect_categorizacion = 'Indispensable'">
+                                                <span :class="editForm.proyect_categorizacion === 'Indispensable' ? 'text-green-700 dark:text-green-400' : ''">Indispensable</span>
+                                            </label>
+                                        </div>
+
+                                        <!-- Opción 2: Necesario -->
+                                        <div class="flex items-center p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
+                                            :class="editForm.proyect_categorizacion === 'Necesario' ? 'border-green-500 bg-green-50/10 dark:border-green-900/30 ring-1 ring-green-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                            @click="editForm.proyect_categorizacion = 'Necesario'">
+                                            <div class="flex items-center h-5" @click.stop>
+                                                <input type="radio" id="cat-radio-necesario" value="Necesario" v-model="editForm.proyect_categorizacion"
+                                                    class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+                                            <label for="cat-radio-necesario" class="ml-3 text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer w-full"
+                                                @click.stop="editForm.proyect_categorizacion = 'Necesario'">
+                                                <span :class="editForm.proyect_categorizacion === 'Necesario' ? 'text-green-700 dark:text-green-400' : ''">Necesario</span>
+                                            </label>
+                                        </div>
+
+                                        <!-- Opción 3: Deseable -->
+                                        <div class="flex items-center p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
+                                            :class="editForm.proyect_categorizacion === 'Deseable' ? 'border-green-500 bg-green-50/10 dark:border-green-900/30 ring-1 ring-green-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                            @click="editForm.proyect_categorizacion = 'Deseable'">
+                                            <div class="flex items-center h-5" @click.stop>
+                                                <input type="radio" id="cat-radio-deseable" value="Deseable" v-model="editForm.proyect_categorizacion"
+                                                    class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+                                            <label for="cat-radio-deseable" class="ml-3 text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer w-full"
+                                                @click.stop="editForm.proyect_categorizacion = 'Deseable'">
+                                                <span :class="editForm.proyect_categorizacion === 'Deseable' ? 'text-green-700 dark:text-green-400' : ''">Deseable</span>
+                                            </label>
+                                        </div>
+
+                                        <!-- Opción 4: Admisible -->
+                                        <div class="flex items-center p-3 border rounded-xl bg-gray-50/50 dark:bg-gray-900/30 transition-all cursor-pointer"
+                                            :class="editForm.proyect_categorizacion === 'Admisible' ? 'border-green-500 bg-green-50/10 dark:border-green-900/30 ring-1 ring-green-500/30' : 'border-gray-200 dark:border-gray-800'"
+                                            @click="editForm.proyect_categorizacion = 'Admisible'">
+                                            <div class="flex items-center h-5" @click.stop>
+                                                <input type="radio" id="cat-radio-admisible" value="Admisible" v-model="editForm.proyect_categorizacion"
+                                                    class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900">
+                                            </div>
+                                            <label for="cat-radio-admisible" class="ml-3 text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer w-full"
+                                                @click.stop="editForm.proyect_categorizacion = 'Admisible'">
+                                                <span :class="editForm.proyect_categorizacion === 'Admisible' ? 'text-green-700 dark:text-green-400' : ''">Admisible</span>
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div v-else-if="activeTab === 'metodologia'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                           
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Metodología para la Vinculación</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Diseño del Estudio: Detallar diseño experimental, tipo de análisis estadístico, otros
+                                </p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Metodología <span class="text-red-500">*</span>
+                                </label>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 text-justify">
+                                    Exponer de forma clara y concisa la metodología que se empleará para el desarrollo del proyecto, considerando los procesos que se emplearán para la recolección de información, las variables que serán consideradas y los análisis que se utilizarán para la obtención de los resultados.
+                                </p>
+                                <textarea 
+                                    ref="metodologiaTextarea"
+                                    v-model="editForm.proyect_metodologia" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Exponer de forma clara y concisa la metodología que se empleará para el desarrollo del proyecto, considerando los procesos que se emplearán para la recolección de información, las variables que serán consideradas y los análisis que se utilizarán para la obtención de los resultados. TIPOS DE INVESTIGACIÓN URL: https://goo.gl/F65YtN"
+                                    rows="4"
+                                ></textarea>
+                                <!-- Contador de palabras -->
+                                <div class="flex justify-between items-center mt-2 text-sm font-semibold transition-colors" :class="colorContadorMetodo">
+                                    <span>Mínimo: 600 / Máximo: 800 palabras</span>
+                                    <span>{{ palabrasMetodo }} palabras</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="activeTab === 'financia'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Financiamiento del Proyecto</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    1. Haga clic en "Agregar Financiamiento" para seleccionar un Rubro.<br>
+                                    2. Ingrese la cantidad, el valor, y distribuya los aportes (UTLVTE y Otros) según los años de duración del proyecto.<br>
+                                    3. Los totales y porcentajes se calcularán automáticamente.
+                                </p>
+                            </div>
+                            
+                            <!-- Botón Generar PDF Anexo 3 (Solo se muestra si hay al menos 1 rubro) -->
+                            <div v-if="editForm.financiamientos && editForm.financiamientos.length > 0" class="shrink-0">
+                               <button @click="abrirModalAreaTematica" :disabled="isGeneratingPDFFinancia" type="button" class="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-500/30 transition-all shadow-sm flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <i v-if="isGeneratingPDFFinancia" class="fas fa-spinner fa-spin"></i>
+                                    <i v-else class="fas fa-file-pdf"></i>
+                                    {{ isGeneratingPDFFinancia ? 'Procesando...' : 'Generar PDF' }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Si NO hay financiamientos -->
+                        <div v-if="editForm.financiamientos.length === 0" class="flex flex-col items-center justify-center p-12 bg-white dark:bg-gray-900 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl">
+                            <i class="fas fa-coins text-5xl mb-4 text-gray-300 dark:text-gray-600"></i>
+                            <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-300">No hay rubros de financiamiento</h4>
+                            <p class="text-sm text-gray-500 mb-6 mt-1 text-center max-w-md">Comience a detallar el presupuesto agregando el primer rubro de financiamiento.</p>
+                            <button @click="abrirModalFinancia" type="button" class="px-6 py-2.5 bg-brand-600 text-white font-medium rounded-lg hover:bg-brand-700 focus:ring-4 focus:ring-brand-500/30 transition-all shadow-sm">
+                                <i class="fas fa-plus mr-2"></i> Agregar Financiamiento
+                            </button>
+                        </div>
+
+                        <!-- Si SÍ hay financiamientos (Tabla Principal) -->
+                        <div v-else class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                            <div class="p-4 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                <h4 class="font-semibold text-gray-700 dark:text-gray-300">Detalle de Rubros</h4>
+                                <button @click="abrirModalFinancia" type="button" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/30 transition-all shadow-sm">
+                                    <i class="fas fa-plus mr-1"></i> Añadir Rubro
+                                </button>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-xs text-left text-gray-600 dark:text-gray-300 border-collapse">
+                                    <thead class="text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                                        <tr>
+                                            <th rowspan="2" class="px-3 py-2 border border-gray-200 dark:border-gray-700 min-w-[200px]">RUBROS</th>
+                                            <th rowspan="2" class="px-3 py-2 text-center border border-gray-200 dark:border-gray-700">CANT.</th>
+                                            <th rowspan="2" class="px-3 py-2 text-center border border-gray-200 dark:border-gray-700">VALOR</th>
+                                            
+                                            <!-- Cabecera dinámica Aportes UTLVTE -->
+                                            <th :colspan="aniosProyecto.length" class="px-3 py-2 text-center border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300">
+                                                APORTES UTLVTE (EFECTIVO)
+                                            </th>
+                                            
+                                            <!-- Cabecera dinámica Otros Aportes -->
+                                            <th :colspan="aniosProyecto.length" class="px-3 py-2 text-center border border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300">
+                                                OTROS APORTES (EFECTIVO)
+                                            </th>
+                                            
+                                            <th rowspan="2" class="px-3 py-2 text-center font-bold border border-gray-200 dark:border-gray-700">TOTAL<br>EFECTIVO</th>
+                                            <th rowspan="2" class="px-2 py-2 text-center border border-gray-200 dark:border-gray-700"><i class="fas fa-cog"></i></th>
+                                        </tr>
+                                        <tr>
+                                            <!-- Subcabeceras de Años UTLVTE -->
+                                            <th v-for="(anio, index) in aniosProyecto" :key="'u-'+index" class="px-2 py-1 text-center border border-gray-200 dark:border-gray-700 bg-blue-50/50 dark:bg-blue-900/10">Año {{index + 1}}</th>
+                                            <!-- Subcabeceras de Años Otros -->
+                                            <th v-for="(anio, index) in aniosProyecto" :key="'o-'+index" class="px-2 py-1 text-center border border-gray-200 dark:border-gray-700 bg-green-50/50 dark:bg-green-900/10">Año {{index + 1}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(item, index) in editForm.financiamientos" :key="index" class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <td class="px-3 py-2 border border-gray-200 dark:border-gray-700 font-medium">
+                                                {{ index + 1 }}. {{ getNombreRubro(item.id_rubro) }}
+                                            </td>
+                                            <td class="px-3 py-2 text-center border border-gray-200 dark:border-gray-700">{{ item.cantidad }}</td>
+                                            <td class="px-3 py-2 text-right border border-gray-200 dark:border-gray-700">${{ formatoDinero(item.valor) }}</td>
+                                            
+                                            <!-- Valores UTLVTE -->
+                                            <td v-for="(_, i) in aniosProyecto" :key="'uv-'+i" class="px-3 py-2 text-right border border-gray-200 dark:border-gray-700 text-blue-600 dark:text-blue-400">
+                                                ${{ formatoDinero(item[`utlvte_anio${i+1}`]) }}
+                                            </td>
+                                            
+                                            <!-- Valores Otros -->
+                                            <td v-for="(_, i) in aniosProyecto" :key="'ov-'+i" class="px-3 py-2 text-right border border-gray-200 dark:border-gray-700 text-green-600 dark:text-green-400">
+                                                ${{ formatoDinero(item[`otros_anio${i+1}`]) }}
+                                            </td>
+                                            
+                                            <td class="px-3 py-2 text-right font-bold border border-gray-200 dark:border-gray-700">${{ formatoDinero(item.total_efectivo) }}</td>
+                                            <td class="px-2 py-2 text-center border border-gray-200 dark:border-gray-700">
+                                                <button @click="eliminarFinanciamiento(index)" class="text-red-500 hover:text-red-700 transition-colors" title="Eliminar">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <!-- Pie de tabla con Totales y Porcentajes -->
+                                    <tfoot class="bg-gray-50 dark:bg-gray-800 font-bold">
+                                        <tr>
+                                            <td colspan="3" class="px-3 py-2 text-right border border-gray-200 dark:border-gray-700 uppercase">Total</td>
+                                            
+                                            <td v-for="(_, i) in aniosProyecto" :key="'ut-'+i" class="px-3 py-2 text-right border border-gray-200 dark:border-gray-700 text-blue-700 dark:text-blue-400">
+                                                ${{ formatoDinero(totalesFinanciamiento[`utlvte_anio${i+1}`]) }}
+                                            </td>
+                                            
+                                            <td v-for="(_, i) in aniosProyecto" :key="'ot-'+i" class="px-3 py-2 text-right border border-gray-200 dark:border-gray-700 text-green-700 dark:text-green-400">
+                                                ${{ formatoDinero(totalesFinanciamiento[`otros_anio${i+1}`]) }}
+                                            </td>
+                                            
+                                            <td class="px-3 py-2 text-right border border-gray-200 dark:border-gray-700 text-brand-600">${{ formatoDinero(totalesFinanciamiento.granTotal) }}</td>
+                                            <td class="border border-gray-200 dark:border-gray-700"></td>
+                                        </tr>
+                                        <tr class="bg-gray-100 dark:bg-gray-700">
+                                            <td colspan="3" class="px-3 py-2 text-right border border-gray-200 dark:border-gray-700 uppercase">Porcentajes</td>
+                                            
+                                            <td v-for="(_, i) in aniosProyecto" :key="'up-'+i" class="px-3 py-2 text-center border border-gray-200 dark:border-gray-700">
+                                                {{ calcularPorcentaje(totalesFinanciamiento[`utlvte_anio${i+1}`]) }}%
+                                            </td>
+                                            
+                                            <td v-for="(_, i) in aniosProyecto" :key="'op-'+i" class="px-3 py-2 text-center border border-gray-200 dark:border-gray-700">
+                                                {{ calcularPorcentaje(totalesFinanciamiento[`otros_anio${i+1}`]) }}%
+                                            </td>
+                                            
+                                            <td class="px-3 py-2 text-center border border-gray-200 dark:border-gray-700">100%</td>
+                                            <td class="border border-gray-200 dark:border-gray-700"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="activeTab === 'viabiliadad_sos'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                           
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Viabilidad y Plan de Sostenibilidad</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Detalle de la viabilidad y plan de sostenibilidad del proyecto.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-6">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Viabilidad Técnica <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="viabTextarea"
+                                    v-model="editForm.proyect_viabilidad_tec" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detalle la viabilidad técnica del proyecto."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Equipamiento Tecnológico Disponible <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="quipteTextarea"
+                                    v-model="editForm.proyect_equip_tec" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detalle el equipamiento tecnológico disponible del proyecto."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    ¿Qué perdería la provincia si el proyecto no se ejecuta en este periodo? <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="perderproTextarea"
+                                    v-model="editForm.proyect_no_ejecuta" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detalle que perdería la provincia si el proyecto no se ejecuta en este periodo."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div v-if="showModalActividad" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
                     <div class="bg-white dark:bg-gray-850 rounded-xl shadow-xl max-w-3xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
@@ -3472,6 +3967,169 @@
                             <button @click="showModalActividad = false" class="px-4 py-2 border rounded-lg text-gray-600">Cancelar</button>
                             <button @click="guardarActividad" class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold">Guardar Actividad</button>
                         </div>
+                    </div>
+                </div>
+                <!-- Modal para Área Temática -->
+                <div v-if="showModalAreaTematica" class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto bg-black/50 backdrop-blur-sm transition-opacity">
+                    <div class="relative w-full max-w-md p-4 mx-auto bg-white rounded-xl shadow-lg dark:bg-gray-800">
+                        <!-- Header -->
+                        <div class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-700">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+                                Área Temática
+                            </h3>
+                            <button @click="cerrarModalAreaTematica" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                                <i class="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+                        <!-- Body -->
+                        <div class="p-5 space-y-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-300">
+                                Ingrese el Área Temática del proyecto para incluirla en el Anexo 3.
+                            </p>
+                            <div>
+                                <input v-model="areaTematicaInput" @keyup.enter="generarPDFFinanciamiento" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Ej: Educación y Ambiente" autofocus>
+                            </div>
+                        </div>
+                        <!-- Footer -->
+                        <div class="flex items-center justify-end p-4 border-t border-gray-200 rounded-b dark:border-gray-700 gap-3">
+                            <button @click="cerrarModalAreaTematica" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white">
+                                Cancelar
+                            </button>
+                            <button @click="generarPDFFinanciamiento" type="button" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed" :disabled="!areaTematicaInput.trim() || isGeneratingPDFFinancia">
+                                <i v-if="isGeneratingPDFFinancia" class="fas fa-spinner fa-spin"></i>
+                                <i v-else class="fas fa-download"></i>
+                                Generar y Descargar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="showModalFinancia" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 overflow-y-auto font-sans transition-opacity">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full p-0 overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up">
+                        
+                        <!-- Encabezado del Modal -->
+                        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800 flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                                <i class="fas fa-file-invoice-dollar text-brand-600"></i>
+                                Añadir Rubro de Financiamiento
+                            </h3>
+                            <button @click="cerrarModalFinancia" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors dark:hover:bg-gray-700">
+                                <i class="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+
+                        <!-- Cuerpo del Modal -->
+                        <div class="p-6 overflow-y-auto space-y-6">
+                            <!-- Formulario Superior: Rubro, Cantidad, Valor -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                                
+                                <!-- Select de Rubro -->
+                                <div class="md:col-span-6">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Rubro <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <!-- Select estilizado (se oculta la flecha nativa con appearance-none y se dibuja una con Tailwind) -->
+                                        <select v-model="formFinancia.id_rubro" class="block w-full pl-3 pr-10 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm transition-all cursor-pointer">
+                                            <option value="" disabled>Seleccione un rubro...</option>
+                                            <option v-for="rubro in rubrosDisponiblesFiltrados" :key="rubro.id_rubro" :value="rubro.id_rubro" :disabled="rubro.disabled" :class="{'text-gray-400': rubro.disabled}">
+                                                {{ rubro.nombre_rubro }} {{ rubro.disabled ? '(Ya agregado)' : '' }}
+                                            </option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                            <i class="fas fa-chevron-down text-xs"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Input Cantidad -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cantidad <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <i class="fas fa-hashtag text-gray-400 text-sm"></i>
+                                        </div>
+                                        <!-- appearance:textfield y variantes webkit ocultan las flechas numéricas nativas -->
+                                        <input type="number" v-model.number="formFinancia.cantidad" min="1" step="1" @input="limpiarNumeros" class="block w-full pl-9 pr-3 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" placeholder="0">
+                                    </div>
+                                </div>
+
+                                <!-- Input Valor Unitario -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Valor Unitario <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <i class="fas fa-dollar-sign text-gray-400 text-sm"></i>
+                                        </div>
+                                        <input type="number" v-model.number="formFinancia.valor" min="0" step="0.01" @input="limpiarNumeros" class="block w-full pl-8 pr-3 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" placeholder="0.00">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta de Distribución por Años -->
+                            <div class="bg-gray-50/80 dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-inner">
+                                <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50">
+                                    <h4 class="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fas fa-calendar-alt text-gray-400"></i> Distribución por Años (Efectivo)
+                                    </h4>
+                                    <p class="text-xs text-gray-500 mt-1">Distribuya los montos. El sistema calculará el total automáticamente.</p>
+                                </div>
+                                
+                                <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <!-- Columna UTLVTE -->
+                                    <div class="space-y-4">
+                                        <div class="inline-block px-3 py-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs font-bold rounded-lg flex items-center w-fit gap-2">
+                                            <i class="fas fa-university"></i> APORTES UTLVTE
+                                        </div>
+                                        <div class="space-y-3">
+                                            <div v-for="(anio, index) in aniosProyecto" :key="'form-u-'+index" class="flex items-center gap-4 group">
+                                                <label class="w-16 text-sm text-gray-600 dark:text-gray-400 font-medium group-hover:text-blue-600 transition-colors">Año {{ index + 1 }}</label>
+                                                <div class="relative flex-1">
+                                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <span class="text-gray-400 sm:text-sm">$</span>
+                                                    </div>
+                                                    <input type="number" v-model.number="formFinancia[`utlvte_anio${index+1}`]" @input="calcularTotalModal" min="0" step="0.01" class="block w-full pl-7 pr-3 py-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:border-gray-700 dark:text-white transition-all shadow-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none hover:border-blue-300" placeholder="0.00">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Columna OTROS APORTES -->
+                                    <div class="space-y-4">
+                                        <div class="inline-block px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-xs font-bold rounded-lg flex items-center w-fit gap-2">
+                                            <i class="fas fa-hand-holding-usd"></i> OTROS APORTES
+                                        </div>
+                                        <div class="space-y-3">
+                                            <div v-for="(anio, index) in aniosProyecto" :key="'form-o-'+index" class="flex items-center gap-4 group">
+                                                <label class="w-16 text-sm text-gray-600 dark:text-gray-400 font-medium group-hover:text-emerald-600 transition-colors">Año {{ index + 1 }}</label>
+                                                <div class="relative flex-1">
+                                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <span class="text-gray-400 sm:text-sm">$</span>
+                                                    </div>
+                                                    <input type="number" v-model.number="formFinancia[`otros_anio${index+1}`]" @input="calcularTotalModal" min="0" step="0.01" class="block w-full pl-7 pr-3 py-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-900 dark:border-gray-700 dark:text-white transition-all shadow-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none hover:border-emerald-300" placeholder="0.00">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tarjeta Total Footer -->
+                                <div class="px-5 py-4 bg-gray-100 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 flex justify-end items-center gap-4">
+                                    <span class="text-sm text-gray-600 dark:text-gray-300 font-medium uppercase">Total Efectivo de este Rubro:</span>
+                                    <div class="bg-white dark:bg-gray-800 px-4 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+                                        <span class="text-xl font-black text-brand-600 dark:text-brand-400">${{ formatoDinero(formFinancia.total_efectivo) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción Footer -->
+                        <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800 flex justify-end gap-3">
+                            <button @click="cerrarModalFinancia" type="button" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 shadow-sm text-sm font-semibold transition-all dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600">
+                                Cancelar
+                            </button>
+                            <button @click="guardarFinanciamientoEnTabla" type="button" :disabled="!formFinancia.id_rubro" class="px-5 py-2.5 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 shadow-sm text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                <i class="fas fa-save"></i> Guardar Rubro
+                            </button>
+                        </div>
+
                     </div>
                 </div>
 
@@ -3681,6 +4339,16 @@ export default {
                 proyect_fact_exito: '',
                 proyect_rest_supu: '',
                 actividades: [],
+                proyect_bienes: '',
+                proyect_servicios: '',
+                proyect_bienes_servicios: '',
+                adquisiciones: [],
+                proyect_categorizacion: '',
+                proyect_metodologia: '',
+                financiamientos: [],
+                proyect_viabilidad_tec: '',
+                proyect_equip_tec: '',
+                proyect_no_ejecuta: '',
             },
             anioSeleccionadoTab: 'Primer Año',
             showModalActividad: false,
@@ -3713,8 +4381,13 @@ export default {
                 invi_actindicadores: [],
                 invi_actsupuestos: []
             },
-            isGeneratingPDF: false
-
+            isGeneratingPDF: false,
+            showModalFinancia: false,
+            listaRubrosDisponibles: [],
+            formFinancia: this.resetFormFinancia(),
+            isGeneratingPDFFinancia: false,
+            showModalAreaTematica: false,
+            areaTematicaInput: '',
         };
     },
     watch: {
@@ -3792,6 +4465,22 @@ export default {
                     this.recalcularAlturasCargadas();
                 });
             }
+            if (newTab === 'bienes_servi_proyec') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
+            if (newTab === 'metodologia') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
+            if (newTab === 'viabiliadad_sos') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
+            
         }
     },
     created() {
@@ -3888,6 +4577,9 @@ export default {
         palabrasAntecedentes() {
             return this.contarPalabras(this.editForm.proyect_antecedentes);
         },
+        palabrasMetodo() {
+            return this.contarPalabras(this.editForm.proyect_metodologia);
+        },
         palabrasDescrip() {
             return this.contarPalabras(this.editForm.proyect_desc_situ_act);
         },
@@ -3901,6 +4593,12 @@ export default {
             const total = this.palabrasAntecedentes;
             if (total === 0) return 'text-gray-500 dark:text-gray-400';
             if (total < 500 || total > 800) return 'text-red-500';
+            return 'text-green-600 dark:text-green-400';
+        },
+        colorContadorMetodo() {
+            const total = this.palabrasMetodo;
+            if (total === 0) return 'text-gray-500 dark:text-gray-400';
+            if (total < 600 || total > 800) return 'text-red-500';
             return 'text-green-600 dark:text-green-400';
         },
         colorContadorDescripcion() {
@@ -3995,6 +4693,35 @@ export default {
         // Suma total de horas del año activo
         totalHorasAnioSeleccionado() {
             return this.actividadesDelAnio.reduce((sum, act) => sum + (parseFloat(act.horas) || 0), 0);
+        },
+        totalesFinanciamiento() {
+            let totales = {
+                utlvte_anio1: 0, utlvte_anio2: 0, utlvte_anio3: 0, utlvte_anio4: 0, utlvte_anio5: 0,
+                otros_anio1: 0, otros_anio2: 0, otros_anio3: 0, otros_anio4: 0, otros_anio5: 0,
+                granTotal: 0
+            };
+
+            this.editForm.financiamientos.forEach(item => {
+                for (let i = 1; i <= 5; i++) {
+                    totales[`utlvte_anio${i}`] += parseFloat(item[`utlvte_anio${i}`] || 0);
+                    totales[`otros_anio${i}`] += parseFloat(item[`otros_anio${i}`] || 0);
+                }
+                totales.granTotal += parseFloat(item.total_efectivo || 0);
+            });
+
+            return totales;
+        },
+        rubrosDisponiblesFiltrados() {
+            // 1. Extraemos los IDs de los rubros que ya están en el array del proyecto
+            const idsSeleccionados = this.editForm.financiamientos.map(fin => fin.id_rubro);
+            
+            // 2. Retornamos la lista mapeando una propiedad "disabled" si el ID ya fue seleccionado
+            return this.listaRubrosDisponibles.map(rubro => {
+                return {
+                    ...rubro,
+                    disabled: idsSeleccionados.includes(rubro.id_rubro)
+                };
+            });
         }
     },
     methods: {
@@ -4554,6 +5281,15 @@ export default {
                 const idenTextarea = this.$refs.identPoblaobjTextarea;
                 const factTextarea = this.$refs.facExitTextarea;
                 const restsuTextarea = this.$refs.restSupuTextarea;
+                const bienTextarea = this.$refs.bienesTextarea;
+                const servTextarea = this.$refs.serviTextarea;
+                const servybiTextarea = this.$refs.servibienTextarea;
+                const textareasBien = this.$refs.detallebTextarea;
+                const servbTextarea = this.$refs.servibienTextarea;
+                const metoTextarea = this.$refs.metodologiaTextarea;
+                const viabilidadTextarea = this.$refs.viabTextarea;
+                const equiptTextarea = this.$refs.quipteTextarea;
+                const perderTextarea = this.$refs.perderproTextarea;
 
                 if (antTextarea) {
                     antTextarea.style.height = 'auto';
@@ -4587,6 +5323,66 @@ export default {
                     restsuTextarea.style.height = 'auto';
                     restsuTextarea.style.height = restsuTextarea.scrollHeight + 'px';
                 }
+                if (servbTextarea) {
+                    servbTextarea.style.height = 'auto';
+                    servbTextarea.style.height = servbTextarea.scrollHeight + 'px';
+                }
+                if (bienTextarea) {
+                    bienTextarea.style.height = 'auto';
+                    bienTextarea.style.height = bienTextarea.scrollHeight + 'px';
+                }
+                if (servTextarea) {
+                    servTextarea.style.height = 'auto';
+                    servTextarea.style.height = servTextarea.scrollHeight + 'px';
+                }
+                if (servybiTextarea) {
+                    servybiTextarea.style.height = 'auto';
+                    servybiTextarea.style.height = servybiTextarea.scrollHeight + 'px';
+                }
+                if (metoTextarea) {
+                    metoTextarea.style.height = 'auto';
+                    metoTextarea.style.height = metoTextarea.scrollHeight + 'px';
+                }
+                if (viabilidadTextarea) {
+                    viabilidadTextarea.style.height = 'auto';
+                    viabilidadTextarea.style.height = viabilidadTextarea.scrollHeight + 'px';
+                }
+                if (equiptTextarea) {
+                    equiptTextarea.style.height = 'auto';
+                    equiptTextarea.style.height = equiptTextarea.scrollHeight + 'px';
+                }
+                if (perderTextarea) {
+                    perderTextarea.style.height = 'auto';
+                    perderTextarea.style.height = perderTextarea.scrollHeight + 'px';
+                }
+                if (textareasBien && textareasBien.length > 0) {
+                    textareasBien.forEach(textarea => {
+                        if (textarea) {
+                            textarea.style.height = 'auto';
+                            textarea.style.height = textarea.scrollHeight + 'px';
+                        }
+                    });
+                }
+                const textareasNac = this.$refs.detalleporcTextarea;
+                if (textareasNac && textareasNac.length > 0) {
+                    textareasNac.forEach(textarea => {
+                        if (textarea) {
+                            textarea.style.height = 'auto';
+                            textarea.style.height = textarea.scrollHeight + 'px';
+                        }
+                    });
+                }
+
+                const textareasImport = this.$refs.detalleimportTextarea;
+                if (textareasImport && textareasImport.length > 0) {
+                    textareasImport.forEach(textarea => {
+                        if (textarea) {
+                            textarea.style.height = 'auto';
+                            textarea.style.height = textarea.scrollHeight + 'px';
+                        }
+                    });
+                }
+                
             }, 50); // 50ms bastan para que el DOM se dibuje tras la transición v-else-if
         },
         calcularTotalBeneficiarios() {
@@ -4600,6 +5396,29 @@ export default {
             const el = event.target;
             el.style.height = 'auto'; // Resetea la altura para recalcular correctamente
             el.style.height = el.scrollHeight + 'px';
+        },
+        actualizarPorcentajes(item){
+            if (item.porcent_nacio > 100) item.porcent_nacio = 100;
+            if (item.porcent_nacio < 0) item.porcent_nacio = 0;
+
+            // 2. Calcular automáticamente el importado (100 - nacional)
+            if (item.porcent_nacio !== null && item.porcent_nacio !== '') {
+                // Redondeamos a 2 decimales para evitar bugs nativos de JS con los flotantes
+                item.porcent_importado = parseFloat((100 - item.porcent_nacio).toFixed(2));
+            } else {
+                item.porcent_importado = 0; // Por defecto
+            }
+
+            // 3. Manejar el bloqueo de 'Detalle Importado'
+            if (item.porcent_importado <= 0) {
+                // Si el importado es 0 (o menos), se pone "N/A"
+                item.detalle_insu_import = 'N/A';
+            } else {
+                // Si el importado es mayor a 0 y estaba en "N/A", lo limpiamos para que escriba
+                if (item.detalle_insu_import === 'N/A') {
+                    item.detalle_insu_import = '';
+                }
+            }
         },
         agregarAporteUtlvt() {
             this.editForm.aportes_utlvt.push({
@@ -4717,6 +5536,7 @@ export default {
                 this.provinciasCatalogo = data.provincias_catalogo || [];
                 this.cantonesCatalogo = data.cantones_catalogo || [];
                 this.parroquiasCatalogo = data.parroquias_catalogo || [];
+                this.listaRubrosDisponibles = data.rubros_catalogo || [];
 
                 let mapeoObjetivos = data.proyecto.invi_obj_proyectos.map(obj => ({
                     id_obj_proy: obj.id_obj_proy,
@@ -4750,6 +5570,42 @@ export default {
                         });
                     }
                 });
+                let adquisicionesMapeadas = [];
+                if (data.proyecto.invi_detalle_adqui && data.proyecto.invi_detalle_adqui.length > 0) {
+                    adquisicionesMapeadas = data.proyecto.invi_detalle_adqui.map(detalle => {
+                        return {
+                            id_adquisicion: detalle.invi_adquisicion.id_adquisicion,
+                            tipo_adqui: detalle.invi_adquisicion.tipo_adqui || '',
+                            detalle: detalle.invi_adquisicion.detalle || '',
+                            porcent_nacio: detalle.invi_adquisicion.porcent_nacio || 0,
+                            detalle_iinsu_nac: detalle.invi_adquisicion.detalle_iinsu_nac || '',
+                            porcent_importado: detalle.invi_adquisicion.porcent_importado || 0,
+                            detalle_insu_import: detalle.invi_adquisicion.detalle_insu_import || ''
+                        };
+                    });
+                }
+                let financiamientosMapeados = [];
+                if (data.proyecto.invi_detalle_financia && data.proyecto.invi_detalle_financia.length > 0) {
+                    financiamientosMapeados = data.proyecto.invi_detalle_financia.map(det => {
+                        return {
+                            id_det_financia: det.id_det_financia,
+                            id_rubro: det.id_rubro,
+                            cantidad: det.cantidad || 0,
+                            valor: det.valor || 0,
+                            utlvte_anio1: det.utlvte_anio1 || 0,
+                            utlvte_anio2: det.utlvte_anio2 || 0,
+                            utlvte_anio3: det.utlvte_anio3 || 0,
+                            utlvte_anio4: det.utlvte_anio4 || 0,
+                            utlvte_anio5: det.utlvte_anio5 || 0,
+                            otros_anio1:  det.otros_anio1 || 0,
+                            otros_anio2:  det.otros_anio2 || 0,
+                            otros_anio3:  det.otros_anio3 || 0,
+                            otros_anio4:  det.otros_anio4 || 0,
+                            otros_anio5:  det.otros_anio5 || 0,
+                            total_efectivo: det.total_efectivo || 0
+                        };
+                    });
+                }
                 this.editForm = {
                     proyect_id: data.proyecto.proyect_id,
                     proyect_nombre: data.proyecto.proyect_nombre || '',
@@ -4805,8 +5661,17 @@ export default {
                     proyect_num_est_part: data.proyecto.proyect_num_est_part ?? calc.estudiantes_total ?? 0,
                     proyect_fact_exito: data.proyecto.proyect_fact_exito || '',
                     proyect_rest_supu: data.proyecto.proyect_rest_supu || '',
-                    actividades: actividadesExtraidas
-                    
+                    actividades: actividadesExtraidas,
+                    proyect_bienes: data.proyecto.proyect_bienes || '',
+                    proyect_servicios: data.proyecto.proyect_servicios || '',
+                    proyect_bienes_servicios: data.proyecto.proyect_bienes_servicios || '',
+                    adquisiciones: adquisicionesMapeadas,
+                    proyect_categorizacion: data.proyecto.proyect_categorizacion || '',
+                    proyect_metodologia: data.proyecto.proyect_metodologia || '',
+                    financiamientos: financiamientosMapeados,
+                    proyect_viabilidad_tec: data.proyecto.proyect_viabilidad_tec || '',
+                    proyect_equip_tec: data.proyecto.proyect_equip_tec || '',
+                    proyect_no_ejecuta: data.proyecto.proyect_no_ejecuta || '',
                 };
                 if (this.aniosProyecto.length > 0) {
                     this.anioSeleccionadoTab = this.aniosProyecto[0].id;
@@ -4820,6 +5685,71 @@ export default {
             } finally {
                 this.cargandoEdicion = false;
             }
+        },
+        resetFormFinancia() {
+            return {
+                id_rubro: '', cantidad: 1, valor: 0,
+                utlvte_anio1: 0, utlvte_anio2: 0, utlvte_anio3: 0, utlvte_anio4: 0, utlvte_anio5: 0,
+                otros_anio1: 0, otros_anio2: 0, otros_anio3: 0, otros_anio4: 0, otros_anio5: 0,
+                total_efectivo: 0
+            };
+        },
+        abrirModalFinancia() {
+            this.formFinancia = this.resetFormFinancia();
+            this.showModalFinancia = true;
+        },
+        cerrarModalFinancia() {
+            this.showModalFinancia = false;
+        },
+        calcularTotalModal() {
+            let total = 0;
+            for (let i = 1; i <= 5; i++) {
+                total += parseFloat(this.formFinancia[`utlvte_anio${i}`] || 0);
+                total += parseFloat(this.formFinancia[`otros_anio${i}`] || 0);
+            }
+            this.formFinancia.total_efectivo = total;
+        },
+        limpiarNumeros(event) {
+            // Previene que escriban la letra 'e' u otros caracteres no válidos en inputs tipo number
+            const val = parseFloat(event.target.value);
+            if(isNaN(val) || val < 0) {
+                event.target.value = 0;
+            }
+        },
+        guardarFinanciamientoEnTabla() {
+            // Agregamos el objeto del modal al arreglo del proyecto
+            this.editForm.financiamientos.push({ ...this.formFinancia });
+            this.cerrarModalFinancia();
+        },
+        eliminarFinanciamiento(index) {
+            this.editForm.financiamientos.splice(index, 1);
+        },
+        getNombreRubro(id) {
+            const rubro = this.listaRubrosDisponibles.find(r => r.id_rubro === id);
+            return rubro ? rubro.nombre_rubro : 'Rubro Desconocido';
+        },
+        formatoDinero(valor) {
+            return parseFloat(valor || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+        calcularPorcentaje(valor) {
+            const granTotal = this.totalesFinanciamiento.granTotal;
+            if (granTotal === 0) return "0.00";
+            return ((parseFloat(valor || 0) / granTotal) * 100).toFixed(2);
+        },
+        agregarAdquisicion() {
+            this.editForm.adquisiciones.push({
+                id_adquisicion: null, // Null porque es nuevo y no está en BD aún
+                tipo_adqui: '',
+                detalle: '',
+                porcent_nacio: 0,
+                detalle_iinsu_nac: '',
+                porcent_importado: 0,
+                detalle_insu_import: ''
+            });
+        },
+
+        eliminarAdquisicion(index) {
+            this.editForm.adquisiciones.splice(index, 1);
         },
         calcularTotalDocentes() {
             const h = parseInt(this.editForm.proyect_num_doce_h) || 0;
@@ -5431,6 +6361,7 @@ export default {
             this.searchAsignatura = '';
             this.asignaturasDisponibles = [];
             this.editForm = {
+                proyect_id: '',
                 proyect_nombre: '',
                 proyect_titulo: '',
                 proyect_nombre_en: '',
@@ -5466,8 +6397,31 @@ export default {
                 proyect_estado: '',
                 proyect_desc_situ_act: '',
                 proyect_diag_probl: '',
-                asignaturas: []
-
+                proyect_contribucion_soci: '',
+                asignaturas: [],
+                proyec_ident_poblaobj: '',
+                proyect_num_direct_hombres: 0,
+                proyect_num_direct_mujeres: 0,
+                proyect_total_num_direct: 0,
+                proyect_num_personas_div_fun: 0,
+                proyect_total_num_indirect: 0,
+                proyect_num_doce_part: 0,
+                proyect_num_doce_h: 0,
+                proyect_num_doce_m: 0,
+                proyect_num_est_part: 0,
+                proyect_num_est_h: 0,
+                proyect_num_est_m: 0,
+                proyect_fact_exito: '',
+                proyect_rest_supu: '',
+                actividades: [],
+                proyect_bienes: '',
+                proyect_servicios: '',
+                proyect_bienes_servicios: '',
+                adquisiciones: [],
+                proyect_metodologia: '',
+                proyect_viabilidad_tec: '',
+                proyect_equip_tec: '',
+                proyect_no_ejecuta: '',
             };
         },
 
@@ -5822,6 +6776,196 @@ export default {
             }
             
         },
+        async generarPDFFinanciamiento() {
+            if (!this.areaTematicaInput.trim()) {
+                mostraralertas2("Debe ingresar un área temática válida.", "warning");
+                return;
+            }
+
+            this.isGeneratingPDFFinancia = true;
+            
+            try {
+                // 1. Inicializar documento en horizontal (landscape)
+                const doc = new jsPDF('l', 'mm', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const maxTextWidth = pageWidth - 92 - 15; // Ancho máximo para los textos antes de saltar de línea
+
+                // 2. Obtener Nombre del Director
+                const proyect_id = this.editForm.proyect_id;
+                let directorProy = '';
+                try {
+                    const resDir = await this.ObteneProDir(proyect_id);
+                    if (resDir.data?.data && resDir.data.data.length > 0) {
+                        directorProy = resDir.data.data[0].nombre_con_titulo;
+                    }
+                } catch (e) { console.warn("No se pudo obtener director", e); }
+
+                // 3. Encabezados y Logos
+                doc.addImage('/ecuador.png', 'PNG', 15, 10, 22, 22); 
+                doc.addImage('/images.png', 'PNG', pageWidth - 37, 10, 22, 22);
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.text('ANEXO 3', pageWidth / 2, 15, { align: 'center' });
+                doc.text('PROGRAMACIÓN ANUAL DE INVERSIONES', pageWidth / 2, 20, { align: 'center' });
+                doc.setFont("helvetica", "normal");
+                doc.text('Plan de trabajo presupuestario Convocatoria Fondos Concursables UTLVTE', pageWidth / 2, 28, { align: 'center' });
+
+                // 4. Datos de Información del Proyecto
+                doc.setFontSize(9);
+                let currentY = 40;
+                
+                // --- Título del Proyecto ---
+                doc.text('Título del Proyecto de Vinculación con la sociedad:', 15, currentY);
+                doc.setFontSize(8);
+                const tituloTexto = this.editForm.proyect_titulo || 'N/A';
+                const splitTitulo = doc.splitTextToSize(tituloTexto, maxTextWidth);
+                doc.text(splitTitulo, 92, currentY);
+                let extraYTitulo = (splitTitulo.length - 1) * 4;
+                doc.line(90, currentY + extraYTitulo + 1, pageWidth - 15, currentY + extraYTitulo + 1);
+                currentY += extraYTitulo + 7;
+                doc.setFontSize(9);
+
+                // --- Nombre de la Institución ---
+                doc.text('Nombre de la Institución:', 15, currentY);
+                doc.text('UTLVTE', 92, currentY);
+                doc.line(90, currentY + 1, pageWidth - 15, currentY + 1);
+                currentY += 7;
+
+                // --- Instituciones Coejecutoras ---
+                doc.text('Nombre de Instituciones', 15, currentY);
+                doc.text('Coejecutoras', 15, currentY + 4);
+                
+                let instY = currentY;
+                if (this.empresasAgregadas2 && this.empresasAgregadas2.length > 0) {
+                    this.empresasAgregadas2.forEach((emp) => {
+                        let prefijo = this.empresasAgregadas2.length > 1 ? '• ' : '';
+                        let nombreEmpresa = prefijo + (emp.empresacorta || 'Empresa sin nombre');
+                        let splitInst = doc.splitTextToSize(nombreEmpresa, maxTextWidth);
+                        doc.text(splitInst, 92, instY);
+                        instY += splitInst.length * 4;
+                    });
+                } else {
+                    doc.text('Ninguna', 92, instY);
+                    instY += 4;
+                }
+                doc.line(90, instY - 2, pageWidth - 15, instY - 2);
+                currentY = Math.max(currentY + 8, instY + 3);
+
+                // --- Área Temática (Viene del Modal) ---
+                doc.text('Área temática:', 15, currentY);
+                // Protegemos el texto por si ingresan algo muy largo
+                const splitArea = doc.splitTextToSize(this.areaTematicaInput.trim(), maxTextWidth);
+                doc.text(splitArea, 92, currentY);
+                let extraYArea = (splitArea.length - 1) * 4;
+                doc.line(90, currentY + extraYArea + 1, pageWidth - 15, currentY + extraYArea + 1);
+                currentY += extraYArea + 10; // Espacio final antes de la tabla
+
+                // 5. Preparar Datos de la Tabla
+                let filasTabla = [];
+                let totalesCols = { utlvte: [0,0,0,0,0], otros: [0,0,0,0,0], totalEfectivo: 0 };
+                const formatMoney = (val) => val > 0 ? `$ ${Number(val).toFixed(2)}` : '';
+                const formatMoneyZero = (val) => `$ ${Number(val || 0).toFixed(2)}`;
+
+                this.editForm.financiamientos.forEach(fin => {
+                    let nombreRubro = '';
+                    const rubroEncontrado = this.listaRubrosDisponibles.find(r => r.id_rubro === fin.id_rubro);
+                    if(rubroEncontrado) nombreRubro = rubroEncontrado.nombre_rubro;
+                    else nombreRubro = `Rubro ${fin.id_rubro}`;
+
+                    let fila = [ nombreRubro, fin.cantidad || 1, formatMoneyZero(fin.valor) ];
+
+                    for (let i = 1; i <= 5; i++) {
+                        let val = Number(fin[`utlvte_anio${i}`] || 0);
+                        totalesCols.utlvte[i-1] += val;
+                        fila.push(formatMoney(val));
+                    }
+                    for (let i = 1; i <= 5; i++) {
+                        let val = Number(fin[`otros_anio${i}`] || 0);
+                        totalesCols.otros[i-1] += val;
+                        fila.push(formatMoney(val));
+                    }
+                    
+                    let totalRow = Number(fin.total_efectivo || 0);
+                    totalesCols.totalEfectivo += totalRow;
+                    fila.push(formatMoneyZero(totalRow));
+                    filasTabla.push(fila);
+                });
+
+                // Fila de Totales
+                let filaTotal = ['Total', '', ''];
+                totalesCols.utlvte.forEach(v => filaTotal.push(formatMoneyZero(v)));
+                totalesCols.otros.forEach(v => filaTotal.push(formatMoneyZero(v)));
+                filaTotal.push(formatMoneyZero(totalesCols.totalEfectivo));
+                filasTabla.push(filaTotal);
+
+                // Fila de Porcentajes
+                let filaPct = ['Porcentajes', '', ''];
+                const calcPct = (val) => totalesCols.totalEfectivo > 0 ? ((val / totalesCols.totalEfectivo) * 100).toFixed(2) + '%' : '0%';
+                totalesCols.utlvte.forEach(v => filaPct.push(calcPct(v)));
+                totalesCols.otros.forEach(v => filaPct.push(calcPct(v)));
+                filaPct.push('100%');
+                filasTabla.push(filaPct);
+
+                // 6. Generar Tabla con autoTable
+                const headerColor = [238, 236, 225];
+                autoTable(doc, {
+                    startY: currentY,
+                    margin: { left: 15, right: 15 },
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: headerColor, textColor: [0, 0, 0], lineColor: [0, 0, 0],
+                        lineWidth: 0.2, halign: 'center', valign: 'middle', fontSize: 8, fontStyle: 'bold'
+                    },
+                    bodyStyles: { lineColor: [0, 0, 0], lineWidth: 0.2, fontSize: 8, textColor: [0, 0, 0] },
+                    head: [
+                        [
+                            { content: 'RUBROS', rowSpan: 3 }, { content: 'Cantidad', rowSpan: 3 }, { content: 'Valor', rowSpan: 3 },
+                            { content: 'APORTES UTLVTE', colSpan: 5 }, { content: 'OTROS APORTES', colSpan: 5 }, { content: 'TOTAL', rowSpan: 1 }
+                        ],
+                        [
+                            { content: 'EFECTIVO', colSpan: 5 }, { content: 'EFECTIVO', colSpan: 5 }, { content: 'EFECTIVO', rowSpan: 2 }
+                        ],
+                        ['Año 1', 'Año 2', 'Año 3', 'Año 4', 'Año 5', 'Año 1', 'Año 2', 'Año 3', 'Año 4', 'Año 5']
+                    ],
+                    body: filasTabla,
+                    didParseCell: function(data) {
+                        if (data.section === 'body' && (data.row.index === filasTabla.length - 1 || data.row.index === filasTabla.length - 2)) {
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fillColor = headerColor;
+                        }
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 50, halign: 'left' }, 1: { halign: 'center' }, 2: { halign: 'right' },
+                        3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' },
+                        8: { halign: 'right' }, 9: { halign: 'right' }, 10: { halign: 'right' }, 11: { halign: 'right' }, 12: { halign: 'right' },
+                        13: { halign: 'right', fontStyle: 'bold' }
+                    }
+                });
+
+                // 7. Pie de firma
+                let finalY = doc.lastAutoTable.finalY + 30;
+                if(finalY > doc.internal.pageSize.getHeight() - 20) {
+                    doc.addPage();
+                    finalY = 30;
+                }
+
+                doc.setFontSize(9);
+                doc.text(directorProy || '_________________________________________', 15, finalY);
+                doc.text('Director(a) Proyecto de Vinculación con la sociedad', 15, finalY + 5);
+
+                // 8. Descargar PDF
+                doc.save('Anexo_3_Financiamiento.pdf');
+
+                // Cerrar modal al terminar con éxito
+                this.cerrarModalAreaTematica();
+
+            } catch (error) {
+                console.error('Error al generar el PDF del Anexo 3:', error);
+            } finally {
+                this.isGeneratingPDFFinancia = false;
+            }
+        },
         async ObtenerCarr(id){
             const response = await API.get(`${this.baseUrl}/obtnercarreraindv/${id}`);
             return response.data.nombre_carrera;
@@ -5849,6 +6993,19 @@ export default {
         async ObteneDirVin(id){
             const response = await API.get(`${this.baseUrl}/getdirectvin`);
             return response;
+        },
+        abrirModalAreaTematica() {
+            if (!this.editForm.financiamientos || this.editForm.financiamientos.length === 0) {
+                mostraralertas2("No hay rubros de financiamiento para generar el Anexo 3.", "warning");
+                return;
+            }
+            this.areaTematicaInput = ''; // Limpiar el input al abrir
+            this.showModalAreaTematica = true;
+        },
+
+        cerrarModalAreaTematica() {
+            this.showModalAreaTematica = false;
+            this.areaTematicaInput = '';
         },
 
 
