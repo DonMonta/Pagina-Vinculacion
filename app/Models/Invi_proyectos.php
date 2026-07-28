@@ -47,7 +47,15 @@ class Invi_proyectos extends Model
         'proyect_num_est_h',
         'proyect_num_est_m',
         'proyect_fact_exito',
-        'proyect_rest_supu'
+        'proyect_rest_supu',
+        'proyect_bienes',
+        'proyect_servicios',
+        'proyect_bienes_servicios',
+        'proyect_categorizacion',
+        'proyect_metodologia',
+        'proyect_viabilidad_tec',
+        'proyect_equip_tec',
+        'proyect_no_ejecuta',
     ];
     public function invi_detalle_integrante()
     {
@@ -116,5 +124,13 @@ class Invi_proyectos extends Model
     public function invi_actividades()
     {
         return $this->hasMany(Invi_actividades::class, 'proyect_id');
+    }
+    public function invi_detalle_adqui()
+    {
+        return $this->hasMany(Invi_detalle_adqui::class, 'proyect_id');
+    }
+    public function invi_detalle_financia()
+    {
+        return $this->hasMany(Invi_detalle_financia::class, 'proyect_id');
     }
 }

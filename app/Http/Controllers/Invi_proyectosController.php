@@ -55,6 +55,10 @@ use App\Models\Invi_actmedios_verificacion;
 use App\Models\Invi_actindicadores;
 use App\Models\Invi_actsupuestos;
 use App\Models\Invi_actividades;
+use App\Models\Invi_adquisicion;
+use App\Models\Invi_detalle_adqui;
+use App\Models\Invi_detalle_financia;
+use App\Models\Invi_rubros;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -210,6 +214,8 @@ class Invi_proyectosController extends Controller
             'invi_obj_proyectos.invi_actividades.invi_actmedios_verificacion',
             'invi_obj_proyectos.invi_actividades.invi_actindicadores',
             'invi_obj_proyectos.invi_actividades.invi_actsupuestos',
+            'invi_detalle_adqui.invi_adquisicion',
+            'invi_detalle_financia.invi_rubros'
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -488,6 +494,7 @@ class Invi_proyectosController extends Controller
 
         $num_doce_part = $num_doce_h + $num_doce_m;
         $num_est_part  = $num_est_h + $num_est_m;
+        $rubrosCatalogo = Invi_rubros::all();
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -539,7 +546,8 @@ class Invi_proyectosController extends Controller
                 'estudiantes_h'     => $num_est_h,
                 'estudiantes_m'     => $num_est_m,
                 'estudiantes_total' => $num_est_part,
-            ]
+            ],
+            'rubros_catalogo' => $rubrosCatalogo,
         ]);
     }
 
@@ -653,6 +661,14 @@ class Invi_proyectosController extends Controller
             $proyecto->proyect_num_est_m = $request->proyect_num_est_m;
             $proyecto->proyect_fact_exito = $request->proyect_fact_exito;
             $proyecto->proyect_rest_supu = $request->proyect_rest_supu;
+            $proyecto->proyect_bienes = $request->proyect_bienes;
+            $proyecto->proyect_servicios = $request->proyect_servicios;
+            $proyecto->proyect_bienes_servicios = $request->proyect_bienes_servicios;
+            $proyecto->proyect_categorizacion = $request->proyect_categorizacion;
+            $proyecto->proyect_metodologia = $request->proyect_metodologia;
+            $proyecto->proyect_viabilidad_tec = $request->proyect_viabilidad_tec;
+            $proyecto->proyect_equip_tec = $request->proyect_equip_tec;
+            $proyecto->proyect_no_ejecuta = $request->proyect_no_ejecuta;
 
             $proyecto->save();
 
@@ -1081,6 +1097,96 @@ class Invi_proyectosController extends Controller
                 Invi_actividades::where('proyect_id', $id)
                     ->whereNotIn('id_actividades', $ids_actividades_recibidas)
                     ->delete();
+            }
+            $adquisicionesReq = $request->adquisiciones ?? [];
+
+            // Obtener IDs de adquisiciones que vienen del frontend (los que ya existen)
+            $adquiIdsReq = collect($adquisicionesReq)->pluck('id_adquisicion')->filter()->toArray();
+
+            // Obtener detalles actuales en BD para este proyecto
+            $detallesActuales = Invi_detalle_adqui::where('proyect_id', $id)->get();
+            $adquiIdsActuales = $detallesActuales->pluck('id_adquisicion')->toArray();
+
+            // Determinar cuáles hay que ELIMINAR (Están en BD pero ya no en el Request)
+            $idsToDelete = array_diff($adquiIdsActuales, $adquiIdsReq);
+            if (!empty($idsToDelete)) {
+                Invi_detalle_adqui::whereIn('id_adquisicion', $idsToDelete)->where('proyect_id', $id)->delete();
+                Invi_adquisicion::whereIn('id_adquisicion', $idsToDelete)->delete();
+            }
+
+            // CREAR o ACTUALIZAR las adquisiciones recibidas
+            foreach ($adquisicionesReq as $adqReq) {
+                if (isset($adqReq['id_adquisicion']) && $adqReq['id_adquisicion']) {
+                    // Actualizar existente
+                    Invi_adquisicion::where('id_adquisicion', $adqReq['id_adquisicion'])->update([
+                        'tipo_adqui'          => $adqReq['tipo_adqui'],
+                        'detalle'             => $adqReq['detalle'],
+                        'porcent_nacio'       => $adqReq['porcent_nacio'],
+                        'detalle_iinsu_nac'   => $adqReq['detalle_iinsu_nac'],
+                        'porcent_importado'   => $adqReq['porcent_importado'],
+                        'detalle_insu_import' => $adqReq['detalle_insu_import'],
+                    ]);
+                } else {
+                    // Crear nueva
+                    $nuevaAdqui = Invi_adquisicion::create([
+                        'tipo_adqui'          => $adqReq['tipo_adqui'],
+                        'detalle'             => $adqReq['detalle'],
+                        'porcent_nacio'       => $adqReq['porcent_nacio'],
+                        'detalle_iinsu_nac'   => $adqReq['detalle_iinsu_nac'],
+                        'porcent_importado'   => $adqReq['porcent_importado'],
+                        'detalle_insu_import' => $adqReq['detalle_insu_import'],
+                    ]);
+
+                    // Relacionarla al proyecto
+                    Invi_detalle_adqui::create([
+                        'proyect_id'     => $id,
+                        'id_adquisicion' => $nuevaAdqui->id_adquisicion
+                    ]);
+                }
+            }
+            $financiamientosReq = $request->financiamientos ?? [];
+            
+            // Obtener IDs de financiamientos que vienen del frontend
+            $finIdsReq = collect($financiamientosReq)->pluck('id_det_financia')->filter()->toArray();
+
+            // Obtener detalles actuales en BD para este proyecto
+            $detallesFinActuales = Invi_detalle_financia::where('proyect_id', $id)->get();
+            $finIdsActuales = $detallesFinActuales->pluck('id_det_financia')->toArray();
+
+            // Determinar cuáles hay que ELIMINAR (Están en BD pero ya no en el Request)
+            $idsFinToDelete = array_diff($finIdsActuales, $finIdsReq);
+            if (!empty($idsFinToDelete)) {
+                Invi_detalle_financia::whereIn('id_det_financia', $idsFinToDelete)->delete();
+            }
+
+            // CREAR o ACTUALIZAR los financiamientos recibidos
+            foreach ($financiamientosReq as $finReq) {
+                $dataFin = [
+                    'id_rubro'       => $finReq['id_rubro'],
+                    'cantidad'       => $finReq['cantidad'],
+                    'valor'          => $finReq['valor'],
+                    'utlvte_anio1'   => $finReq['utlvte_anio1'] ?? 0,
+                    'utlvte_anio2'   => $finReq['utlvte_anio2'] ?? 0,
+                    'utlvte_anio3'   => $finReq['utlvte_anio3'] ?? 0,
+                    'utlvte_anio4'   => $finReq['utlvte_anio4'] ?? 0,
+                    'utlvte_anio5'   => $finReq['utlvte_anio5'] ?? 0,
+                    'otros_anio1'    => $finReq['otros_anio1'] ?? 0,
+                    'otros_anio2'    => $finReq['otros_anio2'] ?? 0,
+                    'otros_anio3'    => $finReq['otros_anio3'] ?? 0,
+                    'otros_anio4'    => $finReq['otros_anio4'] ?? 0,
+                    'otros_anio5'    => $finReq['otros_anio5'] ?? 0,
+                    'total_efectivo' => $finReq['total_efectivo'] ?? 0,
+                ];
+
+                if (isset($finReq['id_det_financia']) && $finReq['id_det_financia']) {
+                    // Actualizar
+                    Invi_detalle_financia::where('id_det_financia', $finReq['id_det_financia'])
+                                         ->update($dataFin);
+                } else {
+                    // Crear
+                    $dataFin['proyect_id'] = $id;
+                    Invi_detalle_financia::create($dataFin);
+                }
             }
 
 
