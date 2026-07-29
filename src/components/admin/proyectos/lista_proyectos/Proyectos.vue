@@ -744,6 +744,15 @@
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">14</span>
                         Viabilidad y Sostenibilidad
                     </button>
+                    <button @click="activeTab = 'impacto_es'"
+                        :class="activeTab === 'impacto_es'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">15</span>
+                        Impacto
+                    </button>
                 </div>
 
                 <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-gray-900">
@@ -3678,9 +3687,14 @@
                                             
                                             <td class="px-3 py-2 text-right font-bold border border-gray-200 dark:border-gray-700">${{ formatoDinero(item.total_efectivo) }}</td>
                                             <td class="px-2 py-2 text-center border border-gray-200 dark:border-gray-700">
-                                                <button @click="eliminarFinanciamiento(index)" class="text-red-500 hover:text-red-700 transition-colors" title="Eliminar">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <button @click="editarFinanciamiento(item, index)" type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button @click="eliminarFinanciamiento(index)" type="button" class="text-red-500 hover:text-red-700 transition-colors" title="Eliminar">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -3769,7 +3783,144 @@
                                     rows="4"
                                 ></textarea>
                             </div>
+                            <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Impactos Esperados</h3>
+                                    <ul class="text-sm text-gray-600 dark:text-gray-400 mt-2 space-y-1 list-disc list-inside">
+                                        <li>Haga clic en <strong>"Añadir Impacto"</strong> para registrar uno nuevo.</li>
+                                        <li>Seleccione el tipo de impacto haciendo clic en la tarjeta correspondiente.</li>
+                                        <li>Redacte la descripción del impacto y guarde. Puede registrar varios impactos de un mismo tipo.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Botón Agregar -->
+                            <div class="flex justify-end">
+                                <button @click="abrirModalImpacto" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2">
+                                    <i class="fas fa-plus"></i> Añadir Impacto
+                                </button>
+                            </div>
+
+                            <!-- Lista de Impactos Agrupados -->
+                            <div class="space-y-6 mt-6">
+                                <div v-if="Object.keys(impactosAgrupados).length === 0" class="text-center py-8 text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+                                    <i class="fas fa-leaf text-4xl mb-3 text-gray-400"></i>
+                                    <p>Aún no existen impactos registrados para este proyecto.</p>
+                                </div>
+                                
+                                <!-- Renderizamos por Grupo de Impacto (Ej: Social, Ambiental...) -->
+                                <div v-for="(listaDetalles, nombreImpacto) in impactosAgrupados" :key="nombreImpacto" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                                    <div class="bg-gray-100 dark:bg-gray-700 px-4 py-3 border-b border-gray-200 dark:border-gray-600">
+                                        <h4 class="text-lg font-bold text-gray-800 dark:text-white capitalize"><i class="fas fa-bullseye text-brand-600 mr-2"></i> Impacto {{ nombreImpacto }}</h4>
+                                    </div>
+                                    <ul class="divide-y divide-gray-100 dark:divide-gray-700 p-4">
+                                        <li v-for="(item, index) in listaDetalles" :key="index" class="py-3 flex justify-between items-start gap-4">
+                                            <p class="text-gray-700 dark:text-gray-300 text-justify w-full">
+                                                {{ item.descripcion_general }}
+                                            </p>
+                                            <div class="flex items-center gap-1 flex-shrink-0">
+                                                <button @click="editarImpacto(item, item.originalIndex)" class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-gray-600 p-2 rounded transition-colors" title="Editar este detalle">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button @click="eliminarImpacto(item.originalIndex)" class="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-gray-600 p-2 rounded transition-colors" title="Eliminar este detalle">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Sostenibilidad social: equidad, género, participación ciudadana <span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="sost_socTextarea"
+                                    v-model="editForm.proyect_sostenibilidad_soc" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detalle la sostenibilidad social: equidad, género, participación ciudadana."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Transferencia Tecnológica<span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="trasnf_tTextarea"
+                                    v-model="editForm.proyect_transf_tecn" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Exponer claramente cuáles serán los medios para realizar la transferencia de los resultados del proyecto. Para la transferencia de resultados se pueden considerar los siguientes medios: publicaciones científicas, publicaciones técnicas, organización de talleres con participación de los beneficiarios del proyecto, participación de los investigadores en congresos nacionales e internacionales, etc. En caso de que el proyecto incluya componentes de desarrollo tecnológico, ya sea en forma de producto o proceso, describa la manera mediante la cual se transferirá dicho resultado al sector productivo"
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Artículos Científicos<span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="artciTextarea"
+                                    v-model="editForm.proyect_art_cientificos" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detalle los artículos científicos que se incluirán en el proyecto."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Prototipos<span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="protoTextarea"
+                                    v-model="editForm.proyect_prototipos" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detalle los prototipos que se incluirán en el proyecto."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Registro de Propiedad Intelectual<span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="reproTextarea"
+                                    v-model="editForm.proyect_reg_propin" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Detalle el registro de propiedad intelectual del proyecto."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                                <label class="block text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    Empresas Spin OffS<span class="text-red-500">*</span>
+                                </label>
+                                <textarea 
+                                    ref="spinofTextarea"
+                                    v-model="editForm.proyect_empr_spin" 
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="¿Qué es una spin-off?
+                                        Las spin-off son iniciativas empresariales promovidas por miembros de la comunidad universitaria, que se caracterizan por basar su actividad en la explotación de nuevos procesos, productos o servicios a partir del conocimiento adquirido y los resultados obtenidos en la propia Universidad.
+                                        La investigación aplicada es la base de estas empresas, cuya importancia radica en el desarrollo de nuevas tecnologías, la creación de empleo de calidad, la capacidad de generar un alto valor añadido en la actividad económica y la aportación al desarrollo regional.
+                                        ¿Por qué crear una spin-off?
+                                        Una spin off tiene ventajas para todos los implicados:
+                                        - Los emprendedores podrán seguir desarrollando la tecnología que se generó en la universidad hasta el nivel de producto final, contratar personal investigador muy valioso y obtener rendimientos económicos del proceso.
+                                        - La universidad podrá impulsa a través de las spin off su labor de transferencia de resultados de la investigación. Además obtendrá retornos económicos por contratos de transferencia con las spin off de investigaciones que si no llegan al mercado no le reportarán beneficios monetarios.
+                                        - La sociedad se beneficiará de los puestos de trabajos cualificados que generan las spin off, de los impuestos que pagan y los productos novedosos que desarrollen
+                                        "
+                                    rows="4"
+                                ></textarea>
+                            </div>
                         </div>
+                    </div>
+                    <div v-else-if="activeTab === 'impacto_es'" class="space-y-8 animate-fade-in-up">
+                        
                     </div>
                 </div>
                 <div v-if="showModalActividad" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
@@ -4010,7 +4161,7 @@
                         <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800 flex justify-between items-center">
                             <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                                 <i class="fas fa-file-invoice-dollar text-brand-600"></i>
-                                Añadir Rubro de Financiamiento
+                                {{ indexFinanciaEditando !== null ? 'Editar Rubro de Financiamiento' : 'Añadir Rubro de Financiamiento' }}
                             </h3>
                             <button @click="cerrarModalFinancia" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors dark:hover:bg-gray-700">
                                 <i class="fas fa-times text-lg"></i>
@@ -4130,6 +4281,60 @@
                             </button>
                         </div>
 
+                    </div>
+                </div>
+                <div v-if="showModalImpacto" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 overflow-y-auto font-sans transition-opacity">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full p-0 overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up">
+                        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800 flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                                <i class="fas fa-file-invoice-dollar text-brand-600"></i>
+                                {{ indexImpactoEditando !== null ? 'Editar Impacto' : 'Añadir Imnpacto' }}
+                            </h3>
+                            <button @click="cerrarModalImpacto" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors dark:hover:bg-gray-700">
+                                <i class="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 overflow-y-auto space-y-6">
+                            <div class="mb-6">
+                                <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-3">1. Seleccione el Tipo de Impacto:</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    <button 
+                                        v-for="cat in listaImpactosDisponibles" 
+                                        :key="cat.id_impactos"
+                                        @click="formImpacto.id_impactos = cat.id_impactos"
+                                        :class="[
+                                            'p-3 border-2 rounded-xl text-center transition-all font-medium', 
+                                            formImpacto.id_impactos === cat.id_impactos 
+                                                ? 'bg-brand-50 border-brand-500 text-brand-700 shadow-sm' 
+                                                : 'bg-white border-gray-200 text-gray-600 hover:border-brand-300 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200'
+                                        ]"
+                                    >
+                                        {{ cat.nombre_impacto }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Área de Texto -->
+                            <div class="mb-6">
+                                <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">2. Describa el impacto esperado:</label>
+                                <textarea 
+                                    v-model="formImpacto.descripcion_general" 
+                                    rows="4" 
+                                    ref="impactodesTextarea"
+                                    @input="ajustarAlturaTextarea"
+                                    class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
+                                    placeholder="Escriba aquí los detalles..."
+                                ></textarea>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800 flex justify-end gap-3">
+                            <button @click="cerrarModalImpacto" type="button" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 shadow-sm text-sm font-semibold transition-all dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600">
+                                Cancelar
+                            </button>
+                            <button @click="guardarImpactoEnTabla" type="button" :disabled="!formImpacto.id_impactos || !formImpacto.descripcion_general.trim()" class="px-5 py-2.5 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 shadow-sm text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                <i class="fas fa-save"></i> Guardar Impacto
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -4349,6 +4554,13 @@ export default {
                 proyect_viabilidad_tec: '',
                 proyect_equip_tec: '',
                 proyect_no_ejecuta: '',
+                impactos: [],
+                proyect_sostenibilidad_soc: '',
+                proyect_transf_tecn: '',
+                proyect_art_cientificos: '',
+                proyect_prototipos: '',
+                proyect_reg_propin: '',
+                proyect_empr_spin: '',
             },
             anioSeleccionadoTab: 'Primer Año',
             showModalActividad: false,
@@ -4388,6 +4600,14 @@ export default {
             isGeneratingPDFFinancia: false,
             showModalAreaTematica: false,
             areaTematicaInput: '',
+            indexFinanciaEditando: null,
+            listaImpactosDisponibles: [],
+            showModalImpacto: false,
+            formImpacto: {
+                id_impactos: '',
+                descripcion_general: ''
+            },
+            indexImpactoEditando: null,
         };
     },
     watch: {
@@ -4476,6 +4696,11 @@ export default {
                 });
             }
             if (newTab === 'viabiliadad_sos') {
+                this.$nextTick(() => {
+                    this.recalcularAlturasCargadas();
+                });
+            }
+            if (newTab === 'impacto_es') {
                 this.$nextTick(() => {
                     this.recalcularAlturasCargadas();
                 });
@@ -4722,6 +4947,25 @@ export default {
                     disabled: idsSeleccionados.includes(rubro.id_rubro)
                 };
             });
+        },
+        impactosAgrupados() {
+            const grupos = {};
+            this.editForm.impactos.forEach((imp, index) => {
+                // Buscar el nombre del impacto en el catálogo
+                const categoria = this.listaImpactosDisponibles.find(c => c.id_impactos === imp.id_impactos);
+                const nombre = categoria ? categoria.nombre_impacto : 'Impacto Desconocido';
+                
+                if (!grupos[nombre]) {
+                    grupos[nombre] = [];
+                }
+                
+                // Guardamos la info junto con su índice original en editForm.impactos para poder eliminarlo
+                grupos[nombre].push({
+                    ...imp,
+                    originalIndex: index
+                });
+            });
+            return grupos;
         }
     },
     methods: {
@@ -5290,6 +5534,13 @@ export default {
                 const viabilidadTextarea = this.$refs.viabTextarea;
                 const equiptTextarea = this.$refs.quipteTextarea;
                 const perderTextarea = this.$refs.perderproTextarea;
+                const impacdesTextarea = this.$refs.impactodesTextarea;
+                const sostTextarea = this.$refs.sost_socTextarea;
+                const trasnfTextarea = this.$refs.trasnf_tTextarea;
+                const artctTextarea = this.$refs.artciTextarea;
+                const protTextarea = this.$refs.protoTextarea;
+                const repTextarea = this.$refs.reproTextarea;
+                const spinTextarea = this.$refs.spinofTextarea;
 
                 if (antTextarea) {
                     antTextarea.style.height = 'auto';
@@ -5354,6 +5605,34 @@ export default {
                 if (perderTextarea) {
                     perderTextarea.style.height = 'auto';
                     perderTextarea.style.height = perderTextarea.scrollHeight + 'px';
+                }
+                if (impacdesTextarea) {
+                    impacdesTextarea.style.height = 'auto';
+                    impacdesTextarea.style.height = impacdesTextarea.scrollHeight + 'px';
+                }
+                if (sostTextarea) {
+                    sostTextarea.style.height = 'auto';
+                    sostTextarea.style.height = sostTextarea.scrollHeight + 'px';
+                }
+                if (trasnfTextarea) {
+                    trasnfTextarea.style.height = 'auto';
+                    trasnfTextarea.style.height = trasnfTextarea.scrollHeight + 'px';
+                }
+                if (artctTextarea) {
+                    artctTextarea.style.height = 'auto';
+                    artctTextarea.style.height = artctTextarea.scrollHeight + 'px';
+                }
+                if (protTextarea) {
+                    protTextarea.style.height = 'auto';
+                    protTextarea.style.height = protTextarea.scrollHeight + 'px';
+                }
+                if (repTextarea) {
+                    repTextarea.style.height = 'auto';
+                    repTextarea.style.height = repTextarea.scrollHeight + 'px';
+                }
+                if (spinTextarea) {
+                    spinTextarea.style.height = 'auto';
+                    spinTextarea.style.height = spinTextarea.scrollHeight + 'px';
                 }
                 if (textareasBien && textareasBien.length > 0) {
                     textareasBien.forEach(textarea => {
@@ -5606,6 +5885,17 @@ export default {
                         };
                     });
                 }
+                this.listaImpactosDisponibles = data.impactos_catalogo || [];
+                let impactosMapeados = [];
+                if (data.proyecto.invi_det_impactos_esperados && data.proyecto.invi_det_impactos_esperados.length > 0) {
+                    impactosMapeados = data.proyecto.invi_det_impactos_esperados.map(det => {
+                        return {
+                            id_det_impactos_esp: det.id_det_impactos_esp,
+                            id_impactos: det.id_impactos,
+                            descripcion_general: det.descripcion_general || ''
+                        };
+                    });
+                }
                 this.editForm = {
                     proyect_id: data.proyecto.proyect_id,
                     proyect_nombre: data.proyecto.proyect_nombre || '',
@@ -5672,6 +5962,13 @@ export default {
                     proyect_viabilidad_tec: data.proyecto.proyect_viabilidad_tec || '',
                     proyect_equip_tec: data.proyecto.proyect_equip_tec || '',
                     proyect_no_ejecuta: data.proyecto.proyect_no_ejecuta || '',
+                    impactos: impactosMapeados,
+                    proyect_sostenibilidad_soc: data.proyecto.proyect_sostenibilidad_soc || '',
+                    proyect_transf_tecn: data.proyecto.proyect_transf_tecn || '',
+                    proyect_art_cientificos: data.proyecto.proyect_art_cientificos || '',
+                    proyect_prototipos: data.proyecto.proyect_prototipos || '',
+                    proyect_reg_propin: data.proyecto.proyect_reg_propin || '',
+                    proyect_empr_spin: data.proyecto.proyect_empr_spin || '',
                 };
                 if (this.aniosProyecto.length > 0) {
                     this.anioSeleccionadoTab = this.aniosProyecto[0].id;
@@ -5695,11 +5992,13 @@ export default {
             };
         },
         abrirModalFinancia() {
+            this.indexFinanciaEditando = null;
             this.formFinancia = this.resetFormFinancia();
             this.showModalFinancia = true;
         },
         cerrarModalFinancia() {
             this.showModalFinancia = false;
+            this.indexFinanciaEditando = null;
         },
         calcularTotalModal() {
             let total = 0;
@@ -5717,9 +6016,25 @@ export default {
             }
         },
         guardarFinanciamientoEnTabla() {
-            // Agregamos el objeto del modal al arreglo del proyecto
-            this.editForm.financiamientos.push({ ...this.formFinancia });
+            if (this.indexFinanciaEditando !== null && this.indexFinanciaEditando >= 0) {
+                // EDITAR: Reemplazamos los datos en la posición correspondiente
+                this.editForm.financiamientos[this.indexFinanciaEditando] = { ...this.formFinancia };
+            } else {
+                // AGREGAR: Si el índice es null, agregamos un elemento nuevo
+                this.editForm.financiamientos.push({ ...this.formFinancia });
+            }
+
             this.cerrarModalFinancia();
+        },
+        editarFinanciamiento(item, index) {
+            // Guardamos el índice actual por si necesitas actualizarlo directamente en el array
+            this.indexFinanciaEditando = index;
+
+            // Clonamos el objeto para evitar mutaciones no deseadas antes de guardar
+            this.formFinancia = JSON.parse(JSON.stringify(item));
+
+            // Abrimos el modal de financiamiento
+            this.showModalFinancia = true;
         },
         eliminarFinanciamiento(index) {
             this.editForm.financiamientos.splice(index, 1);
@@ -5735,6 +6050,35 @@ export default {
             const granTotal = this.totalesFinanciamiento.granTotal;
             if (granTotal === 0) return "0.00";
             return ((parseFloat(valor || 0) / granTotal) * 100).toFixed(2);
+        },
+        abrirModalImpacto() {
+            this.indexImpactoEditando = null;
+            this.formImpacto = { id_impactos: '', descripcion_general: '' };
+            this.showModalImpacto = true;
+        },
+        cerrarModalImpacto() {
+            this.showModalImpacto = false;
+            this.indexImpactoEditando = null;
+        },
+        guardarImpactoEnTabla() {
+            // Empujamos el nuevo impacto al array
+            if(this.indexImpactoEditando !== null && this.indexImpactoEditando >= 0) {
+                // EDITAR: Reemplazamos los datos en la posición correspondiente
+                this.editForm.impactos[this.indexImpactoEditando] = { ...this.formImpacto };
+            } else {
+                // AGREGAR: Si el índice es null, agregamos un elemento nuevo
+                this.editForm.impactos.push({ ...this.formImpacto });
+            }
+            this.cerrarModalImpacto();
+        },
+        editarImpacto(item, index) {
+            this.indexImpactoEditando = index;
+            this.formImpacto = JSON.parse(JSON.stringify(item));
+            this.showModalImpacto = true;
+        },
+        eliminarImpacto(indexOriginal) {
+            // Se elimina usando el índice que tenía en this.editForm.impactos
+            this.editForm.impactos.splice(indexOriginal, 1);
         },
         agregarAdquisicion() {
             this.editForm.adquisiciones.push({
@@ -6422,6 +6766,13 @@ export default {
                 proyect_viabilidad_tec: '',
                 proyect_equip_tec: '',
                 proyect_no_ejecuta: '',
+                impactos: [],
+                proyect_sostenibilidad_soc: '',
+                proyect_transf_tecn: '',
+                proyect_art_cientificos: '',
+                proyect_prototipos: '',
+                proyect_reg_propin: '',
+                proyect_empr_spin: '',
             };
         },
 
