@@ -56,6 +56,12 @@ class Invi_proyectos extends Model
         'proyect_viabilidad_tec',
         'proyect_equip_tec',
         'proyect_no_ejecuta',
+        'proyect_sostenibilidad_soc',
+        'proyect_transf_tecn',
+        'proyect_art_cientificos',
+        'proyect_prototipos',
+        'proyect_reg_propin',
+        'proyect_empr_spin',
     ];
     public function invi_detalle_integrante()
     {
@@ -132,5 +138,9 @@ class Invi_proyectos extends Model
     public function invi_detalle_financia()
     {
         return $this->hasMany(Invi_detalle_financia::class, 'proyect_id');
+    }
+    public function invi_det_impactos_esperados()
+    {
+        return $this->hasMany(Invi_det_impactos_esperados::class, 'proyect_id');
     }
 }

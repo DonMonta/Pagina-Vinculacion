@@ -59,6 +59,8 @@ use App\Models\Invi_adquisicion;
 use App\Models\Invi_detalle_adqui;
 use App\Models\Invi_detalle_financia;
 use App\Models\Invi_rubros;
+use App\Models\Invi_impactos;
+use App\Models\Invi_det_impactos_esperados;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -215,7 +217,8 @@ class Invi_proyectosController extends Controller
             'invi_obj_proyectos.invi_actividades.invi_actindicadores',
             'invi_obj_proyectos.invi_actividades.invi_actsupuestos',
             'invi_detalle_adqui.invi_adquisicion',
-            'invi_detalle_financia.invi_rubros'
+            'invi_detalle_financia.invi_rubros',
+            'invi_det_impactos_esperados.invi_impactos'
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -495,6 +498,7 @@ class Invi_proyectosController extends Controller
         $num_doce_part = $num_doce_h + $num_doce_m;
         $num_est_part  = $num_est_h + $num_est_m;
         $rubrosCatalogo = Invi_rubros::all();
+        $impactosCatalogo = Invi_impactos::all();
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -548,6 +552,7 @@ class Invi_proyectosController extends Controller
                 'estudiantes_total' => $num_est_part,
             ],
             'rubros_catalogo' => $rubrosCatalogo,
+            'impactos_catalogo' => $impactosCatalogo,
         ]);
     }
 
@@ -669,6 +674,12 @@ class Invi_proyectosController extends Controller
             $proyecto->proyect_viabilidad_tec = $request->proyect_viabilidad_tec;
             $proyecto->proyect_equip_tec = $request->proyect_equip_tec;
             $proyecto->proyect_no_ejecuta = $request->proyect_no_ejecuta;
+            $proyecto->proyect_sostenibilidad_soc = $request->proyect_sostenibilidad_soc;
+            $proyecto->proyect_transf_tecn = $request->proyect_transf_tecn;
+            $proyecto->proyect_art_cientificos = $request->proyect_art_cientificos;
+            $proyecto->proyect_prototipos = $request->proyect_prototipos;
+            $proyecto->proyect_reg_propin = $request->proyect_reg_propin;
+            $proyecto->proyect_empr_spin = $request->proyect_empr_spin;
 
             $proyecto->save();
 
@@ -1186,6 +1197,38 @@ class Invi_proyectosController extends Controller
                     // Crear
                     $dataFin['proyect_id'] = $id;
                     Invi_detalle_financia::create($dataFin);
+                }
+            }
+            $impactosReq = $request->impactos ?? [];
+            
+            // Obtener IDs de impactos que vienen del frontend
+            $impIdsReq = collect($impactosReq)->pluck('id_det_impactos_esp')->filter()->toArray();
+
+            // Obtener detalles actuales en BD para este proyecto
+            $detallesImpActuales = Invi_det_impactos_esperados::where('proyect_id', $id)->get();
+            $impIdsActuales = $detallesImpActuales->pluck('id_det_impactos_esp')->toArray();
+
+            // Determinar cuáles hay que ELIMINAR
+            $idsImpToDelete = array_diff($impIdsActuales, $impIdsReq);
+            if (!empty($idsImpToDelete)) {
+                Invi_det_impactos_esperados::whereIn('id_det_impactos_esp', $idsImpToDelete)->delete();
+            }
+
+            // CREAR o ACTUALIZAR los impactos recibidos
+            foreach ($impactosReq as $impReq) {
+                $dataImp = [
+                    'id_impactos'         => $impReq['id_impactos'],
+                    'descripcion_general' => $impReq['descripcion_general']
+                ];
+
+                if (isset($impReq['id_det_impactos_esp']) && $impReq['id_det_impactos_esp']) {
+                    // Actualizar
+                    Invi_det_impactos_esperados::where('id_det_impactos_esp', $impReq['id_det_impactos_esp'])
+                                               ->update($dataImp);
+                } else {
+                    // Crear
+                    $dataImp['proyect_id'] = $id;
+                    Invi_det_impactos_esperados::create($dataImp);
                 }
             }
 
