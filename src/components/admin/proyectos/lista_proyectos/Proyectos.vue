@@ -744,14 +744,23 @@
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">14</span>
                         Viabilidad y Sostenibilidad
                     </button>
-                    <button @click="activeTab = 'impacto_es'"
-                        :class="activeTab === 'impacto_es'
+                    <button @click="activeTab = 'difusion'"
+                        :class="activeTab === 'difusion'
                             ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
                             : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
                         class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
                         <span
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">15</span>
-                        Impacto
+                        Difusión
+                    </button>
+                    <button @click="activeTab = 'bibliografias'"
+                        :class="activeTab === 'bibliografias'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">16</span>
+                        Bibliografías
                     </button>
                 </div>
 
@@ -2335,8 +2344,9 @@
                                     ref="antecedentesTextarea"
                                     v-model="editForm.proyect_antecedentes" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_antecedentes')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
-                                    placeholder="Deben incluirse todos los aspectos y circunstancias que motivaron la identificación y preparación del proyecto, básicamente debe contener información referente a ciertos indicadores cualitativos y cuantitativos que apoyen su comprensión."
+                                    placeholder="Deben incluirse todos los aspectos y circunstancias que motivaron la identificación y preparación del proyecto..."
                                     rows="4"
                                 ></textarea>
                                 <!-- Contador de palabras -->
@@ -2358,6 +2368,7 @@
                                     ref="justificacionTextarea"
                                     v-model="editForm.proyect_justificacion" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_justificacion')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Argumento que apoya o sustenta la idea. En otras palabras, es una forma de explicar algo que sirve como complemento o aclaración de una afirmación previa."
                                     rows="4"
@@ -2771,6 +2782,7 @@
                                     ref="descripcionTextarea"
                                     v-model="editForm.proyect_desc_situ_act" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_desc_situ_act')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Descripción de la realidad existente de una zona determinada, problemas o necesidades de su población; que inciden en el lento o nulo desarrollo económico, social, cultural y ambiental; falta de integración física, comercial y social en pro del bienestar de sus habitantes."
                                     rows="4"
@@ -2794,6 +2806,7 @@
                                     ref="diagnostico_problemaTextarea"
                                     v-model="editForm.proyect_diag_probl" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_diag_probl')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="En los proyectos sociales el problema social se define como una carencia o déficits existentes que afecta a un segmento de la población de una determinado zona o lugar. En el proceso de identificación, descripción y diagnóstico del problema es fundamental realizar el análisis de participación de los/as involucrados/as con la finalidad que la comunidad beneficiaria en el futuro se involucre y comprometa en la implementación del proyecto"
                                     rows="4"
@@ -2816,6 +2829,7 @@
                                     ref="articulaTextarea"
                                     v-model="editForm.proyect_contribucion_soci" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_contribucion_soci')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Detalle como contribuye a la sociedad su proyecto de vinculación"
                                     rows="4"
@@ -2883,6 +2897,7 @@
                                     ref="identPoblaobjTextarea"
                                     v-model="editForm.proyec_ident_poblaobj" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyec_ident_poblaobj')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Para determinar la población objetiva o beneficiaria, el/la director(a) debe realizar la siguiente división: 
                                     Población de Referencia: Población total del área de intervención del proyecto.
@@ -3128,6 +3143,7 @@
                                     ref="facExitTextarea"
                                     v-model="editForm.proyect_fact_exito" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_fact_exito')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Los factores críticos de éxito son puntos clave que, cuando están bien ejecutados, definen y garantizan el desarrollo y ejecución del proyecto, logrando sus objetivos. Por el contrario, cuando estos mismos factores se pasan por alto o se ignoran, contribuyen al fracaso de la organización. ¿Qué recursos económicos, tecnológicos, talento humano, infraestructura física, etc., cuenta la institución para lograr el éxito del proyecto?"
                                     rows="4"
@@ -3141,6 +3157,7 @@
                                     ref="restSupuTextarea"
                                     v-model="editForm.proyect_rest_supu" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_rest_supu')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Identificar las circunstancias y eventos que deben ocurrir para que el proyecto sea exitoso e identificar los elementos que restringen, limitan o regulan la gestión del proyecto."
                                     rows="4"
@@ -3587,6 +3604,7 @@
                                     ref="metodologiaTextarea"
                                     v-model="editForm.proyect_metodologia" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_metodologia')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Exponer de forma clara y concisa la metodología que se empleará para el desarrollo del proyecto, considerando los procesos que se emplearán para la recolección de información, las variables que serán consideradas y los análisis que se utilizarán para la obtención de los resultados. TIPOS DE INVESTIGACIÓN URL: https://goo.gl/F65YtN"
                                     rows="4"
@@ -3752,6 +3770,7 @@
                                     ref="viabTextarea"
                                     v-model="editForm.proyect_viabilidad_tec" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_viabilidad_tec')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Detalle la viabilidad técnica del proyecto."
                                     rows="4"
@@ -3765,6 +3784,7 @@
                                     ref="quipteTextarea"
                                     v-model="editForm.proyect_equip_tec" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_equip_tec')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Detalle el equipamiento tecnológico disponible del proyecto."
                                     rows="4"
@@ -3778,6 +3798,7 @@
                                     ref="perderproTextarea"
                                     v-model="editForm.proyect_no_ejecuta" 
                                     @input="ajustarAlturaTextarea"
+                                    @contextmenu.prevent="abrirMenuContextual($event, 'proyect_no_ejecuta')"
                                     class="w-full p-4 text-sm bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none overflow-hidden text-justify transition-shadow" 
                                     placeholder="Detalle que perdería la provincia si el proyecto no se ejecuta en este periodo."
                                     rows="4"
@@ -3919,8 +3940,108 @@
                             </div>
                         </div>
                     </div>
-                    <div v-else-if="activeTab === 'impacto_es'" class="space-y-8 animate-fade-in-up">
+                    <div v-else-if="activeTab === 'difusion'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Difusión</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Detalle de qué manera se difundirá el proyecto.</p>
+                                <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
+                                    <li>Haga clic en <strong>"Añadir Actividad"</strong> para abrir el formulario.</li>
+                                    <li>Escriba el nombre de la actividad y asigne su costo estimado.</li>
+                                    <li>Puede registrar y modificar múltiples actividades.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Botón Agregar -->
+                        <div class="flex justify-end">
+                            <button @click="abrirModalDifusion" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2">
+                                <i class="fas fa-plus"></i> Añadir Actividad
+                            </button>
+                        </div>
+
+                        <!-- Contenido: Mensaje vacío o Tabla -->
+                        <div class="space-y-3 mt-6">
+                            <div v-if="editForm.difusion.length === 0" class="text-center py-8 text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+                                <i class="fas fa-bullhorn text-4xl mb-3 text-gray-400"></i>
+                                <p>Aún no existen actividades de difusión registradas para este proyecto.</p>
+                            </div>
+
+                            <div v-else class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead class="bg-gray-200 dark:bg-gray-700">
+                                        <!-- Fila Superior: Tipo de Evento (Referencia imagen) -->
+                                        <tr>
+                                            <th colspan="3" class="px-6 py-2 text-left text-sm font-extrabold text-gray-800 dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">
+                                                Tipo de Evento / Actividades
+                                            </th>
+                                        </tr>
+                                        <!-- Columnas -->
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider w-[60%] border-r border-gray-300 dark:border-gray-600">Actividad</th>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider w-[25%] border-r border-gray-300 dark:border-gray-600">Costo ($)</th>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider w-[15%]">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                        <tr v-for="(item, index) in editForm.difusion" :key="index" class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                                            <td class="px-6 py-4 whitespace-normal text-sm text-gray-800 dark:text-gray-200 border-r border-gray-200 dark:border-gray-700">
+                                                {{ item.nombre_actividad }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 text-center font-medium border-r border-gray-200 dark:border-gray-700">
+                                                {{ parseFloat(item.costo).toFixed(2) }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
+                                                <button @click="editarDifusion(item, index)" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:bg-gray-700 dark:hover:bg-gray-600 p-2 rounded-lg transition-colors" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button @click="eliminarDifusion(index)" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-gray-600 p-2 rounded-lg transition-colors" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="activeTab === 'bibliografias'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Bibliografías</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Listado de todas las referencias citadas en el proyecto.</p>
+                            </div>
+                        </div>
                         
+                        <div class="space-y-3 mt-6">
+                            <div v-if="editForm.bibliografias.length === 0" class="text-center py-8 text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+                                <i class="fas fa-book text-4xl mb-3 text-gray-400"></i>
+                                <p>No hay bibliografías registradas. Puede añadirlas haciendo clic derecho sobre los textos del proyecto.</p>
+                            </div>
+                            
+                            <ul v-else class="space-y-4">
+                                <!-- Formato: Autor. (Año). Título. Editorial o fuente. -->
+                                <li v-for="(bib, index) in editForm.bibliografias" :key="index" class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-start gap-4 transition-all hover:shadow-md">
+                                    <div class="mt-1 text-brand-500">
+                                        <i class="fas fa-bookmark"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed text-justify">
+                                            <span class="font-bold">{{ bib.autor }}.</span> 
+                                            ({{ bib.anio }}). 
+                                            <span class="italic">{{ bib.titulo }}.</span> 
+                                            {{ bib.editorial_fuente }}.
+                                        </p>
+                                        <span class="inline-block mt-2 px-2 py-1 bg-gray-100 dark:bg-gray-700 text-xs text-gray-500 dark:text-gray-400 rounded">
+                                            Citado en: {{ formatearNombreCampo(bib.seccion_campo) }}
+                                        </span>
+                                    </div>
+                                    <button @click="eliminarBibliografia(index)" class="text-red-400 hover:text-red-600 p-2 transition-colors" title="Eliminar bibliografía">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div v-if="showModalActividad" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
@@ -4337,6 +4458,106 @@
                         </div>
                     </div>
                 </div>
+                <div v-if="showDivModalDifusion" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 overflow-y-auto font-sans transition-opacity">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-fade-in-up">
+                        <!-- Header -->
+                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-700/50">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+                                <i class="fas fa-bullhorn text-brand-500 mr-2"></i>
+                                {{ indexDifusionEditando !== null ? 'Editar Actividad de Difusión' : 'Nueva Actividad de Difusión' }}
+                            </h3>
+                            <button @click="cerrarModalDifusion" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none transition-colors">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Body -->
+                        <div class="p-6 space-y-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Actividad / Tipo de Evento:</label>
+                                <textarea 
+                                    v-model="formDifusion.nombre_actividad" 
+                                    rows="2"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-3 focus:ring-2 focus:ring-brand-500 outline-none transition-shadow" 
+                                    placeholder="Ej. Presentación de resultados en congreso internacional..."
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Costo Estimado ($):</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+                                    <input 
+                                        type="text" 
+                                        v-model="formDifusion.costo" 
+                                        @input="validarNumeroCosto"
+                                        class="w-full pl-8 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-3 focus:ring-2 focus:ring-brand-500 outline-none transition-shadow" 
+                                        placeholder="0.00"
+                                    >
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Solo se permiten valores numéricos.</p>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex justify-end gap-3">
+                            <button @click="cerrarModalDifusion" class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 font-medium transition-colors">Cancelar</button>
+                            <button @click="guardarDifusionEnTabla" :disabled="!formDifusion.nombre_actividad.trim() || formDifusion.costo === ''" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                Guardar Actividad
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div 
+                    v-show="mostrarMenu" 
+                    ref="contextMenu"
+                    :style="{ top: menuY + 'px', left: menuX + 'px' }" 
+                    class="absolute z-[9999] w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+                >
+                    <ul class="py-1">
+                        <li>
+                            <button 
+                                @click="prepararModalBibliografia" 
+                                class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors font-medium"
+                            >
+                                <i class="fas fa-quote-right text-brand-500"></i> Añadir cita
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div v-if="showModalBib" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-60 backdrop-blur-sm transition-opacity">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-fade-in-up">
+                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Añadir Bibliografía</h3>
+                            <button @click="showModalBib = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="p-6 space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Autor(es):</label>
+                                <input v-model="formBib.autor" type="text" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Ej. Pérez, J. y Gómez, A.">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Año:</label>
+                                <input v-model="formBib.anio" type="text" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Ej. 2023">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Título:</label>
+                                <input v-model="formBib.titulo" type="text" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Título del artículo o libro">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Editorial o Fuente:</label>
+                                <input v-model="formBib.editorial_fuente" type="text" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Nombre de la revista, url o editorial">
+                            </div>
+                        </div>
+
+                        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex justify-end gap-3">
+                            <button @click="showModalBib = false" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 font-medium">Cancelar</button>
+                            <button @click="guardarCitaEnTexto" :disabled="!formBib.autor || !formBib.anio || !formBib.titulo" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50">Insertar Cita</button>
+                        </div>
+                    </div>
+                </div>
 
                 <div
                     class="p-5 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 bg-gray-50/50 dark:bg-gray-900/50">
@@ -4561,6 +4782,8 @@ export default {
                 proyect_prototipos: '',
                 proyect_reg_propin: '',
                 proyect_empr_spin: '',
+                difusion: [],
+                bibliografias: [],
             },
             anioSeleccionadoTab: 'Primer Año',
             showModalActividad: false,
@@ -4608,6 +4831,26 @@ export default {
                 descripcion_general: ''
             },
             indexImpactoEditando: null,
+            showDivModalDifusion: false,
+            indexDifusionEditando: null,
+            formDifusion: {
+                id_det_difusion: null,
+                id_difusion: null,
+                nombre_actividad: '',
+                costo: ''
+            },
+            mostrarMenu: false,
+            menuX: 0,
+            menuY: 0,
+            campoObjetivoCita: '',
+            posicionCursorCita: 0,
+            showModalBib: false,
+            formBib: {
+                autor: '',
+                anio: '',
+                titulo: '',
+                editorial_fuente: ''
+            }
         };
     },
     watch: {
@@ -4700,7 +4943,7 @@ export default {
                     this.recalcularAlturasCargadas();
                 });
             }
-            if (newTab === 'impacto_es') {
+            if (newTab === 'difusion') {
                 this.$nextTick(() => {
                     this.recalcularAlturasCargadas();
                 });
@@ -4717,7 +4960,11 @@ export default {
     async mounted() {
         const ruta = useRoute();
         this.GetData(1, this.searchQuery);
+        document.addEventListener('click', this.cerrarMenuContextual);
 
+    },
+    beforeUnmount() {
+        document.removeEventListener('click', this.cerrarMenuContextual);
     },
     computed: {
         integrantesFiltrados() {
@@ -5896,6 +6143,17 @@ export default {
                         };
                     });
                 }
+                let difusionMapeada = [];
+                if (data.proyecto.invi_detalle_difusion && data.proyecto.invi_detalle_difusion.length > 0) {
+                    difusionMapeada = data.proyecto.invi_detalle_difusion.map(det => {
+                        return {
+                            id_det_difusion: det.id_det_difusion,
+                            id_difusion: det.id_difusion,
+                            costo: det.costo,
+                            nombre_actividad: det.invi_difusion ? det.invi_difusion.nombre_actividad : ''
+                        };
+                    });
+                }
                 this.editForm = {
                     proyect_id: data.proyecto.proyect_id,
                     proyect_nombre: data.proyecto.proyect_nombre || '',
@@ -5969,6 +6227,8 @@ export default {
                     proyect_prototipos: data.proyecto.proyect_prototipos || '',
                     proyect_reg_propin: data.proyecto.proyect_reg_propin || '',
                     proyect_empr_spin: data.proyecto.proyect_empr_spin || '',
+                    difusion: difusionMapeada,
+                    bibliografias: data.proyecto.invi_bibliografias ? [...data.proyecto.invi_bibliografias] : [],
                 };
                 if (this.aniosProyecto.length > 0) {
                     this.anioSeleccionadoTab = this.aniosProyecto[0].id;
@@ -6080,6 +6340,44 @@ export default {
             // Se elimina usando el índice que tenía en this.editForm.impactos
             this.editForm.impactos.splice(indexOriginal, 1);
         },
+        abrirModalDifusion() {
+            this.indexDifusionEditando = null;
+            this.formDifusion = { id_det_difusion: null, id_difusion: null, nombre_actividad: '', costo: '' };
+            this.showDivModalDifusion = true;
+        },
+        cerrarModalDifusion() {
+            this.showDivModalDifusion = false;
+            this.indexDifusionEditando = null;
+        },
+        validarNumeroCosto(event) {
+            // Reemplaza cualquier caracter que no sea un dígito o un punto decimal
+            let valor = event.target.value.replace(/[^0-9.]/g, '');
+            // Evitar múltiples puntos decimales
+            const partes = valor.split('.');
+            if (partes.length > 2) {
+                valor = partes[0] + '.' + partes.slice(1).join('');
+            }
+            this.formDifusion.costo = valor;
+        },
+        guardarDifusionEnTabla() {
+            if (this.indexDifusionEditando !== null && this.indexDifusionEditando >= 0) {
+                // Modo Edición
+                this.editForm.difusion[this.indexDifusionEditando] = { ...this.formDifusion };
+            } else {
+                // Modo Creación
+                this.editForm.difusion.push({ ...this.formDifusion });
+            }
+            this.cerrarModalDifusion();
+        },
+        editarDifusion(item, index) {
+            this.indexDifusionEditando = index;
+            // Clonamos el objeto para no editar en vivo la tabla
+            this.formDifusion = JSON.parse(JSON.stringify(item));
+            this.showDivModalDifusion = true;
+        },
+        eliminarDifusion(index) {
+            this.editForm.difusion.splice(index, 1);
+        },
         agregarAdquisicion() {
             this.editForm.adquisiciones.push({
                 id_adquisicion: null, // Null porque es nuevo y no está en BD aún
@@ -6091,7 +6389,108 @@ export default {
                 detalle_insu_import: ''
             });
         },
+        async abrirMenuContextual(event, campo) {
+            // 1. Guardar datos de la selección
+            this.campoObjetivoCita = campo;
+            this.posicionCursorCita = event.target.selectionStart;
 
+            // 2. Dimensiones estáticas del menú (w-48 = 192px aprox, alto 55px)
+            const menuWidth = 195;
+            const menuHeight = 55;
+
+            // 3. Obtener el modal padre (el que tiene la clase transform)
+            // event.target es el textarea donde dimos clic
+            const modal = event.target.closest('.transform');
+
+            if (modal) {
+                // Obtenemos las coordenadas exactas del modal en la pantalla
+                const modalRect = modal.getBoundingClientRect();
+
+                // 4. RESTAMOS la posición del modal a la posición del clic
+                // Así convertimos coordenadas de "pantalla" a coordenadas de "modal"
+                let relativeX = event.clientX - modalRect.left;
+                let relativeY = event.clientY - modalRect.top;
+
+                // 5. Ajuste inteligente: si choca con el borde DERECHO del modal, abrir a la izquierda
+                if (relativeX + menuWidth > modalRect.width) {
+                    relativeX = relativeX - menuWidth;
+                }
+
+                // 6. Ajuste inteligente: si choca con el borde INFERIOR del modal, abrir hacia arriba
+                if (relativeY + menuHeight > modalRect.height) {
+                    relativeY = relativeY - menuHeight;
+                }
+
+                // Asignamos las coordenadas limpias
+                this.menuX = relativeX;
+                this.menuY = relativeY;
+            } else {
+                // Fallback de seguridad
+                this.menuX = event.clientX;
+                this.menuY = event.clientY;
+            }
+
+            // 7. Mostramos el menú (saldrá a la primera, sin necesidad de doble clic)
+            this.mostrarMenu = true;
+        },
+        cerrarMenuContextual() {
+            this.mostrarMenu = false;
+        },
+        prepararModalBibliografia() {
+            this.cerrarMenuContextual();
+            this.formBib = { autor: '', anio: '', titulo: '', editorial_fuente: '' };
+            this.showModalBib = true;
+        },
+        guardarCitaEnTexto() {
+            // 1. Evitar duplicados exactos en el array de bibliografías
+            const existe = this.editForm.bibliografias.find(b => 
+                b.autor.toLowerCase().trim() === this.formBib.autor.toLowerCase().trim() && 
+                b.anio.trim() === this.formBib.anio.trim() &&
+                b.titulo.toLowerCase().trim() === this.formBib.titulo.toLowerCase().trim()
+            );
+
+            if (!existe) {
+                this.editForm.bibliografias.push({
+                    ...this.formBib,
+                    seccion_campo: this.campoObjetivoCita
+                });
+            }
+
+            // 2. Insertar la cita en formato APA (Autor, Año) en el texto
+            const citaAPA = ` (${this.formBib.autor}, ${this.formBib.anio})`;
+            const textoActual = this.editForm[this.campoObjetivoCita] || '';
+            
+            this.editForm[this.campoObjetivoCita] = 
+                textoActual.substring(0, this.posicionCursorCita) + 
+                citaAPA + 
+                textoActual.substring(this.posicionCursorCita);
+
+            // 3. Cerrar modal y notificar
+            this.showModalBib = false;
+        },
+        eliminarBibliografia(index) {
+            this.editForm.bibliografias.splice(index, 1);
+        },
+        formatearNombreCampo(campo) {
+            // Un pequeño helper para que se vea bonito en la pestaña Bibliografías
+            const diccionario = {
+                'proyect_antecedentes': 'Antecedentes',
+                'proyect_justificacion': 'Justificación',
+                'proyect_desc_situ_act': ' Descripción de la situación actual',
+                'proyect_diag_probl': ' Diagnóstico de los problemas',
+                'proyect_contribucion_soci': 'Contribución a la sociedad',
+                'proyec_ident_poblaobj': 'Identificación y caracterización de la población objetiva beneficiarios',
+                'proyect_fact_exito': ' Factores críticos de éxito',
+                'proyect_rest_supu': 'Restricciones/Supuestos',
+                'proyect_metodologia': 'Metodología',
+                'proyect_viabilidad_tec': 'Viabilidad Técnica',
+                'proyect_equip_tec': 'Equipamiento Tecnológico Disponible',
+                'proyect_no_ejecuta': '¿Qué perdería la provincia si el proyecto no se ejecuta en este periodo?',
+                
+                // Añade otros campos si decides habilitar el clic derecho en ellos
+            };
+            return diccionario[campo] || campo;
+        },
         eliminarAdquisicion(index) {
             this.editForm.adquisiciones.splice(index, 1);
         },
