@@ -61,6 +61,9 @@ use App\Models\Invi_detalle_financia;
 use App\Models\Invi_rubros;
 use App\Models\Invi_impactos;
 use App\Models\Invi_det_impactos_esperados;
+use App\Models\Invi_det_difusion;
+use App\Models\Invi_difusion;
+use App\Models\Invi_bibliografias;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -218,7 +221,9 @@ class Invi_proyectosController extends Controller
             'invi_obj_proyectos.invi_actividades.invi_actsupuestos',
             'invi_detalle_adqui.invi_adquisicion',
             'invi_detalle_financia.invi_rubros',
-            'invi_det_impactos_esperados.invi_impactos'
+            'invi_det_impactos_esperados.invi_impactos',
+            'invi_detalle_difusion.invi_difusion',
+            'invi_bibliografias'
         )->findOrFail($id);
 
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
@@ -1229,6 +1234,90 @@ class Invi_proyectosController extends Controller
                     // Crear
                     $dataImp['proyect_id'] = $id;
                     Invi_det_impactos_esperados::create($dataImp);
+                }
+            }
+            $difusionReq = $request->difusion ?? [];
+            
+            // Obtener IDs de detalles de difusión que vienen del frontend
+            $difIdsReq = collect($difusionReq)->pluck('id_det_difusion')->filter()->toArray();
+
+            // Obtener detalles actuales en BD para este proyecto
+            $detallesDifActuales = Invi_det_difusion::where('proyect_id', $id)->get();
+            $difIdsActuales = $detallesDifActuales->pluck('id_det_difusion')->toArray();
+
+            // Determinar cuáles hay que ELIMINAR
+            $idsDifToDelete = array_diff($difIdsActuales, $difIdsReq);
+            if (!empty($idsDifToDelete)) {
+                // Obtenemos los id_difusion (catálogo) vinculados antes de eliminar el detalle
+                $detallesAborrar = Invi_det_difusion::whereIn('id_det_difusion', $idsDifToDelete)->get();
+                $idsCatalogoDifusionAborrar = $detallesAborrar->pluck('id_difusion')->filter()->toArray();
+                
+                // Eliminamos los detalles
+                Invi_det_difusion::whereIn('id_det_difusion', $idsDifToDelete)->delete();
+                
+                // Eliminamos las actividades del catálogo vinculadas (ya que se crean en conjunto)
+                if (!empty($idsCatalogoDifusionAborrar)) {
+                    Invi_difusion::whereIn('id_difusion', $idsCatalogoDifusionAborrar)->delete();
+                }
+            }
+
+            // CREAR o ACTUALIZAR los detalles de difusión
+            foreach ($difusionReq as $difReq) {
+                if (isset($difReq['id_det_difusion']) && $difReq['id_det_difusion']) {
+                    // ACTUALIZAR
+                    Invi_det_difusion::where('id_det_difusion', $difReq['id_det_difusion'])
+                                     ->update(['costo' => $difReq['costo']]);
+                    
+                    if (isset($difReq['id_difusion']) && $difReq['id_difusion']) {
+                        Invi_difusion::where('id_difusion', $difReq['id_difusion'])
+                                     ->update(['nombre_actividad' => $difReq['nombre_actividad']]);
+                    }
+                } else {
+                    // CREAR (Primero el catálogo, luego el detalle)
+                    $nuevaDifusion = Invi_difusion::create([
+                        'nombre_actividad' => $difReq['nombre_actividad']
+                    ]);
+
+                    Invi_det_difusion::create([
+                        'proyect_id'  => $id,
+                        'id_difusion' => $nuevaDifusion->id_difusion,
+                        'costo'       => $difReq['costo']
+                    ]);
+                }
+            }
+            $bibReq = $request->bibliografias ?? [];
+            
+            // Obtener IDs de bibliografías que vienen del frontend
+            $bibIdsReq = collect($bibReq)->pluck('id_bibliografia')->filter()->toArray();
+
+            // Obtener bibliografías actuales en BD para este proyecto
+            $bibActuales = Invi_bibliografias::where('proyect_id', $id)->get();
+            $bibIdsActuales = $bibActuales->pluck('id_bibliografia')->toArray();
+
+            // Determinar cuáles hay que ELIMINAR
+            $idsBibToDelete = array_diff($bibIdsActuales, $bibIdsReq);
+            if (!empty($idsBibToDelete)) {
+                Invi_bibliografias::whereIn('id_bibliografia', $idsBibToDelete)->delete();
+            }
+
+            // CREAR o ACTUALIZAR las bibliografías
+            foreach ($bibReq as $bib) {
+                $dataBib = [
+                    'seccion_campo'    => $bib['seccion_campo'],
+                    'autor'            => $bib['autor'],
+                    'anio'             => $bib['anio'],
+                    'titulo'           => $bib['titulo'],
+                    'editorial_fuente' => $bib['editorial_fuente'],
+                ];
+
+                if (isset($bib['id_bibliografia']) && $bib['id_bibliografia']) {
+                    // Actualizar
+                    Invi_bibliografias::where('id_bibliografia', $bib['id_bibliografia'])
+                                      ->update($dataBib);
+                } else {
+                    // Crear
+                    $dataBib['proyect_id'] = $id;
+                    Invi_bibliografias::create($dataBib);
                 }
             }
 

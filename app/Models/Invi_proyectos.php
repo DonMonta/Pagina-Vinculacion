@@ -143,4 +143,12 @@ class Invi_proyectos extends Model
     {
         return $this->hasMany(Invi_det_impactos_esperados::class, 'proyect_id');
     }
+    public function invi_detalle_difusion()
+    {
+        return $this->hasMany(Invi_det_difusion::class, 'proyect_id');
+    }
+    public function invi_bibliografias()
+    {
+        return $this->hasMany(Invi_bibliografias::class, 'proyect_id');
+    }
 }
