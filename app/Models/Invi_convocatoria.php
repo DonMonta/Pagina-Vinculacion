@@ -9,7 +9,7 @@ class Invi_convocatoria extends Model
 {
     protected $table = 'invi_convocatoria';
     protected $primaryKey = 'id_convocatoria';
-    public $incrementing = false;
+    public $incrementing = true;
     protected $keyType = 'int';
     public $timestamps = false;
 

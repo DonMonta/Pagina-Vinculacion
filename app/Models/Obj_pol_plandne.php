@@ -9,7 +9,7 @@ class Obj_pol_plandne extends Model
 {
     protected $table = 'obj_pol_plandne';
     protected $primaryKey = 'id_obj_pol_pladne';
-    public $incrementing = false;
+    public $incrementing = true;
     protected $keyType = 'int';
     public $timestamps = false;
 

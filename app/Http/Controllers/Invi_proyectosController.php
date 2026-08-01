@@ -64,6 +64,8 @@ use App\Models\Invi_det_impactos_esperados;
 use App\Models\Invi_det_difusion;
 use App\Models\Invi_difusion;
 use App\Models\Invi_bibliografias;
+use App\Models\Invi_compromiso;
+use App\Models\Obj_pol_plandne;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -504,6 +506,29 @@ class Invi_proyectosController extends Controller
         $num_est_part  = $num_est_h + $num_est_m;
         $rubrosCatalogo = Invi_rubros::all();
         $impactosCatalogo = Invi_impactos::all();
+        $facultadesData = Facultad::whereIn('idfacultad', $facultadesSeleccionadas)->get();
+        // Usamos DB table directo a la tabla de carreras asumiendo tu convención
+        $carrerasData = DB::table('carrera')->whereIn('idCarr', $carrerasSeleccionadas)->get();
+        $dominiosData = Invi_dom_huma::whereIn('id_dom_huma', $dominiosSeleccionados)->get();
+        $objetivosPeiData = Objetivos_pei::whereIn('id_obj_pei', $preseleccionados)->get();
+        $politicasData = Politicas_plandne::whereIn('id_pol_pladne', $politicasSeleccionadas)->get();
+        $agendaOdsData = ODS::whereIn('id_ods', $odsSeleccionadas)->get();
+        $objPolData = Politicas_plandne::with('objetivos_plandne')
+                    ->whereIn('id_pol_pladne', $politicasSeleccionadas)
+                    ->get()->pluck('objetivos_plandne')
+                    ->unique('id_obj_pol_pladne')
+                    ->values();
+        $convocatoriaData = Invi_convocatoria::where('id_convocatoria', $proyecto->id_convocatoria)->get();
+        $lineasData = Invi_sub_linea_inves::with('linea_investigacion')
+            ->whereIn('id_sublin_investiga', $sublineasSeleccionadas)
+            ->get()->pluck('linea_investigacion')
+            ->unique('id_lin_investiga')
+            ->values();
+        $sublineasData = Invi_sub_linea_inves::whereIn('id_sublin_investiga', $sublineasSeleccionadas)->get();
+        
+        // Para Unesco filtramos la collection que ya creaste previamente:
+        $unescoData = collect($unescoCatalogo)->whereIn('sau_id', $unescoSeleccionadas)->values();
+        $tipoproyectoData = Invi_tip_proyect::where('id_tip_invi_proy', $proyecto->id_tip_invi_proy)->get();
 
         return response()->json([
             'proyecto' => $proyecto,
@@ -558,6 +583,18 @@ class Invi_proyectosController extends Controller
             ],
             'rubros_catalogo' => $rubrosCatalogo,
             'impactos_catalogo' => $impactosCatalogo,
+            'facultades_data' => $facultadesData,
+            'carreras_data' => $carrerasData,
+            'dominios_data' => $dominiosData,
+            'unesco_data' => $unescoData,
+            'objetivos_pei_data' => $objetivosPeiData,
+            'politicas_data' => $politicasData,
+            'agenda_ods_data' => $agendaOdsData,
+            'objetivos_politicas_data' => $objPolData,
+            'convocatoria_data' => $convocatoriaData,
+            'lineas_data' => $lineasData,
+            'sublineas_data' => $sublineasData,
+            'tipproyectos_data' => $tipoproyectoData,
         ]);
     }
 
@@ -588,6 +625,7 @@ class Invi_proyectosController extends Controller
             'invi_detalle_integrante.carreras',
             'invi_detalle_integrante.informacionPersonalD',
             'invi_detalle_integrante.informacionpersonal',
+            'invi_detalle_integrante.compromisos',
         ])->findOrFail($id);
 
         // 1. Extraer la facultad prioritaria
@@ -1405,6 +1443,8 @@ class Invi_proyectosController extends Controller
             $form = $request->form;
             $reemplazoConfig = $request->reemplazo_config;
             $proyect_id = $request->proyect_id;
+            $compromisos = $form['compromisos'] ?? [];
+            $integranteAfectado = null;
             // --- OBTENER CÓDIGO DEL PROYECTO ---
             $proyecto = Invi_proyectos::find($proyect_id);
             $codigoProyect = $proyecto?->proyect_cod ?? 'S/N';
@@ -1442,7 +1482,7 @@ class Invi_proyectosController extends Controller
                     }
                 }
 
-                Invi_deta_inte::create([
+                $integranteAfectado = Invi_deta_inte::create([
                     'proyect_id' => $proyect_id,
                     'ciinfper_doc' => $form['tipo_nuevo'] == 'doc' ? $form['cedula_nueva'] : null,
                     'ciinfper_est' => $form['tipo_nuevo'] == 'est' ? $form['cedula_nueva'] : null,
@@ -1503,11 +1543,12 @@ class Invi_proyectosController extends Controller
                     if ($integranteExistente) {
                         // SI YA EXISTÍA: Lo actualizamos en lugar de crear uno nuevo
                         $integranteExistente->update($datosNuevoRol);
+                        $integranteAfectado = $integranteExistente;
                         $accionBitacora = 'REEMPLAZO DE INTEGRANTE EXISTENTE';
                         $obsBitacora = "Reemplazo en proyecto: {$codigoProyect}. Reemplazo del integrante ID: {$request->id_deta_invi_proyect}, por un docente del mismo proyecto con cédula: {$form['cedula_nueva']}";
                     } else {
                         // SI NO EXISTÍA: Lo creamos
-                        Invi_deta_inte::create($datosNuevoRol);
+                        $integranteAfectado = Invi_deta_inte::create($datosNuevoRol);
                         $accionBitacora = 'REEMPLAZO DE INTEGRANTE POR UN DOCENTE NUEVO';
                         $obsBitacora = "Reemplazo en proyecto: {$codigoProyect}. Reemplazo del integrante ID: {$request->id_deta_invi_proyect}, por un docente nuevo con cédula: {$form['cedula_nueva']}";
                     }
@@ -1517,12 +1558,29 @@ class Invi_proyectosController extends Controller
                         'id_funcion' => $form['id_funcion'],
                         'idCarr' => $form['idCarr'],
                         'horas' => $form['horas'],
-                        // 'anexo_integrante2' => $form['anexo_integrante2'],
+                        'anexo_integrante2' => $form['anexo_integrante2'],
                         'reemplazado' => 0,
                         'estado' => 1,
                     ]);
+                    $integranteAfectado = $registroOriginal;
                     $accionBitacora = 'EDICIÓN DE INTEGRANTE';
                     $obsBitacora = "Se editaron datos del integrante ID: {$request->id_deta_invi_proyect} en proyecto: {$codigoProyect}";
+                }
+            }
+            if ($integranteAfectado && is_array($compromisos)) {
+                // Si la clave primaria no está configurada en el modelo, el ID se guarda en ->id
+                // Usamos getKey() que es más seguro, o el fallback (??)
+                $idDetalleIntegrante = $integranteAfectado->id_deta_invi_proyect ?? $integranteAfectado->id;
+                
+                // Eliminamos compromisos previos para evitar duplicados en la edición
+                Invi_compromiso::where('id_deta_invi_proyect', $idDetalleIntegrante)->delete();
+                
+                // Iteramos sobre el arreglo para crear todos los seleccionados
+                foreach ($compromisos as $detalle) {
+                    Invi_compromiso::create([
+                        'id_deta_invi_proyect' => $idDetalleIntegrante,
+                        'detalle_compromiso'   => $detalle,
+                    ]);
                 }
             }
 

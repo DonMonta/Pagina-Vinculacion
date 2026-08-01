@@ -9,7 +9,7 @@ class Invi_deta_inte extends Model
 {
     protected $table = 'invi_detalle_integrante';
     protected $primaryKey = 'id_deta_invi_proyect';
-    public $incrementing = false;
+    public $incrementing = true;
     protected $keyType = 'int';
 
     protected $fillable = [
@@ -43,5 +43,9 @@ class Invi_deta_inte extends Model
     public function informacionpersonal()
     {
         return $this->belongsTo(informacionpersonal::class, 'ciinfper_est', 'CIInfPer');
+    }
+    public function compromisos()
+    {
+        return $this->hasMany(Invi_compromiso::class, 'id_deta_invi_proyect', 'id_deta_invi_proyect');
     }
 }
