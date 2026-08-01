@@ -239,8 +239,33 @@
                                             </option>
                                         </select>
                                     </div>
+                                    <div class="md:col-span-3 mt-2 p-4 border rounded-xl bg-gray-50 dark:bg-gray-700/30">
+                                        <label class="block text-[10px] font-bold mb-3 uppercase text-blue-600">
+                                            Compromisos a entregar
+                                        </label>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                            <label v-for="comp in listaCompromisos" :key="comp" 
+                                                   class="flex items-start gap-2 cursor-pointer group">
+                                                <input type="checkbox" :value="comp" v-model="formInt.compromisos"
+                                                    class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                                <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">
+                                                    {{ comp }}
+                                                </span>
+                                            </label>
+                                        </div>
+                                        
+                                        <!-- Input dinámico para "Otros" -->
+                                        <div v-if="formInt.compromisos.includes('Otros')" class="mt-4 animate-fadeIn">
+                                            <label class="block text-[10px] font-bold mb-1 uppercase text-gray-500">
+                                                Especifique el otro compromiso
+                                            </label>
+                                            <input type="text" v-model="formInt.compromiso_otro" 
+                                                placeholder="Ej: Manual de usuario, Prototipo funcional..."
+                                                class="w-full border rounded-lg p-2 text-sm focus:ring-2 ring-blue-200 outline-none bg-white dark:bg-gray-800">
+                                        </div>
+                                    </div>
 
-                                    <div v-if="formInt.reemplazado == 1 || modoNuevo" class="md:col-span-2">
+                                    <div v-if="formInt.reemplazado == 1 || modoNuevo || formInt.anexo_integrante2==null" class="md:col-span-2">
                                         <label class="block text-[10px] font-bold mb-1">Documento Respaldo (PDF)</label>
                                         <div @click="$refs.fileFoto.click()"
                                             class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
@@ -375,6 +400,7 @@
                                         <th class="p-3 text-left">Registro / Act.</th>
                                         <th class="p-3 text-center">Anexo Reemplazo</th>
                                         <th class="p-3 text-center">Anexo Original</th>
+                                        <th class="p-3 text-center">Anexo Compromiso</th>
                                         <th class="p-3 text-center">Estado</th>
                                         <th class="p-3 text-right">Acciones</th>
                                     </tr>
@@ -477,6 +503,22 @@
                                                 </a>
                                             </div>
                                             <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
+                                        </td>
+                                        <td class="p-3 text-center">
+                                            <div v-if="int.compromisos.length > 0" class="flex justify-center">
+                                                <button @click="descargarcompromiso(int.ciinfper_doc || int.ciinfper_est)"
+                                                    target="_blank"
+                                                    class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                                    title="Ver documento PDF">
+                                                    <svg width="18" height="18" fill="none" stroke="currentColor"
+                                                        stroke-width="2" viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                        <path d="M9 15h6M9 11h6" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <span v-else class="text-[10px] text-gray-300 italic">Sin anexo Compromiso</span>
                                         </td>
                                         <td class="p-3 text-center">
                                             <span
@@ -4648,6 +4690,13 @@ export default {
             proyectoSeleccionado: { invi_detalle_fac_proy: [], invi_detalle_integrante: [] },
             filtroIntegrante: '',
             integranteEdit: null,
+            listaCompromisos: [
+                'Libros',
+                'Capítulos de libros',
+                'Artículos científicos',
+                'Informe de Avance cada tres meses',
+                'Otros'
+            ],
             formInt: {
                 id_deta_invi_proyect: null,
                 horas: 0,
@@ -4655,10 +4704,12 @@ export default {
                 idCarr: null,
                 reemplazado: 0,
                 anexo_integrante: null,
+                anexo_integrante2: null,
                 id_funcion_reemplazado: null,
                 horas_reemplazado: 0,
-                idCarr_reemplazado: null
-
+                idCarr_reemplazado: null,
+                compromisos: [],
+                compromiso_otro: ''
             },
             funciones: [],
             carreras: [],
@@ -5431,6 +5482,7 @@ export default {
                     API.get(`${this.baseUrl}/catalogos-integrantes`)
                 ]);
                 this.proyectoSeleccionado = resProj.data;
+                console.log(this.proyectoSeleccionado);
                 this.funciones = resCat.data.funciones;
                 this.carreras = resCat.data.carreras;
                 this.showModalDetalles = true;
@@ -5440,6 +5492,21 @@ export default {
             }
         },
         seleccionarIntegrante(int) {
+            const compAsignados = (int.compromisos || []).map(c => c.detalle_compromiso);
+            
+            let compromisosVModel = [];
+            let compromisoOtroVModel = '';
+
+            // 2. Evaluamos cada compromiso para saber si es estándar o es "Otro"
+            compAsignados.forEach(c => {
+                if (this.listaCompromisos.includes(c)) {
+                    compromisosVModel.push(c);
+                } else {
+                    // Si no está en la lista predefinida, significa que era "Otros"
+                    compromisosVModel.push('Otros');
+                    compromisoOtroVModel = c;
+                }
+            });
             this.integranteEdit = {
                 id: int.id_deta_invi_proyect,
                 id_deta_invi_proyect: int.id_deta_invi_proyect,
@@ -5459,7 +5526,10 @@ export default {
                 // Campos para el que se queda:
                 id_funcion_reemplazado: null,
                 horas_reemplazado: 0,
-                idCarr_reemplazado: int.idCarr
+                idCarr_reemplazado: int.idCarr,
+                anexo_integrante2: int.anexo_integrante2,
+                compromisos: compromisosVModel,
+                compromiso_otro: compromisoOtroVModel
             };
             this.nuevoIntegranteData = null;
             this.cedulaBusqueda = '';
@@ -5471,6 +5541,11 @@ export default {
             if (this.integranteEdit && this.cedulaBusqueda === this.integranteEdit.cedula) {
                 mostraralertas2("No puedes reemplazar a un integrante por sí mismo.", "warning");
                 return;
+            }
+            if(this.formInt.reemplazado == 1){
+                this.formInt.compromisos = []; 
+                this.formInt.compromiso_otro = ''; 
+            
             }
 
             try {
@@ -5501,7 +5576,10 @@ export default {
             this.nuevoIntegranteData = null;
             this.cedulaBusqueda = '';
             this.pdfFile = null;
-            this.formInt = { horas: 0, id_funcion: null, idCarr: null, reemplazado: 0 };
+            this.formInt = {
+                horas: 0, id_funcion: null, idCarr: null, reemplazado: 0, compromisos: [],        // <-- IMPORTANTE REINICIAR
+                compromiso_otro: ''
+            };
         },
 
         async inhabilitarIntegrante(int) {
@@ -5516,11 +5594,14 @@ export default {
             if (!this.formInt.id_funcion || !this.formInt.idCarr) {
                 return mostraralertas2("Complete función y carrera.", "warning");
             }
-
+            if (this.formInt.compromisos.includes('Otros') && !this.formInt.compromiso_otro.trim()) {
+                return mostraralertas2("Por favor, especifique el compromiso en el campo 'Otros'.", "warning");
+            }
             // Si es nuevo o reemplazo, el archivo es obligatorio
             if ((this.modoNuevo || this.formInt.reemplazado == 1) && !this.archivoSeleccionado && !this.formInt.anexo_integrante) {
                 return mostraralertas2("El documento de respaldo PDF es obligatorio.", "warning");
             }
+            
             // 2. Bloqueo de doble clic
             if (this.enviando) return;
 
@@ -5553,6 +5634,13 @@ export default {
                         return;
                     }
                 }
+                let compromisosParaBackend = [...this.formInt.compromisos];
+                if (compromisosParaBackend.includes('Otros')) {
+                    compromisosParaBackend = compromisosParaBackend.filter(c => c !== 'Otros');
+                    if (this.formInt.compromiso_otro.trim()) {
+                        compromisosParaBackend.push(this.formInt.compromiso_otro.trim());
+                    }
+                }
 
                 // 4. Preparar Payload
                 const payload = {
@@ -5566,7 +5654,8 @@ export default {
                         // Si es reemplazo, el archivo va a 'anexo_integrante' (el que entra)
                         anexo_integrante: (this.formInt.reemplazado == 1 && anexoData) ? anexoData.filename : this.formInt.anexo_integrante,
                         // Si es nuevo o edición simple, va a 'anexo_integrante2'
-                        anexo_integrante2: (this.formInt.reemplazado == 0 && anexoData) ? anexoData.filename : this.formInt.anexo_integrante2
+                        anexo_integrante2: (this.formInt.reemplazado == 0 && anexoData) ? anexoData.filename : this.formInt.anexo_integrante2,
+                        compromisos: compromisosParaBackend
                     },
                     reemplazo_config: {
                         mantener_docente: this.continuarEnProyecto,
@@ -6046,9 +6135,13 @@ export default {
                 // Asegúrate de crear esta ruta en tus routes/api.php de Laravel
                 const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
                 const data = response.data;
+                
                 this.objetivosPeiDisponibles = data.objetivos_pei;
+                
                 this.politicasPlandeDisponibles = data.politicas_plandne || [];
+                //Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:
                 this.objetivosPoliticasDisponibles = data.objetivos_politicas_seleccionadas || [];
+                
                 this.objetivosODSDisponibles = data.ods || [];
                 this.facultadesCatalogo = data.facultades_catalogo || [];
                 this.dominiosCatalogo = data.dominios_catalogo || [];
@@ -6161,14 +6254,21 @@ export default {
                     proyect_nombre_en: data.proyecto.proyect_nombre_en || '',
                     proyect_titulo_en: data.proyecto.proyect_titulo_en || '',
                     proyect_multidis: data.proyecto.proyect_multidis,
+                    //Objetivos del Plan Estratégico Institucional
                     objetivos: data.seleccionados || [],
+                    //Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025
                     politicas: data.politicas_seleccionadas || [],
+                    //Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe
                     ods: data.ods_seleccionadas || [],
+                    //Nombre de Facultad/es: 
                     facultades: data.facultades_seleccionadas || [],
                     id_facultad_priori: data.id_facultad_priori || '',
+                    //Carrera/s
                     carreras: data.carreras_seleccionadas || [],
                     id_carr_priori: data.id_carr_priori || '',
+                    //Dominios académicos
                     dominios_humanisticos: data.dominios_seleccionados || [],
+                    //No. Convocatoria
                     id_convocatoria: data.proyecto.id_convocatoria || '',
                     sublineas_investigacion: [],
                     unesco_areas: data.unesco_seleccionadas || [],
@@ -7714,6 +7814,191 @@ export default {
                 console.error('Error al generar el PDF del Anexo 3:', error);
             } finally {
                 this.isGeneratingPDFFinancia = false;
+            }
+        },
+        async descargarcompromiso(cedula) {
+            try {
+                // 1. Buscar al integrante seleccionado
+                const integrante = this.integrantesFiltrados.find(
+                    i => i.ciinfper_doc === cedula || i.ciinfper_est === cedula
+                );
+
+                if (!integrante) {
+                    return mostraralertas2("No se encontró la información del integrante.", "warning");
+                }
+
+                mostraralertas2("Generando documento, por favor espere...", "info");
+
+                // 2. Llamada directa a la API
+                const idProyecto = this.proyectoSeleccionado?.proyect_id;
+                
+                if(!idProyecto) {
+                    return mostraralertas2("Error: No se ha seleccionado un proyecto válido.", "warning");
+                }
+
+                const response = await API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`);
+                const data = response.data;
+                const proy = data.proyecto;
+
+                // 3. Inicializar jsPDF
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                const rutaImagenFondo = '/fondo2.png'; 
+
+                const dibujarFondoYEncabezado = () => {
+                    doc.addImage(rutaImagenFondo, 'PNG', 0, 0, pageWidth, pageHeight);
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                    
+                    let startY = 25; 
+                    
+                    doc.text('ANEXO 5', pageWidth / 2, startY + 20, { align: 'center' });
+                    doc.text('FORMATO DE PROFESORES QUE DESEAN PARTICIPAR EN PROYECTOS DE', pageWidth / 2, startY + 28, { align: 'center' });
+                    doc.text('VINCULACIÓN CON LA SOCIEDAD', pageWidth / 2, startY + 33, { align: 'center' });
+                };
+
+                // NUEVO: Dibujar el fondo en la primera página ANTES de la tabla
+                dibujarFondoYEncabezado();
+
+                // NUEVO: Interceptar doc.addPage para asegurar el fondo en páginas nuevas
+                const originalAddPage = doc.addPage.bind(doc);
+                doc.addPage = function() {
+                    originalAddPage();
+                    dibujarFondoYEncabezado();
+                };
+
+                // 4. Mapear los datos desde las variables del backend para el PDF
+                const facultadesTxt = data.facultades_data?.map(f => f.siglas || f.siglas || f.siglas).join('\n') || 'N/A';
+                const carrerasTxt = data.carreras_data?.map(c => c.NombCarr || c.NombCarr || c.NombCarr).join('\n') || 'N/A';
+                const dominiosTxt = data.dominios_data?.map(dom => dom.detalle_dom_huma).join('\n') || 'N/A';
+
+                const objetivosTxt = data.objetivos_pei_data?.map(o => o.cod_obj+'. '+ o.detalle_obj).join('\n') || 'N/A';
+                const politicasTxt = data.politicas_data?.map(p => p.cod_pol+'. '+ p.detalle_pol || 'Política').join('\n') || 'N/A';
+                const agendaTxt = data.agenda_ods_data?.map(a => a.cod_ods+'. '+ a.detalle_ods || 'Agenda').join('\n') || 'N/A';
+                const objplandeTxt = data.objetivos_politicas_data?.map(a => a.cod_obj_pol+'. '+ a.detalle_obj_pol || 'Obj').join('\n') || 'N/A';
+                const convocatoriaTxt = data.convocatoria_data?.map(c => c.num_convocatoria).join('\n') || 'N/A';
+                const lineaInvestigacion = data.lineas_data?.map(l => l.nombre_lin).join('\n') || 'N/A';
+                const sublineaInvestigacion = data.sublineas_data?.map(sl => sl.nombre_sublin).join('\n') || 'N/A';
+                const areaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
+                const subareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Subárea de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
+                const especareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área específica de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
+                const tipoproyectTxt = data.tipproyectos_data?.map(t => t.detalle_invi_proyect).join('\n') || 'N/A';
+
+                // LÓGICA DE COBERTURA: Extraemos la cobertura y comprobamos qué marcar con X
+                const coberturaSeleccionada = (proy.proyect_cobertura || '').toLowerCase();
+                const checkLocal = coberturaSeleccionada.includes('local') ? 'X' : '  ';
+                const checkRegional = coberturaSeleccionada.includes('regional') ? 'X' : '  ';
+                const checkNacional = coberturaSeleccionada.includes('nacional') ? 'X' : '  ';
+                const checkInternacional = coberturaSeleccionada.includes('internacional') ? 'X' : '  ';
+
+                // 5. Definir la estructura de la TABLA 1 (Datos Generales - 3 Columnas)
+                const tablaDatosGenerales = [
+                    [{ content: '1. DATOS GENERALES', colSpan: 3, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220] } }],
+                    
+                    [{ content: `Nombre (Español):\n${proy.proyect_nombre || ''}`, colSpan: 3 }],
+                    [{ content: `Título del proyecto (Español):\n${proy.proyect_titulo || ''}`, colSpan: 3 }],
+                    [{ content: `Name (Inglés):\n${proy.proyect_nombre_en || ''}`, colSpan: 3 }],
+                    [{ content: `Title of the project (Inglés):\n${proy.proyect_titulo_en || ''}`, colSpan: 3 }],
+                    
+                    [{ content: `Objetivos del Plan Estratégico Institucional:\n${objetivosTxt}`, colSpan: 3 }],
+                    [{ content: `Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:\n${politicasTxt}`, colSpan: 3 }],
+                    [{ content: `Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe:\n${agendaTxt}`, colSpan: 3 }],
+                    [{ content: `Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:\n${objplandeTxt}`, colSpan: 3 }],
+                    
+                    [
+                        { content: `Nombre de Facultad/es:\n${facultadesTxt}` },
+                        { content: `Carrera/s:\n${carrerasTxt}` },
+                        { content: `Dominios académicos:\n${dominiosTxt}` }
+                    ],
+                    [
+                        { content: `No. Convocatoria:\n${convocatoriaTxt}` },
+                        { content: `Línea de Investigación:\n${lineaInvestigacion}` },
+                        { content: `Sublínea de Investigación:\n${sublineaInvestigacion}` }
+                    ],
+                    [
+                        { content: `Área Conocimiento UNESCO:\n${areaespecifica}` },
+                        { content: `SubÁrea Conocimiento UNESCO:\n${subareaespecifica}` },
+                        { content: `SubÁrea Específica Conocimiento UNESCO:\n${especareaespecifica}` }
+                    ],
+                    [{ content: `Tipo de proyecto de vinculación:\n${tipoproyectTxt}`, colSpan: 3 }]
+                ];
+
+                // 6. Dibujar Tabla 1
+                autoTable(doc, {
+                    startY: 65,
+                    margin: { left: 15, right: 15 },
+                    theme: 'grid',
+                    body: tablaDatosGenerales,
+                    styles: { fontSize: 8, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+                });
+
+                // 7. Definir estructura de la TABLA 2 (Cobertura - 4 Columnas para coincidir con la imagen)
+                const tablaCobertura = [
+                    [{ content: 'COBERTURA Y LOCALIZACIÓN', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [220, 220, 220] } }],
+                    [
+                        { content: `Local                [ ${checkLocal} ]`, styles: { halign: 'center' } },
+                        { content: `Regional          [ ${checkRegional} ]`, styles: { halign: 'center' } },
+                        { content: `Nacional          [ ${checkNacional} ]`, styles: { halign: 'center' } },
+                        { content: `Internacional   [ ${checkInternacional} ]`, styles: { halign: 'center' } }
+                    ]
+                ];
+
+                // 8. Dibujar Tabla 2 (Pegada exactamente debajo de la primera)
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, // Inicia justo donde terminó la anterior
+                    margin: { left: 15, right: 15 },
+                    theme: 'grid',
+                    body: tablaCobertura,
+                    styles: { fontSize: 8, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+                });
+
+                // 9. Calcular salto de página para la TABLA 3 (Firmas)
+                let finalY = doc.lastAutoTable.finalY + 10;
+                
+                if (finalY > pageHeight - 90) {
+                    doc.addPage();
+                    finalY = 65; // Ajustado un poco el top de la nueva página
+                }
+
+                let compromisosTexto = "Sin compromisos registrados.";
+                if (integrante.compromisos && integrante.compromisos.length > 0) {
+                    compromisosTexto = integrante.compromisos.map(c => `• ${c.detalle_compromiso}`).join('\n');
+                }
+
+                const nombreDocente = integrante.informacion_personal_d?.nombres_completos || integrante.informacionpersonal?.nombres_completos || '_______________________';
+                const cedulaDocente = cedula;
+                const nombreDirector = proy.director_proyecto || '_______________________'; 
+
+                // 10. Definir estructura de la TABLA 3 (Firmas - 2 Columnas)
+                const tablaFirmas = [
+                    [{ content: '2. FIRMAS DE RESPONSABILIDAD', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [220, 220, 220] } }],
+                    [
+                        { content: '\n\nCiudad y Fecha:\n\n__________________________________', styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } },
+                        { content: `DECLARO EL DESEO DE PARTICIPAR EN PROYECTOS DE VINCULACIÓN CON LA\nSOCIEDAD\n\n\n__________________________________\nNombre del Docente Investigador: ${nombreDocente}\nC.I. ${cedulaDocente}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } }
+                    ],
+                    [
+                        { content: `DECLARO QUE EL DOCENTE PARTICIPARÁ EN PROYECTOS DE VINCULACIÓN CON LA SOCIEDAD\n\n\n__________________________________\nNombre del Director/a de Vinculación con la Sociedad\nC.I. ${nombreDirector}\n\nNOTA: ME COMPROMETO AL FINAL DEL SEMESTRE A ENTREGAR:\n${compromisosTexto}`, colSpan: 2, styles: { minCellHeight: 45, valign: 'top', halign: 'center' } }
+                    ]
+                ];
+
+                // 11. Dibujar Tabla 3
+                autoTable(doc, {
+                    startY: finalY,
+                    margin: { left: 15, right: 15 },
+                    theme: 'grid',
+                    body: tablaFirmas,
+                    styles: { fontSize: 8, cellPadding: 4, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+                });
+
+                // 12. Descargar Documento
+                doc.save(`Anexo_5_Compromiso_${cedula}.pdf`);
+
+            } catch (error) {
+                console.error('Error al generar el PDF del Anexo 5:', error);
+                mostraralertas2("Ocurrió un error al generar el PDF.", "error");
             }
         },
         async ObtenerCarr(id){
