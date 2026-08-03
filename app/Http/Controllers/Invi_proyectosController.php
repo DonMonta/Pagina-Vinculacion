@@ -203,7 +203,7 @@ class Invi_proyectosController extends Controller
             'invi_detalle_dom_hum',
             'invi_detalle_lin_inves',
             'invi_detalle_area_unesco',
-            'invi_detalle_cobe',
+            'invi_detalle_cobe.provincias',
             'invi_obj_proyectos.invi_indicadores',
             'invi_obj_proyectos.invi_metas',
             'invi_obj_proyectos.invi_supuestos',
@@ -626,6 +626,7 @@ class Invi_proyectosController extends Controller
             'invi_detalle_integrante.informacionPersonalD',
             'invi_detalle_integrante.informacionpersonal',
             'invi_detalle_integrante.compromisos',
+            'invi_detalle_integrante.informacionPersonalD.titulos.nivel'
         ])->findOrFail($id);
 
         // 1. Extraer la facultad prioritaria
@@ -655,7 +656,83 @@ class Invi_proyectosController extends Controller
                 default => 50, // Cualquier otra función intermedia
             };
         })->values();
+        // 4. Crear una nueva colección con los títulos (SIN alterar la original)
+        $integrantesConTitulos = $integrantesOrdenados->map(function ($integrante) {
+            // Clonamos el modelo para no mutar el objeto original de la otra colección
+            $integranteModificado = clone $integrante;
+            
+            $persona = $integranteModificado->informacionPersonalD;
+            $nombreCompletoConTitulo = '';
+            $cargoFormateado = '';
 
+            if ($persona) {
+                // 2. Lógica de Género para Nombres y Cargos
+                $esMujer = strtoupper(trim($persona->GeneroPer)) === 'F';
+                $cargoFormateado = $esMujer ? 'Directora' : 'Director';
+
+                // 3. Procesar títulos académicos filtrando por nv_numnivel
+                $tituloGrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 3; // TERCER NIVEL
+                });
+
+                $tituloPosgrado = $persona->titulos->first(function ($titulo) {
+                    return optional($titulo->nivel)->nv_numnivel == 4; // CUARTO NIVEL
+                });
+
+                $prefijoNombre = '';
+                $sufijoNombre = '';
+
+                // A. Mapeo ampliado de PREFIJOS (3er Nivel)
+                if ($tituloGrado) {
+                    $textoGrado = mb_strtolower($tituloGrado->ad_titulo);
+
+                    if (str_contains($textoGrado, 'licencia')) {
+                        $prefijoNombre = $esMujer ? 'Lcda.' : 'Lcdo.';
+                    } elseif (
+                        str_contains($textoGrado, 'ingenier') || str_contains($textoGrado, 'ing.') ||
+                        str_contains($textoGrado, 'ingeniería') || str_contains($textoGrado, 'tecnolog')
+                    ) {
+                        $prefijoNombre = 'Ing.';
+                    } elseif (str_contains($textoGrado, 'econom') || str_contains($textoGrado, 'econ.')) {
+                        $prefijoNombre = 'Econ.';
+                    } elseif (str_contains($textoGrado, 'abogad') || str_contains($textoGrado, 'abg.')) {
+                        $prefijoNombre = 'Abg.';
+                    } elseif (str_contains($textoGrado, 'arquitect') || str_contains($textoGrado, 'arq.')) {
+                        $prefijoNombre = 'Arq.';
+                    } else {
+                        $prefijoNombre = 'Prof.';
+                    }
+                } else {
+                    $prefijoNombre = $esMujer ? 'Sra.' : 'Sr.';
+                }
+
+                // B. Definir el SUFIJO (4to Nivel)
+                if ($tituloPosgrado) {
+                    $textoPosgrado = mb_strtolower($tituloPosgrado->ad_titulo);
+
+                    if (str_contains($textoPosgrado, 'phd') || str_contains($textoPosgrado, 'doctorado') || str_contains($textoPosgrado, 'doctor')) {
+                        $sufijoNombre = ', PhD';
+                    } elseif (str_contains($textoPosgrado, 'msc') || str_contains($textoPosgrado, 'science') || str_contains($textoPosgrado, 'ciencias')) {
+                        $sufijoNombre = ', MSc.';
+                    } else {
+                        $sufijoNombre = ', Mgtr.';
+                    }
+                }
+
+                // Formatear Nombres y Apellidos en formato Title Case
+                $nombreRaw = trim($persona->NombInfPer . ' ' . $persona->ApellInfPer . ' ' . $persona->ApellMatInfPer);
+                $nombresFormateados = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+
+                // Construcción del nombre con rango académico completo
+                $nombreCompletoConTitulo = trim("{$prefijoNombre} {$nombresFormateados}{$sufijoNombre}");
+            }
+
+            // Inyectamos las nuevas variables como atributos extra del modelo clonado
+            $integranteModificado->setAttribute('nombre_completo_titulo', $nombreCompletoConTitulo);
+            $integranteModificado->setAttribute('cargo_genero_formateado', $cargoFormateado);
+
+            return $integranteModificado;
+        });
         // 4. Formatear la respuesta JSON
         return response()->json([
             'proyect_id' => $proyecto->proyect_id,
@@ -665,7 +742,8 @@ class Invi_proyectosController extends Controller
             'fechafin' => $proyecto->fechafin,
             'facultades_priori' => $facultadPrincipal,
             'facultades' => $facultadesParticipantes,
-            'invi_detalle_integrante' => $integrantesOrdenados,
+            'invi_detalle_integrante' => $integrantesConTitulos,
+            'invi_detalle_integrante_titulos' => $integrantesConTitulos,
         ]);
     }
 
