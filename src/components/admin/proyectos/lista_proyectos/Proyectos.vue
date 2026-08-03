@@ -7839,6 +7839,7 @@ export default {
                 const response = await API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`);
                 const data = response.data;
                 const proy = data.proyecto;
+                console.log("Datos del proyecto obtenidos:", proy);
 
                 // 3. Inicializar jsPDF
                 const doc = new jsPDF('p', 'mm', 'a4');
@@ -7847,8 +7848,12 @@ export default {
 
                 const rutaImagenFondo = '/fondo2.png'; 
 
-                const dibujarFondoYEncabezado = () => {
+                // SEPARAR EL DIBUJO: Solo el banner en hojas nuevas para evitar que se pise con los textos
+                const dibujarFondoBanner = () => {
                     doc.addImage(rutaImagenFondo, 'PNG', 0, 0, pageWidth, pageHeight);
+                };
+
+                const dibujarTextosEncabezado = () => {
                     doc.setFont("helvetica", "bold");
                     doc.setFontSize(10);
                     doc.setTextColor(0, 0, 0);
@@ -7860,14 +7865,15 @@ export default {
                     doc.text('VINCULACIÓN CON LA SOCIEDAD', pageWidth / 2, startY + 33, { align: 'center' });
                 };
 
-                // NUEVO: Dibujar el fondo en la primera página ANTES de la tabla
-                dibujarFondoYEncabezado();
+                // Dibujar en la primera página
+                dibujarFondoBanner();
+                dibujarTextosEncabezado();
 
-                // NUEVO: Interceptar doc.addPage para asegurar el fondo en páginas nuevas
+                // Interceptar doc.addPage para asegurar que solo se repita el banner gráfico
                 const originalAddPage = doc.addPage.bind(doc);
                 doc.addPage = function() {
                     originalAddPage();
-                    dibujarFondoYEncabezado();
+                    dibujarFondoBanner();
                 };
 
                 // 4. Mapear los datos desde las variables del backend para el PDF
@@ -7887,107 +7893,202 @@ export default {
                 const especareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área específica de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
                 const tipoproyectTxt = data.tipproyectos_data?.map(t => t.detalle_invi_proyect).join('\n') || 'N/A';
 
-                // LÓGICA DE COBERTURA: Extraemos la cobertura y comprobamos qué marcar con X
                 const coberturaSeleccionada = (proy.proyect_cobertura || '').toLowerCase();
                 const checkLocal = coberturaSeleccionada.includes('local') ? 'X' : '  ';
                 const checkRegional = coberturaSeleccionada.includes('regional') ? 'X' : '  ';
                 const checkNacional = coberturaSeleccionada.includes('nacional') ? 'X' : '  ';
                 const checkInternacional = coberturaSeleccionada.includes('internacional') ? 'X' : '  ';
 
-                // 5. Definir la estructura de la TABLA 1 (Datos Generales - 3 Columnas)
-                const tablaDatosGenerales = [
-                    [{ content: '1. DATOS GENERALES', colSpan: 3, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220] } }],
-                    
-                    [{ content: `Nombre (Español):\n${proy.proyect_nombre || ''}`, colSpan: 3 }],
-                    [{ content: `Título del proyecto (Español):\n${proy.proyect_titulo || ''}`, colSpan: 3 }],
-                    [{ content: `Name (Inglés):\n${proy.proyect_nombre_en || ''}`, colSpan: 3 }],
-                    [{ content: `Title of the project (Inglés):\n${proy.proyect_titulo_en || ''}`, colSpan: 3 }],
-                    
-                    [{ content: `Objetivos del Plan Estratégico Institucional:\n${objetivosTxt}`, colSpan: 3 }],
-                    [{ content: `Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:\n${politicasTxt}`, colSpan: 3 }],
-                    [{ content: `Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe:\n${agendaTxt}`, colSpan: 3 }],
-                    [{ content: `Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:\n${objplandeTxt}`, colSpan: 3 }],
-                    
-                    [
-                        { content: `Nombre de Facultad/es:\n${facultadesTxt}` },
-                        { content: `Carrera/s:\n${carrerasTxt}` },
-                        { content: `Dominios académicos:\n${dominiosTxt}` }
-                    ],
-                    [
-                        { content: `No. Convocatoria:\n${convocatoriaTxt}` },
-                        { content: `Línea de Investigación:\n${lineaInvestigacion}` },
-                        { content: `Sublínea de Investigación:\n${sublineaInvestigacion}` }
-                    ],
-                    [
-                        { content: `Área Conocimiento UNESCO:\n${areaespecifica}` },
-                        { content: `SubÁrea Conocimiento UNESCO:\n${subareaespecifica}` },
-                        { content: `SubÁrea Específica Conocimiento UNESCO:\n${especareaespecifica}` }
-                    ],
-                    [{ content: `Tipo de proyecto de vinculación:\n${tipoproyectTxt}`, colSpan: 3 }]
-                ];
+                // --- ESTILOS MAGISTRALES PARA SIMULAR UNA SOLA CELDA SIN LÍNEA DIVISORIA ---
+                const lblStyle = { 
+                    fontStyle: 'bold', 
+                    halign: 'left',
+                    cellPadding: { top: 3, left: 3, right: 3, bottom: 0 }, 
+                    lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 } // Borde inferior en cero
+                };
+                const valStyle = { 
+                    fontStyle: 'normal', 
+                    halign: 'left',
+                    cellPadding: { top: 1, left: 3, right: 3, bottom: 3 }, 
+                    lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 } // Borde superior en cero
+                };
 
-                // 6. Dibujar Tabla 1
+                // 5. Dibujar Tabla 1: ÚNICAMENTE EL TÍTULO "1. DATOS GENERALES"
                 autoTable(doc, {
                     startY: 65,
                     margin: { left: 15, right: 15 },
                     theme: 'grid',
-                    body: tablaDatosGenerales,
-                    styles: { fontSize: 8, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+                    body: [
+                        [{ content: '1. DATOS GENERALES', styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 } }]
+                    ],
+                    styles: { lineColor: [0, 0, 0], lineWidth: 0.3 }
                 });
 
-                // 7. Definir estructura de la TABLA 2 (Cobertura - 4 Columnas para coincidir con la imagen)
-                const tablaCobertura = [
-                    [{ content: 'COBERTURA Y LOCALIZACIÓN', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [220, 220, 220] } }],
+                // 6. Definir la estructura de la TABLA 2 (Datos Generales con el diseño de celdas unidas)
+                const tablaDatosGenerales = [
+                    [{ content: 'Nombre (Español):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_nombre || '', colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Título del proyecto (Español):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_titulo || '', colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Name (Inglés):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_nombre_en || '', colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Title of the project (Inglés):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_titulo_en || '', colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Objetivos del Plan Estratégico Institucional:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objetivosTxt, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+                    [{ content: politicasTxt, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe:', colSpan: 3, styles: lblStyle }],
+                    [{ content: agendaTxt, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objplandeTxt, colSpan: 3, styles: valStyle }],
+                    
+                    // Sección de 3 columnas aplicando los mismos estilos divididos
                     [
-                        { content: `Local                [ ${checkLocal} ]`, styles: { halign: 'center' } },
-                        { content: `Regional          [ ${checkRegional} ]`, styles: { halign: 'center' } },
-                        { content: `Nacional          [ ${checkNacional} ]`, styles: { halign: 'center' } },
-                        { content: `Internacional   [ ${checkInternacional} ]`, styles: { halign: 'center' } }
+                        { content: 'Nombre de Facultad/es:', styles: lblStyle },
+                        { content: 'Carrera/s:', styles: lblStyle },
+                        { content: 'Dominios académicos:', styles: lblStyle }
+                    ],
+                    [
+                        { content: facultadesTxt, styles: valStyle },
+                        { content: carrerasTxt, styles: valStyle },
+                        { content: dominiosTxt, styles: valStyle }
+                    ],
+                    
+                    [
+                        { content: 'No. Convocatoria:', styles: lblStyle },
+                        { content: 'Línea de Investigación:', styles: lblStyle },
+                        { content: 'Sublínea de Investigación:', styles: lblStyle }
+                    ],
+                    [
+                        { content: convocatoriaTxt, styles: valStyle },
+                        { content: lineaInvestigacion, styles: valStyle },
+                        { content: sublineaInvestigacion, styles: valStyle }
+                    ],
+                    
+                    [
+                        { content: 'Área Conocimiento UNESCO:', styles: lblStyle },
+                        { content: 'SubÁrea Conocimiento UNESCO:', styles: lblStyle },
+                        { content: 'SubÁrea Específica Conocimiento UNESCO:', styles: lblStyle }
+                    ],
+                    [
+                        { content: areaespecifica, styles: valStyle },
+                        { content: subareaespecifica, styles: valStyle },
+                        { content: especareaespecifica, styles: valStyle }
+                    ],
+                    
+                    [{ content: 'Tipo de proyecto de vinculación:', colSpan: 3, styles: lblStyle }],
+                    [{ content: tipoproyectTxt, colSpan: 3, styles: valStyle }]
+                ];
+
+                // Dibujar Tabla 2 (Empieza un poco más abajo para generar el espacio en blanco)
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 4, // <-- AQUÍ SE GENERA EL ESPACIO EN BLANCO SEGÚN LA IMAGEN 2
+                    margin: { top: 45, left: 15, right: 15, bottom: 20 }, 
+                    theme: 'grid',
+                    body: tablaDatosGenerales,
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0] } // NO ponemos lineWidth aquí para que respeten los de valStyle/lblStyle
+                });
+
+                // 7. Definir estructura de la TABLA 3 (Cobertura - 4 Columnas)
+                const tablaCobertura = [
+                    [{ content: 'COBERTURA Y LOCALIZACIÓN', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+                    [
+                        { content: `Local                [ ${checkLocal} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+                        { content: `Regional          [ ${checkRegional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+                        { content: `Nacional          [ ${checkNacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+                        { content: `Internacional   [ ${checkInternacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } }
                     ]
                 ];
 
-                // 8. Dibujar Tabla 2 (Pegada exactamente debajo de la primera)
+                // 8. Dibujar Tabla 3 (Pegada exactamente debajo de los Datos Generales)
                 autoTable(doc, {
-                    startY: doc.lastAutoTable.finalY, // Inicia justo donde terminó la anterior
-                    margin: { left: 15, right: 15 },
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 45, left: 15, right: 15, bottom: 20 },
                     theme: 'grid',
                     body: tablaCobertura,
                     styles: { fontSize: 8, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
                 });
 
-                // 9. Calcular salto de página para la TABLA 3 (Firmas)
+                // 9. Calcular salto de página para la TABLA 4 (Firmas)
                 let finalY = doc.lastAutoTable.finalY + 10;
                 
                 if (finalY > pageHeight - 90) {
                     doc.addPage();
-                    finalY = 65; // Ajustado un poco el top de la nueva página
+                    finalY = 45; 
                 }
 
                 let compromisosTexto = "Sin compromisos registrados.";
                 if (integrante.compromisos && integrante.compromisos.length > 0) {
                     compromisosTexto = integrante.compromisos.map(c => `• ${c.detalle_compromiso}`).join('\n');
                 }
-
-                const nombreDocente = integrante.informacion_personal_d?.nombres_completos || integrante.informacionpersonal?.nombres_completos || '_______________________';
+                let directorProy = '';
+                let ceduladirecto = '';
+                try {
+                    const resDir = await this.ObteneProDir(proy.proyect_id);
+                    console.log("Respuesta de ObteneProDir:", resDir);
+                    if (resDir.data?.data && resDir.data.data.length > 0) {
+                        directorProy = resDir.data.data[0].nombre_con_titulo;
+                        ceduladirecto = resDir.data.data[0].cedula;
+                    }
+                } catch (e) { console.warn("No se pudo obtener director", e); }
+                
+                const nombreDocente = integrante.nombre_completo_titulo || '_______________________';
                 const cedulaDocente = cedula;
-                const nombreDirector = proy.director_proyecto || '_______________________'; 
-
-                // 10. Definir estructura de la TABLA 3 (Firmas - 2 Columnas)
+                const nombreDirector = directorProy || '_______________________'; 
+                const provincia = proy.invi_detalle_cobe.provincias.map(l => l.detalle).join('\n') || 'N/A';
+                // 10. Definir estructura de la TABLA 4 (Firmas)
                 const tablaFirmas = [
+                    // FILA 1: Título
                     [{ content: '2. FIRMAS DE RESPONSABILIDAD', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [220, 220, 220] } }],
+                    
+                    // FILA 2: Fecha y Docente
                     [
-                        { content: '\n\nCiudad y Fecha:\n\n__________________________________', styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } },
+                        { content: `\n\nCiudad y Fecha:\n\n${provincia}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } },
                         { content: `DECLARO EL DESEO DE PARTICIPAR EN PROYECTOS DE VINCULACIÓN CON LA\nSOCIEDAD\n\n\n__________________________________\nNombre del Docente Investigador: ${nombreDocente}\nC.I. ${cedulaDocente}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } }
                     ],
+
+                    // FILA 3: Director (Se le quita el borde inferior)
                     [
-                        { content: `DECLARO QUE EL DOCENTE PARTICIPARÁ EN PROYECTOS DE VINCULACIÓN CON LA SOCIEDAD\n\n\n__________________________________\nNombre del Director/a de Vinculación con la Sociedad\nC.I. ${nombreDirector}\n\nNOTA: ME COMPROMETO AL FINAL DEL SEMESTRE A ENTREGAR:\n${compromisosTexto}`, colSpan: 2, styles: { minCellHeight: 45, valign: 'top', halign: 'center' } }
+                        { 
+                            content: `DECLARO QUE EL DOCENTE PARTICIPARÁ EN PROYECTOS DE VINCULACIÓN CON LA SOCIEDAD\n\n\n__________________________________\n ${nombreDirector}\n Director(a) del Proyecto de Vinculación con la Sociedad\nC.I. ${ceduladirecto}`, 
+                            colSpan: 2, 
+                            styles: { 
+                                minCellHeight: 40, 
+                                valign: 'top', 
+                                halign: 'center',
+                                lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 } // <-- Aquí está la magia (bottom: 0)
+                            } 
+                        }
+                    ],
+
+                    // FILA 4: Compromisos (Se le quita el borde superior)
+                    [
+                        { 
+                            content: `NOTA: ME COMPROMETO AL FINAL DEL SEMESTRE A ENTREGAR:\n${compromisosTexto}`, 
+                            colSpan: 2, 
+                            styles: { 
+                                minCellHeight: 15, 
+                                valign: 'top', 
+                                halign: 'left', 
+                                cellPadding: 4,
+                                lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 } // <-- Aquí está la magia (top: 0)
+                            } 
+                        }
                     ]
                 ];
 
-                // 11. Dibujar Tabla 3
+                // 11. Dibujar Tabla Firmas
                 autoTable(doc, {
                     startY: finalY,
-                    margin: { left: 15, right: 15 },
+                    margin: { top: 45, left: 15, right: 15, bottom: 20 },
                     theme: 'grid',
                     body: tablaFirmas,
                     styles: { fontSize: 8, cellPadding: 4, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
