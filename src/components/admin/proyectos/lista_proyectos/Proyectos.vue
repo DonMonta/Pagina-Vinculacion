@@ -75,25 +75,82 @@
                         </td>
                         <td class="py-3 px-4 text-right">
                             <div class="flex justify-end gap-2">
+                                
+                                <!-- Botón 1: Editar Proyecto (Lápiz) -->
                                 <button @click="abrirEdicion(post.proyect_id)"
-                                    class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                                    :disabled="botonCargando === 'editar_' + post.proyect_id"
+                                    class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center"
                                     title="Editar Proyecto">
-                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                                        viewBox="0 0 24 24">
+                                    <!-- Spinner -->
+                                    <svg v-if="botonCargando === 'editar_' + post.proyect_id" class="animate-spin h-5 w-5 text-amber-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <!-- Icono Lápiz -->
+                                    <svg v-else width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                     </svg>
                                 </button>
+
+                                <!-- Botón 2: Ver Detalles / Integrantes (Usuarios) -->
                                 <button @click="abrirDetallesProyecto(post.proyect_id)"
-                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Ver Detalles">
-                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                                        viewBox="0 0 24 24">
-                                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    :disabled="botonCargando === 'detalles_' + post.proyect_id"
+                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center"
+                                    title="Ver Integrantes">
+                                    <!-- Spinner -->
+                                    <svg v-if="botonCargando === 'detalles_' + post.proyect_id" class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <!-- Icono Grupo de Usuarios -->
+                                    <svg v-else width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                     </svg>
                                 </button>
+
+                                <!-- Botón 3: Generar Anexo 2 (Documento PDF) -->
+                                <button @click="generarPDFCronograma(post.proyect_id)"
+                                    :disabled="botonCargando === 'anexo2_' + post.proyect_id"
+                                    class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center"
+                                    title="Generar Anexo 2">
+                                    <!-- Spinner -->
+                                    <svg v-if="botonCargando === 'anexo2_' + post.proyect_id" class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <!-- Icono Documento Texto -->
+                                    <svg v-else width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                </button>
+
+                                <!-- Botón 4: Generar Anexo 3 (Documento PDF Variante) -->
+                                <button @click="abrirModalAreaTematica(post.proyect_id)"
+                                    :disabled="botonCargando === 'anexo3_' + post.proyect_id"
+                                    class="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center"
+                                    title="Generar Anexo 3">
+                                    <!-- Spinner -->
+                                    <svg v-if="botonCargando === 'anexo3_' + post.proyect_id" class="animate-spin h-5 w-5 text-teal-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <!-- Icono Documento Check -->
+                                    <svg v-else width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <path d="M9 15l2 2 4-4"></path>
+                                    </svg>
+                                </button>
+                                
+                                
                             </div>
                         </td>
 
@@ -239,7 +296,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="md:col-span-3 mt-2 p-4 border rounded-xl bg-gray-50 dark:bg-gray-700/30">
+                                    <div class="md:col-span-3 mt-2 p-4 border rounded-xl bg-gray-50 dark:bg-gray-700/30" v-if="habilitarcompro">
                                         <label class="block text-[10px] font-bold mb-3 uppercase text-blue-600">
                                             Compromisos a entregar
                                         </label>
@@ -346,7 +403,7 @@
                                             <div class="md:col-span-2">
                                                 <label
                                                     class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
-                                                    Carrera (Opcional)</label>
+                                                    Carrera</label>
                                                 <select v-model="formInt.idCarr_reemplazado"
                                                     class="w-full border rounded-lg p-2 text-sm bg-white">
                                                     <option v-for="c in carreras" :key="c.idCarr" :value="c.idCarr">{{
@@ -386,6 +443,26 @@
                                     + Añadir
                                 </button>
                             </div>
+                        </div>
+                        <div class="flex justify-end mb-4">
+                            <button @click="descargarTodosCompromisos()"
+                                :disabled="botonCargando === 'descarga_masiva'"
+                                class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                
+                                <!-- Spinner -->
+                                <svg v-if="botonCargando === 'descarga_masiva'" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+
+                                <!-- Icono Descarga Multiple -->
+                                <svg v-else width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Descarga Masiva de Anexos
+                            </button>
                         </div>
 
                         <div class="overflow-x-auto">
@@ -505,15 +582,22 @@
                                             <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
                                         </td>
                                         <td class="p-3 text-center">
-                                            <div v-if="int.compromisos.length > 0" class="flex justify-center">
+                                            <div v-if="int.compromisos.length > 0 || int.funciones?.nombre_funcion =='Estudiante integrante del proyecto de vinculación'" class="flex justify-center">
                                                 <button @click="descargarcompromiso(int.ciinfper_doc || int.ciinfper_est)"
+                                                    :disabled="botonCargando === 'compromiso_' + (int.ciinfper_doc || int.ciinfper_est)"
                                                     target="_blank"
-                                                    class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                                    class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                                     title="Ver documento PDF">
-                                                    <svg width="18" height="18" fill="none" stroke="currentColor"
-                                                        stroke-width="2" viewBox="0 0 24 24">
-                                                        <path
-                                                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                    
+                                                    <!-- Spinner -->
+                                                    <svg v-if="botonCargando === 'compromiso_' + (int.ciinfper_doc || int.ciinfper_est)" class="animate-spin h-[18px] w-[18px]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+
+                                                    <!-- Ícono de Documento PDF (se oculta si está cargando) -->
+                                                    <svg v-else width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                                         <path d="M9 15h6M9 11h6" />
                                                     </svg>
                                                 </button>
@@ -553,6 +637,47 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="showModalArea2Tematica"
+            class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
+            <div class="relative w-full max-w-md p-4 mx-auto bg-white rounded-xl shadow-lg dark:bg-gray-800">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-700">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+                        Área Temática
+                    </h3>
+                    <button @click="cerrarModalAreaTematica" type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                <!-- Body -->
+                <div class="p-5 space-y-4">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                        Ingrese el Área Temática del proyecto para incluirla en el Anexo 3.
+                    </p>
+                    <div>
+                        <input v-model="areaTematica2Input" @keyup.enter="generarPDFFinanciamiento" type="text"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                            placeholder="Ej: Educación y Ambiente" autofocus>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div
+                    class="flex items-center justify-end p-4 border-t border-gray-200 rounded-b dark:border-gray-700 gap-3">
+                    <button @click="cerrarModalAreaTematica" type="button"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white">
+                        Cancelar
+                    </button>
+                    <button @click="generarPDFFinanciamiento" type="button"
+                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                        :disabled="!areaTematica2Input.trim() || isGeneratingPDFFinancia">
+                        <i v-if="isGeneratingPDFFinancia" class="fas fa-spinner fa-spin"></i>
+                        <i v-else class="fas fa-download"></i>
+                        Generar y Descargar
+                    </button>
                 </div>
             </div>
         </div>
@@ -4679,6 +4804,7 @@ export default {
             idus: 0,
             baseUrl: "/vin",
             filteredarray: [],
+            botonCargando: null,
             searchQuery: "",
             isProfileAddressModal: false,
             cargando: false,
@@ -4697,6 +4823,7 @@ export default {
                 'Informe de Avance cada tres meses',
                 'Otros'
             ],
+            habilitarcompro: false,
             formInt: {
                 id_deta_invi_proyect: null,
                 horas: 0,
@@ -4873,7 +5000,9 @@ export default {
             formFinancia: this.resetFormFinancia(),
             isGeneratingPDFFinancia: false,
             showModalAreaTematica: false,
+            showModalArea2Tematica: false,
             areaTematicaInput: '',
+            areaTematica2Input: '',
             indexFinanciaEditando: null,
             listaImpactosDisponibles: [],
             showModalImpacto: false,
@@ -5456,10 +5585,17 @@ export default {
             const nombre = funcionObj.nombre_funcion.toLowerCase();
             if (nombre.includes('director') && !nombre.includes('sub')) {
                 this.formInt.horas = 8;
+                this.habilitarcompro = true;
             } else if (nombre.includes('subdirector')) {
                 this.formInt.horas = 6;
-            } else {
+                this.habilitarcompro = true;
+            }else if (nombre.includes('estudiante')){
+                this.formInt.horas = 0;
+                this.habilitarcompro = false;
+            }
+             else {
                 this.formInt.horas = 4;
+                this.habilitarcompro = true;
             }
         },
         calcularHorasReemplazo() {
@@ -5469,26 +5605,34 @@ export default {
             const nombre = funcionObj.nombre_funcion.toLowerCase();
             if (nombre.includes('director') && !nombre.includes('sub')) {
                 this.formInt.horas_reemplazado = 8;
+                this.habilitarcompro = true;
             } else if (nombre.includes('subdirector')) {
                 this.formInt.horas_reemplazado = 6;
+                this.habilitarcompro = true;
+            } else if (nombre.includes('estudiante')) {
+                this.formInt.horas_reemplazado = 0;
+                this.habilitarcompro = false;
             } else {
                 this.formInt.horas_reemplazado = 4;
+                this.habilitarcompro = true;
             }
         },
         async abrirDetallesProyecto(id) {
+            this.botonCargando = 'detalles_' + id;
             try {
                 const [resProj, resCat] = await Promise.all([
                     API.get(`${this.baseUrl}/invi_proyectos/${id}`),
                     API.get(`${this.baseUrl}/catalogos-integrantes`)
                 ]);
                 this.proyectoSeleccionado = resProj.data;
-                console.log(this.proyectoSeleccionado);
                 this.funciones = resCat.data.funciones;
                 this.carreras = resCat.data.carreras;
                 this.showModalDetalles = true;
                 this.showEditModal = false;
             } catch (e) {
                 console.error(e);
+            }finally {
+                this.botonCargando = null; // Detiene el spinner al terminar
             }
         },
         seleccionarIntegrante(int) {
@@ -5516,6 +5660,11 @@ export default {
                 funcion: int.funciones?.nombre_funcion || 'N/A',
                 cedula: int.ciinfper_doc || int.ciinfper_est,
             };
+            if(this.integranteEdit.funcion !== 'Estudiante integrante del proyecto de vinculación'){
+                this.habilitarcompro = true;
+            }else{
+                this.habilitarcompro = false;
+            }
             this.formInt = {
                 id_deta_invi_proyect: int.id_deta_invi_proyect,
                 horas: int.horas,
@@ -6124,12 +6273,14 @@ export default {
                 this.editForm.proyect_duracion_mes = 0;
             }
         },
+
         async abrirEdicion(id) {
             this.proyectoEditandoId = id;
             this.showEditModal = true;
             this.cargandoEdicion = true;
             this.activeTab = 'generales';
             this.yaTraducido = false;
+            this.botonCargando = 'editar_' + id;
 
             try {
                 // Asegúrate de crear esta ruta en tus routes/api.php de Laravel
@@ -6341,6 +6492,7 @@ export default {
                 this.cerrarEdicion();
             } finally {
                 this.cargandoEdicion = false;
+                this.botonCargando = null;
             }
         },
         resetFormFinancia() {
@@ -7296,13 +7448,196 @@ export default {
             // Simplemente recarga la página actual de datos
             this.GetData(this.currentPage, this.searchQuery);
         },
-        async generarPDFCronograma() {
+        async generarPDFCronograma(id) {
             this.isGeneratingPDF = true;
+            
             try{
-                // 1. Validar que existan actividades
-                if (!this.editForm.actividades || this.editForm.actividades.length === 0) {
-                    mostraralertas2("No hay actividades registradas para generar el cronograma.", "warning");
-                    return;
+                if(this.editForm.proyect_id){
+
+                    // 1. Validar que existan actividades
+                    if (!this.editForm.actividades || this.editForm.actividades.length === 0) {
+                        mostraralertas2("No hay actividades registradas para generar el cronograma.", "warning");
+                        return;
+                    }
+                }else{
+                    this.botonCargando = 'anexo2_' + id;
+                    const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
+                    const data = response.data;
+                    this.empresasAgregadas = data.empresas_seleccionadas || [];
+                    this.empresasAgregadas2 = data.empresas_seleccionadas2 || [];
+                    let mapeoObjetivos = data.proyecto.invi_obj_proyectos.map(obj => ({
+                        id_obj_proy: obj.id_obj_proy,
+                        tipo_obj_proy: obj.tipo_obj_proy,
+                        detalle_obj_proy: obj.detalle_obj_proy,
+                        // Aseguramos que siempre sean arrays (mapeando con las propiedades exactas de tu Base de Datos)
+                        indicadores: obj.invi_indicadores || [],
+                        metas: obj.invi_metas || [],
+                        supuestos: obj.invi_supuestos || [],
+                        medios_verificacion: obj.invi_medios_verificacion || [],
+                        prod_verificables: obj.invi_prod_verificables || [],
+                    }));
+                    const calc = data.calculo_integrantes || {};
+                    let actividadesExtraidas = [];
+                    (data.proyecto.invi_obj_proyectos || []).forEach(obj => {
+                        if (obj.invi_actividades && obj.invi_actividades.length > 0) {
+                            obj.invi_actividades.forEach(act => {
+                                actividadesExtraidas.push({
+                                    ...act,
+                                    invi_subactividad: act.invi_subactividad || [],
+                                    invi_actprod_verificables: act.invi_actprod_verificables || [],
+                                    invi_actmedios_verificacion: act.invi_actmedios_verificacion || [],
+                                    invi_actindicadores: act.invi_actindicadores || [],
+                                    invi_actsupuestos: act.invi_actsupuestos || []
+                                });
+                            });
+                        }
+                    });
+                    let adquisicionesMapeadas = [];
+                    if (data.proyecto.invi_detalle_adqui && data.proyecto.invi_detalle_adqui.length > 0) {
+                        adquisicionesMapeadas = data.proyecto.invi_detalle_adqui.map(detalle => {
+                            return {
+                                id_adquisicion: detalle.invi_adquisicion.id_adquisicion,
+                                tipo_adqui: detalle.invi_adquisicion.tipo_adqui || '',
+                                detalle: detalle.invi_adquisicion.detalle || '',
+                                porcent_nacio: detalle.invi_adquisicion.porcent_nacio || 0,
+                                detalle_iinsu_nac: detalle.invi_adquisicion.detalle_iinsu_nac || '',
+                                porcent_importado: detalle.invi_adquisicion.porcent_importado || 0,
+                                detalle_insu_import: detalle.invi_adquisicion.detalle_insu_import || ''
+                            };
+                        });
+                    }
+                    let financiamientosMapeados = [];
+                    if (data.proyecto.invi_detalle_financia && data.proyecto.invi_detalle_financia.length > 0) {
+                        financiamientosMapeados = data.proyecto.invi_detalle_financia.map(det => {
+                            return {
+                                id_det_financia: det.id_det_financia,
+                                id_rubro: det.id_rubro,
+                                cantidad: det.cantidad || 0,
+                                valor: det.valor || 0,
+                                utlvte_anio1: det.utlvte_anio1 || 0,
+                                utlvte_anio2: det.utlvte_anio2 || 0,
+                                utlvte_anio3: det.utlvte_anio3 || 0,
+                                utlvte_anio4: det.utlvte_anio4 || 0,
+                                utlvte_anio5: det.utlvte_anio5 || 0,
+                                otros_anio1:  det.otros_anio1 || 0,
+                                otros_anio2:  det.otros_anio2 || 0,
+                                otros_anio3:  det.otros_anio3 || 0,
+                                otros_anio4:  det.otros_anio4 || 0,
+                                otros_anio5:  det.otros_anio5 || 0,
+                                total_efectivo: det.total_efectivo || 0
+                            };
+                        });
+                    }
+                    this.listaImpactosDisponibles = data.impactos_catalogo || [];
+                    let impactosMapeados = [];
+                    if (data.proyecto.invi_det_impactos_esperados && data.proyecto.invi_det_impactos_esperados.length > 0) {
+                        impactosMapeados = data.proyecto.invi_det_impactos_esperados.map(det => {
+                            return {
+                                id_det_impactos_esp: det.id_det_impactos_esp,
+                                id_impactos: det.id_impactos,
+                                descripcion_general: det.descripcion_general || ''
+                            };
+                        });
+                    }
+                    let difusionMapeada = [];
+                    if (data.proyecto.invi_detalle_difusion && data.proyecto.invi_detalle_difusion.length > 0) {
+                        difusionMapeada = data.proyecto.invi_detalle_difusion.map(det => {
+                            return {
+                                id_det_difusion: det.id_det_difusion,
+                                id_difusion: det.id_difusion,
+                                costo: det.costo,
+                                nombre_actividad: det.invi_difusion ? det.invi_difusion.nombre_actividad : ''
+                            };
+                        });
+                    }
+                    this.editForm = {
+                        proyect_id: data.proyecto.proyect_id,
+                        proyect_nombre: data.proyecto.proyect_nombre || '',
+                        proyect_titulo: data.proyecto.proyect_titulo || '',
+                        proyect_nombre_en: data.proyecto.proyect_nombre_en || '',
+                        proyect_titulo_en: data.proyecto.proyect_titulo_en || '',
+                        proyect_multidis: data.proyecto.proyect_multidis,
+                        //Objetivos del Plan Estratégico Institucional
+                        objetivos: data.seleccionados || [],
+                        //Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025
+                        politicas: data.politicas_seleccionadas || [],
+                        //Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe
+                        ods: data.ods_seleccionadas || [],
+                        //Nombre de Facultad/es: 
+                        facultades: data.facultades_seleccionadas || [],
+                        id_facultad_priori: data.id_facultad_priori || '',
+                        //Carrera/s
+                        carreras: data.carreras_seleccionadas || [],
+                        id_carr_priori: data.id_carr_priori || '',
+                        //Dominios académicos
+                        dominios_humanisticos: data.dominios_seleccionados || [],
+                        //No. Convocatoria
+                        id_convocatoria: data.proyecto.id_convocatoria || '',
+                        sublineas_investigacion: [],
+                        unesco_areas: data.unesco_seleccionadas || [],
+                        id_tip_invi_proy: data.proyecto.id_tip_invi_proy || '',
+                        proyect_cobertura: data.proyecto.proyect_cobertura || '',
+                        id_zona_plan: data.cobertura_guardada?.id_zona_plan || '',
+                        provincias:   data.cobertura_guardada?.provincias || [],
+                        cantones:     data.cobertura_guardada?.cantones || [],
+                        parroquias:   data.cobertura_guardada?.parroquias || [],
+                        objetivos_marco_logico: mapeoObjetivos,
+                        proyect_antecedentes: data.proyecto.proyect_antecedentes || '',
+                        proyect_justificacion: data.proyecto.proyect_justificacion || '',
+                        empresas: [...this.empresasAgregadas],
+                        aportes_utlvt: data.aportes_utlvt || [],
+                        aportes_inst: data.aportes_inst || [],
+                        proyect_fecha_pres: data.proyecto.proyect_fecha_pres || '',
+                        fechainicio: data.proyecto.fechainicio || '',
+                        fechafin: data.proyecto.fechafin || '',
+                        proyect_duracion_mes: data.proyecto.proyect_duracion_mes || '',
+                        proyect_estado: data.proyecto.proyect_estado || '',
+                        proyect_desc_situ_act: data.proyecto.proyect_desc_situ_act || '',
+                        proyect_diag_probl: data.proyecto.proyect_diag_probl || '',
+                        proyect_contribucion_soci: data.proyecto.proyect_contribucion_soci || '',
+                        asignaturas: data.asignaturas_seleccionadas || [],
+                        proyec_ident_poblaobj: data.proyecto.proyec_ident_poblaobj || '',
+                        proyect_num_direct_hombres: data.proyecto.proyect_num_direct_hombres || '',
+                        proyect_num_direct_mujeres: data.proyecto.proyect_num_direct_mujeres || '',
+                        proyect_total_num_direct: data.proyecto.proyect_total_num_direct || '',
+                        proyect_num_personas_div_fun: data.proyecto.proyect_num_personas_div_fun || '',
+                        proyect_total_num_indirect: data.proyecto.proyect_total_num_indirect || '',
+                        proyect_num_doce_h: data.proyecto.proyect_num_doce_h ?? calc.docentes_h ?? 0,
+                        proyect_num_doce_m: data.proyecto.proyect_num_doce_m ?? calc.docentes_m ?? 0,
+                        proyect_num_doce_part: data.proyecto.proyect_num_doce_part ?? calc.docentes_total ?? 0,
+
+                        // Estudiantes (se usan los valores guardados en BD o se calculan automáticamente si están nulos)
+                        proyect_num_est_h: data.proyecto.proyect_num_est_h ?? calc.estudiantes_h ?? 0,
+                        proyect_num_est_m: data.proyecto.proyect_num_est_m ?? calc.estudiantes_m ?? 0,
+                        proyect_num_est_part: data.proyecto.proyect_num_est_part ?? calc.estudiantes_total ?? 0,
+                        proyect_fact_exito: data.proyecto.proyect_fact_exito || '',
+                        proyect_rest_supu: data.proyecto.proyect_rest_supu || '',
+                        actividades: actividadesExtraidas,
+                        proyect_bienes: data.proyecto.proyect_bienes || '',
+                        proyect_servicios: data.proyecto.proyect_servicios || '',
+                        proyect_bienes_servicios: data.proyecto.proyect_bienes_servicios || '',
+                        adquisiciones: adquisicionesMapeadas,
+                        proyect_categorizacion: data.proyecto.proyect_categorizacion || '',
+                        proyect_metodologia: data.proyecto.proyect_metodologia || '',
+                        financiamientos: financiamientosMapeados,
+                        proyect_viabilidad_tec: data.proyecto.proyect_viabilidad_tec || '',
+                        proyect_equip_tec: data.proyecto.proyect_equip_tec || '',
+                        proyect_no_ejecuta: data.proyecto.proyect_no_ejecuta || '',
+                        impactos: impactosMapeados,
+                        proyect_sostenibilidad_soc: data.proyecto.proyect_sostenibilidad_soc || '',
+                        proyect_transf_tecn: data.proyecto.proyect_transf_tecn || '',
+                        proyect_art_cientificos: data.proyecto.proyect_art_cientificos || '',
+                        proyect_prototipos: data.proyecto.proyect_prototipos || '',
+                        proyect_reg_propin: data.proyecto.proyect_reg_propin || '',
+                        proyect_empr_spin: data.proyecto.proyect_empr_spin || '',
+                        difusion: difusionMapeada,
+                        bibliografias: data.proyecto.invi_bibliografias ? [...data.proyecto.invi_bibliografias] : [],
+                    };
+                    if (!this.editForm.actividades || this.editForm.actividades.length === 0) {
+                        mostraralertas2("No hay actividades registradas para generar el cronograma.", "warning");
+                        return;
+                    }
+
                 }
 
                 // Inicializar documento en horizontal (landscape), milímetros, A4
@@ -7622,14 +7957,23 @@ export default {
                 // Aquí podrías mostrar una alerta de error (ej: SweetAlert)
             } finally {
                 // 4. Se ejecuta SIEMPRE al terminar (con o sin éxito), liberando el botón
-                this.isGeneratingPDF = false; 
+                this.isGeneratingPDF = false;
+                this.botonCargando = null; 
             }
             
         },
         async generarPDFFinanciamiento() {
-            if (!this.areaTematicaInput.trim()) {
-                mostraralertas2("Debe ingresar un área temática válida.", "warning");
-                return;
+            if(this.showEditModal){
+
+                if (!this.areaTematicaInput.trim()) {
+                    mostraralertas2("Debe ingresar un área temática válida.", "warning");
+                    return;
+                }
+            }else{
+                 if (!this.areaTematica2Input.trim()) {
+                    mostraralertas2("Debe ingresar un área temática válida.", "warning");
+                    return;
+                }
             }
 
             this.isGeneratingPDFFinancia = true;
@@ -7705,7 +8049,12 @@ export default {
                 // --- Área Temática (Viene del Modal) ---
                 doc.text('Área temática:', 15, currentY);
                 // Protegemos el texto por si ingresan algo muy largo
-                const splitArea = doc.splitTextToSize(this.areaTematicaInput.trim(), maxTextWidth);
+                let splitArea
+                if(this.showEditModal){
+                    splitArea = doc.splitTextToSize(this.areaTematicaInput.trim(), maxTextWidth);
+                }else{
+                    splitArea = doc.splitTextToSize(this.areaTematica2Input.trim(), maxTextWidth);
+                }
                 doc.text(splitArea, 92, currentY);
                 let extraYArea = (splitArea.length - 1) * 4;
                 doc.line(90, currentY + extraYArea + 1, pageWidth - 15, currentY + extraYArea + 1);
@@ -7817,6 +8166,7 @@ export default {
             }
         },
         async descargarcompromiso(cedula) {
+            this.botonCargando = 'compromiso_' + cedula;
             try {
                 // 1. Buscar al integrante seleccionado
                 const integrante = this.integrantesFiltrados.find(
@@ -7827,7 +8177,18 @@ export default {
                     return mostraralertas2("No se encontró la información del integrante.", "warning");
                 }
 
-                mostraralertas2("Generando documento, por favor espere...", "info");
+                // --- NUEVA LÓGICA: Validar si es estudiante o docente ---
+                const esEstudiante = integrante.ciinfper_est === cedula;
+                
+                // Variables dinámicas según el tipo de integrante
+                const numAnexo = esEstudiante ? 'ANEXO 6' : 'ANEXO 5';
+                const tituloFormato = esEstudiante 
+                    ? 'FORMATO DE ESTUDIANTES QUE DESEAN PARTICIPAR EN PROYECTOS DE' 
+                    : 'FORMATO DE PROFESORES QUE DESEAN PARTICIPAR EN PROYECTOS DE';
+                const labelInvestigador = esEstudiante 
+                    ? 'Nombre del/la Estudiante Investigador:' 
+                    : 'Nombre del Docente Investigador:';
+                const participacionTexto = esEstudiante ? 'ESTUDIANTE' : 'DOCENTE';
 
                 // 2. Llamada directa a la API
                 const idProyecto = this.proyectoSeleccionado?.proyect_id;
@@ -7839,7 +8200,6 @@ export default {
                 const response = await API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`);
                 const data = response.data;
                 const proy = data.proyecto;
-                console.log("Datos del proyecto obtenidos:", proy);
 
                 // 3. Inicializar jsPDF
                 const doc = new jsPDF('p', 'mm', 'a4');
@@ -7860,8 +8220,9 @@ export default {
                     
                     let startY = 25; 
                     
-                    doc.text('ANEXO 5', pageWidth / 2, startY + 20, { align: 'center' });
-                    doc.text('FORMATO DE PROFESORES QUE DESEAN PARTICIPAR EN PROYECTOS DE', pageWidth / 2, startY + 28, { align: 'center' });
+                    // Textos dinámicos de acuerdo al rol
+                    doc.text(numAnexo, pageWidth / 2, startY + 20, { align: 'center' });
+                    doc.text(tituloFormato, pageWidth / 2, startY + 28, { align: 'center' });
                     doc.text('VINCULACIÓN CON LA SOCIEDAD', pageWidth / 2, startY + 33, { align: 'center' });
                 };
 
@@ -7904,13 +8265,13 @@ export default {
                     fontStyle: 'bold', 
                     halign: 'left',
                     cellPadding: { top: 3, left: 3, right: 3, bottom: 0 }, 
-                    lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 } // Borde inferior en cero
+                    lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 } 
                 };
                 const valStyle = { 
                     fontStyle: 'normal', 
                     halign: 'left',
                     cellPadding: { top: 1, left: 3, right: 3, bottom: 3 }, 
-                    lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 } // Borde superior en cero
+                    lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 } 
                 };
 
                 // 5. Dibujar Tabla 1: ÚNICAMENTE EL TÍTULO "1. DATOS GENERALES"
@@ -7924,7 +8285,7 @@ export default {
                     styles: { lineColor: [0, 0, 0], lineWidth: 0.3 }
                 });
 
-                // 6. Definir la estructura de la TABLA 2 (Datos Generales con el diseño de celdas unidas)
+                // 6. Definir la estructura de la TABLA 2
                 const tablaDatosGenerales = [
                     [{ content: 'Nombre (Español):', colSpan: 3, styles: lblStyle }],
                     [{ content: proy.proyect_nombre || '', colSpan: 3, styles: valStyle }],
@@ -7950,7 +8311,6 @@ export default {
                     [{ content: 'Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
                     [{ content: objplandeTxt, colSpan: 3, styles: valStyle }],
                     
-                    // Sección de 3 columnas aplicando los mismos estilos divididos
                     [
                         { content: 'Nombre de Facultad/es:', styles: lblStyle },
                         { content: 'Carrera/s:', styles: lblStyle },
@@ -7988,16 +8348,16 @@ export default {
                     [{ content: tipoproyectTxt, colSpan: 3, styles: valStyle }]
                 ];
 
-                // Dibujar Tabla 2 (Empieza un poco más abajo para generar el espacio en blanco)
+                // Dibujar Tabla 2 
                 autoTable(doc, {
-                    startY: doc.lastAutoTable.finalY + 4, // <-- AQUÍ SE GENERA EL ESPACIO EN BLANCO SEGÚN LA IMAGEN 2
+                    startY: doc.lastAutoTable.finalY + 4, 
                     margin: { top: 45, left: 15, right: 15, bottom: 20 }, 
                     theme: 'grid',
                     body: tablaDatosGenerales,
-                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0] } // NO ponemos lineWidth aquí para que respeten los de valStyle/lblStyle
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0] } 
                 });
 
-                // 7. Definir estructura de la TABLA 3 (Cobertura - 4 Columnas)
+                // 7. Definir estructura de la TABLA 3 
                 const tablaCobertura = [
                     [{ content: 'COBERTURA Y LOCALIZACIÓN', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
                     [
@@ -8008,7 +8368,7 @@ export default {
                     ]
                 ];
 
-                // 8. Dibujar Tabla 3 (Pegada exactamente debajo de los Datos Generales)
+                // 8. Dibujar Tabla 3
                 autoTable(doc, {
                     startY: doc.lastAutoTable.finalY, 
                     margin: { top: 45, left: 15, right: 15, bottom: 20 },
@@ -8029,61 +8389,108 @@ export default {
                 if (integrante.compromisos && integrante.compromisos.length > 0) {
                     compromisosTexto = integrante.compromisos.map(c => `• ${c.detalle_compromiso}`).join('\n');
                 }
+                
                 let directorProy = '';
                 let ceduladirecto = '';
                 try {
                     const resDir = await this.ObteneProDir(proy.proyect_id);
-                    console.log("Respuesta de ObteneProDir:", resDir);
                     if (resDir.data?.data && resDir.data.data.length > 0) {
                         directorProy = resDir.data.data[0].nombre_con_titulo;
                         ceduladirecto = resDir.data.data[0].cedula;
                     }
                 } catch (e) { console.warn("No se pudo obtener director", e); }
-                
-                const nombreDocente = integrante.nombre_completo_titulo || '_______________________';
+                let nombreIntegrante = '';
+                if(esEstudiante){
+                    nombreIntegrante = integrante.informacionpersonal.NombInfPer + ' ' + integrante.informacionpersonal.ApellInfPer + ' ' + integrante.informacionpersonal.ApellMatInfPer;
+                }else{
+                    nombreIntegrante = integrante.nombre_completo_titulo;
+                }
+                //const nombreDocente = integrante.nombre_completo_titulo || '_______________________';
                 const cedulaDocente = cedula;
                 const nombreDirector = directorProy || '_______________________'; 
-                const provincia = proy.invi_detalle_cobe.provincias.map(l => l.detalle).join('\n') || 'N/A';
-                // 10. Definir estructura de la TABLA 4 (Firmas)
+                
+                const formatearFecha = (fechaStr) => {
+                    if (!fechaStr) return '';
+                    const partes = fechaStr.split('-');
+                    if (partes.length === 3) {
+                        const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                        const dia = parseInt(partes[2], 10);
+                        const mes = meses[parseInt(partes[1], 10) - 1];
+                        const anio = partes[0];
+                        return `${dia} de ${mes} de ${anio}`;
+                    }
+                    return fechaStr;
+                };
+
+                const fechaFormateada = formatearFecha(proy.proyect_fecha_pres);
+
+                // --- 2. OBTENER PROVINCIA SIN DUPLICADOS ---
+                let provincia = 'N/A';
+
+                if (Array.isArray(proy.invi_detalle_cobe)) {
+                    const provinciasMapeadas = proy.invi_detalle_cobe
+                        .map(cobe => cobe.provincias?.detalle || cobe.provincia?.detalle)
+                        .filter(Boolean);
+                    
+                    provincia = [...new Set(provinciasMapeadas)].join(', ') || 'N/A';
+
+                } else if (Array.isArray(proy.invi_detalle_cobe?.provincias)) {
+                    const provinciasMapeadas = proy.invi_detalle_cobe.provincias
+                        .map(p => p.detalle)
+                        .filter(Boolean);
+                        
+                    provincia = [...new Set(provinciasMapeadas)].join(', ') || 'N/A';
+
+                } else if (proy.invi_detalle_cobe?.provincias?.detalle) {
+                    provincia = proy.invi_detalle_cobe.provincias.detalle;
+                }
+                
+                // 10. Definir estructura de la TABLA 4 (Firmas dinámica)
                 const tablaFirmas = [
                     // FILA 1: Título
                     [{ content: '2. FIRMAS DE RESPONSABILIDAD', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [220, 220, 220] } }],
                     
-                    // FILA 2: Fecha y Docente
+                    // FILA 2: Fecha y Docente/Estudiante
                     [
-                        { content: `\n\nCiudad y Fecha:\n\n${provincia}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } },
-                        { content: `DECLARO EL DESEO DE PARTICIPAR EN PROYECTOS DE VINCULACIÓN CON LA\nSOCIEDAD\n\n\n__________________________________\nNombre del Docente Investigador: ${nombreDocente}\nC.I. ${cedulaDocente}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } }
+                        { content: `\n\nCiudad y Fecha:\n\n${provincia}, ${fechaFormateada}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } },
+                        { content: `DECLARO EL DESEO DE PARTICIPAR EN PROYECTOS DE VINCULACIÓN CON LA\nSOCIEDAD\n\n\n__________________________________\n${labelInvestigador} ${nombreIntegrante}\nC.I. ${cedulaDocente}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } }
                     ],
 
-                    // FILA 3: Director (Se le quita el borde inferior)
+                    // FILA 3: Director (Se ajusta el borde según si hay o no compromisos más abajo)
                     [
                         { 
-                            content: `DECLARO QUE EL DOCENTE PARTICIPARÁ EN PROYECTOS DE VINCULACIÓN CON LA SOCIEDAD\n\n\n__________________________________\n ${nombreDirector}\n Director(a) del Proyecto de Vinculación con la Sociedad\nC.I. ${ceduladirecto}`, 
+                            content: `DECLARO QUE EL ${participacionTexto} PARTICIPARÁ EN PROYECTOS DE VINCULACIÓN CON LA SOCIEDAD\n\n\n__________________________________\n ${nombreDirector}\n Director(a) del Proyecto de Vinculación con la Sociedad\nC.I. ${ceduladirecto}`, 
                             colSpan: 2, 
                             styles: { 
                                 minCellHeight: 40, 
                                 valign: 'top', 
                                 halign: 'center',
-                                lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 } // <-- Aquí está la magia (bottom: 0)
-                            } 
-                        }
-                    ],
-
-                    // FILA 4: Compromisos (Se le quita el borde superior)
-                    [
-                        { 
-                            content: `NOTA: ME COMPROMETO AL FINAL DEL SEMESTRE A ENTREGAR:\n${compromisosTexto}`, 
-                            colSpan: 2, 
-                            styles: { 
-                                minCellHeight: 15, 
-                                valign: 'top', 
-                                halign: 'left', 
-                                cellPadding: 4,
-                                lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 } // <-- Aquí está la magia (top: 0)
+                                // Si es estudiante (no lleva compromisos), el borde inferior debe cerrarse en 0.3. Si es docente, en 0 para unirse.
+                                lineWidth: { top: 0.3, right: 0.3, bottom: esEstudiante ? 0.3 : 0, left: 0.3 } 
                             } 
                         }
                     ]
                 ];
+
+                // 10.1: Si NO es estudiante, agregamos la fila de compromisos
+                if (!esEstudiante) {
+                    tablaFirmas.push(
+                        // FILA 4: Compromisos (Se le quita el borde superior)
+                        [
+                            { 
+                                content: `NOTA: ME COMPROMETO AL FINAL DEL SEMESTRE A ENTREGAR:\n${compromisosTexto}`, 
+                                colSpan: 2, 
+                                styles: { 
+                                    minCellHeight: 15, 
+                                    valign: 'top', 
+                                    halign: 'left', 
+                                    cellPadding: 4,
+                                    lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 }
+                                } 
+                            }
+                        ]
+                    );
+                }
 
                 // 11. Dibujar Tabla Firmas
                 autoTable(doc, {
@@ -8094,12 +8501,298 @@ export default {
                     styles: { fontSize: 8, cellPadding: 4, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
                 });
 
-                // 12. Descargar Documento
-                doc.save(`Anexo_5_Compromiso_${cedula}.pdf`);
+                // 12. Descargar Documento (Nombre del archivo actualizado dinámicamente)
+                const nombreArchivo = `${numAnexo.replace(' ', '_')}_Compromiso_${cedula}.pdf`;
+                doc.save(nombreArchivo);
 
             } catch (error) {
-                console.error('Error al generar el PDF del Anexo 5:', error);
+                console.error(`Error al generar el PDF del Anexo:`, error);
                 mostraralertas2("Ocurrió un error al generar el PDF.", "error");
+            }finally {
+                // 2. Apagamos el spinner pase lo que pase (éxito o error)
+                this.botonCargando = null;
+            }
+        },
+        async descargarTodosCompromisos() {
+            
+            try {
+                this.botonCargando = 'descarga_masiva';
+                const idProyecto = this.proyectoSeleccionado?.proyect_id;
+                if(!idProyecto) {
+                    return mostraralertas2("Error: No se ha seleccionado un proyecto válido.", "warning");
+                }
+
+                // 1. Filtrar únicamente a los integrantes válidos (que tengan cédula y cumplan los requisitos)
+                const integrantesValidos = this.proyectoSeleccionado.invi_detalle_integrante.filter(int => {
+                    const cedula = int.ciinfper_doc || int.ciinfper_est;
+                    const tieneCompromisos = int.compromisos && int.compromisos.length > 0;
+                    const esEstudianteRol = int.funciones?.nombre_funcion === 'Estudiante integrante del proyecto de vinculación';
+                    return cedula && (tieneCompromisos || esEstudianteRol);
+                });
+
+                if (integrantesValidos.length === 0) {
+                    return mostraralertas2("No hay integrantes válidos con anexos de compromiso en este proyecto.", "warning");
+                }
+
+                // 2. Llamada a la API UNA SOLA VEZ para todos
+                const [responseDatos, resDir] = await Promise.all([
+                    API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`),
+                    this.ObteneProDir(idProyecto).catch(() => ({ data: { data: [] } }))
+                ]);
+                
+                const data = responseDatos.data;
+                const proy = data.proyecto;
+                
+                let directorProy = '';
+                let ceduladirecto = '';
+                if (resDir.data?.data && resDir.data.data.length > 0) {
+                    directorProy = resDir.data.data[0].nombre_con_titulo;
+                    ceduladirecto = resDir.data.data[0].cedula;
+                }
+
+                // 3. Mapear datos estáticos del proyecto (Fuera del bucle para optimizar rendimiento)
+                const facultadesTxt = data.facultades_data?.map(f => f.siglas || f.siglas || f.siglas).join('\n') || 'N/A';
+                const carrerasTxt = data.carreras_data?.map(c => c.NombCarr || c.NombCarr || c.NombCarr).join('\n') || 'N/A';
+                const dominiosTxt = data.dominios_data?.map(dom => dom.detalle_dom_huma).join('\n') || 'N/A';
+                const objetivosTxt = data.objetivos_pei_data?.map(o => o.cod_obj+'. '+ o.detalle_obj).join('\n') || 'N/A';
+                const politicasTxt = data.politicas_data?.map(p => p.cod_pol+'. '+ p.detalle_pol || 'Política').join('\n') || 'N/A';
+                const agendaTxt = data.agenda_ods_data?.map(a => a.cod_ods+'. '+ a.detalle_ods || 'Agenda').join('\n') || 'N/A';
+                const objplandeTxt = data.objetivos_politicas_data?.map(a => a.cod_obj_pol+'. '+ a.detalle_obj_pol || 'Obj').join('\n') || 'N/A';
+                const convocatoriaTxt = data.convocatoria_data?.map(c => c.num_convocatoria).join('\n') || 'N/A';
+                const lineaInvestigacion = data.lineas_data?.map(l => l.nombre_lin).join('\n') || 'N/A';
+                const sublineaInvestigacion = data.sublineas_data?.map(sl => sl.nombre_sublin).join('\n') || 'N/A';
+                const areaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
+                const subareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Subárea de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
+                const especareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área específica de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
+                const tipoproyectTxt = data.tipproyectos_data?.map(t => t.detalle_invi_proyect).join('\n') || 'N/A';
+
+                const coberturaSeleccionada = (proy.proyect_cobertura || '').toLowerCase();
+                const checkLocal = coberturaSeleccionada.includes('local') ? 'X' : '  ';
+                const checkRegional = coberturaSeleccionada.includes('regional') ? 'X' : '  ';
+                const checkNacional = coberturaSeleccionada.includes('nacional') ? 'X' : '  ';
+                const checkInternacional = coberturaSeleccionada.includes('internacional') ? 'X' : '  ';
+
+                const formatearFecha = (fechaStr) => {
+                    if (!fechaStr) return '';
+                    const partes = fechaStr.split('-');
+                    if (partes.length === 3) {
+                        const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                        return `${parseInt(partes[2], 10)} de ${meses[parseInt(partes[1], 10) - 1]} de ${partes[0]}`;
+                    }
+                    return fechaStr;
+                };
+                const fechaFormateada = formatearFecha(proy.proyect_fecha_pres);
+
+                let provincia = 'N/A';
+                if (Array.isArray(proy.invi_detalle_cobe)) {
+                    const provMap = proy.invi_detalle_cobe.map(c => c.provincias?.detalle || c.provincia?.detalle).filter(Boolean);
+                    provincia = [...new Set(provMap)].join(', ') || 'N/A';
+                } else if (Array.isArray(proy.invi_detalle_cobe?.provincias)) {
+                    const provMap = proy.invi_detalle_cobe.provincias.map(p => p.detalle).filter(Boolean);
+                    provincia = [...new Set(provMap)].join(', ') || 'N/A';
+                } else if (proy.invi_detalle_cobe?.provincias?.detalle) {
+                    provincia = proy.invi_detalle_cobe.provincias.detalle;
+                }
+
+                // Estilos y Tablas Generales (Se definen una vez)
+                const lblStyle = { fontStyle: 'bold', halign: 'left', cellPadding: { top: 3, left: 3, right: 3, bottom: 0 }, lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 } };
+                const valStyle = { fontStyle: 'normal', halign: 'left', cellPadding: { top: 1, left: 3, right: 3, bottom: 3 }, lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 } };
+
+                const tablaDatosGenerales = [
+                    [{ content: 'Nombre (Español):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_nombre || '', colSpan: 3, styles: valStyle }],
+                    [{ content: 'Título del proyecto (Español):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_titulo || '', colSpan: 3, styles: valStyle }],
+                    [{ content: 'Name (Inglés):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_nombre_en || '', colSpan: 3, styles: valStyle }],
+                    [{ content: 'Title of the project (Inglés):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_titulo_en || '', colSpan: 3, styles: valStyle }],
+                    [{ content: 'Objetivos del Plan Estratégico Institucional:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objetivosTxt, colSpan: 3, styles: valStyle }],
+                    [{ content: 'Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+                    [{ content: politicasTxt, colSpan: 3, styles: valStyle }],
+                    [{ content: 'Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe:', colSpan: 3, styles: lblStyle }],
+                    [{ content: agendaTxt, colSpan: 3, styles: valStyle }],
+                    [{ content: 'Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objplandeTxt, colSpan: 3, styles: valStyle }],
+                    [
+                        { content: 'Nombre de Facultad/es:', styles: lblStyle },
+                        { content: 'Carrera/s:', styles: lblStyle },
+                        { content: 'Dominios académicos:', styles: lblStyle }
+                    ],
+                    [
+                        { content: facultadesTxt, styles: valStyle },
+                        { content: carrerasTxt, styles: valStyle },
+                        { content: dominiosTxt, styles: valStyle }
+                    ],
+                    [
+                        { content: 'No. Convocatoria:', styles: lblStyle },
+                        { content: 'Línea de Investigación:', styles: lblStyle },
+                        { content: 'Sublínea de Investigación:', styles: lblStyle }
+                    ],
+                    [
+                        { content: convocatoriaTxt, styles: valStyle },
+                        { content: lineaInvestigacion, styles: valStyle },
+                        { content: sublineaInvestigacion, styles: valStyle }
+                    ],
+                    [
+                        { content: 'Área Conocimiento UNESCO:', styles: lblStyle },
+                        { content: 'SubÁrea Conocimiento UNESCO:', styles: lblStyle },
+                        { content: 'SubÁrea Específica Conocimiento UNESCO:', styles: lblStyle }
+                    ],
+                    [
+                        { content: areaespecifica, styles: valStyle },
+                        { content: subareaespecifica, styles: valStyle },
+                        { content: especareaespecifica, styles: valStyle }
+                    ],
+                    [{ content: 'Tipo de proyecto de vinculación:', colSpan: 3, styles: lblStyle }],
+                    [{ content: tipoproyectTxt, colSpan: 3, styles: valStyle }]
+                ];
+
+                const tablaCobertura = [
+                    [{ content: 'COBERTURA Y LOCALIZACIÓN', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+                    [
+                        { content: `Local                [ ${checkLocal} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+                        { content: `Regional          [ ${checkRegional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+                        { content: `Nacional          [ ${checkNacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+                        { content: `Internacional   [ ${checkInternacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } }
+                    ]
+                ];
+
+                // 4. Inicializar jsPDF
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const rutaImagenFondo = '/fondo2.png'; 
+
+                const dibujarFondoBanner = () => {
+                    doc.addImage(rutaImagenFondo, 'PNG', 0, 0, pageWidth, pageHeight);
+                };
+
+                const originalAddPage = doc.addPage.bind(doc);
+                doc.addPage = function() {
+                    originalAddPage();
+                    dibujarFondoBanner();
+                };
+
+                // -----------------------------------------------------------
+                // 5. BUCLE PRINCIPAL (ITERAR POR CADA INTEGRANTE)
+                // -----------------------------------------------------------
+                for (let i = 0; i < integrantesValidos.length; i++) {
+                    const integrante = integrantesValidos[i];
+                    
+                    const cedula = integrante.ciinfper_doc || integrante.ciinfper_est;
+                    const esEstudiante = integrante.ciinfper_est === cedula;
+                    
+                    const numAnexo = esEstudiante ? 'ANEXO 6' : 'ANEXO 5';
+                    const tituloFormato = esEstudiante 
+                        ? 'FORMATO DE ESTUDIANTES QUE DESEAN PARTICIPAR EN PROYECTOS DE' 
+                        : 'FORMATO DE PROFESORES QUE DESEAN PARTICIPAR EN PROYECTOS DE';
+                    const labelInvestigador = esEstudiante ? 'Nombre del/la Estudiante Investigador:' : 'Nombre del Docente Investigador:';
+                    const participacionTexto = esEstudiante ? 'ESTUDIANTE' : 'DOCENTE';
+
+                    let nombreIntegrante = esEstudiante 
+                        ? `${integrante.informacionpersonal.NombInfPer} ${integrante.informacionpersonal.ApellInfPer} ${integrante.informacionpersonal.ApellMatInfPer}` 
+                        : integrante.nombre_completo_titulo;
+                    
+                    let compromisosTexto = "Sin compromisos registrados.";
+                    if (integrante.compromisos && integrante.compromisos.length > 0) {
+                        compromisosTexto = integrante.compromisos.map(c => `• ${c.detalle_compromiso}`).join('\n');
+                    }
+
+                    // Si NO es el primero, añadimos una nueva página para separar el anexo del siguiente integrante
+                    if (i === 0) {
+                        dibujarFondoBanner();
+                    } else {
+                        doc.addPage(); 
+                    }
+
+                    // Dibujar Textos de Encabezado dinámicos
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                    let startY = 25; 
+                    doc.text(numAnexo, pageWidth / 2, startY + 20, { align: 'center' });
+                    doc.text(tituloFormato, pageWidth / 2, startY + 28, { align: 'center' });
+                    doc.text('VINCULACIÓN CON LA SOCIEDAD', pageWidth / 2, startY + 33, { align: 'center' });
+
+                    // Tabla 1: Titulo
+                    autoTable(doc, {
+                        startY: 65, margin: { left: 15, right: 15 }, theme: 'grid',
+                        body: [[{ content: '1. DATOS GENERALES', styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 } }]],
+                        styles: { lineColor: [0, 0, 0], lineWidth: 0.3 }
+                    });
+
+                    // Tabla 2: Datos (Reutilizamos la variable)
+                    autoTable(doc, {
+                        startY: doc.lastAutoTable.finalY + 4, margin: { top: 45, left: 15, right: 15, bottom: 20 }, theme: 'grid',
+                        body: tablaDatosGenerales, styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0] } 
+                    });
+
+                    // Tabla 3: Cobertura (Reutilizamos la variable)
+                    autoTable(doc, {
+                        startY: doc.lastAutoTable.finalY, margin: { top: 45, left: 15, right: 15, bottom: 20 }, theme: 'grid',
+                        body: tablaCobertura, styles: { fontSize: 8, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+                    });
+
+                    // Control de salto de página para Firmas
+                    let finalY = doc.lastAutoTable.finalY + 10;
+                    if (finalY > pageHeight - 90) {
+                        doc.addPage();
+                        finalY = 45; 
+                    }
+
+                    // Tabla 4: Firmas Dinámicas
+                    const nombreDirector = directorProy || '_______________________'; 
+                    
+                    const tablaFirmas = [
+                        [{ content: '2. FIRMAS DE RESPONSABILIDAD', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [220, 220, 220] } }],
+                        [
+                            { content: `\n\nCiudad y Fecha:\n\n${provincia}, ${fechaFormateada}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } },
+                            { content: `DECLARO EL DESEO DE PARTICIPAR EN PROYECTOS DE VINCULACIÓN CON LA\nSOCIEDAD\n\n\n__________________________________\n${labelInvestigador} ${nombreIntegrante}\nC.I. ${cedula}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } }
+                        ],
+                        [
+                            { 
+                                content: `DECLARO QUE EL ${participacionTexto} PARTICIPARÁ EN PROYECTOS DE VINCULACIÓN CON LA SOCIEDAD\n\n\n__________________________________\n ${nombreDirector}\n Director(a) del Proyecto de Vinculación con la Sociedad\nC.I. ${ceduladirecto}`, 
+                                colSpan: 2, 
+                                styles: { 
+                                    minCellHeight: 40, valign: 'top', halign: 'center',
+                                    lineWidth: { top: 0.3, right: 0.3, bottom: esEstudiante ? 0.3 : 0, left: 0.3 } 
+                                } 
+                            }
+                        ]
+                    ];
+
+                    // Condicional: Compromisos si no es estudiante
+                    if (!esEstudiante) {
+                        tablaFirmas.push([
+                            { 
+                                content: `NOTA: ME COMPROMETO AL FINAL DEL SEMESTRE A ENTREGAR:\n${compromisosTexto}`, 
+                                colSpan: 2, 
+                                styles: { 
+                                    minCellHeight: 15, valign: 'top', halign: 'left', cellPadding: 4,
+                                    lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 }
+                                } 
+                            }
+                        ]);
+                    }
+
+                    // Dibujar Tabla de firmas
+                    autoTable(doc, {
+                        startY: finalY, margin: { top: 45, left: 15, right: 15, bottom: 20 }, theme: 'grid',
+                        body: tablaFirmas, styles: { fontSize: 8, cellPadding: 4, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+                    });
+                }
+
+                // 6. Descargar el documento compilado final
+                const nombreArchivo = `Anexos5y6_Masivos_Compromisos_.pdf`;
+                doc.save(nombreArchivo);
+
+            } catch (error) {
+                console.error(`Error al generar el PDF masivo:`, error);
+                mostraralertas2("Ocurrió un error al generar la descarga masiva.", "error");
+            } finally {
+                this.botonCargando = null;
             }
         },
         async ObtenerCarr(id){
@@ -8130,18 +8823,213 @@ export default {
             const response = await API.get(`${this.baseUrl}/getdirectvin`);
             return response;
         },
-        abrirModalAreaTematica() {
-            if (!this.editForm.financiamientos || this.editForm.financiamientos.length === 0) {
-                mostraralertas2("No hay rubros de financiamiento para generar el Anexo 3.", "warning");
-                return;
+        async abrirModalAreaTematica(id) {
+            try{
+                if(this.editForm.proyect_id){
+
+                    if (!this.editForm.financiamientos || this.editForm.financiamientos.length === 0) {
+                        mostraralertas2("No hay rubros de financiamiento para generar el Anexo 3.", "warning");
+                        return;
+                    }
+                    this.areaTematicaInput = ''; // Limpiar el input al abrir
+                    this.showModalAreaTematica = true;
+                }else{
+                    this.botonCargando = 'anexo3_' + id;
+                    const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
+                    const data = response.data;
+                    this.empresasAgregadas = data.empresas_seleccionadas || [];
+                    this.empresasAgregadas2 = data.empresas_seleccionadas2 || [];
+                    this.listaRubrosDisponibles = data.rubros_catalogo || [];
+                    let mapeoObjetivos = data.proyecto.invi_obj_proyectos.map(obj => ({
+                        id_obj_proy: obj.id_obj_proy,
+                        tipo_obj_proy: obj.tipo_obj_proy,
+                        detalle_obj_proy: obj.detalle_obj_proy,
+                        // Aseguramos que siempre sean arrays (mapeando con las propiedades exactas de tu Base de Datos)
+                        indicadores: obj.invi_indicadores || [],
+                        metas: obj.invi_metas || [],
+                        supuestos: obj.invi_supuestos || [],
+                        medios_verificacion: obj.invi_medios_verificacion || [],
+                        prod_verificables: obj.invi_prod_verificables || [],
+                    }));
+                    const calc = data.calculo_integrantes || {};
+                    let actividadesExtraidas = [];
+                    (data.proyecto.invi_obj_proyectos || []).forEach(obj => {
+                        if (obj.invi_actividades && obj.invi_actividades.length > 0) {
+                            obj.invi_actividades.forEach(act => {
+                                actividadesExtraidas.push({
+                                    ...act,
+                                    invi_subactividad: act.invi_subactividad || [],
+                                    invi_actprod_verificables: act.invi_actprod_verificables || [],
+                                    invi_actmedios_verificacion: act.invi_actmedios_verificacion || [],
+                                    invi_actindicadores: act.invi_actindicadores || [],
+                                    invi_actsupuestos: act.invi_actsupuestos || []
+                                });
+                            });
+                        }
+                    });
+                    let adquisicionesMapeadas = [];
+                    if (data.proyecto.invi_detalle_adqui && data.proyecto.invi_detalle_adqui.length > 0) {
+                        adquisicionesMapeadas = data.proyecto.invi_detalle_adqui.map(detalle => {
+                            return {
+                                id_adquisicion: detalle.invi_adquisicion.id_adquisicion,
+                                tipo_adqui: detalle.invi_adquisicion.tipo_adqui || '',
+                                detalle: detalle.invi_adquisicion.detalle || '',
+                                porcent_nacio: detalle.invi_adquisicion.porcent_nacio || 0,
+                                detalle_iinsu_nac: detalle.invi_adquisicion.detalle_iinsu_nac || '',
+                                porcent_importado: detalle.invi_adquisicion.porcent_importado || 0,
+                                detalle_insu_import: detalle.invi_adquisicion.detalle_insu_import || ''
+                            };
+                        });
+                    }
+                    let financiamientosMapeados = [];
+                    if (data.proyecto.invi_detalle_financia && data.proyecto.invi_detalle_financia.length > 0) {
+                        financiamientosMapeados = data.proyecto.invi_detalle_financia.map(det => {
+                            return {
+                                id_det_financia: det.id_det_financia,
+                                id_rubro: det.id_rubro,
+                                cantidad: det.cantidad || 0,
+                                valor: det.valor || 0,
+                                utlvte_anio1: det.utlvte_anio1 || 0,
+                                utlvte_anio2: det.utlvte_anio2 || 0,
+                                utlvte_anio3: det.utlvte_anio3 || 0,
+                                utlvte_anio4: det.utlvte_anio4 || 0,
+                                utlvte_anio5: det.utlvte_anio5 || 0,
+                                otros_anio1: det.otros_anio1 || 0,
+                                otros_anio2: det.otros_anio2 || 0,
+                                otros_anio3: det.otros_anio3 || 0,
+                                otros_anio4: det.otros_anio4 || 0,
+                                otros_anio5: det.otros_anio5 || 0,
+                                total_efectivo: det.total_efectivo || 0
+                            };
+                        });
+                    }
+                    this.listaImpactosDisponibles = data.impactos_catalogo || [];
+                    let impactosMapeados = [];
+                    if (data.proyecto.invi_det_impactos_esperados && data.proyecto.invi_det_impactos_esperados.length > 0) {
+                        impactosMapeados = data.proyecto.invi_det_impactos_esperados.map(det => {
+                            return {
+                                id_det_impactos_esp: det.id_det_impactos_esp,
+                                id_impactos: det.id_impactos,
+                                descripcion_general: det.descripcion_general || ''
+                            };
+                        });
+                    }
+                    let difusionMapeada = [];
+                    if (data.proyecto.invi_detalle_difusion && data.proyecto.invi_detalle_difusion.length > 0) {
+                        difusionMapeada = data.proyecto.invi_detalle_difusion.map(det => {
+                            return {
+                                id_det_difusion: det.id_det_difusion,
+                                id_difusion: det.id_difusion,
+                                costo: det.costo,
+                                nombre_actividad: det.invi_difusion ? det.invi_difusion.nombre_actividad : ''
+                            };
+                        });
+                    }
+                    this.editForm = {
+                        proyect_id: data.proyecto.proyect_id,
+                        proyect_nombre: data.proyecto.proyect_nombre || '',
+                        proyect_titulo: data.proyecto.proyect_titulo || '',
+                        proyect_nombre_en: data.proyecto.proyect_nombre_en || '',
+                        proyect_titulo_en: data.proyecto.proyect_titulo_en || '',
+                        proyect_multidis: data.proyecto.proyect_multidis,
+                        //Objetivos del Plan Estratégico Institucional
+                        objetivos: data.seleccionados || [],
+                        //Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025
+                        politicas: data.politicas_seleccionadas || [],
+                        //Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe
+                        ods: data.ods_seleccionadas || [],
+                        //Nombre de Facultad/es: 
+                        facultades: data.facultades_seleccionadas || [],
+                        id_facultad_priori: data.id_facultad_priori || '',
+                        //Carrera/s
+                        carreras: data.carreras_seleccionadas || [],
+                        id_carr_priori: data.id_carr_priori || '',
+                        //Dominios académicos
+                        dominios_humanisticos: data.dominios_seleccionados || [],
+                        //No. Convocatoria
+                        id_convocatoria: data.proyecto.id_convocatoria || '',
+                        sublineas_investigacion: [],
+                        unesco_areas: data.unesco_seleccionadas || [],
+                        id_tip_invi_proy: data.proyecto.id_tip_invi_proy || '',
+                        proyect_cobertura: data.proyecto.proyect_cobertura || '',
+                        id_zona_plan: data.cobertura_guardada?.id_zona_plan || '',
+                        provincias: data.cobertura_guardada?.provincias || [],
+                        cantones: data.cobertura_guardada?.cantones || [],
+                        parroquias: data.cobertura_guardada?.parroquias || [],
+                        objetivos_marco_logico: mapeoObjetivos,
+                        proyect_antecedentes: data.proyecto.proyect_antecedentes || '',
+                        proyect_justificacion: data.proyecto.proyect_justificacion || '',
+                        empresas: [...this.empresasAgregadas],
+                        aportes_utlvt: data.aportes_utlvt || [],
+                        aportes_inst: data.aportes_inst || [],
+                        proyect_fecha_pres: data.proyecto.proyect_fecha_pres || '',
+                        fechainicio: data.proyecto.fechainicio || '',
+                        fechafin: data.proyecto.fechafin || '',
+                        proyect_duracion_mes: data.proyecto.proyect_duracion_mes || '',
+                        proyect_estado: data.proyecto.proyect_estado || '',
+                        proyect_desc_situ_act: data.proyecto.proyect_desc_situ_act || '',
+                        proyect_diag_probl: data.proyecto.proyect_diag_probl || '',
+                        proyect_contribucion_soci: data.proyecto.proyect_contribucion_soci || '',
+                        asignaturas: data.asignaturas_seleccionadas || [],
+                        proyec_ident_poblaobj: data.proyecto.proyec_ident_poblaobj || '',
+                        proyect_num_direct_hombres: data.proyecto.proyect_num_direct_hombres || '',
+                        proyect_num_direct_mujeres: data.proyecto.proyect_num_direct_mujeres || '',
+                        proyect_total_num_direct: data.proyecto.proyect_total_num_direct || '',
+                        proyect_num_personas_div_fun: data.proyecto.proyect_num_personas_div_fun || '',
+                        proyect_total_num_indirect: data.proyecto.proyect_total_num_indirect || '',
+                        proyect_num_doce_h: data.proyecto.proyect_num_doce_h ?? calc.docentes_h ?? 0,
+                        proyect_num_doce_m: data.proyecto.proyect_num_doce_m ?? calc.docentes_m ?? 0,
+                        proyect_num_doce_part: data.proyecto.proyect_num_doce_part ?? calc.docentes_total ?? 0,
+
+                        // Estudiantes (se usan los valores guardados en BD o se calculan automáticamente si están nulos)
+                        proyect_num_est_h: data.proyecto.proyect_num_est_h ?? calc.estudiantes_h ?? 0,
+                        proyect_num_est_m: data.proyecto.proyect_num_est_m ?? calc.estudiantes_m ?? 0,
+                        proyect_num_est_part: data.proyecto.proyect_num_est_part ?? calc.estudiantes_total ?? 0,
+                        proyect_fact_exito: data.proyecto.proyect_fact_exito || '',
+                        proyect_rest_supu: data.proyecto.proyect_rest_supu || '',
+                        actividades: actividadesExtraidas,
+                        proyect_bienes: data.proyecto.proyect_bienes || '',
+                        proyect_servicios: data.proyecto.proyect_servicios || '',
+                        proyect_bienes_servicios: data.proyecto.proyect_bienes_servicios || '',
+                        adquisiciones: adquisicionesMapeadas,
+                        proyect_categorizacion: data.proyecto.proyect_categorizacion || '',
+                        proyect_metodologia: data.proyecto.proyect_metodologia || '',
+                        financiamientos: financiamientosMapeados,
+                        proyect_viabilidad_tec: data.proyecto.proyect_viabilidad_tec || '',
+                        proyect_equip_tec: data.proyecto.proyect_equip_tec || '',
+                        proyect_no_ejecuta: data.proyecto.proyect_no_ejecuta || '',
+                        impactos: impactosMapeados,
+                        proyect_sostenibilidad_soc: data.proyecto.proyect_sostenibilidad_soc || '',
+                        proyect_transf_tecn: data.proyecto.proyect_transf_tecn || '',
+                        proyect_art_cientificos: data.proyecto.proyect_art_cientificos || '',
+                        proyect_prototipos: data.proyecto.proyect_prototipos || '',
+                        proyect_reg_propin: data.proyecto.proyect_reg_propin || '',
+                        proyect_empr_spin: data.proyecto.proyect_empr_spin || '',
+                        difusion: difusionMapeada,
+                        bibliografias: data.proyecto.invi_bibliografias ? [...data.proyecto.invi_bibliografias] : [],
+                    };
+                    if (!this.editForm.financiamientos || this.editForm.financiamientos.length === 0) {
+                        mostraralertas2("No hay rubros de financiamiento para generar el Anexo 3.", "warning");
+                        return;
+                    }
+                    this.areaTematica2Input = ''; // Limpiar el input al abrir
+                    this.showModalArea2Tematica = true;
+                }
+
+            }catch(error){
+                console.error('Error al abrir el modal de Área Temática:', error);
+            }finally {
+                this.botonCargando = null; // Detiene el spinner al terminar
             }
-            this.areaTematicaInput = ''; // Limpiar el input al abrir
-            this.showModalAreaTematica = true;
+            
         },
 
         cerrarModalAreaTematica() {
             this.showModalAreaTematica = false;
+            this.showModalArea2Tematica = false;
             this.areaTematicaInput = '';
+            this.areaTematica2Input = '';
+            this.botonCargando = null;
         },
 
 
