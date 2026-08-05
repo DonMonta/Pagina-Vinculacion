@@ -204,6 +204,8 @@ class Invi_proyectosController extends Controller
             'invi_detalle_lin_inves',
             'invi_detalle_area_unesco',
             'invi_detalle_cobe.provincias',
+            'invi_detalle_cobe.cantones',
+            'invi_detalle_cobe.parroquias',
             'invi_obj_proyectos.invi_indicadores',
             'invi_obj_proyectos.invi_metas',
             'invi_obj_proyectos.invi_supuestos',
@@ -380,6 +382,10 @@ class Invi_proyectosController extends Controller
             if ($cobe->idparroquia && !in_array($cobe->idparroquia, $parroquias_guardadas)) {
                 $parroquias_guardadas[] = $cobe->idparroquia;
             }
+        }
+        $zonaPlanData = null;
+        if (!empty($id_zona_plan_guardada)) {
+            $zonaPlanData = Zona_planificacion::where('id_zona_plan', $id_zona_plan_guardada)->first();
         }
         $empresasSeleccionadas = $proyecto->invi_detalle_inst_proy->map(function ($detalle) {
             return $detalle->praempresas;
@@ -595,6 +601,7 @@ class Invi_proyectosController extends Controller
             'lineas_data' => $lineasData,
             'sublineas_data' => $sublineasData,
             'tipproyectos_data' => $tipoproyectoData,
+            'zona_plan_data' => $zonaPlanData,
         ]);
     }
 

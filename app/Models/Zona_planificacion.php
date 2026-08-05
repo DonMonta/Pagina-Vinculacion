@@ -10,7 +10,7 @@ class Zona_planificacion extends Model
     use HasFactory;
     protected $table = 'zona_planificacion';
     protected $primaryKey = 'id_zona_plan';
-    public $incrementing = false;
+    public $incrementing = true;
     protected $keyType = 'int';
     public $timestamps = false;
     protected $fillable = [
