@@ -32,7 +32,7 @@
                         <th class="py-5 px-4 text-left">
                             <p class="font-semibold text-gray-500 text-sm">Fecha Inicio/Fin</p>
                         </th>
-                        <th class="py-5 px-4 text-right">
+                        <th class="py-5 px-4 text-center">
                             <p class="font-semibold text-gray-500 text-sm">Acciones</p>
                         </th>
                     </tr>
@@ -149,7 +149,23 @@
                                         <path d="M9 15l2 2 4-4"></path>
                                     </svg>
                                 </button>
-                                
+                                <button @click="PDFProyect(post.proyect_id)"
+                                    :disabled="botonCargando === 'pdf_completo_' + post.proyect_id"
+                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center"
+                                    title="Generar PDF Completo">
+                                    <!-- Spinner -->
+                                    <svg v-if="botonCargando === 'pdf_completo_' + post.proyect_id" class="animate-spin h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <!-- Icono Documento de Descarga / PDF -->
+                                    <svg v-else width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <path d="M12 18v-6"></path>
+                                        <path d="M9 15l3 3 3-3"></path>
+                                    </svg>
+                                </button>
                                 
                             </div>
                         </td>
@@ -461,7 +477,7 @@
                                     <polyline points="7 10 12 15 17 10"></polyline>
                                     <line x1="12" y1="15" x2="12" y2="3"></line>
                                 </svg>
-                                Descarga Masiva de Anexos
+                                Descarga Masiva de Anexos de Compromiso
                             </button>
                         </div>
 
@@ -4691,7 +4707,7 @@
                         </li>
                     </ul>
                 </div>
-                <div v-if="showModalBib" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-60 backdrop-blur-sm transition-opacity">
+                <div v-if="showModalBib" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 overflow-y-auto font-sans transition-opacity">
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-fade-in-up">
                         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white">Añadir Bibliografía</h3>
@@ -8510,6 +8526,541 @@ export default {
                 mostraralertas2("Ocurrió un error al generar el PDF.", "error");
             }finally {
                 // 2. Apagamos el spinner pase lo que pase (éxito o error)
+                this.botonCargando = null;
+            }
+        },
+        async PDFProyect(id) {
+            this.botonCargando = 'pdf_completo_' + id;
+            try {
+                const idProyecto = id;
+                
+                if(!idProyecto) {
+                    return mostraralertas2("Error: No se ha seleccionado un proyecto válido.", "warning");
+                }
+
+                const response = await API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`);
+                const data = response.data;
+                console.log("Datos obtenidos para PDF completo:", data);
+                const proy = data.proyecto;
+
+                // 1. Inicializar jsPDF
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                // ==============================================================
+                // FASE 1: CREACIÓN DE LA PORTADA (PRIMERA HOJA)
+                // ==============================================================
+                const rutaPortada = '/fondoproy.png'; // <-- Nombre de tu imagen de portada en la carpeta public
+                
+                // Dibujar el fondo de la portada
+                doc.addImage(rutaPortada, 'PNG', 0, 0, pageWidth, pageHeight);
+
+                // -- Añadir el Título del Proyecto --
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(14);
+                doc.setTextColor(0, 0, 0); // Color oscuro (puedes cambiarlo a [0, 0, 0] para negro)
+                
+                const nombreProyecto = proy.proyect_nombre || 'NOMBRE DEL PROYECTO NO DEFINIDO';
+                
+                // Coordenada X desplazada un poco a la derecha (130 aprox) para esquivar la franja verde izquierda
+                const centroAreaBlancaX = 130; 
+                
+                doc.text(nombreProyecto, centroAreaBlancaX, 140, { 
+                    align: 'center', 
+                    maxWidth: 120 // Ancho máximo para que el texto haga salto de línea automático si es largo
+                });
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(11);
+                doc.setTextColor(0, 0, 0);
+
+                // Texto del Vicerrectorado (dividido en 2 líneas como en la imagen)
+                doc.text("Vicerrectorado Investigación, Vinculación", centroAreaBlancaX, 180, { align: 'center' });
+                doc.text("y Posgrado", centroAreaBlancaX, 187, { align: 'center' });
+
+                // Texto de la Dirección de Vinculación
+                doc.text("Dirección de Vinculación con la Sociedad", centroAreaBlancaX, 202, { align: 'center' });
+                // -- Extraer y formatear la fecha (Solo Mes y Año) --
+                let mesAnio = '';
+                if (proy.proyect_fecha_pres) {
+                    const partes = proy.proyect_fecha_pres.split('-'); // Formato esperado: YYYY-MM-DD
+                    if (partes.length >= 2) {
+                        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                        const mesString = meses[parseInt(partes[1], 10) - 1];
+                        const anioString = partes[0];
+                        mesAnio = `${mesString} ${anioString}`;
+                    }
+                } else {
+                    mesAnio = 'Fecha no definida';
+                }
+
+                // -- Añadir la Fecha en la parte inferior --
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0); // Texto negro
+                doc.text(mesAnio, centroAreaBlancaX, 260, { align: 'center' }); // Ajusta el Y=260 según necesidad
+
+
+                // ==============================================================
+                // FASE 2: HOJAS SIGUIENTES Y CONTENIDO (FONDO NORMAL)
+                // ==============================================================
+                const rutaImagenFondo = '/fondo.png'; 
+
+                const dibujarFondoBanner = () => {
+                    doc.addImage(rutaImagenFondo, 'PNG', 0, 0, pageWidth, pageHeight);
+                };
+
+                // Pasamos a la hoja 2
+                doc.addPage();
+                
+                // Dibujamos el fondo normal en la hoja 2
+                dibujarFondoBanner();
+
+                // Interceptamos doc.addPage para asegurar que las futuras hojas (3, 4, 5...) lleven el fondo normal
+                const originalAddPage = doc.addPage.bind(doc);
+                doc.addPage = function() {
+                    originalAddPage();
+                    dibujarFondoBanner();
+                };
+
+                // -------------------------------------------------------------
+                // CONTINÚA TU LÓGICA DE DATOS Y TABLAS (Hoja 2 en adelante)
+                // -------------------------------------------------------------
+                const facultadesTxt = data.facultades_data?.map(f => f.siglas || f.siglas || f.siglas).join('\n') || 'N/A';
+                const carrerasTxt = data.carreras_data?.map(c => c.NombCarr || c.NombCarr || c.NombCarr).join('\n') || 'N/A';
+                const dominiosTxt = data.dominios_data?.map(dom => dom.detalle_dom_huma).join('\n') || 'N/A';
+
+                const objetivosTxt = data.objetivos_pei_data?.map(o => o.cod_obj+'. '+ o.detalle_obj).join('\n') || 'N/A';
+                const politicasTxt = data.politicas_data?.map(p => p.cod_pol+'. '+ p.detalle_pol || 'Política').join('\n') || 'N/A';
+                const agendaTxt = data.agenda_ods_data?.map(a => a.cod_ods+'. '+ a.detalle_ods || 'Agenda').join('\n') || 'N/A';
+                const objplandeTxt = data.objetivos_politicas_data?.map(a => a.cod_obj_pol+'. '+ a.detalle_obj_pol || 'Obj').join('\n') || 'N/A';
+                const convocatoriaTxt = data.convocatoria_data?.map(c => c.num_convocatoria).join('\n') || 'N/A';
+                const lineaInvestigacion = data.lineas_data?.map(l => l.nombre_lin).join('\n') || 'N/A';
+                const sublineaInvestigacion = data.sublineas_data?.map(sl => sl.nombre_sublin).join('\n') || 'N/A';
+                const areaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
+                const subareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Subárea de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
+                const especareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área específica de conocimiento').map(item =>item.sau_id+' '+ item.sau_descripcion).join('\n') || 'N/A';
+                const tipoproyectTxt = data.tipproyectos_data?.map(t => t.detalle_invi_proyect).join('\n') || 'N/A';
+
+                const coberturaSeleccionada = (proy.proyect_cobertura || '').toLowerCase();
+                const checkLocal = coberturaSeleccionada.includes('local') ? 'X' : '  ';
+                const checkRegional = coberturaSeleccionada.includes('regional') ? 'X' : '  ';
+                const checkNacional = coberturaSeleccionada.includes('nacional') ? 'X' : '  ';
+                const checkInternacional = coberturaSeleccionada.includes('internacional') ? 'X' : '  ';
+
+                // --- ESTILOS MAGISTRALES PARA SIMULAR UNA SOLA CELDA SIN LÍNEA DIVISORIA ---
+                const lblStyle = { 
+                    fontStyle: 'bold', 
+                    halign: 'left',
+                    cellPadding: { top: 3, left: 3, right: 3, bottom: 0 }, 
+                    lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 } 
+                };
+                const valStyle = { 
+                    fontStyle: 'normal', 
+                    halign: 'left',
+                    cellPadding: { top: 1, left: 3, right: 3, bottom: 3 }, 
+                    lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 } 
+                };
+
+                // 5. Dibujar Tabla 1: ÚNICAMENTE EL TÍTULO "1. DATOS GENERALES"
+                autoTable(doc, {
+                    startY: 30, // Inicia en la segunda hoja a esta altura
+                    margin: { left: 15, right: 15 },
+                    theme: 'grid',
+                    body: [
+                        [{ content: '1. DATOS GENERALES', styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 } }]
+                    ],
+                    styles: { lineColor: [0, 0, 0], lineWidth: 0.3 }
+                });
+
+                // 6. Definir la estructura de la TABLA 2
+                const tablaDatosGenerales = [
+                    [{ content: 'Nombre (Español):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_nombre || '', colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Título del proyecto (Español):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_titulo || '', colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Name (Inglés):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_nombre_en || '', colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Title of the project (Inglés):', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_titulo_en || '', colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Objetivos del Plan Estratégico Institucional:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objetivosTxt, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+                    [{ content: politicasTxt, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe:', colSpan: 3, styles: lblStyle }],
+                    [{ content: agendaTxt, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objplandeTxt, colSpan: 3, styles: valStyle }],
+                    
+                    [
+                        { content: 'Nombre de Facultad/es:', styles: lblStyle },
+                        { content: 'Carrera/s:', styles: lblStyle },
+                        { content: 'Dominios académicos:', styles: lblStyle }
+                    ],
+                    [
+                        { content: facultadesTxt, styles: valStyle },
+                        { content: carrerasTxt, styles: valStyle },
+                        { content: dominiosTxt, styles: valStyle }
+                    ],
+                    
+                    [
+                        { content: 'No. Convocatoria:', styles: lblStyle },
+                        { content: 'Línea de Investigación:', styles: lblStyle },
+                        { content: 'Sublínea de Investigación:', styles: lblStyle }
+                    ],
+                    [
+                        { content: convocatoriaTxt, styles: valStyle },
+                        { content: lineaInvestigacion, styles: valStyle },
+                        { content: sublineaInvestigacion, styles: valStyle }
+                    ],
+                    
+                    [
+                        { content: 'Área Conocimiento UNESCO:', styles: lblStyle },
+                        { content: 'SubÁrea Conocimiento UNESCO:', styles: lblStyle },
+                        { content: 'SubÁrea Específica Conocimiento UNESCO:', styles: lblStyle }
+                    ],
+                    [
+                        { content: areaespecifica, styles: valStyle },
+                        { content: subareaespecifica, styles: valStyle },
+                        { content: especareaespecifica, styles: valStyle }
+                    ],
+                    
+                    [{ content: 'Tipo de proyecto de vinculación:', colSpan: 3, styles: lblStyle }],
+                    [{ content: tipoproyectTxt, colSpan: 3, styles: valStyle }]
+                ];
+
+                // Dibujar Tabla 2 
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 4, 
+                    margin: { top: 45, left: 15, right: 15, bottom: 20 }, 
+                    theme: 'grid',
+                    body: tablaDatosGenerales,
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                });
+
+                // 7. Definir estructura de la TABLA 3 
+                const tablaCobertura = [
+                    [{ content: 'COBERTURA Y LOCALIZACIÓN', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+                    [
+                        { content: `Local                [ ${checkLocal} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+                        { content: `Regional          [ ${checkRegional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+                        { content: `Nacional          [ ${checkNacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+                        { content: `Internacional   [ ${checkInternacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } }
+                    ]
+                ];
+
+                // 8. Dibujar Tabla 3
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 45, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablaCobertura,
+                    styles: { fontSize: 8, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0],fillColor: false }
+                });
+                let rawZona = data.zona_plan_data ? data.zona_plan_data.nombre_zona : '';
+                let zonaTxt = rawZona;
+                let regionTxt = '';
+
+                // Expresión regular para separar cuando encuentra " o Región" o simplemente "Región"
+                const regexRegion = /(?:\s+o\s+)?(regi[óo]n\s+.*)/i;
+                const matchRegion = rawZona.match(regexRegion);
+
+                if (matchRegion) {
+                    // Remueve la parte de la región para dejar solo el texto de la Zona
+                    zonaTxt = rawZona.replace(matchRegion[0], '').trim();
+                    // Guarda el resto a partir de la palabra "Región"
+                    regionTxt = matchRegion[1].trim(); 
+                }
+
+                // --- 2. OBTENER PROVINCIA SIN DUPLICADOS ---
+                let provincia = 'N/A';
+
+                if (Array.isArray(proy.invi_detalle_cobe)) {
+                    const provinciasMapeadas = proy.invi_detalle_cobe
+                        .map(cobe => cobe.provincias?.detalle || cobe.provincia?.detalle)
+                        .filter(Boolean);
+                    
+                    provincia = [...new Set(provinciasMapeadas)].join(', ') || 'N/A';
+
+                } else if (Array.isArray(proy.invi_detalle_cobe?.provincias)) {
+                    const provinciasMapeadas = proy.invi_detalle_cobe.provincias
+                        .map(p => p.detalle)
+                        .filter(Boolean);
+                        
+                    provincia = [...new Set(provinciasMapeadas)].join(', ') || 'N/A';
+
+                } else if (proy.invi_detalle_cobe?.provincias?.detalle) {
+                    provincia = proy.invi_detalle_cobe.provincias.detalle;
+                }
+
+                // --- 3. OBTENER CANTONES SIN DUPLICADOS ---
+                let cantones = 'N/A';
+
+                if (Array.isArray(proy.invi_detalle_cobe)) {
+                    const cantonesMapeadas = proy.invi_detalle_cobe
+                        .map(cobe => cobe.cantones?.detalle || cobe.canton?.detalle)
+                        .filter(Boolean);
+                    
+                    cantones = [...new Set(cantonesMapeadas)].join(', ') || 'N/A';
+
+                } else if (Array.isArray(proy.invi_detalle_cobe?.cantones)) {
+                    const cantonesMapeadas = proy.invi_detalle_cobe.cantones
+                        .map(p => p.detalle)
+                        .filter(Boolean);
+                        
+                    cantones = [...new Set(cantonesMapeadas)].join(', ') || 'N/A';
+
+                } else if (proy.invi_detalle_cobe?.cantones?.detalle) {
+                    cantones = proy.invi_detalle_cobe.cantones.detalle;
+                }
+                
+                // --- 4. LÓGICA DE PARROQUIAS (> 6 SE AGRUPAN) ---
+                let parroquiaTxt = 'N/A';
+
+                if (Array.isArray(proy.invi_detalle_cobe)) {
+                    const parroquiasMapeadas = proy.invi_detalle_cobe
+                        .map(c => {
+                            if (c.parroquias?.parroquia) {
+                                let tipo = c.parroquias.tipoparroquia ? ` - ${c.parroquias.tipoparroquia}` : '';
+                                return `${c.parroquias.parroquia}${tipo}`;
+                            }
+                            return null;
+                        })
+                        .filter(Boolean);
+                    
+                    // Eliminamos duplicados por si acaso
+                    const parroquiasUnicas = [...new Set(parroquiasMapeadas)];
+
+                    if (parroquiasUnicas.length > 6) {
+                        parroquiaTxt = `Urbanas y rurales de la Provincia de ${provincia}`;
+                    } else if (parroquiasUnicas.length > 0) {
+                        parroquiaTxt = parroquiasUnicas.join('\n');
+                    }
+                }
+
+
+                // -------------------------------------------------------------
+                // 10. ESTRUCTURA Y DIBUJO DE LA TABLA 4 (ZONAS Y OBJETIVOS)
+                // -------------------------------------------------------------
+                const tablaUbicacion = [
+                    // Fila 1: Cabeceras
+                    [
+                        { content: 'Zona de\nPlanificación', styles: lblStyle },
+                        { content: 'Región', styles: lblStyle },
+                        { content: 'Provincia', styles: lblStyle },
+                        { content: 'Cantón', styles: lblStyle },
+                        { content: 'Parroquia', styles: lblStyle }
+                    ],
+                    // Fila 2: Datos procesados
+                    [
+                        { content: zonaTxt, styles: valStyle },
+                        { content: regionTxt, styles: valStyle },
+                        { content: provincia, styles: valStyle },
+                        { content: cantones, styles: valStyle },
+                        { content: parroquiaTxt, styles: valStyle }
+                    ],
+                    // Fila 3: Celda combinada gris para Objetivos
+                    [
+                        { 
+                            content: 'OBJETIVOS DEL PROYECTO', 
+                            colSpan: 5, 
+                            styles: { 
+                                fontStyle: 'bold', 
+                                fillColor: [220, 220, 220], // Color gris referencial de la imagen
+                                halign: 'left' 
+                            } 
+                        }
+                    ]
+                ];
+
+                // Dibujar Tabla 4
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 10, // Inicia justo debajo de la Tabla de Cobertura sin espacio
+                    margin: { left: 15, right: 15 },
+                    theme: 'grid',
+                    body: tablaUbicacion,
+                    styles: { 
+                        fontSize: 8, 
+                        cellPadding: 3, 
+                        lineColor: [0, 0, 0], 
+                        lineWidth: 0.3, 
+                        textColor: [0, 0, 0],
+                        fillColor: false 
+                    }
+                });
+                const objetivosGenerales = proy.invi_obj_proyectos?.filter(item => item.tipo_obj_proy === 'general') || [];
+                const objetivosFin = proy.invi_obj_proyectos?.filter(item => item.tipo_obj_proy === 'fin') || [];
+
+                // 2. Extraer Objetivo General y Fin
+                const objetivogeneral = objetivosGenerales.map(item => item.detalle_obj_proy).filter(Boolean).join('\n') || 'N/A';
+                const finproy = objetivosFin.map(item => item.detalle_obj_proy).filter(Boolean).join('\n') || 'N/A';
+
+                // 3. Función auxiliar para extraer relaciones (Medios, Metas, Indicadores) y poner viñetas
+                const extraerConVinetas = (objetivos, relacion, campoTexto) => {
+                    let resultados = [];
+                    
+                    objetivos.forEach(obj => {
+                        const dataRelacion = obj[relacion];
+                        if (Array.isArray(dataRelacion)) {
+                            // Si viene como Array (Múltiples registros)
+                            dataRelacion.forEach(item => {
+                                if (item[campoTexto]) resultados.push(item[campoTexto]);
+                            });
+                        } else if (dataRelacion && dataRelacion[campoTexto]) {
+                            // Si viene como Objeto único
+                            resultados.push(dataRelacion[campoTexto]);
+                        }
+                    });
+
+                    if (resultados.length === 0) return 'N/A';
+                    if (resultados.length === 1) return resultados[0]; // Sin viñeta si es solo uno
+                    
+                    // Si hay más de 1, agregamos viñetas
+                    return resultados.map(r => `• ${r}`).join('\n');
+                };
+
+                // 4. Aplicar la función a las variables
+                const objgemediover = extraerConVinetas(objetivosGenerales, 'invi_medios_verificacion', 'detalle_medio_verifica');
+                const objgemeta = extraerConVinetas(objetivosGenerales, 'invi_metas', 'detalle_metas');
+                const objgindica = extraerConVinetas(objetivosGenerales, 'invi_indicadores', 'detalle_indicador');
+
+                // 5. Estructurar la Tabla
+                const tablaObjetivos = [
+                    [{ content: 'Objetivo General:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objetivogeneral, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Fin:', colSpan: 3, styles: lblStyle }],
+                    [{ content: finproy, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Medio de Verificación:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objgemediover, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Meta:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objgemeta, colSpan: 3, styles: valStyle }],
+                    
+                    [{ content: 'Indicador:', colSpan: 3, styles: lblStyle }],
+                    [{ content: objgindica, colSpan: 3, styles: valStyle }]
+                ];
+
+                // 6. Dibujar Tabla de Objetivos
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 45, left: 15, right: 15, bottom: 20 }, 
+                    theme: 'grid',
+                    body: tablaObjetivos,
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                });
+                const formatearLista = (relacion, campo, etiqueta = '') => {
+                    if (!relacion) return etiqueta ? `${etiqueta} N/A` : 'N/A';
+
+                    const items = Array.isArray(relacion) ? relacion : [relacion];
+                    const textos = items.map(item => item[campo] || item.detalle || '').filter(Boolean);
+
+                    if (textos.length === 0) return etiqueta ? `${etiqueta} N/A` : 'N/A';
+
+                    // Si es solo 1 elemento
+                    if (textos.length === 1) {
+                        return etiqueta ? `${etiqueta} ${textos[0]}` : textos[0];
+                    }
+
+                    // Si hay más de 1 elemento, se agregan viñetas a cada uno
+                    const listaConVinetas = textos.map(t => `•  ${t}`).join('\n');
+                    return etiqueta ? `${etiqueta}\n${listaConVinetas}` : listaConVinetas;
+                };
+
+                // -------------------------------------------------------------
+                // 2. FILTRAR OBJETIVOS ESPECÍFICOS Y CONSTRUIR FILAS DE LA TABLA
+                // -------------------------------------------------------------
+                const objetivosEspecificos = proy.invi_obj_proyectos?.filter(item => item.tipo_obj_proy === 'especifico') || [];
+
+                const bodyObjEspecificos = [
+                    // Cabecera de la tabla
+                    [
+                        { content: 'OBJETIVOS ESPECÍFICOS', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: 'PRODUCTOS VERIFICABLES', styles: { fontStyle: 'bold', halign: 'center' } }
+                    ]
+                ];
+
+                // Recorrer y numerar dinámicamente cada objetivo específico
+                objetivosEspecificos.forEach((obj, index) => {
+                    const numero = index + 1;
+                    const objTexto = `${numero}.  ${obj.detalle_obj_proy || ''}`;
+                    
+                    // Si hay 1 meta/indicador muestra "Meta: Texto". Si hay varias, genera viñetas debajo de "Meta:"
+                    const metaTexto = formatearLista(obj.invi_metas, 'detalle_metas', 'Meta:');
+                    const indicadorTexto = formatearLista(obj.invi_indicadores, 'detalle_indicador', 'Indicador:');
+                    const productosTexto = formatearLista(obj.invi_prod_verificables, 'detalle_prod_verif');
+
+                    // Fila 1 del Objetivo (Texto del Objetivo + Productos Verificables combinados verticalmente)
+                    bodyObjEspecificos.push([
+                        { content: objTexto, styles: { halign: 'left', fontStyle: 'bold' } },
+                        { content: productosTexto, rowSpan: 3, styles: { halign: 'left', valign: 'top' } }
+                    ]);
+
+                    // Fila 2 del Objetivo (Meta / Metas)
+                    bodyObjEspecificos.push([
+                        { content: metaTexto, styles: { halign: 'left' } }
+                    ]);
+
+                    // Fila 3 del Objetivo (Indicador / Indicadores)
+                    bodyObjEspecificos.push([
+                        { content: indicadorTexto, styles: { halign: 'left' } }
+                    ]);
+                });
+
+                // -------------------------------------------------------------
+                // 3. DIBUJAR LA TABLA DE OBJETIVOS ESPECÍFICOS
+                // -------------------------------------------------------------
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY,
+                    margin: { top: 45, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: bodyObjEspecificos,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        lineWidth: 0.3,
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        cellPadding: 3
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 'auto' }, // Columna de Objetivos Específicos
+                        1: { cellWidth: 80 }     // Ancho fijo de la columna Productos Verificables
+                    }
+                });
+                const tablaAntecedentesyJustif = [
+                    [{ content: 'Antecedentes:', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+                    [{ content: proy.proyect_antecedentes || '', colSpan: 3, styles: valStyle }],
+                    [{ content: 'Justificación:', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+                    [{ content: proy.proyect_justificacion || '', colSpan: 3, styles: valStyle }]
+                ];
+
+                // 8. Dibujar Tabla 3
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 45, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablaAntecedentesyJustif,
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                });
+
+                
+                const nombreArchivo = `Proyecto-${proy.proyect_cod}.pdf`;
+                doc.save(nombreArchivo);
+
+            } catch (error) {
+                console.error(`Error al generar el PDF del Anexo:`, error);
+                mostraralertas2("Ocurrió un error al generar el PDF.", "error");
+            } finally {
+                // Apagamos el spinner pase lo que pase (éxito o error)
                 this.botonCargando = null;
             }
         },
