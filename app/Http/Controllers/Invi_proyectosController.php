@@ -216,7 +216,7 @@ class Invi_proyectosController extends Controller
             'invi_detalle_presu_proy.invi_aportesinst.praempresa',
             'invi_detalle_articulacion',
             'invi_detalle_integrante.funciones',
-            'invi_detalle_integrante.informacionPersonalD',
+            'invi_detalle_integrante.informacionPersonalD.titulos.nivel',
             'invi_detalle_integrante.informacionpersonal',
             'invi_obj_proyectos.invi_actividades.invi_subactividad',
             'invi_obj_proyectos.invi_actividades.invi_actprod_verificables',
