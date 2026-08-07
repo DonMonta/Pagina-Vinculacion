@@ -9,7 +9,7 @@ class Asignaturas extends Model
 {
     protected $table = 'asignatura';
     protected $primaryKey = 'IdAsig';
-    public $incrementing = true;
+    public $incrementing = false;
     protected $keyType = 'varchar';
     public $timestamps = false;
 
