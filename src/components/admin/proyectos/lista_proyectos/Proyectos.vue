@@ -9329,17 +9329,37 @@ export default {
                         2: { cellWidth: '33%' }
                     }
                 });
-                // 1. Función auxiliar para convertir texto a formato Título (Mayúscula la primera letra)
                 const capitalizarNombres = (str) => {
                     if (!str) return '';
                     return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                 };
 
-                // 2. Procesar dinámicamente los integrantes que vienen de tu BD
-                const integrantes = data.integrantes_activos || [];
+                // 2. Función auxiliar para obtener la prioridad según el texto del rol/función
+                const getPrioridadFuncion = (nombreFuncion = '') => {
+                    const f = nombreFuncion.toLowerCase();
+                    
+                    // Evaluamos 'subdirector' antes de 'director' para evitar coincidencias erróneas
+                    if (f.includes('subdirector')) return 2;
+                    if (f.includes('director')) return 1;
+                    if (f.includes('técnico') || f.includes('tecnico')) return 4;
+                    if (f.includes('docente')) return 3;
+                    if (f.includes('administrativo') || f.includes('administrativa')) return 5;
+                    if (f.includes('estudiante')) return 6;
+                    
+                    return 7; // Cualquier otro rol no contemplado
+                };
 
-                const filasPersonal = integrantes.map(async integrante => {
-                    // Validar en qué objeto viene la info (varía si es docente o estudiante)
+                // 3. Obtener e integrar la lista ordenada por función
+                const integrantesRaw = data.integrantes_titulosactivos || data.integrantes_activos || [];
+
+                const integrantes = [...integrantesRaw].sort((a, b) => {
+                    const funcA = a.funciones ? a.funciones.nombre_funcion : '';
+                    const funcB = b.funciones ? b.funciones.nombre_funcion : '';
+                    return getPrioridadFuncion(funcA) - getPrioridadFuncion(funcB);
+                });
+
+                // 4. Mapear los datos para las filas de AutoTable
+                const filasPersonal = integrantes.map(integrante => {
                     const info = integrante.informacion_personal_d || integrante.informacionpersonal || {};
                     
                     // Función (rol en el proyecto)
@@ -9348,44 +9368,42 @@ export default {
                     // Cédula
                     const cedula = info.cedula_pasaporte || info.CIInfPer || '';
                     
-                    // Nombre Completo (Unimos Nombres, Apellido Paterno y Materno)
-                    const nombresStr = `${info.NombInfPer || ''} ${info.ApellInfPer || ''} ${info.ApellMatInfPer || ''}`.trim();
-                    const nombreCompleto = capitalizarNombres(nombresStr);
+                    // Nombre formateado enviado desde el backend (PHP)
+                    let nombreCompleto = integrante.nombre_completo_titulo;
+                    if (!nombreCompleto) {
+                        const nombresStr = `${info.NombInfPer || ''} ${info.ApellInfPer || ''} ${info.ApellMatInfPer || ''}`.trim();
+                        nombreCompleto = capitalizarNombres(nombresStr);
+                    }
+                    
+                    // Carrera y Facultad
                     const idcarr = integrante.idCarr;
                     let carrera = '';
                     let facultad = '';
-                    if(idcarr){
-
-                       carrera =  this.ObtenerCarr(idcarr);
-                       facultad = this.ObtenerCarrFAC(idcarr);
-                        //console.log(facultad);
-                    }else{
-                        carrera = info.area ? `${info.area} - ELÉCTRICA` : 'FACI - ELÉCTRICA';
+                    
+                    if (idcarr && integrante.carreras) {
+                        carrera = integrante.carrera_formateada|| '';
+                        if (integrante.carreras.facultades && integrante.carreras.facultades.length > 0) {
+                            facultad = integrante.carreras.facultades[0].siglas || '';
+                        }
                     }
                     
-                    // Carrera / Área Institucional
-                    // Nota: Aquí se colocó "FACI - ELÉCTRICA" según tu imagen. Puedes ajustarlo a `info.area` o al campo de carrera real si lo tienes.
-                    const fincarrera = info.area ? `${info.area} - ELÉCTRICA` : 'FACI - ELÉCTRICA'; 
-                    
-                    // Correo (priorizamos el institucional, si no hay, usamos el personal)
-                    const correo = info.mailInst || '';
+                    const fincarrera = (facultad && carrera) ? `${facultad} - ${carrera}` : (carrera || facultad || ''); 
+
+                    // Correo
+                    const correo = info.mailInst || info.mailPer || '';
 
                     return [
                         { content: funcion, styles: { halign: 'center' } },
                         { content: cedula, styles: { halign: 'center' } },
                         { content: nombreCompleto, styles: { halign: 'center' } },
                         { content: fincarrera, styles: { halign: 'center' } },
-                        // El correo en la imagen aparece en color azul
                         { content: correo, styles: { halign: 'center', textColor: [0, 85, 164] } }, 
-                        { content: '', styles: { halign: 'center' } } // Celda vacía para Firmas
+                        { content: '', styles: { halign: 'center' } } 
                     ];
                 });
 
-                // 3. Estructura general de la tabla "PERSONAL RESPONSABLE"
+                // 5. Estructura general de la tabla "PERSONAL RESPONSABLE"
                 const tablaPersonal = [
-                    // Fila 1 y 2: Título y Nota.
-                    // Como AutoTable no permite mezclar Negrita e Cursiva en el mismo texto fácilmente,
-                    // usamos dos filas y les quitamos los bordes divisorios para que parezcan una sola celda gris.
                     [
                         { 
                             content: 'PERSONAL RESPONSABLE DEL PROYECTO', 
@@ -9400,44 +9418,344 @@ export default {
                             styles: { fontStyle: 'italic', fillColor: [230, 230, 230], halign: 'left', fontSize: 7, cellPadding: { top: 1, left: 2, right: 2, bottom: 3 }, lineWidth: { top: 0, left: 0.1, right: 0.1, bottom: 0.1 } } 
                         }
                     ],
-                    // Fila 3: Fila de espacio en blanco debajo de la cabecera gris (como se ve en la captura)
                     [
                         { content: '', colSpan: 6, styles: { cellPadding: 2, fillColor: [255, 255, 255] } }
                     ],
-                    // Fila 4: Cabeceras de cada columna
                     [
                         { content: 'FUNCIÓN', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
-                        { content: 'CÉDULA\nDE\nIDENTIDAD', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
-                        { content: 'NOMBRE\nCOMPLETO', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
-                        { content: 'CARRERA/DIRECCIONES/INSTITUCIÓN\nA LA QUE PERTENECE', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
-                        { content: 'CORREO\nELECTRÓNICO', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+                        { content: 'CÉDULA DE IDENTIDAD', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+                        { content: 'NOMBRE COMPLETO', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+                        // EL TRUCO ESTÁ AQUÍ: Añadimos espacios antes y después de las barras "/"
+                        { content: 'CARRERA / DIRECCIONES / INSTITUCIÓN A LA QUE PERTENECE', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+                        { content: 'CORREO ELECTRÓNICO', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
                         { content: 'FIRMAS', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } }
                     ],
-                    // 4. Inyectamos todas las filas procesadas de los integrantes
                     ...filasPersonal
                 ];
 
-                // 5. Renderizado final de la tabla
+                // 6. Renderizado final de la tabla con anchos optimizados
                 autoTable(doc, {
-                    // Inicia inmediatamente debajo de la tabla anterior
                     startY: doc.lastAutoTable.finalY + 10, 
-                    margin: { left: 15, right: 15 },
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
                     theme: 'grid',
                     body: tablaPersonal,
+                    styles: { 
+                        fontSize: 7.5, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0],
+                        fillColor: false, 
+                        valign: 'middle',
+                        // Aseguramos que el texto largo se rompa hacia abajo y no empuje las celdas
+                        overflow: 'linebreak' 
+                    },
+                    // Suma exacta de 100% con anchos más realistas para que nada se trabe
+                    columnStyles: {
+                        0: { cellWidth: '10%' }, // Función
+                        1: { cellWidth: '10%' }, // Cédula 
+                        2: { cellWidth: '14%' }, // Nombre completo
+                        3: { cellWidth: '13%' }, // Carrera / Facultad (Un 13% es el mínimo seguro)
+                        4: { cellWidth: '18%' }, // Correo (Necesita este espacio para que los correos largos no rompan la tabla)
+                        5: { cellWidth: '35%' }  // Firmas (Espacio amplio y garantizado)
+                    }
+                });
+                const tablaplan1 = [
+                    // Fila 1: Título
+                    [
+                        { content: 'CONSIDERACIONES DE CÁRACTER EQUITATIVO', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }
+                    ],
+                    // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+                    [
+                        { content: 'El proyecto debe estar redactado con perspectiva de género, lo que implica usar el femenino y masculino o sustantivo neutro. Asimismo, es recomendable dirigirse en estos términos a la comunidad beneficiaria con el objetivo de evitar la exclusión.', colSpan: 3, styles: { halign: 'left' } }
+                    ],
+                    [
+                        { content: 'ÉTICA', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }
+                    ],
+                    [
+                        { content: 'Las y los participantes del proyecto demostrarán un comportamiento absolutamente opuesto al fraude o deshonestidad académica, descritas en el artículo 68 del Reglamento de Régimen Académico emitido por el CES, como "toda acción que, inobservando el principio de transparencia académica, viola los derechos de autor o incumple las normas éticas establecidas por las IES o por el profesor, para los procesos de evaluación y/o presentación de resultados de aprendizaje, investigación o sistematización".', 
+                        colSpan: 3, styles: { halign: 'left' } }
+                    ],
+                    [
+                        { content: '2. DIAGNÓSTICO Y PROBLEMA', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }
+                    ],
+                ];
+
+                // 4. Renderizado
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablaplan1,
                     styles: { 
                         fontSize: 8, 
                         lineColor: [0, 0, 0], 
                         textColor: [0, 0, 0], 
-                        valign: 'middle' 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
                     },
-                    // Ajuste de anchos para que se distribuya como en la imagen
+                });
+                const tabladiagprom = [
+                    [{ content: '2.1 Descripción de la situación actual para contribuir a la satisfacción de necesidades y la solución de problemáticas del entorno desde el ámbito académico e investigativo:', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_desc_situ_act, colSpan: 6, styles: valStyle }],
+                    
+                    [{ content: '2.2 Identificación, descripción y diagnóstico del problema:', colSpan: 6, styles: lblStyle }],
+                    [{ content: proy.proyect_diag_probl, colSpan: 6, styles: valStyle }],
+                    [
+                        { content: '2.3 Articulación del proyecto de vinculación con el programa de la carrera', colSpan: 6, styles: { fontStyle: 'bold', halign: 'left' } }
+                    ],
+                ];
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 4, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tabladiagprom,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                });
+                const asiognaturasTxt = data.asignaturas_data?.map(f => '* '+ f.NombAsig).join('\n') || 'N/A';
+                const tablaarticula = [
+                    // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+                    [
+                        { content: 'Contribución a la sociedad', styles: { halign: 'left' } },
+                        { content: 'Asignatura(s) que aportan al proyecto', styles: { fontStyle: 'bold', halign: 'left' } }
+                    ],
+                    [
+                        { content: proy.proyect_contribucion_soci, styles: { halign: 'left' } },
+                        { content: asiognaturasTxt, styles: { halign: 'left' } }
+                    ]
+                ];
+
+                // 4. Renderizado
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablaarticula,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
                     columnStyles: {
-                        0: { cellWidth: '20%' },  // Función
-                        1: { cellWidth: '20%' },  // Cédula
-                        2: { cellWidth: '20%' },  // Nombre
-                        3: { cellWidth: '15%' },  // Carrera
-                        4: { cellWidth: '12%' },  // Correo
-                        5: { cellWidth: '15%' }   // Firmas
+                        0: { cellWidth: 'auto' }, // 
+                        1: { cellWidth: 80 }     // 
+                    }
+                });
+                const tablaidentific = [
+                    [{ content: 'Identificación y caracterización de la población objetiva beneficiarios (as)', colSpan: 3, styles: lblStyle }],
+                    [{ content: `${proy.proyec_ident_poblaobj} \n(Obtención de datos de página oficial del INEC censo 2022)`, colSpan: 3, styles: valStyle }]
+                ];
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablaidentific,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                });
+                const tablapersonas = [
+                    // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+                    [
+                        { content: 'Número Directos Hombres:', styles: lblStyle },
+                        { content: 'Número Directos Mujeres:', styles: lblStyle },
+                        { content: 'Total, Número Directos:', styles: lblStyle },
+                        { content: 'Total, Número Indirectos:', styles: lblStyle },
+                        { content: 'Personas con diversidad funcional (capacidades especiales):', styles: lblStyle },
+                    ],
+                    [
+                        { content: proy.proyect_num_direct_hombres, styles: valStyle },
+                        { content: proy.proyect_num_direct_mujeres, styles: valStyle },
+                        { content: proy.proyect_total_num_direct, styles: valStyle },
+                        { content: proy.proyect_total_num_indirect, styles: valStyle },
+                        { content: proy.proyect_num_personas_div_fun, styles: valStyle }
+                    ]
+                ];
+
+                // 4. Renderizado
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablapersonas,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 'auto' }, // 
+                        1: { cellWidth: 'auto' },
+                        2: { cellWidth: 'auto' },
+                        3: { cellWidth: 'auto' },
+                        4: { cellWidth: 'auto' }
+                    }
+                });
+                const tablatextpaln = [
+                    [{ content: 'Identificación y caracterización de la población objetiva participante', colSpan: 3, styles: { fontStyle: 'bold', halign: 'left' } }],
+                    
+                ];
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablatextpaln,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                });
+                const tablanumdoc = [
+                    // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+                    [
+                        { content: 'Número de docentes participantes:', styles: lblStyle },
+                        { content: 'Docentes participantes hombres:', styles: lblStyle },
+                        { content: 'Docentes participantes mujeres:', styles: lblStyle },
+                    ],
+                    [
+                        { content: proy.proyect_num_doce_part, styles: valStyle },
+                        { content: proy.proyect_num_doce_h, styles: valStyle },
+                        { content: proy.proyect_num_doce_m, styles: valStyle },
+                    ]
+                ];
+
+                // 4. Renderizado
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablanumdoc,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 'auto' }, // 
+                        1: { cellWidth: 'auto' },
+                        2: { cellWidth: 'auto' },
+                    }
+                });
+                const tablanumest = [
+                    // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+                    [
+                        { content: 'Número de estudiantes participantes:', styles: lblStyle },
+                        { content: 'Estudiantes participantes hombres:', styles: lblStyle },
+                        { content: 'Estudiantes participantes mujeres:', styles: lblStyle },
+                    ],
+                    [
+                        { content: proy.proyect_num_est_part, styles: valStyle },
+                        { content: proy.proyect_num_est_h, styles: valStyle },
+                        { content: proy.proyect_num_est_m, styles: valStyle },
+                    ]
+                ];
+
+                // 4. Renderizado
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablanumest,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 'auto' }, // 
+                        1: { cellWidth: 'auto' },
+                        2: { cellWidth: 'auto' },
+                    }
+                });
+                const tablafactore = [
+                    [{ content: 'Factores críticos de éxito:', colSpan: 3, styles: lblStyle }],
+                    [{ content: `${proy.proyect_fact_exito}`, colSpan: 3, styles: valStyle }]
+                ];
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablafactore,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                });
+                const tablarestric = [
+                    [{ content: 'Restricciones/Supuestos:', colSpan: 3, styles: lblStyle }],
+                    [{ content: `${proy.proyect_rest_supu}`, colSpan: 3, styles: valStyle }]
+                ];
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablarestric,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                });
+                const tablatextpaln2 = [
+                    [{ content: '3. MARCO LÓGICO', colSpan: 3, styles: { fontStyle: 'bold', halign: 'left' } }],
+                    [{ content: 'Las actividades que se registren en el cronograma del anexo 2 deben corresponder a las mismas actividades detalladas en la matriz de marco lógico.', colSpan: 3, styles: { halign: 'left' } }],
+                    
+                ];
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablatextpaln2,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 'auto' }, // 
+                        1: { cellWidth: 'auto' },
                     }
                 });
                 const nombreArchivo = `Proyecto-${proy.proyect_cod}.pdf`;
@@ -9736,11 +10054,6 @@ export default {
         async ObtenerCarr(id){
             const response = await API.get(`${this.baseUrl}/obtnercarreraindv/${id}`);
             return response.data.nombre_carrera;
-        },
-        async ObtenerCarrFAC(id){
-            const response = await API.get(`${this.baseUrl}/obtnercarreraindv/${id}`);
-            console.log(response.data.data.facultades[0].siglas);
-            return response.data.data.facultades[0].siglas;
         },
         async ObteneProDoc(id){
             const response = await API.get(`${this.baseUrl}/getDocentesIndProyectosVinculacion/${id}`);
