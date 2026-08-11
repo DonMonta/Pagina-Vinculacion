@@ -8926,11 +8926,16 @@ export default {
                     return resultados.map(r => `• ${r}`).join('\n');
                 };
 
-                // 4. Aplicar la función a las variables
+                // 4. Aplicar la función a las variables Objetivo General
                 const objgemediover = extraerConVinetas(objetivosGenerales, 'invi_medios_verificacion', 'detalle_medio_verifica');
                 const objgemeta = extraerConVinetas(objetivosGenerales, 'invi_metas', 'detalle_metas');
                 const objgindica = extraerConVinetas(objetivosGenerales, 'invi_indicadores', 'detalle_indicador');
+                const objgsupuestos = extraerConVinetas(objetivosGenerales, 'invi_supuestos', 'detalle_supuestos');
 
+                //Fin
+                const finmediover = extraerConVinetas(objetivosFin, 'invi_medios_verificacion', 'detalle_medio_verifica');
+                const finindica = extraerConVinetas(objetivosFin, 'invi_indicadores', 'detalle_indicador');
+                const finsupuestos = extraerConVinetas(objetivosFin, 'invi_supuestos', 'detalle_supuestos');
                 // 5. Estructurar la Tabla
                 const tablaObjetivos = [
                     [{ content: 'Objetivo General:', colSpan: 3, styles: lblStyle }],
@@ -9756,6 +9761,392 @@ export default {
                     columnStyles: {
                         0: { cellWidth: 'auto' }, // 
                         1: { cellWidth: 'auto' },
+                    }
+                });
+                const tablamarcologicT = [
+                    // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+                    [
+                        { content: 'Descripción', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: 'Indicadores verificables objetivamente', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: 'Medio de verificación', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: 'Supuestos', styles: { fontStyle: 'bold', halign: 'center' } },
+                    ],
+                    [
+                        { content: `Fines (efectos): ${finproy}`, styles: valStyle },
+                        { content: finindica, styles: valStyle },
+                        { content: finmediover, styles: valStyle },
+                        { content: finsupuestos, styles: valStyle },
+                    ],
+                    [
+                        { content: `Propósito ( u objetivo general): ${objetivogeneral}`, styles: valStyle },
+                        { content: objgindica, styles: valStyle },
+                        { content: objgemediover, styles: valStyle },
+                        { content: objgsupuestos, styles: valStyle },
+                    ],
+                    
+                ];
+                tablamarcologicT.push([
+                    { 
+                        content: 'Componentes (objetivos específicos):', 
+                        colSpan: 4, 
+                        styles: { fontStyle: 'bold', halign: 'left' } 
+                    }
+                ]);
+
+                // 5. Recorrer y añadir una fila por cada Objetivo Específico dinámicamente
+                if (objetivosEspecificos.length > 0) {
+                    objetivosEspecificos.forEach((obj, index) => {
+                        const numero = index + 1;
+                        // Agregamos el prefijo "ObjE X:"
+                        const descripcionObj = `ObjE ${numero}: ${obj.detalle_obj_proy || 'N/A'}`;
+                        
+                        // Extraemos las relaciones 
+                        const indicadoresTexto = formatearLista(obj.invi_indicadores, 'detalle_indicador', '');
+                        const mediosVerificacionTexto = formatearLista(obj.invi_medios_verificacion, 'detalle_medio_verifica', ''); 
+                        const supuestosTexto = formatearLista(obj.invi_supuestos, 'detalle_supuestos', ''); 
+
+                        tablamarcologicT.push([
+                            { content: descripcionObj, styles: valStyle },
+                            { content: indicadoresTexto, styles: valStyle },
+                            { content: mediosVerificacionTexto, styles: valStyle },
+                            { content: supuestosTexto, styles: valStyle }
+                        ]);
+                    });
+                } else {
+                    // Fila por defecto si no existen objetivos específicos registrados
+                    tablamarcologicT.push([
+                        { content: 'N/A', styles: valStyle },
+                        { content: 'N/A', styles: valStyle },
+                        { content: 'N/A', styles: valStyle },
+                        { content: 'N/A', styles: valStyle }
+                    ]);
+                }
+                tablamarcologicT.push([
+                    { 
+                        content: 'Actividades:', 
+                        colSpan: 4, 
+                        styles: { fontStyle: 'bold', halign: 'left' } 
+                    }
+                ]);
+                let todasLasActividades = [];
+                
+                if (objetivosEspecificos.length > 0) {
+                    objetivosEspecificos.forEach((obj, index) => {
+                        const numObj = index + 1; // ObjE 1, ObjE 2...
+                        const actividadesObj = obj.invi_actividades || [];
+                        
+                        actividadesObj.forEach((act, actIndex) => {
+                            todasLasActividades.push({
+                                ...act,
+                                numObj: numObj,
+                                // Generamos la numeración 1.1, 1.2, 2.1, etc.
+                                numeracion: `${numObj}.${actIndex + 1}` 
+                            });
+                        });
+                    });
+                }
+
+                // ---------------------------------------------------------------------------
+                // 2. Agrupar por año y luego por Objetivo Específico
+                // ---------------------------------------------------------------------------
+                const actividadesPorAnio = {};
+                
+                todasLasActividades.forEach(act => {
+                    const anio = act.detalle_anio || 'Año no especificado';
+                    
+                    if (!actividadesPorAnio[anio]) {
+                        actividadesPorAnio[anio] = {};
+                    }
+                    
+                    // Dentro del año, agrupamos por el número de objetivo (1, 2, 3...)
+                    if (!actividadesPorAnio[anio][act.numObj]) {
+                        actividadesPorAnio[anio][act.numObj] = [];
+                    }
+                    
+                    actividadesPorAnio[anio][act.numObj].push(act);
+                });
+
+                // ---------------------------------------------------------------------------
+                // 3. Construir las filas dinámicamente en tablamarcologicT
+                // ---------------------------------------------------------------------------
+                const anios = Object.keys(actividadesPorAnio);
+                
+                if (anios.length > 0) {
+                    anios.forEach(anio => {
+                        // A. Fila agrupadora del Año (Ej: "Primer Año")
+                        tablamarcologicT.push([
+                            { 
+                                content: anio, 
+                                colSpan: 4, 
+                                styles: { fontStyle: 'bold', halign: 'left', fillColor: [240, 240, 240] } 
+                            }
+                        ]);
+
+                        const gruposObj = actividadesPorAnio[anio];
+                        // Ordenamos las llaves para que ObjE1 salga antes que ObjE2
+                        const numsObj = Object.keys(gruposObj).sort((a, b) => parseInt(a) - parseInt(b));
+
+                        numsObj.forEach(numObj => {
+                            // B. Fila agrupadora del Objetivo (Ej: "*Actividades ObjE1:")
+                            tablamarcologicT.push([
+                                { 
+                                    content: `*Actividades ObjE${numObj}:`, 
+                                    colSpan: 4, 
+                                    styles: { fontStyle: 'italic', halign: 'left' } 
+                                }
+                            ]);
+
+                            // C. Filas individuales de las actividades
+                            gruposObj[numObj].forEach(act => {
+                                // Agregamos un par de espacios al inicio para crear sangría (indentación)
+                                const descripcionAct = `  ${act.numeracion} ${act.nom_actividad || 'N/A'}`;
+                                
+                                // Extraemos las listas usando los nombres exactos de tu JSON
+                                const indTexto = formatearLista(act.invi_actindicadores, 'detalle_indicador', '');
+                                const medTexto = formatearLista(act.invi_actmedios_verificacion, 'detalle_medio_verifica', '');
+                                const supTexto = formatearLista(act.invi_actsupuestos, 'detalle_supuestos', '');
+
+                                tablamarcologicT.push([
+                                    { content: descripcionAct, styles: valStyle },
+                                    { content: indTexto, styles: valStyle },
+                                    { content: medTexto, styles: valStyle },
+                                    { content: supTexto, styles: valStyle }
+                                ]);
+                            });
+                        });
+                    });
+                } else {
+                    // Si no existen actividades registradas
+                    tablamarcologicT.push([
+                        { content: 'N/A', styles: valStyle },
+                        { content: 'N/A', styles: valStyle },
+                        { content: 'N/A', styles: valStyle },
+                        { content: 'N/A', styles: valStyle }
+                    ]);
+                }
+                // 4. Renderizado
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablamarcologicT,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 40 }, // 
+                        1: { cellWidth: 40 },
+                        2: { cellWidth: 'auto' },
+                        3: { cellWidth: 40 },
+                    }
+                });
+                const tablabien1 = [
+                    [{ content: 'Detalles de bienes y servicios proporcionados por proyecto', colSpan: 3, styles: { fontStyle: 'bold', halign: 'center' } }],
+                    
+                ];
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablabien1,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                });
+                
+
+                // 4. Armamos la tabla
+                const tablabiende = [
+                    [
+                        { content: 'Bienes', styles: { fontStyle: 'bold', halign: 'left' } },
+                        { content: proy.proyect_bienes, styles: valStyle }, // Asegúrate de tener valStyle definido
+                    ],
+                    [
+                        { content: 'Servicios', styles: { fontStyle: 'bold', halign: 'left' } },
+                        { content: proy.proyect_servicios, styles: valStyle },
+                    ],
+                    [
+                        { content: 'Bienes y servicios', styles: { fontStyle: 'bold', halign: 'left' } },
+                        { content: proy.proyect_bienes_servicios, styles: valStyle },
+                    ],
+                ];
+
+                // 5. Renderizado
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, // Le agregué un +6 para que respire con la tabla anterior
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablabiende,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 40 }, // Ajusté la columna 0 a un ancho fijo para que la tabla se vea más uniforme
+                        1: { cellWidth: 'auto' }, // La columna de texto toma el resto del espacio
+                    }
+                });
+                const tablabiendeta = [
+                    [{ content: 'Detalle de adquisiciones del proyecto', colSpan: 3, styles: { fontStyle: 'bold', halign: 'center' } }],
+                    
+                ];
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablabiendeta,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                        // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+                    },
+                });
+                const detallesAdqui = Array.isArray(proy.invi_detalle_adqui) 
+                    ? proy.invi_detalle_adqui 
+                    : (proy.invi_detalle_adqui ? [proy.invi_detalle_adqui] : []);
+
+                // 2. Extraemos todos los objetos "invi_adquisicion" descartando los nulos
+                const adquisiciones = detallesAdqui.map(item => item.invi_adquisicion).filter(Boolean);
+
+                // 3. Filtramos por tipo
+                const bienes = adquisiciones.filter(item => item.tipo_adqui === 'bien');
+                const servicios = adquisiciones.filter(item => item.tipo_adqui === 'servicio');
+                const bienesServicios = adquisiciones.filter(item => item.tipo_adqui === 'bienes y servicios');
+
+                // 4. Construimos la cabecera de la tabla
+                const tablabiendecont = [
+                    [
+                        { content: 'Descripción', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: '%\nNacional', styles: { fontStyle: 'bold', halign: 'center' } }, 
+                        { content: '%\nImportado', styles: { fontStyle: 'bold', halign: 'center' } }, 
+                        { content: 'Detalle insumo nacional', styles: { fontStyle: 'bold', halign: 'center' } }, 
+                        { content: 'Detalle insumo importado', styles: { fontStyle: 'bold', halign: 'center' } }, 
+                    ]
+                ];
+
+                // 5. Función auxiliar para dar formato a los números (Ej: 100.00 -> 100%)
+                const formatNum = (num) => {
+                    if (num === null || num === undefined || num === '') return '0%';
+                    return Number(num) + '%'; 
+                };
+
+                // 6. Función para añadir cada ítem como una fila independiente
+                const agregarFilasPorCategoria = (tituloCategoria, listaItems) => {
+                    if (!listaItems || listaItems.length === 0) {
+                        // Opcional: Mostrar la categoría vacía con N/A si no hay registros de ese tipo
+                        tablabiendecont.push([
+                            { content: tituloCategoria, styles: { fontStyle: 'bold', halign: 'center' } },
+                            { content: 'N/A', styles: { halign: 'center' } },
+                            { content: 'N/A', styles: { halign: 'center' } },
+                            { content: 'N/A', styles: { halign: 'center' } },
+                            { content: 'N/A', styles: { halign: 'center' } }
+                        ]);
+                        return;
+                    }
+
+                    listaItems.forEach((item, index) => {
+                        // Si es el primer ítem, agregamos el título de la categoría con un salto de línea
+                        const descripcionTexto = index === 0 
+                            ? `${tituloCategoria}\n${item.detalle || 'N/A'}`
+                            : (item.detalle || 'N/A');
+
+                        tablabiendecont.push([
+                            { content: descripcionTexto, styles: { halign: 'center' } },
+                            { content: formatNum(item.porcent_nacio), styles: { halign: 'center' } },
+                            { content: formatNum(item.porcent_importado), styles: { halign: 'center' } },
+                            { content: item.detalle_iinsu_nac || 'N/A', styles: { halign: 'center' } },
+                            { content: item.detalle_insu_import || 'N/A', styles: { halign: 'center' } }
+                        ]);
+                    });
+                };
+
+                // 7. Agregamos las filas en el orden deseado
+                agregarFilasPorCategoria('Bienes', bienes);
+                agregarFilasPorCategoria('Servicios', servicios);
+                agregarFilasPorCategoria('Bienes y Servicios', bienesServicios);
+
+                // 8. Renderizado de AutoTable
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablabiendecont,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 40 }, // Descripción
+                        1: { cellWidth: 20 }, // % Nacional
+                        2: { cellWidth: 20 }, // % Importado
+                        3: { cellWidth: 'auto' }, // Detalle Insumo Nacional
+                        4: { cellWidth: 'auto' }, // Detalle Insumo Importado
+                    }
+                });
+                const categorizapro = proy.proyect_categorizacion;
+                const checkNece = (categorizapro === 'Necesario') ? `\n X ` : '';
+                const checkIndispensable = (categorizapro === 'Indispensable') ? `\n X ` : '';
+                const checkDeseable = (categorizapro === 'Deseable') ? `\n X ` : '';
+                const checkAdmisible = (categorizapro === 'Admisible') ? `\n X ` : '';
+                const tablacateg = [
+                    [
+                        { 
+                            content: 'Categorización del Proyecto', 
+                            colSpan: 4, 
+                            styles: { fontStyle: 'bold', halign: 'center' } 
+                        }
+                    ],
+                    [
+                        { content: 'Necesario', styles: lblStyle },
+                        { content: 'Indispensable', styles: lblStyle }, 
+                        { content: 'Deseable', styles: lblStyle }, 
+                        { content: 'Admisible', styles: lblStyle }, 
+                    ],
+                    [
+                        { content: checkNece, styles: valStyle },
+                        { content: checkIndispensable, styles: valStyle }, 
+                        { content: checkDeseable, styles: valStyle }, 
+                        { content: checkAdmisible, styles: valStyle }, 
+                    ]
+                ];
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablacateg,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false,
+                        valign: 'middle',
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 'auto' }, // Descripción
+                        1: { cellWidth: 'auto' }, // % Nacional
+                        2: { cellWidth: 'auto' }, // % Importado
+                        3: { cellWidth: 'auto' }, // Detalle Insumo Nacional
                     }
                 });
                 const nombreArchivo = `Proyecto-${proy.proyect_cod}.pdf`;
