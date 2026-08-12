@@ -2535,7 +2535,7 @@
                                 <!-- Contador de palabras -->
                                 <div class="flex justify-between items-center mt-2 text-sm font-semibold transition-colors" :class="colorContadorAntecedentes">
                                     <span>Mínimo: 500 / Máximo: 800 palabras</span>
-                                    <span>{{ palabrasMetodo }} palabras</span>
+                                    <span>{{ palabrasAntecedentes }} palabras</span>
                                 </div>
                             </div>
 
@@ -3202,7 +3202,7 @@
                                             </svg>
                                             Docentes Hombres
                                         </label>
-                                        <input type="number" v-model.number="editForm.proyect_num_doce_h"
+                                        <input type="number" v-model.number="editForm.proyect_num_doce_h" disabled
                                             @input="calcularTotalDocentes" min="0"
                                             class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition"
                                             placeholder="0">
@@ -3220,7 +3220,7 @@
                                             </svg>
                                             Docentes Mujeres
                                         </label>
-                                        <input type="number" v-model.number="editForm.proyect_num_doce_m"
+                                        <input type="number" v-model.number="editForm.proyect_num_doce_m" disabled
                                             @input="calcularTotalDocentes" min="0"
                                             class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition"
                                             placeholder="0">
@@ -3276,7 +3276,7 @@
                                             </svg>
                                             Estudiantes Hombres
                                         </label>
-                                        <input type="number" v-model.number="editForm.proyect_num_est_h"
+                                        <input type="number" v-model.number="editForm.proyect_num_est_h" disabled
                                             @input="calcularTotalEstudiantes" min="0"
                                             class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition"
                                             placeholder="0">
@@ -3294,7 +3294,7 @@
                                             </svg>
                                             Estudiantes Mujeres
                                         </label>
-                                        <input type="number" v-model.number="editForm.proyect_num_est_m"
+                                        <input type="number" v-model.number="editForm.proyect_num_est_m" disabled
                                             @input="calcularTotalEstudiantes" min="0"
                                             class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition"
                                             placeholder="0">
@@ -4227,203 +4227,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="showModalActividad" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
-                    <div class="bg-white dark:bg-gray-850 rounded-xl shadow-xl max-w-3xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b pb-2">
-                            {{ indiceActividadEditando !== null ? 'Editar Actividad' : 'Registrar Actividad' }}
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <!-- Objetivo Especifico Relacionado -->
-                            <div class="md:col-span-2">
-                                <label class="block font-bold mb-2 dark:text-white">Objetivo Específico Relacionado</label>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
-                                    <div 
-                                        v-for="obj in obtenerEspecificos()" 
-                                        :key="obj.id_obj_proy"
-                                        @click="modalActividad.id_obj_proy = obj.id_obj_proy"
-                                        :class="[
-                                            'p-3 rounded-lg border-2 cursor-pointer transition-all flex items-start gap-3',
-                                            modalActividad.id_obj_proy === obj.id_obj_proy 
-                                                ? 'bg-green-50 border-green-500 shadow-sm dark:bg-green-900/20' 
-                                                : 'bg-white border-gray-200 hover:border-green-300 dark:bg-gray-800 dark:border-gray-700'
-                                        ]"
-                                    >
-                                        <!-- Custom Radio Button -->
-                                        <div :class="['w-5 h-5 mt-0.5 rounded-full border-2 flex-shrink-0 flex items-center justify-center', 
-                                            modalActividad.id_obj_proy === obj.id_obj_proy ? 'border-green-500' : 'border-gray-300 dark:border-gray-500']">
-                                            <div v-if="modalActividad.id_obj_proy === obj.id_obj_proy" class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
-                                        </div>
-                                        <span :class="['text-sm font-medium', modalActividad.id_obj_proy === obj.id_obj_proy ? 'text-green-800 dark:text-green-400' : 'text-gray-700 dark:text-gray-300']">
-                                            {{ obj.detalle_obj_proy }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Nombre de Actividad -->
-                            <div class="md:col-span-2">
-                                <label class="block font-bold mb-1">Nombre de la Actividad</label>
-                                <textarea v-model="modalActividad.nom_actividad"
-                                rows="1" 
-                                @input="ajustarAlturaTextarea" 
-                                type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" 
-                                placeholder="Ej: Talleres de Capacitación"></textarea>
-                            </div>
-
-                            <!-- Responsables -->
-                            <div>
-                                <label class="block font-bold mb-1">Responsables</label>
-                                <input v-model="modalActividad.responsables" type="text" class="w-full border rounded-lg p-2 dark:bg-gray-800">
-                            </div>
-
-                            <!-- Año del Cronograma -->
-                            <div>
-                                <label class="block font-bold mb-1">Año asignado</label>
-                                <select 
-                                    v-model="modalActividad.detalle_anio" 
-                                    @change="alCambiarAnioModal"
-                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                                    <option v-for="itemAnio in aniosProyecto" :key="itemAnio.id" :value="itemAnio.id">
-                                        {{ itemAnio.label }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Fechas y Horas -->
-                            <div>
-                                <label class="block font-bold mb-1 dark:text-white">Fecha Desde</label>
-                                <input 
-                                    v-model="modalActividad.fecha_desde" 
-                                    type="date" 
-                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
-                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
-                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                            </div>
-                            <div>
-                                <label class="block font-bold mb-1 dark:text-white">Fecha Hasta</label>
-                                <input 
-                                    v-model="modalActividad.fecha_hasta" 
-                                    type="date" 
-                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
-                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
-                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                            </div>
-                            <div>
-                                <label class="block font-bold mb-1">Total de Horas</label>
-                                <input v-model.number="modalActividad.horas" type="number" min="1" max="240" class="w-full border rounded-lg p-2 dark:bg-gray-800">
-                            </div>
-                        </div>
-
-                        <!-- SECCIÓN DE SUBACTIVIDADES -->
-                        <div class="border-t pt-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h4 class="font-bold text-sm">Subactividades</h4>
-                                <button @click="agregarItemActividad('invi_subactividad')" class="text-xs bg-blue-500 text-white px-2 py-1 rounded">+ Agregar Subactividad</button>
-                            </div>
-                            <div v-for="(sub, sIdx) in modalActividad.invi_subactividad" :key="sIdx" class="grid grid-cols-12 gap-2 mb-2 items-center">
-                                <textarea v-model="sub.nom_sub_actv"
-                                    rows="1" 
-                                    @input="ajustarAlturaTextarea"
-                                    type="text" placeholder="Nombre" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden"/>
-                                
-                                <input 
-                                    v-model="sub.fecha_desde" 
-                                    type="date" 
-                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
-                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
-                                    class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                                <input 
-                                    v-model="sub.fecha_hasta" 
-                                    type="date" 
-                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
-                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
-                                    class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                                
-                                <input v-model.number="sub.horas" type="number" placeholder="Hrs" class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600">
-                                <button @click="eliminarItemActividad('invi_subactividad', sIdx)" class="col-span-1 text-red-500 hover:text-red-700 font-bold text-center transition">✕</button>
-                            </div>
-                        </div>
-
-                        <!-- COMPONENTES DINÁMICOS (Indicadores, Productos, Medios, Supuestos) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 text-xs">
-                            <!-- Indicadores -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="font-bold">Indicadores</span>
-                                    <button @click="agregarItemActividad('invi_actindicadores')" class="text-blue-500">+ Agregar</button>
-                                </div>
-                                <div v-for="(item, k) in modalActividad.invi_actindicadores" :key="k" class="flex gap-1 mb-1">
-                                    <textarea 
-                                        v-model="item.detalle_indicador" 
-                                        rows="1" 
-                                        @input="ajustarAlturaTextarea"
-                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
-                                    <button @click="eliminarItemActividad('invi_actindicadores', k)" class="text-red-500">✕</button>
-                                </div>
-                            </div>
-
-                            <!-- Productos Verificables -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="font-bold">Productos Verificables</span>
-                                    <button @click="agregarItemActividad('invi_actprod_verificables')" class="text-blue-500">+ Agregar</button>
-                                </div>
-                                <div v-for="(item, k) in modalActividad.invi_actprod_verificables" :key="k" class="flex gap-1 mb-1">
-                                    <textarea 
-                                        v-model="item.detalle_prod_verif" 
-                                        rows="1" 
-                                        @input="ajustarAlturaTextarea"
-                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
-                                    <button @click="eliminarItemActividad('invi_actprod_verificables', k)" class="text-red-500">✕</button>
-                                </div>
-                            </div>
-
-                            <!-- Medios de Verificación -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="font-bold">Medios de Verificación</span>
-                                    <button @click="agregarItemActividad('invi_actmedios_verificacion')" class="text-blue-500">+ Agregar</button>
-                                </div>
-                                <div v-for="(item, k) in modalActividad.invi_actmedios_verificacion" :key="k" class="flex gap-1 mb-1">
-                                    <textarea
-                                        v-model="item.detalle_medio_verifica"
-                                        rows="1" 
-                                        @input="ajustarAlturaTextarea" 
-                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
-                                    <button @click="eliminarItemActividad('invi_actmedios_verificacion', k)" class="text-red-500">✕</button>
-                                </div>
-                            </div>
-
-                            <!-- Supuestos -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="font-bold">Supuestos</span>
-                                    <button @click="agregarItemActividad('invi_actsupuestos')" class="text-blue-500">+ Agregar</button>
-                                </div>
-                                <div v-for="(item, k) in modalActividad.invi_actsupuestos" :key="k" class="flex gap-1 mb-1">
-                                    <textarea 
-                                        v-model="item.detalle_supuestos" 
-                                        rows="1" 
-                                        @input="ajustarAlturaTextarea"
-                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
-                                    <button @click="eliminarItemActividad('invi_actsupuestos', k)" class="text-red-500">✕</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Botones de Acción del Modal -->
-                        <div class="flex justify-end gap-3 border-t pt-4">
-                            <button @click="showModalActividad = false" class="px-4 py-2 border rounded-lg text-gray-600">Cancelar</button>
-                            <button @click="guardarActividad" class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold">Guardar Actividad</button>
-                        </div>
-                    </div>
-                </div>
+                
                 <!-- Modal para Área Temática -->
                 <div v-if="showModalAreaTematica" class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto bg-black/50 backdrop-blur-sm transition-opacity">
                     <div class="relative w-full max-w-md p-4 mx-auto bg-white rounded-xl shadow-lg dark:bg-gray-800">
@@ -4756,6 +4560,203 @@
                     </button>
                 </div>
             </div>
+            <div v-if="showModalActividad" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
+                    <div class="bg-white dark:bg-gray-850 rounded-xl shadow-xl max-w-3xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b pb-2">
+                            {{ indiceActividadEditando !== null ? 'Editar Actividad' : 'Registrar Actividad' }}
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <!-- Objetivo Especifico Relacionado -->
+                            <div class="md:col-span-2">
+                                <label class="block font-bold mb-2 dark:text-white">Objetivo Específico Relacionado</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                                    <div 
+                                        v-for="obj in obtenerEspecificos()" 
+                                        :key="obj.id_obj_proy"
+                                        @click="modalActividad.id_obj_proy = obj.id_obj_proy"
+                                        :class="[
+                                            'p-3 rounded-lg border-2 cursor-pointer transition-all flex items-start gap-3',
+                                            modalActividad.id_obj_proy === obj.id_obj_proy 
+                                                ? 'bg-green-50 border-green-500 shadow-sm dark:bg-green-900/20' 
+                                                : 'bg-white border-gray-200 hover:border-green-300 dark:bg-gray-800 dark:border-gray-700'
+                                        ]"
+                                    >
+                                        <!-- Custom Radio Button -->
+                                        <div :class="['w-5 h-5 mt-0.5 rounded-full border-2 flex-shrink-0 flex items-center justify-center', 
+                                            modalActividad.id_obj_proy === obj.id_obj_proy ? 'border-green-500' : 'border-gray-300 dark:border-gray-500']">
+                                            <div v-if="modalActividad.id_obj_proy === obj.id_obj_proy" class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                                        </div>
+                                        <span :class="['text-sm font-medium', modalActividad.id_obj_proy === obj.id_obj_proy ? 'text-green-800 dark:text-green-400' : 'text-gray-700 dark:text-gray-300']">
+                                            {{ obj.detalle_obj_proy }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Nombre de Actividad -->
+                            <div class="md:col-span-2">
+                                <label class="block font-bold mb-1">Nombre de la Actividad</label>
+                                <textarea v-model="modalActividad.nom_actividad"
+                                rows="1" 
+                                @input="ajustarAlturaTextarea" 
+                                type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" 
+                                placeholder="Ej: Talleres de Capacitación"></textarea>
+                            </div>
+
+                            <!-- Responsables -->
+                            <div>
+                                <label class="block font-bold mb-1">Responsables</label>
+                                <input v-model="modalActividad.responsables" type="text" class="w-full border rounded-lg p-2 dark:bg-gray-800">
+                            </div>
+
+                            <!-- Año del Cronograma -->
+                            <div>
+                                <label class="block font-bold mb-1">Año asignado</label>
+                                <select 
+                                    v-model="modalActividad.detalle_anio" 
+                                    @change="alCambiarAnioModal"
+                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                                    <option v-for="itemAnio in aniosProyecto" :key="itemAnio.id" :value="itemAnio.id">
+                                        {{ itemAnio.label }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Fechas y Horas -->
+                            <div>
+                                <label class="block font-bold mb-1 dark:text-white">Fecha Desde</label>
+                                <input 
+                                    v-model="modalActividad.fecha_desde" 
+                                    type="date" 
+                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1 dark:text-white">Fecha Hasta</label>
+                                <input 
+                                    v-model="modalActividad.fecha_hasta" 
+                                    type="date" 
+                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">Total de Horas</label>
+                                <input v-model.number="modalActividad.horas" type="number" min="1" max="240" class="w-full border rounded-lg p-2 dark:bg-gray-800">
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN DE SUBACTIVIDADES -->
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-bold text-sm">Subactividades</h4>
+                                <button @click="agregarItemActividad('invi_subactividad')" class="text-xs bg-blue-500 text-white px-2 py-1 rounded">+ Agregar Subactividad</button>
+                            </div>
+                            <div v-for="(sub, sIdx) in modalActividad.invi_subactividad" :key="sIdx" class="grid grid-cols-12 gap-2 mb-2 items-center">
+                                <textarea v-model="sub.nom_sub_actv"
+                                    rows="1" 
+                                    @input="ajustarAlturaTextarea"
+                                    type="text" placeholder="Nombre" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden"/>
+                                
+                                <input 
+                                    v-model="sub.fecha_desde" 
+                                    type="date" 
+                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                    class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                                <input 
+                                    v-model="sub.fecha_hasta" 
+                                    type="date" 
+                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                    class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                >
+                                
+                                <input v-model.number="sub.horas" type="number" placeholder="Hrs" class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600">
+                                <button @click="eliminarItemActividad('invi_subactividad', sIdx)" class="col-span-1 text-red-500 hover:text-red-700 font-bold text-center transition">✕</button>
+                            </div>
+                        </div>
+
+                        <!-- COMPONENTES DINÁMICOS (Indicadores, Productos, Medios, Supuestos) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 text-xs">
+                            <!-- Indicadores -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-bold">Indicadores</span>
+                                    <button @click="agregarItemActividad('invi_actindicadores')" class="text-blue-500">+ Agregar</button>
+                                </div>
+                                <div v-for="(item, k) in modalActividad.invi_actindicadores" :key="k" class="flex gap-1 mb-1">
+                                    <textarea 
+                                        v-model="item.detalle_indicador" 
+                                        rows="1" 
+                                        @input="ajustarAlturaTextarea"
+                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                    <button @click="eliminarItemActividad('invi_actindicadores', k)" class="text-red-500">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Productos Verificables -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-bold">Productos Verificables</span>
+                                    <button @click="agregarItemActividad('invi_actprod_verificables')" class="text-blue-500">+ Agregar</button>
+                                </div>
+                                <div v-for="(item, k) in modalActividad.invi_actprod_verificables" :key="k" class="flex gap-1 mb-1">
+                                    <textarea 
+                                        v-model="item.detalle_prod_verif" 
+                                        rows="1" 
+                                        @input="ajustarAlturaTextarea"
+                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                    <button @click="eliminarItemActividad('invi_actprod_verificables', k)" class="text-red-500">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Medios de Verificación -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-bold">Medios de Verificación</span>
+                                    <button @click="agregarItemActividad('invi_actmedios_verificacion')" class="text-blue-500">+ Agregar</button>
+                                </div>
+                                <div v-for="(item, k) in modalActividad.invi_actmedios_verificacion" :key="k" class="flex gap-1 mb-1">
+                                    <textarea
+                                        v-model="item.detalle_medio_verifica"
+                                        rows="1" 
+                                        @input="ajustarAlturaTextarea" 
+                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                    <button @click="eliminarItemActividad('invi_actmedios_verificacion', k)" class="text-red-500">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Supuestos -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-bold">Supuestos</span>
+                                    <button @click="agregarItemActividad('invi_actsupuestos')" class="text-blue-500">+ Agregar</button>
+                                </div>
+                                <div v-for="(item, k) in modalActividad.invi_actsupuestos" :key="k" class="flex gap-1 mb-1">
+                                    <textarea 
+                                        v-model="item.detalle_supuestos" 
+                                        rows="1" 
+                                        @input="ajustarAlturaTextarea"
+                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                    <button @click="eliminarItemActividad('invi_actsupuestos', k)" class="text-red-500">✕</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción del Modal -->
+                        <div class="flex justify-end gap-3 border-t pt-4">
+                            <button @click="showModalActividad = false" class="px-4 py-2 border rounded-lg text-gray-600">Cancelar</button>
+                            <button @click="guardarActividad" class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold">Guardar Actividad</button>
+                        </div>
+                    </div>
+                </div>
         </div>
     </div>
 </template>
@@ -10105,10 +10106,10 @@ export default {
                     }
                 });
                 const categorizapro = proy.proyect_categorizacion;
-                const checkNece = (categorizapro === 'Necesario') ? `\n X ` : '';
-                const checkIndispensable = (categorizapro === 'Indispensable') ? `\n X ` : '';
-                const checkDeseable = (categorizapro === 'Deseable') ? `\n X ` : '';
-                const checkAdmisible = (categorizapro === 'Admisible') ? `\n X ` : '';
+                const checkNece = (categorizapro === 'Necesario') ? `X ` : '';
+                const checkIndispensable = (categorizapro === 'Indispensable') ? `X ` : '';
+                const checkDeseable = (categorizapro === 'Deseable') ? `X ` : '';
+                const checkAdmisible = (categorizapro === 'Admisible') ? `X ` : '';
                 const tablacateg = [
                     [
                         { 
@@ -10149,8 +10150,289 @@ export default {
                         3: { cellWidth: 'auto' }, // Detalle Insumo Nacional
                     }
                 });
+                const tablametodología = [
+                    [{ content: '4. METODOLOGÍA PARA LA VINCULACIÓN (Diseño del Estudio: Detallar diseño experimental, tipo de análisis estadístico, otros) ', colSpan: 6, styles: { fontStyle: 'bold', halign: 'left' } }],
+                    [{ content: proy.proyect_metodologia || '', colSpan: 6, styles: valStyle }],
+                ];
+
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablametodología,
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                });
+
+                const tablafinantitu = [
+                    [{ content: '5. FINANCIAMIENTO', colSpan: 6, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+                    [{ content: '(Ingresar información en Anexo 3)', colSpan: 6, styles: valStyle }],
+                    
+                ];
+
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablafinantitu,
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                });
+                const tablaviabilitiut = [
+                    [{ content: '6. VIABILIDAD Y PLAN DE SOSTENIBILIDAD', colSpan: 6, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+                   
+                    
+                ];
+
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablaviabilitiut,
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                });
+                const detaimpacto = Array.isArray(proy.invi_det_impactos_esperados)
+                    ? proy.invi_det_impactos_esperados
+                    : (proy.invi_det_impactos_esperados ? [proy.invi_det_impactos_esperados] : []);
+
+                // 2. Función para buscar la 'descripcion_general' filtrando por el nombre del impacto
+                const getDescripcionImpacto = (nombreImpacto) => {
+                    // Filtrar TODOS los registros que coincidan con el tipo de impacto
+                    const items = detaimpacto.filter(
+                        item => item.invi_impactos && item.invi_impactos.nombre_impacto === nombreImpacto
+                    );
+
+                    if (items.length === 0) return '';
+
+                    // Si solo hay un registro, retorna el texto simple
+                    if (items.length === 1) {
+                        return items[0].descripcion_general || '';
+                    }
+
+                    // Si hay 2 o más registros, añade una viñeta a cada uno y los une con saltos de línea
+                    return items
+                        .map(item => `• ${item.descripcion_general || ''}`)
+                        .join('\n');
+                };
+
+
+                const tablaviabiliconten = [
+                    [{ content: 'Viabilidad Técnica:', colSpan: 2, styles: lblStyle }],
+                    [{ content: proy.proyect_viabilidad_tec || '', colSpan: 2, styles: {halign: 'justify'} }],
+                    [{ content: 'Equipamiento Tecnológico Disponible', colSpan: 2, styles: lblStyle }],
+                    [{ content: proy.proyect_equip_tec || '', colSpan: 2, styles: valStyle }],
+                    [
+                        { content: '¿Qué perdería la provincia si el proyecto no se ejecuta en este periodo?', styles: { fontStyle: 'bold', halign: 'left' } },
+                        { content: proy.proyect_no_ejecuta || '', styles: valStyle }
+                    ],
+                    [{ content: 'IMPACTOS ESPERADOS:', colSpan: 2, styles: { fontStyle: 'bold', halign: 'left' } }],
+                    [
+                        { content: 'Tipo', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: 'Descripción', styles: { fontStyle: 'bold', halign: 'center' } },
+                    ],
+                    [
+                        { content: 'Impacto económico', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: getDescripcionImpacto('Impacto económico') || '', styles: valStyle }
+                    ],
+                    [
+                        { content: 'Impacto social', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: getDescripcionImpacto('Impacto social') || '', styles: valStyle }
+                    ],
+                    [
+                        { content: 'Impacto político', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: getDescripcionImpacto('Impacto político') || '', styles: valStyle }
+                    ],
+                    [
+                        { content: 'Impacto científico', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: getDescripcionImpacto('Impacto científico') || '', styles: valStyle }
+                    ],
+                    [
+                        { content: 'Impacto ambiental', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: getDescripcionImpacto('Impacto ambiental') || '', styles: valStyle }
+                    ],
+                    [
+                        { content: 'Otros impactos', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: getDescripcionImpacto('Otros impactos') || '', styles: valStyle }
+                    ],
+                    [{ content: 'Sostenibilidad social: equidad, género, participación ciudadana:', colSpan: 2, styles: lblStyle }],
+                    [{ content: proy.proyect_sostenibilidad_soc || '', colSpan: 2, styles: valStyle }],
+                    [{ content: 'Transferencia Tecnológica', colSpan: 2, styles: lblStyle }],
+                    [{ content: proy.proyect_transf_tecn || '', colSpan: 2, styles: valStyle }],
+                    [{ content: 'Artículos Científicos: ', colSpan: 2, styles: lblStyle }],
+                    [{ content: proy.proyect_art_cientificos || '', colSpan: 2, styles: valStyle }],
+                    [{ content: 'Prototipos:', colSpan: 2, styles: lblStyle }],
+                    [{ content: proy.proyect_prototipos || '', colSpan: 2, styles: valStyle }],
+                    [{ content: 'Registro de Propiedad Intelectual:', colSpan: 2, styles: lblStyle }],
+                    [{ content: proy.proyect_reg_propin || '', colSpan: 2, styles: valStyle }],
+                    [{ content: 'Empresas Spin OffS', colSpan: 2, styles: lblStyle }],
+                    [{ content: proy.proyect_empr_spin || '', colSpan: 2, styles: valStyle }],
+
+                ];
+
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablaviabiliconten,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false 
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 80 }, 
+                        1: { cellWidth: 'auto' }, 
+                    } 
+                });
+                const tablaestrategia = [
+                    [{ content: '7. ESTRATEGIA DE EJECUCIÓN', colSpan: 6, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+                    [{ content: 'Elaborar el cronograma de ejecución en el Anexo 2, considerando como periodo de ejecución', colSpan: 6, styles: valStyle }],
+                    
+                ];
+
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tablaestrategia,
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                });
+                const textomonito = `Mensualmente y semestralmente se deberá remitir a la dirección de Vinculación con la Sociedad el reporte de avances del proyecto, según las actividades establecidas en el cronograma.\n` +
+                    `Al finalizar el proyecto debe presentar el informe final que contendrá las fichas de estudiantes y docentes, la encuesta a los beneficiarios y los resultados del proyecto (productos o entregables).\n` +
+                    `La evaluación del proyecto y sus impactos, entraran dentro del informe semestral es decir al final del ciclo académico.\n` +
+                    `• Anexo 8\n` +
+                    `• Anexo 9\n` +
+                    `• Anexo 10\n`;
+                const tablamonito = [
+                    [{ content: '8. MONITOREO Y EVALUACIÓN', styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left', lineWidth: 0.1, lineColor: [0, 0, 0] } }],
+                    [{ content: `${textomonito}`, styles: { halign: 'left', fillColor: false, textColor: [0, 0, 0] }  }],
+                    
+                ];
+
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'plain', // El tema 'plain' elimina la cuadrícula general
+                    body: tablamonito,
+                    styles: { 
+                        fontSize: 8, 
+                        cellPadding: 3 // Un poco de espacio para que el texto respire respecto a los márgenes
+                    } 
+                });
+                const detalleDifusion = Array.isArray(proy.invi_detalle_difusion)
+                    ? proy.invi_detalle_difusion
+                    : (proy.invi_detalle_difusion ? [proy.invi_detalle_difusion] : []);
+
+                // 2. Extraemos las actividades y las unimos con un salto de línea
+                const actividadesText = detalleDifusion
+                    .map(item => item.invi_difusion && item.invi_difusion.nombre_actividad ? item.invi_difusion.nombre_actividad : '')
+                    .join('\n');
+
+                // 3. Extraemos los costos, parseando a entero (para quitar el .00 y que coincida con tu imagen) y los unimos
+                const costosText = detalleDifusion
+                    .map(item => item.costo ? parseInt(item.costo).toString() : '')
+                    .join('\n');
+
+                // 4. Construimos la tabla dinámica
+                const tabladifusi = [
+                    // Fila 1: Título con fondo celeste
+                    [{ content: '9. DIFUSIÓN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [210, 230, 245], halign: 'left' } }],
+                    
+                    // Fila 2: Subtítulo con fondo gris
+                    [{ content: 'Tipo de Evento', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+                    
+                    // Fila 3: Cabeceras de las columnas (centradas)
+                    [
+                        { content: 'Actividad', styles: { fontStyle: 'bold', halign: 'center' } },
+                        { content: 'Costo', styles: { fontStyle: 'bold', halign: 'center' } },
+                    ],
+                    
+                    // Fila 4: Los datos agrupados en una sola fila pero separados por saltos de línea
+                    [
+                        { content: actividadesText, styles: { halign: 'left', valign: 'top' } },
+                        { content: costosText, styles: { halign: 'center', valign: 'top' } } // El costo va centrado
+                    ]
+                ];
+
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'grid',
+                    body: tabladifusi,
+                    styles: { 
+                        fontSize: 8, 
+                        lineColor: [0, 0, 0], 
+                        textColor: [0, 0, 0], 
+                        fillColor: false 
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 'auto' }, // Toma el ancho disponible
+                        1: { cellWidth: 50 }      // Limita la columna de costo para que la actividad tenga más espacio
+                    }
+                });
+                const textbio = proy.invi_bibliografias?.map(bib => `- ${bib.autor} (${bib.anio}). ${bib.titulo}. ${bib.editorial_fuente}.`).join('\n') || 'N/A';
+                const tablabiblio = [
+                    [{ content: '10. BIBLIOGRAFÍA Y OTRA PRODUCCIÓN CIENTÍFICA CITADA', styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left', lineWidth: 0.1, lineColor: [0, 0, 0] } }],
+                    [{ content: `${textbio}`, styles: { halign: 'left', fillColor: false, textColor: [0, 0, 0] } }],
+                    
+                ];
+
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'plain',
+                    body: tablabiblio,
+                    styles: { 
+                        fontSize: 8, 
+                        cellPadding: 3 // Un poco de espacio para que el texto respire respecto a los márgenes
+                    } 
+                });
+                const textoAnexo = `En los formatos que se encuentran en la hoja electrónica que se acompaña se debe ingresar la información relacionada con:\n\n` +
+                    `1.Carta aval del proyecto de Vinculación con la Sociedad responsable de Vinculación de la facultad\n(debidamente firmado y sellado)\n` +
+                    `2. Cronograma del proyecto de Vinculación con la Sociedad (debidamente firmado)\n` +
+                    `3. Programación Anual de inversiones (debidamente firmado)\n` +
+                    `4. Hoja de vida\n` +
+                    `5. Compromiso de participación docentes UTLVTE (debidamente firmado)\n` +
+                    `6. Compromiso de participación estudiantes UTLVTE (debidamente firmado)\n` +
+                    `7. Monitoreo y evaluación\n` +
+                    `8. Monitoreo y evaluación\n` +
+                    `9. Monitoreo y evaluación\n` +
+                    `10. Impacto del proyecto\n` +
+                    `11. Formatos para productos de eventos de capacitación. (Aplica solo a proyectos que justifican el desarrollo de capacitaciones como parte de sus objetivos)`;
+
+                const tablaanexo = [
+                    // Fila 1: Encabezado. Le forzamos borde negro (lineWidth y lineColor)
+                    [{ 
+                        content: '11. ANEXO', 
+                        styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left', lineWidth: 0.1, lineColor: [0, 0, 0] } 
+                    }],
+                    
+                    // Fila 2: Contenido. Al no ponerle lineWidth, tomará el borde 0 del tema 'plain'
+                    [{ 
+                        content: textoAnexo, 
+                        styles: { halign: 'left', fillColor: false, textColor: [0, 0, 0] } 
+                    }]
+                ];
+                
+                autoTable(doc, {
+                    startY: doc.lastAutoTable.finalY + 6, 
+                    margin: { top: 30, left: 15, right: 15, bottom: 20 },
+                    theme: 'plain', // El tema 'plain' elimina la cuadrícula general
+                    body: tablaanexo,
+                    styles: { 
+                        fontSize: 8, 
+                        cellPadding: 3 // Un poco de espacio para que el texto respire respecto a los márgenes
+                    } 
+                });
                 const nombreArchivo = `Proyecto-${proy.proyect_cod}.pdf`;
                 doc.save(nombreArchivo);
+                
 
             } catch (error) {
                 console.error(`Error al generar el PDF del Anexo:`, error);
