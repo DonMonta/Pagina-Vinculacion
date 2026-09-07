@@ -762,7 +762,7 @@ export default {
       this.PoliticasForm.id_obj_pol_pladne = obj.id_obj_pol_pladne;
       this.PoliticasForm.detalle_pol = obj.detalle_pol;
       // Extraer solo el número del código (quita las letras OE)
-      this.codNumero = obj.cod_pol.replace('POLÍTICAS', '');
+      this.codNumero = obj.cod_pol.replace('POLÍTICA', '');
     },
 
     cancelarEdicionPoliticas() {

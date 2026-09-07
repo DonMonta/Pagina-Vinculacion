@@ -8623,7 +8623,13 @@ export default {
                     originalAddPage();
                     dibujarFondoBanner();
                 };
-
+                const limpiarTextoRespectandoSaltos = (texto) => {
+                    if (!texto) return '';
+                    return texto
+                        .split('\n')
+                        .map(linea => linea.replace(/[^\S\r\n]+/g, ' ').trim())
+                        .join('\n');
+                };
                 // -------------------------------------------------------------
                 // CONTINÚA TU LÓGICA DE DATOS Y TABLAS (Hoja 2 en adelante)
                 // -------------------------------------------------------------
@@ -8631,10 +8637,19 @@ export default {
                 const carrerasTxt = data.carreras_data?.map(c => c.NombCarr || c.NombCarr || c.NombCarr).join('\n') || 'N/A';
                 const dominiosTxt = data.dominios_data?.map(dom => dom.detalle_dom_huma).join('\n') || 'N/A';
 
-                const objetivosTxt = data.objetivos_pei_data?.map(o => o.cod_obj+'. '+ o.detalle_obj).join('\n') || 'N/A';
-                const politicasTxt = data.politicas_data?.map(p => p.cod_pol+'. '+ p.detalle_pol || 'Política').join('\n') || 'N/A';
-                const agendaTxt = data.agenda_ods_data?.map(a => a.cod_ods+'. '+ a.detalle_ods || 'Agenda').join('\n') || 'N/A';
-                const objplandeTxt = data.objetivos_politicas_data?.map(a => a.cod_obj_pol+'. '+ a.detalle_obj_pol || 'Obj').join('\n') || 'N/A';
+                const objetivosTxt = limpiarTextoRespectandoSaltos(
+                    data.objetivos_pei_data?.map(o => `${o.cod_obj}. ${(o.detalle_obj || '').trim()}`).join('\n')
+                ) || 'N/A';
+
+                const politicasTxt = limpiarTextoRespectandoSaltos(
+                    data.politicas_data?.map(p => `${p.cod_pol}. ${(p.detalle_pol || 'Política').trim()}`).join('\n')
+                ) || 'N/A';
+
+                const agendaTxt = limpiarTextoRespectandoSaltos(
+                    data.agenda_ods_data?.map(a => `${a.cod_ods}. ${(a.detalle_ods || 'Agenda').trim()}`).join('\n')
+                ) || 'N/A';
+
+                const objplandeTxt = limpiarTextoRespectandoSaltos(proy.obj_plan_desarrollo || '');
                 const convocatoriaTxt = data.convocatoria_data?.map(c => c.num_convocatoria).join('\n') || 'N/A';
                 const lineaInvestigacion = data.lineas_data?.map(l => l.nombre_lin).join('\n') || 'N/A';
                 const sublineaInvestigacion = data.sublineas_data?.map(sl => sl.nombre_sublin).join('\n') || 'N/A';
@@ -8689,16 +8704,16 @@ export default {
                     [{ content: proy.proyect_titulo_en || '', colSpan: 3, styles: valStyle }],
                     
                     [{ content: 'Objetivos del Plan Estratégico Institucional:', colSpan: 3, styles: lblStyle }],
-                    [{ content: objetivosTxt, colSpan: 3, styles: valStyle }],
+                    [{ content: objetivosTxt, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
                     
                     [{ content: 'Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
-                    [{ content: politicasTxt, colSpan: 3, styles: valStyle }],
+                    [{ content: politicasTxt, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
                     
                     [{ content: 'Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe:', colSpan: 3, styles: lblStyle }],
-                    [{ content: agendaTxt, colSpan: 3, styles: valStyle }],
+                    [{ content: agendaTxt, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
                     
                     [{ content: 'Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
-                    [{ content: objplandeTxt, colSpan: 3, styles: valStyle }],
+                    [{ content: objplandeTxt, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
                     
                     [
                         { content: 'Nombre de Facultad/es:', styles: lblStyle },
@@ -8743,7 +8758,7 @@ export default {
                     margin: { top: 30, left: 15, right: 15, bottom: 20 }, 
                     theme: 'grid',
                     body: tablaDatosGenerales,
-                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false, cellPadding: 3 }
                 });
 
                 // 7. Definir estructura de la TABLA 3 
@@ -8940,19 +8955,19 @@ export default {
                 // 5. Estructurar la Tabla
                 const tablaObjetivos = [
                     [{ content: 'Objetivo General:', colSpan: 3, styles: lblStyle }],
-                    [{ content: objetivogeneral, colSpan: 3, styles: valStyle }],
+                    [{ content: objetivogeneral, colSpan: 3, styles: {halign: 'justify'} }],
                     
                     [{ content: 'Fin:', colSpan: 3, styles: lblStyle }],
-                    [{ content: finproy, colSpan: 3, styles: valStyle }],
+                    [{ content: finproy, colSpan: 3, styles: {halign: 'justify'} }],
                     
                     [{ content: 'Medio de Verificación:', colSpan: 3, styles: lblStyle }],
-                    [{ content: objgemediover, colSpan: 3, styles: valStyle }],
+                    [{ content: objgemediover, colSpan: 3, styles: {halign: 'justify'} }],
                     
                     [{ content: 'Meta:', colSpan: 3, styles: lblStyle }],
-                    [{ content: objgemeta, colSpan: 3, styles: valStyle }],
+                    [{ content: objgemeta, colSpan: 3, styles: {halign: 'justify'} }],
                     
                     [{ content: 'Indicador:', colSpan: 3, styles: lblStyle }],
-                    [{ content: objgindica, colSpan: 3, styles: valStyle }]
+                    [{ content: objgindica, colSpan: 3, styles: {halign: 'justify'} }]
                 ];
 
                 // 6. Dibujar Tabla de Objetivos
@@ -8961,7 +8976,7 @@ export default {
                     margin: { top: 30, left: 15, right: 15, bottom: 20 }, 
                     theme: 'grid',
                     body: tablaObjetivos,
-                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false,cellPadding: 3 } 
                 });
                 const formatearLista = (relacion, campo, etiqueta = '') => {
                     if (!relacion) return etiqueta ? `${etiqueta} N/A` : 'N/A';
@@ -9006,18 +9021,18 @@ export default {
 
                     // Fila 1 del Objetivo (Texto del Objetivo + Productos Verificables combinados verticalmente)
                     bodyObjEspecificos.push([
-                        { content: objTexto, styles: { halign: 'left', fontStyle: 'bold' } },
-                        { content: productosTexto, rowSpan: 3, styles: { halign: 'left', valign: 'top' } }
+                        { content: objTexto, styles: { halign: 'justify', fontStyle: 'bold' } },
+                        { content: productosTexto, rowSpan: 3, styles: { halign: 'justify', valign: 'top' } }
                     ]);
 
                     // Fila 2 del Objetivo (Meta / Metas)
                     bodyObjEspecificos.push([
-                        { content: metaTexto, styles: { halign: 'left' } }
+                        { content: metaTexto, styles: { halign: 'justify' } }
                     ]);
 
                     // Fila 3 del Objetivo (Indicador / Indicadores)
                     bodyObjEspecificos.push([
-                        { content: indicadorTexto, styles: { halign: 'left' } }
+                        { content: indicadorTexto, styles: { halign: 'justify' } }
                     ]);
                 });
 
@@ -9043,10 +9058,10 @@ export default {
                     }
                 });
                 const tablaAntecedentesyJustif = [
-                    [{ content: 'Antecedentes:', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
-                    [{ content: proy.proyect_antecedentes || '', colSpan: 3, styles: valStyle }],
-                    [{ content: 'Justificación:', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
-                    [{ content: proy.proyect_justificacion || '', colSpan: 3, styles: valStyle }]
+                    [{ content: 'Antecedentes:', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'justify' } }],
+                    [{ content: proy.proyect_antecedentes || '', colSpan: 3, styles: {halign: 'justify'} }],
+                    [{ content: 'Justificación:', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'justify' } }],
+                    [{ content: proy.proyect_justificacion || '', colSpan: 3, styles: {halign: 'justify'} }]
                 ];
 
                 
@@ -9055,7 +9070,7 @@ export default {
                     margin: { top: 30, left: 15, right: 15, bottom: 20 },
                     theme: 'grid',
                     body: tablaAntecedentesyJustif,
-                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false, cellPadding: 3 } 
                 });
                 const tablainstituciones = [
                     [{ content: 'INSTITUCIONES INVOLUCRADAS QUE BRINDAN FINANCIAMIENTO INTERNO Y EXTERNO', colSpan: 6, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'center' } }],
@@ -9421,7 +9436,7 @@ export default {
                         { 
                             content: 'Nota. De ser el caso que exista un docente que se desvincule del proyecto o de algunos/as de los/as integrantes se deberá informar mediante oficio a la Dirección de Vinculación con la Sociedad.', 
                             colSpan: 6, 
-                            styles: { fontStyle: 'italic', fillColor: [230, 230, 230], halign: 'left', fontSize: 7, cellPadding: { top: 1, left: 2, right: 2, bottom: 3 }, lineWidth: { top: 0, left: 0.1, right: 0.1, bottom: 0.1 } } 
+                            styles: { fontStyle: 'italic', fillColor: [230, 230, 230], halign: 'justify', fontSize: 7, cellPadding: { top: 1, left: 2, right: 2, bottom: 3 }, lineWidth: { top: 0, left: 0.1, right: 0.1, bottom: 0.1 } } 
                         }
                     ],
                     [
@@ -9471,14 +9486,14 @@ export default {
                     ],
                     // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
                     [
-                        { content: 'El proyecto debe estar redactado con perspectiva de género, lo que implica usar el femenino y masculino o sustantivo neutro. Asimismo, es recomendable dirigirse en estos términos a la comunidad beneficiaria con el objetivo de evitar la exclusión.', colSpan: 3, styles: { halign: 'left' } }
+                        { content: 'El proyecto debe estar redactado con perspectiva de género, lo que implica usar el femenino y masculino o sustantivo neutro. Asimismo, es recomendable dirigirse en estos términos a la comunidad beneficiaria con el objetivo de evitar la exclusión.', colSpan: 3, styles: { halign: 'justify' } }
                     ],
                     [
                         { content: 'ÉTICA', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }
                     ],
                     [
                         { content: 'Las y los participantes del proyecto demostrarán un comportamiento absolutamente opuesto al fraude o deshonestidad académica, descritas en el artículo 68 del Reglamento de Régimen Académico emitido por el CES, como "toda acción que, inobservando el principio de transparencia académica, viola los derechos de autor o incumple las normas éticas establecidas por las IES o por el profesor, para los procesos de evaluación y/o presentación de resultados de aprendizaje, investigación o sistematización".', 
-                        colSpan: 3, styles: { halign: 'left' } }
+                        colSpan: 3, styles: { halign: 'justify' } }
                     ],
                     [
                         { content: '2. DIAGNÓSTICO Y PROBLEMA', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }
@@ -9497,17 +9512,18 @@ export default {
                         textColor: [0, 0, 0], 
                         fillColor: false,
                         valign: 'middle',
+                        cellPadding: 3
                         // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
                     },
                 });
                 const tabladiagprom = [
                     [{ content: '2.1 Descripción de la situación actual para contribuir a la satisfacción de necesidades y la solución de problemáticas del entorno desde el ámbito académico e investigativo:', colSpan: 3, styles: lblStyle }],
-                    [{ content: proy.proyect_desc_situ_act, colSpan: 6, styles: valStyle }],
+                    [{ content: proy.proyect_desc_situ_act, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
                     
-                    [{ content: '2.2 Identificación, descripción y diagnóstico del problema:', colSpan: 6, styles: lblStyle }],
-                    [{ content: proy.proyect_diag_probl, colSpan: 6, styles: valStyle }],
+                    [{ content: '2.2 Identificación, descripción y diagnóstico del problema:', colSpan: 3, styles: lblStyle }],
+                    [{ content: proy.proyect_diag_probl, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
                     [
-                        { content: '2.3 Articulación del proyecto de vinculación con el programa de la carrera', colSpan: 6, styles: { fontStyle: 'bold', halign: 'left' } }
+                        { content: '2.3 Articulación del proyecto de vinculación con el programa de la carrera', colSpan: 3, styles: { fontStyle: 'bold', halign: 'left' } }
                     ],
                 ];
                 autoTable(doc, {
@@ -9521,6 +9537,7 @@ export default {
                         textColor: [0, 0, 0], 
                         fillColor: false,
                         valign: 'middle',
+                        cellPadding: 3
                         // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
                     },
                 });
@@ -9532,7 +9549,7 @@ export default {
                         { content: 'Asignatura(s) que aportan al proyecto', styles: { fontStyle: 'bold', halign: 'left' } }
                     ],
                     [
-                        { content: proy.proyect_contribucion_soci, styles: { halign: 'left' } },
+                        { content: proy.proyect_contribucion_soci, styles: { halign: 'justify' } },
                         { content: asiognaturasTxt, styles: { halign: 'left' } }
                     ]
                 ];
@@ -9549,6 +9566,7 @@ export default {
                         textColor: [0, 0, 0], 
                         fillColor: false,
                         valign: 'middle',
+                        cellPadding: 3
                         // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
                     },
                     columnStyles: {
@@ -9558,7 +9576,7 @@ export default {
                 });
                 const tablaidentific = [
                     [{ content: 'Identificación y caracterización de la población objetiva beneficiarios (as)', colSpan: 3, styles: lblStyle }],
-                    [{ content: `${proy.proyec_ident_poblaobj} \n(Obtención de datos de página oficial del INEC censo 2022)`, colSpan: 3, styles: valStyle }]
+                    [{ content: `${proy.proyec_ident_poblaobj} \n(Obtención de datos de página oficial del INEC censo 2022)`, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }]
                 ];
                 
                 autoTable(doc, {
@@ -9572,6 +9590,7 @@ export default {
                         textColor: [0, 0, 0], 
                         fillColor: false,
                         valign: 'middle',
+                        cellPadding: 3
                         // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
                     },
                 });
@@ -9605,6 +9624,7 @@ export default {
                         textColor: [0, 0, 0], 
                         fillColor: false,
                         valign: 'middle',
+                        cellPadding: 3
                         // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
                     },
                     columnStyles: {
@@ -9704,7 +9724,7 @@ export default {
                 });
                 const tablafactore = [
                     [{ content: 'Factores críticos de éxito:', colSpan: 3, styles: lblStyle }],
-                    [{ content: `${proy.proyect_fact_exito}`, colSpan: 3, styles: valStyle }]
+                    [{ content: `${proy.proyect_fact_exito}`, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }]
                 ];
                 
                 autoTable(doc, {
@@ -9718,12 +9738,13 @@ export default {
                         textColor: [0, 0, 0], 
                         fillColor: false,
                         valign: 'middle',
+                        cellPadding: 3
                         // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
                     },
                 });
                 const tablarestric = [
                     [{ content: 'Restricciones/Supuestos:', colSpan: 3, styles: lblStyle }],
-                    [{ content: `${proy.proyect_rest_supu}`, colSpan: 3, styles: valStyle }]
+                    [{ content: `${proy.proyect_rest_supu}`, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }]
                 ];
                 
                 autoTable(doc, {
@@ -9737,6 +9758,7 @@ export default {
                         textColor: [0, 0, 0], 
                         fillColor: false,
                         valign: 'middle',
+                        cellPadding: 3
                         // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
                     },
                 });
@@ -9773,16 +9795,16 @@ export default {
                         { content: 'Supuestos', styles: { fontStyle: 'bold', halign: 'center' } },
                     ],
                     [
-                        { content: `Fines (efectos): ${finproy}`, styles: valStyle },
-                        { content: finindica, styles: valStyle },
-                        { content: finmediover, styles: valStyle },
-                        { content: finsupuestos, styles: valStyle },
+                        { content: `Fines (efectos): ${finproy}`, styles: { ...valStyle, halign: 'justify' } },
+                        { content: finindica, styles: { ...valStyle, halign: 'justify' } },
+                        { content: finmediover, styles: { ...valStyle, halign: 'justify' } },
+                        { content: finsupuestos, styles: { ...valStyle, halign: 'justify' } },
                     ],
                     [
-                        { content: `Propósito ( u objetivo general): ${objetivogeneral}`, styles: valStyle },
-                        { content: objgindica, styles: valStyle },
-                        { content: objgemediover, styles: valStyle },
-                        { content: objgsupuestos, styles: valStyle },
+                        { content: `Propósito ( u objetivo general): ${objetivogeneral}`, styles: { ...valStyle, halign: 'justify' } },
+                        { content: objgindica, styles: { ...valStyle, halign: 'justify' } },
+                        { content: objgemediover, styles: { ...valStyle, halign: 'justify' } },
+                        { content: objgsupuestos, styles: { ...valStyle, halign: 'justify' } },
                     ],
                     
                 ];
@@ -9807,10 +9829,10 @@ export default {
                         const supuestosTexto = formatearLista(obj.invi_supuestos, 'detalle_supuestos', ''); 
 
                         tablamarcologicT.push([
-                            { content: descripcionObj, styles: valStyle },
-                            { content: indicadoresTexto, styles: valStyle },
-                            { content: mediosVerificacionTexto, styles: valStyle },
-                            { content: supuestosTexto, styles: valStyle }
+                            { content: descripcionObj, styles: { ...valStyle, halign: 'justify' } },
+                            { content: indicadoresTexto, styles: { ...valStyle, halign: 'justify' } },
+                            { content: mediosVerificacionTexto, styles: { ...valStyle, halign: 'justify' } },
+                            { content: supuestosTexto, styles: { ...valStyle, halign: 'justify' } }
                         ]);
                     });
                 } else {
@@ -9908,10 +9930,10 @@ export default {
                                 const supTexto = formatearLista(act.invi_actsupuestos, 'detalle_supuestos', '');
 
                                 tablamarcologicT.push([
-                                    { content: descripcionAct, styles: valStyle },
-                                    { content: indTexto, styles: valStyle },
-                                    { content: medTexto, styles: valStyle },
-                                    { content: supTexto, styles: valStyle }
+                                    { content: descripcionAct, styles: { ...valStyle, halign: 'justify' } },
+                                    { content: indTexto, styles: { ...valStyle, halign: 'justify' } },
+                                    { content: medTexto, styles: { ...valStyle, halign: 'justify' } },
+                                    { content: supTexto, styles: { ...valStyle, halign: 'justify' } }
                                 ]);
                             });
                         });
@@ -9937,6 +9959,7 @@ export default {
                         textColor: [0, 0, 0], 
                         fillColor: false,
                         valign: 'middle',
+                        cellPadding: 3
                         // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
                     },
                     columnStyles: {
@@ -9971,15 +9994,15 @@ export default {
                 const tablabiende = [
                     [
                         { content: 'Bienes', styles: { fontStyle: 'bold', halign: 'left' } },
-                        { content: proy.proyect_bienes, styles: valStyle }, // Asegúrate de tener valStyle definido
+                        { content: proy.proyect_bienes, styles: { ...valStyle, halign: 'justify' } }, // Asegúrate de tener valStyle definido
                     ],
                     [
                         { content: 'Servicios', styles: { fontStyle: 'bold', halign: 'left' } },
-                        { content: proy.proyect_servicios, styles: valStyle },
+                        { content: proy.proyect_servicios, styles: { ...valStyle, halign: 'justify' } },
                     ],
                     [
                         { content: 'Bienes y servicios', styles: { fontStyle: 'bold', halign: 'left' } },
-                        { content: proy.proyect_bienes_servicios, styles: valStyle },
+                        { content: proy.proyect_bienes_servicios, styles: { ...valStyle, halign: 'justify' } },
                     ],
                 ];
 
@@ -9995,6 +10018,7 @@ export default {
                         textColor: [0, 0, 0], 
                         fillColor: false,
                         valign: 'middle',
+                        cellPadding: 3
                     },
                     columnStyles: {
                         0: { cellWidth: 40 }, // Ajusté la columna 0 a un ancho fijo para que la tabla se vea más uniforme
@@ -10152,7 +10176,7 @@ export default {
                 });
                 const tablametodología = [
                     [{ content: '4. METODOLOGÍA PARA LA VINCULACIÓN (Diseño del Estudio: Detallar diseño experimental, tipo de análisis estadístico, otros) ', colSpan: 6, styles: { fontStyle: 'bold', halign: 'left' } }],
-                    [{ content: proy.proyect_metodologia || '', colSpan: 6, styles: valStyle }],
+                    [{ content: proy.proyect_metodologia || '', colSpan: 6, styles: { ...valStyle, halign: 'justify' } }],
                 ];
 
                 
@@ -10161,7 +10185,7 @@ export default {
                     margin: { top: 30, left: 15, right: 15, bottom: 20 },
                     theme: 'grid',
                     body: tablametodología,
-                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false,cellPadding: 3 } 
                 });
 
                 const tablafinantitu = [
@@ -10196,35 +10220,37 @@ export default {
                     ? proy.invi_det_impactos_esperados
                     : (proy.invi_det_impactos_esperados ? [proy.invi_det_impactos_esperados] : []);
 
-                // 2. Función para buscar la 'descripcion_general' filtrando por el nombre del impacto
                 const getDescripcionImpacto = (nombreImpacto) => {
-                    // Filtrar TODOS los registros que coincidan con el tipo de impacto
                     const items = detaimpacto.filter(
                         item => item.invi_impactos && item.invi_impactos.nombre_impacto === nombreImpacto
                     );
 
                     if (items.length === 0) return '';
+                    if (items.length === 1) return items[0].descripcion_general || '';
 
-                    // Si solo hay un registro, retorna el texto simple
-                    if (items.length === 1) {
-                        return items[0].descripcion_general || '';
-                    }
-
-                    // Si hay 2 o más registros, añade una viñeta a cada uno y los une con saltos de línea
                     return items
                         .map(item => `• ${item.descripcion_general || ''}`)
                         .join('\n');
                 };
 
+                
+
+                // 2. Aplicamos la limpieza inteligente
+                const viabilidadLimpia = limpiarTextoRespectandoSaltos(proy.proyect_viabilidad_tec);
+                const equipamientoLimpio = limpiarTextoRespectandoSaltos(proy.proyect_equip_tec);
+                const noEjecutaLimpio = limpiarTextoRespectandoSaltos(proy.proyect_no_ejecuta);
 
                 const tablaviabiliconten = [
                     [{ content: 'Viabilidad Técnica:', colSpan: 2, styles: lblStyle }],
-                    [{ content: proy.proyect_viabilidad_tec || '', colSpan: 2, styles: {halign: 'justify'} }],
+                    // Aplicamos la variable limpia y el justify
+                    [{ content: viabilidadLimpia, colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+                    
                     [{ content: 'Equipamiento Tecnológico Disponible', colSpan: 2, styles: lblStyle }],
-                    [{ content: proy.proyect_equip_tec || '', colSpan: 2, styles: valStyle }],
+                    [{ content: equipamientoLimpio, colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+                    
                     [
                         { content: '¿Qué perdería la provincia si el proyecto no se ejecuta en este periodo?', styles: { fontStyle: 'bold', halign: 'left' } },
-                        { content: proy.proyect_no_ejecuta || '', styles: valStyle }
+                        { content: noEjecutaLimpio, styles: valStyle } // Si quieres justificar este también, añádele { halign: 'justify' }
                     ],
                     [{ content: 'IMPACTOS ESPERADOS:', colSpan: 2, styles: { fontStyle: 'bold', halign: 'left' } }],
                     [
@@ -10233,44 +10259,42 @@ export default {
                     ],
                     [
                         { content: 'Impacto económico', styles: { fontStyle: 'bold', halign: 'center' } },
-                        { content: getDescripcionImpacto('Impacto económico') || '', styles: valStyle }
+                        { content: getDescripcionImpacto('Impacto económico') || '', styles: { ...valStyle, halign: 'justify' } }
                     ],
                     [
                         { content: 'Impacto social', styles: { fontStyle: 'bold', halign: 'center' } },
-                        { content: getDescripcionImpacto('Impacto social') || '', styles: valStyle }
+                        { content: getDescripcionImpacto('Impacto social') || '', styles: { ...valStyle, halign: 'justify' } }
                     ],
                     [
                         { content: 'Impacto político', styles: { fontStyle: 'bold', halign: 'center' } },
-                        { content: getDescripcionImpacto('Impacto político') || '', styles: valStyle }
+                        { content: getDescripcionImpacto('Impacto político') || '', styles: { ...valStyle, halign: 'justify' } }
                     ],
                     [
                         { content: 'Impacto científico', styles: { fontStyle: 'bold', halign: 'center' } },
-                        { content: getDescripcionImpacto('Impacto científico') || '', styles: valStyle }
+                        { content: getDescripcionImpacto('Impacto científico') || '', styles: { ...valStyle, halign: 'justify' } }
                     ],
                     [
                         { content: 'Impacto ambiental', styles: { fontStyle: 'bold', halign: 'center' } },
-                        { content: getDescripcionImpacto('Impacto ambiental') || '', styles: valStyle }
+                        { content: getDescripcionImpacto('Impacto ambiental') || '', styles: { ...valStyle, halign: 'justify' } }
                     ],
                     [
                         { content: 'Otros impactos', styles: { fontStyle: 'bold', halign: 'center' } },
-                        { content: getDescripcionImpacto('Otros impactos') || '', styles: valStyle }
+                        { content: getDescripcionImpacto('Otros impactos') || '', styles: { ...valStyle, halign: 'justify' } }
                     ],
                     [{ content: 'Sostenibilidad social: equidad, género, participación ciudadana:', colSpan: 2, styles: lblStyle }],
-                    [{ content: proy.proyect_sostenibilidad_soc || '', colSpan: 2, styles: valStyle }],
+                    [{ content: proy.proyect_sostenibilidad_soc || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
                     [{ content: 'Transferencia Tecnológica', colSpan: 2, styles: lblStyle }],
-                    [{ content: proy.proyect_transf_tecn || '', colSpan: 2, styles: valStyle }],
+                    [{ content: proy.proyect_transf_tecn || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
                     [{ content: 'Artículos Científicos: ', colSpan: 2, styles: lblStyle }],
-                    [{ content: proy.proyect_art_cientificos || '', colSpan: 2, styles: valStyle }],
+                    [{ content: proy.proyect_art_cientificos || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
                     [{ content: 'Prototipos:', colSpan: 2, styles: lblStyle }],
-                    [{ content: proy.proyect_prototipos || '', colSpan: 2, styles: valStyle }],
+                    [{ content: proy.proyect_prototipos || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
                     [{ content: 'Registro de Propiedad Intelectual:', colSpan: 2, styles: lblStyle }],
-                    [{ content: proy.proyect_reg_propin || '', colSpan: 2, styles: valStyle }],
+                    [{ content: proy.proyect_reg_propin || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
                     [{ content: 'Empresas Spin OffS', colSpan: 2, styles: lblStyle }],
-                    [{ content: proy.proyect_empr_spin || '', colSpan: 2, styles: valStyle }],
-
+                    [{ content: proy.proyect_empr_spin || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
                 ];
 
-                
                 autoTable(doc, {
                     startY: doc.lastAutoTable.finalY + 6, 
                     margin: { top: 30, left: 15, right: 15, bottom: 20 },
@@ -10280,7 +10304,8 @@ export default {
                         fontSize: 8, 
                         lineColor: [0, 0, 0], 
                         textColor: [0, 0, 0], 
-                        fillColor: false 
+                        fillColor: false,
+                        cellPadding: 3
                     },
                     columnStyles: {
                         0: { cellWidth: 80 }, 
@@ -10299,7 +10324,7 @@ export default {
                     margin: { top: 30, left: 15, right: 15, bottom: 20 },
                     theme: 'grid',
                     body: tablaestrategia,
-                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false } 
+                    styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false, cellPadding: 3 } 
                 });
                 const textomonito = `Mensualmente y semestralmente se deberá remitir a la dirección de Vinculación con la Sociedad el reporte de avances del proyecto, según las actividades establecidas en el cronograma.\n` +
                     `Al finalizar el proyecto debe presentar el informe final que contendrá las fichas de estudiantes y docentes, la encuesta a los beneficiarios y los resultados del proyecto (productos o entregables).\n` +
@@ -10439,6 +10464,25 @@ export default {
                 mostraralertas2("Ocurrió un error al generar el PDF.", "error");
             } finally {
                 // Apagamos el spinner pase lo que pase (éxito o error)
+                this.botonCargando = null;
+            }
+        },
+        async PDFAnexo1(id){
+            this.botonCargando = 'anexo_1_' + id;
+            try{
+                const idProyecto = id;
+                if(!idProyecto) {
+                    return mostraralertas2("Error: No se ha seleccionado un proyecto válido.", "warning");
+                }
+                const response = await API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`);
+                const data = response.data;
+                const proy = data.proyecto;
+                
+
+            }catch(error){
+                console.error(`Error al generar el PDF del Anexo 1 para el ID ${id}:`, error);
+                mostraralertas2("Ocurrió un error al generar el PDF del Anexo 1.", "error");
+            } finally {
                 this.botonCargando = null;
             }
         },
