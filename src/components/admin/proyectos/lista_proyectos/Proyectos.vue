@@ -131,6 +131,22 @@
                                         <polyline points="10 9 9 9 8 9"></polyline>
                                     </svg>
                                 </button>
+                                <button @click="PDFAnexo1(post.proyect_id)"
+                                    :disabled="botonCargando === 'anexo1_' + post.proyect_id"
+                                    class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center"
+                                    title="Generar Carta Aval">
+                                    <!-- Spinner -->
+                                    <svg v-if="botonCargando === 'anexo1_' + post.proyect_id" class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <!-- Icono Documento Texto -->
+                                    <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22h6a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v10"></path>
+                                        <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+                                        <path d="M9 16l2 2 4-4"></path> <!-- Check de Aval -->
+                                    </svg>
+                                </button>
 
                                 <!-- Botón 4: Generar Anexo 3 (Documento PDF Variante) -->
                                 <button @click="abrirModalAreaTematica(post.proyect_id)"
@@ -10467,19 +10483,209 @@ export default {
                 this.botonCargando = null;
             }
         },
-        async PDFAnexo1(id){
-            this.botonCargando = 'anexo_1_' + id;
-            try{
+        async PDFAnexo1(id) {
+            this.botonCargando = 'anexo1_' + id;
+            try {
                 const idProyecto = id;
-                if(!idProyecto) {
+                if (!idProyecto) {
                     return mostraralertas2("Error: No se ha seleccionado un proyecto válido.", "warning");
                 }
-                const response = await API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`);
-                const data = response.data;
-                const proy = data.proyecto;
-                
 
-            }catch(error){
+                const [responseDatos, resDir] = await Promise.all([
+                    API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`),
+                    this.ObteneProDir(idProyecto).catch(() => ({ data: { data: [] } }))
+                ]);
+
+                const data = responseDatos.data;
+                const proy = data.proyecto || {};
+
+                // Limpiar caracteres extraños
+                const sanitizarTexto = (str) => {
+                    if (!str) return '';
+                    return String(str)
+                        .replace(/’|'/g, "'")
+                        .replace(/“|”/g, '"')
+                        .replace(/ã'|ã/g, 'ñ');
+                };
+
+                const capitalizarNombres = (str) => {
+                    if (!str) return '';
+                    return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                };
+
+                const getPrioridadFuncion = (nombreFuncion = '') => {
+                    const f = nombreFuncion.toLowerCase();
+                    if (f.includes('subdirector')) return 2;
+                    if (f.includes('director')) return 1;
+                    if (f.includes('técnico') || f.includes('tecnico')) return 4;
+                    if (f.includes('docente')) return 3;
+                    if (f.includes('administrativo') || f.includes('administrativa')) return 5;
+                    return 6;
+                };
+
+                // Procesar Integrantes
+                const integrantesRaw = data.integrantes_titulosactivos || data.integrantes_activos || [];
+                const integrantes = [...integrantesRaw].sort((a, b) => {
+                    const funcA = a.funciones ? a.funciones.nombre_funcion : '';
+                    const funcB = b.funciones ? b.funciones.nombre_funcion : '';
+                    return getPrioridadFuncion(funcA) - getPrioridadFuncion(funcB);
+                });
+
+                const nombresAutores = sanitizarTexto(
+                    integrantes.map(integrante => {
+                        let nombreCompleto = integrante.nombre_completo_titulo;
+                        if (!nombreCompleto) {
+                            const info = integrante.informacion_personal_d || {};
+                            const nombresStr = `${info.NombInfPer || ''} ${info.ApellInfPer || ''} ${info.ApellMatInfPer || ''}`.trim();
+                            nombreCompleto = capitalizarNombres(nombresStr);
+                        }
+                        return nombreCompleto;
+                    }).filter(Boolean).join(', ')
+                );
+
+                // Director del Proyecto
+                let directorProy = 'Director No Asignado';
+                if (resDir.data?.data && resDir.data.data.length > 0) {
+                    directorProy = resDir.data.data[0].nombre_con_titulo || directorProy;
+                }
+                directorProy = sanitizarTexto(directorProy);
+
+                // Variables de datos
+                const facultadTxt = sanitizarTexto(data.facultades_data?.map(f => f.facultad).join(', ') || 'N/A');
+                const carrerasTxt = sanitizarTexto(data.carreras_data?.map(c => c.NombCarr).join(', ') || 'N/A');
+                const lineaInvestigacion = sanitizarTexto(data.lineas_data?.map(l => l.nombre_lin).join(', ') || 'N/A');
+                const proyecttitulo = sanitizarTexto(proy.proyect_titulo || proy.proyect_nombre || 'N/A');
+                const proyectInvestigacion = sanitizarTexto(proy.proyect_investigacion || proy.proyecto_investigacion || 'Investigación Institucional');
+
+                const directorCarrera = sanitizarTexto(
+                    (data.carreras_data && data.carreras_data[0]?.director) 
+                        ? data.carreras_data[0].director 
+                        : 'Director(a) de Carrera'
+                );
+
+                const decanoFacultad = sanitizarTexto(
+                    (data.facultades_data && data.facultades_data[0]?.decano) 
+                        ? data.facultades_data[0].decano 
+                        : 'Decano(a) de la Facultad'
+                );
+
+                // Ubicación y Fecha
+                let provincia = 'Esmeraldas';
+                if (Array.isArray(proy.invi_detalle_cobe)) {
+                    const provMap = proy.invi_detalle_cobe.map(c => c.provincias?.detalle || c.provincia?.detalle).filter(Boolean);
+                    provincia = [...new Set(provMap)].join(', ') || 'Esmeraldas';
+                } else if (proy.invi_detalle_cobe?.provincias?.detalle) {
+                    provincia = proy.invi_detalle_cobe.provincias.detalle;
+                }
+
+                const formatearFecha = (fechaStr) => {
+                    if (!fechaStr) return '';
+                    const partes = fechaStr.split('-');
+                    if (partes.length === 3) {
+                        const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                        return `${parseInt(partes[2], 10)} de ${meses[parseInt(partes[1], 10) - 1]} de ${partes[0]}`;
+                    }
+                    return fechaStr;
+                };
+
+                const fechaFormateada = formatearFecha(proy.proyect_fecha_pres) || `${new Date().getDate()} de septiembre de ${new Date().getFullYear()}`;
+
+                // === INICIO PDF ===
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const rutaImagenFondo = '/fondo2.png';
+
+                const dibujarFondoBanner = () => {
+                    doc.addImage(rutaImagenFondo, 'PNG', 0, 0, pageWidth, pageHeight);
+                };
+
+                const originalAddPage = doc.addPage.bind(doc);
+                doc.addPage = function() {
+                    originalAddPage();
+                    dibujarFondoBanner();
+                };
+
+                dibujarFondoBanner();
+
+                // Encabezados
+                let cursorY = 48;
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(11);
+                doc.text("ANEXO 1", pageWidth / 2, cursorY, { align: "center" });
+                cursorY += 6;
+                doc.text("CARTA DE AVAL DEL PROYECTO", pageWidth / 2, cursorY, { align: "center" });
+                cursorY += 12;
+
+                // Párrafos
+                const parrafo1 = `Como Director/Profesor(a) de la Facultad de ${facultadTxt} - ${carrerasTxt}, por medio de la presente, declaro conocer lo establecido en el Plan de Vinculación con la Sociedad 2020 - 2024 y Reglamento de Proyectos de Vinculación; desarrollado por la Dirección de Vinculación con la Sociedad de la UTLVTE en correspondencia con las exigencias de la Secretaría de Educación Superior, Ciencia, Tecnología e Innovación.`;
+                
+                const parrafo2 = `Así también, certifico que el proyecto de vinculación "${proyecttitulo}" de autoría de los ingenieros/docentes ${nombresAutores}, está sustentado en el proyecto de investigación "${proyectInvestigacion}" y la línea de investigación "${lineaInvestigacion}" y ha sido desarrollado bajo mi dirección y acompañamiento, y debidamente conciliado con los Decanos(as) y Directores(as) de Carrera Respectivos.`;
+
+                // ==========================================
+                // AUTO-TABLE PARA JUSTIFICADO PERFECTO
+                // ==========================================
+                autoTable({
+                    startY: cursorY,
+                    body: [
+                        [parrafo1],
+                        [parrafo2]
+                    ],
+                    theme: 'plain', // Sin bordes ni fondos
+                    styles: {
+                        halign: 'justify', // El justificado mágico
+                        font: 'helvetica',
+                        fontSize: 10,
+                        textColor: [0, 0, 0], // Texto negro
+                        cellPadding: { top: 3, right: 0, bottom: 4, left: 0 } // Separación entre los párrafos
+                    },
+                    margin: { left: 20, right: 20 }
+                });
+
+                // Actualizar el cursor Y después de la tabla
+                cursorY = doc.lastAutoTable.finalY + 10;
+
+                // Despedida
+                doc.setFont("helvetica", "normal");
+                doc.text("Saludo a Ud. atentamente,", 20, cursorY);
+                cursorY += 25;
+
+                // ==========================================
+                // SECCIÓN DE FIRMAS
+                // ==========================================
+                doc.setFontSize(9.5);
+
+                // Firma Izquierda (Director de Proyecto)
+                doc.setFont("helvetica", "bold");
+                doc.text(directorProy, 55, cursorY, { align: "center" });
+                doc.setFont("helvetica", "normal");
+                doc.text("Director(a) del Proyecto de Vinculación", 55, cursorY + 4, { align: "center" });
+
+                // Firma Derecha (Director de Carrera)
+                doc.setFont("helvetica", "bold");
+                doc.text(directorCarrera, pageWidth - 55, cursorY, { align: "center" });
+                doc.setFont("helvetica", "normal");
+                doc.text("Director(a) de la Carrera", pageWidth - 55, cursorY + 4, { align: "center" });
+
+                cursorY += 25;
+
+                // Firma Inferior Central (Decano)
+                doc.setFont("helvetica", "bold");
+                doc.text(decanoFacultad, pageWidth / 2, cursorY, { align: "center" });
+                doc.setFont("helvetica", "normal");
+                doc.text("Decano(a) de la Facultad", pageWidth / 2, cursorY + 4, { align: "center" });
+
+                // Fecha final
+                cursorY += 15;
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.text(`${provincia}, ${fechaFormateada}`, pageWidth / 2, cursorY, { align: "center" });
+
+                // Guardar archivo
+                const codigoProy = proy.proyect_cod || id;
+                doc.save(`Anexo_1_Carta_Aval_${codigoProy}.pdf`);
+
+            } catch (error) {
                 console.error(`Error al generar el PDF del Anexo 1 para el ID ${id}:`, error);
                 mostraralertas2("Ocurrió un error al generar el PDF del Anexo 1.", "error");
             } finally {
