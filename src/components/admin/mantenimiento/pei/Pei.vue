@@ -126,7 +126,8 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button v-if="post.estado_pei === 1 && post.subsistemas_pei_count > 0" @click="abrirModalObjetivos(post)"
+                <button v-if="post.estado_pei === 1 && post.subsistemas_pei_count > 0"
+                  @click="abrirModalObjetivos(post)"
                   class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors" title="Gestionar Objetivos">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10" />
@@ -196,11 +197,15 @@
         </div>
         <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20">
           <div class="flex gap-3">
-            <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+            <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
             <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-              <strong>Nota importante:</strong> Los objetivos que añada aquí deben ser únicamente los que se encuentran registrados en el documento oficial del <strong>PEI</strong> seleccionado.
+              <strong>Nota importante:</strong> Los objetivos que añada aquí deben ser únicamente los que se encuentran
+              registrados en el documento oficial del <strong>PEI</strong> seleccionado.
             </p>
           </div>
         </div>
@@ -247,7 +252,8 @@
           </div>
 
           <div class="md:col-span-8 flex flex-col min-h-0">
-            <div class="overflow-x-auto border rounded-xl dark:border-gray-800 custom-scrollbar" style="max-height: 400px;">
+            <div class="overflow-x-auto border rounded-xl dark:border-gray-800 custom-scrollbar"
+              style="max-height: 400px;">
               <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                 <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
                   <tr>
@@ -255,7 +261,7 @@
                     <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">Subsistema / Detalle</th>
                     <th class="px-4 py-3 text-right text-xs font-bold text-gray-500">Acciones</th>
                   </tr>
-                </thead> 
+                </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-transparent">
                   <tr v-for="obj in listaObjetivos" :key="obj.id_obj_pei">
                     <td class="px-4 py-3 text-sm font-bold text-cyan-600">{{ obj.cod_obj }}</td>
@@ -293,7 +299,7 @@
             <h3 class="text-xl font-bold text-gray-800 dark:text-white">Subsistemas del</h3>
             <p class="text-sm text-success-600 font-medium">{{ selectedPei?.nombre_pei }}</p>
           </div>
-          
+
           <button @click="isSubsistemaModalOpen = false"
             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -303,11 +309,15 @@
         </div>
         <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20">
           <div class="flex gap-3">
-            <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+            <svg class="text-blue-600 dark:text-blue-400 shrink-0" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
             <p class="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-              <strong>Nota importante:</strong> Los subsistemas que añada aquí deben ser únicamente los que se encuentran registrados en el documento oficial del <strong>PEI</strong> seleccionado.
+              <strong>Nota importante:</strong> Los subsistemas que añada aquí deben ser únicamente los que se
+              encuentran registrados en el documento oficial del <strong>PEI</strong> seleccionado.
             </p>
           </div>
         </div>
@@ -315,7 +325,7 @@
         <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8">
 
           <div class="md:col-span-4 border-r border-gray-100 dark:border-gray-800 pr-0 md:pr-8">
-            
+
             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">
               {{ isEditingSubsistema ? 'Editar Subsistema' : 'Nuevo Subsistema' }}
             </h4>
@@ -342,7 +352,8 @@
           <div class="md:col-span-8 flex flex-col min-h-0">
             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Registrados
             </h4>
-            <div class="overflow-y-auto border rounded-xl dark:border-gray-800 custom-scrollbar" style="max-height: 400px;">
+            <div class="overflow-y-auto border rounded-xl dark:border-gray-800 custom-scrollbar"
+              style="max-height: 400px;">
               <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                 <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
                   <tr>
@@ -503,7 +514,7 @@
             </p>
           </div>
           <form class="flex flex-col">
-            <div class="px-2 overflow-y-auto custom-scrollbar">
+            <div class="px-2 overflow-y-auto custom-scrollbar max-h-[60vh]">
               <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -538,12 +549,27 @@
                 </select>
               </div>
 
-              <div class="mt-5">
+              <div v-if="objetoeditar.ad_archivo_url && !archivoSeleccionado" class="mt-4 col-span-1 lg:col-span-2">
+                <label class="block text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">Documento PEI
+                  Actual:</label>
+                <div
+                  class="w-full h-[400px] border border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden bg-gray-50">
+                  <iframe :src="objetoeditar.ad_archivo_url" class="w-full h-full border-0"></iframe>
+                </div>
+                <div class="mt-2 text-right">
+                  <a :href="objetoeditar.ad_archivo_url" target="_blank"
+                    class="text-sm text-brand-600 hover:underline">Abrir en nueva pestaña</a>
+                </div>
+              </div>
+
+              <!-- ZONA PARA SUBIR/REEMPLAZAR PDF -->
+              <div class="mt-5 col-span-1 lg:col-span-2">
                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Documento PEI (PDF)
+                  {{ objetoeditar.ad_archivo_url ? 'Subir un nuevo documento para reemplazar el actual (PDF)' :
+                  'Documento PEI (PDF)' }}
                 </label>
 
-                <div @click="$refs.fileFoto.click()"
+                <div @click="$refs.filePDF.click()"
                   class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
                   :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
                   <div class="flex flex-col items-center justify-center pt-5 pb-6">
@@ -559,14 +585,23 @@
                     </svg>
 
                     <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                      <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para cargar</span>
+                      <span class="font-semibold" v-if="!archivoPreviewName">
+                        {{ objetoeditar.ad_archivo_url ? 'Haga clic para reemplazar' : 'Haga clic para cargar' }}
+                      </span>
                       <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName }}</span>
                     </p>
                     <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
                   </div>
 
-                  <input type="file" ref="fileFoto" class="hidden" accept="application/pdf"
-                    @change="handleFileChange" />
+                  <!-- NOTA: Cambié ref="fileFoto" por ref="filePDF" para ser coherentes -->
+                  <input type="file" ref="filePDF" class="hidden" accept="application/pdf" @change="handleFileChange" />
+                </div>
+
+                <!-- Botón para cancelar el archivo recién seleccionado -->
+                <div class="mt-2 text-right" v-if="archivoPreviewName && objetoeditar.ad_archivo_url">
+                  <button @click.prevent="cancelarNuevoPDF" class="text-sm text-red-500 hover:underline">
+                    Cancelar nuevo archivo y mantener el actual
+                  </button>
                 </div>
               </div>
             </div>
@@ -632,6 +667,8 @@ export default {
         nombre_pei: "",
         anios_pei: "",
         estado_pei: 0,
+        archivo_pei: "",       // El nombre del archivo en la BD
+        ad_archivo_url: null
       },
       filteredarray: [],
       searchQuery: "",
@@ -875,13 +912,23 @@ export default {
     },
     abrirModalEdicion(user) {
       // Clonamos el objeto para no modificar la tabla directamente antes de guardar
+      this.cancelarNuevoPDF();
       this.objetoeditar = {
         id_pei: user.id_pei,
         nombre_pei: user.nombre_pei,
         anios_pei: user.anios_pei,
-        estado_pei: user.estado_pei
+        estado_pei: user.estado_pei,
+        archivo_pei: user.archivo_pei,       // Nombre del archivo base
+        ad_archivo_url: user.ad_archivo_url
       };
       this.$.setupState.isEditModalOpen = true;
+    },
+    cancelarNuevoPDF() {
+      this.archivoSeleccionado = null;
+      this.archivoPreviewName = '';
+      if (this.$refs.fileFoto) {
+        this.$refs.fileFoto.value = null;
+      }
     },
     async uploadArchivo(anio_pei, oldFilename = null, oldAnio = null) {
       if (!this.archivoSeleccionado) return null; // nada que subir
@@ -934,7 +981,7 @@ export default {
           return {
             ...item,
             ad_archivo_url: item.archivo_pei
-              ? `http://vinculacion.test/Documentos/Pei/${folderName}/${item.archivo_pei}`
+              ? `http://192.168.1.112:8082/Documentos/Pei/${folderName}/${item.archivo_pei}`
               : null
           };
         });

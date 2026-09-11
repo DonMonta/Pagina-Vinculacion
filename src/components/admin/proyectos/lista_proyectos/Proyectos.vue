@@ -132,11 +132,11 @@
                                     </svg>
                                 </button>
                                 <button @click="PDFAnexo1(post.proyect_id)"
-                                    :disabled="botonCargando === 'anexo1_' + post.proyect_id"
+                                    :disabled="botonCargando === 'anexo_1_' + post.proyect_id"
                                     class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center"
                                     title="Generar Carta Aval">
                                     <!-- Spinner -->
-                                    <svg v-if="botonCargando === 'anexo1_' + post.proyect_id" class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <svg v-if="botonCargando === 'anexo_1_' + post.proyect_id" class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
@@ -960,6 +960,15 @@
                         <span
                             class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">16</span>
                         Bibliografías
+                    </button>
+                    <button @click="activeTab = 'evidencia_pdf'"
+                        :class="activeTab === 'evidencia_pdf'
+                            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-850 shadow-sm rounded-t-xl border-t border-x'
+                            : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100/60 dark:hover:bg-gray-800 rounded-t-xl border-transparent'"
+                        class="flex-shrink-0 whitespace-nowrap pb-3 pt-2.5 px-4 text-sm font-medium transition-all duration-200 border-b-2 -mb-[1px] flex items-center gap-2">
+                        <span
+                            class="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-[11px] font-bold text-brand-600 dark:text-brand-400">17</span>
+                        Evidencia PDF
                     </button>
                 </div>
 
@@ -4242,6 +4251,63 @@
                             </ul>
                         </div>
                     </div>
+                    <div v-else-if="activeTab === 'evidencia_pdf'" class="space-y-8 animate-fade-in-up">
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-gray-800 rounded-lg border-l-4 border-green-500 flex gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Evidencia PDF del proyecto</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400" v-if="editForm.proyect_archivo">Edite el pdf anteriormente subido</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400" v-else>Suba la evidencia del proyecto en pdf</p>
+                            </div>
+                        </div>
+                        <!-- VISUALIZADOR DEL PDF ACTUAL -->
+                        <div v-if="editForm.pdfurlarchivo && !archivopdfSeleccionado" class="mt-4">
+                            <label class="block text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">Documento Actual Guardado:</label>
+                            <div class="w-full h-[400px] border border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden bg-gray-50">
+                                <iframe :src="editForm.pdfurlarchivo" class="w-full h-full border-0"></iframe>
+                            </div>
+                            <div class="mt-2 text-right">
+                                <a :href="editForm.pdfurlarchivo" target="_blank" class="text-sm text-brand-600 hover:underline">Abrir en nueva pestaña</a>
+                            </div>
+                        </div>
+
+                        <!-- ZONA PARA SUBIR/REEMPLAZAR PDF -->
+                        <div class="space-y-3 mt-6">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">
+                                    {{ editForm.pdfurlarchivo ? 'Subir un nuevo documento para reemplazar el actual (PDF)' : 'Documento Respaldo (PDF)' }}
+                                </label>
+                                <div @click="$refs.filePDF.click()"
+                                    class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
+                                    :class="archivopdfPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg v-if="!archivopdfPreviewName" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                        <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                                            <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                                        </svg>
+                                        <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                                            <span class="font-semibold" v-if="!archivopdfPreviewName">
+                                                {{ editForm.pdfurlarchivo ? 'Haga clic para reemplazar' : 'Haga clic para cargar' }}
+                                            </span>
+                                            <span class="font-semibold text-brand-600" v-else>{{ archivopdfPreviewName }}</span>
+                                        </p>
+                                        <p class="text-xs text-gray-400" v-if="!archivopdfPreviewName">PDF (Máx. 30MB)</p>
+                                    </div>
+                                    <!-- Cuidado aquí: El ref que usabas en @click era filePDF, pero en tu input era fileFoto. Lo he estandarizado a filePDF -->
+                                    <input type="file" ref="filePDF" class="hidden" accept="application/pdf" @change="handlepdfFileChange" />
+                                </div>
+                                
+                                <!-- Botón para cancelar el archivo recién seleccionado y dejar el anterior -->
+                                <div class="mt-2 text-right" v-if="archivopdfPreviewName && editForm.pdfurlarchivo">
+                                    <button @click="cancelarNuevoPDF" class="text-sm text-red-500 hover:underline">
+                                        Cancelar nuevo archivo y mantener el actual
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Modal para Área Temática -->
@@ -4879,6 +4945,10 @@ export default {
             archivoSeleccionado: null,
             archivoPreviewName: '',
             uploading: false,
+            //pdf proyect
+            archivopdfSeleccionado: null,
+            archivopdfPreviewName: '',
+            pdfuploading: false,
             continuarEnProyecto: true,
             showModalBaja: false,
             integranteBaja: null,
@@ -4924,6 +4994,7 @@ export default {
             searchAsignatura: '',
             editForm: {
                 proyect_id: '',
+                proyect_cod: '',
                 proyect_nombre: '',
                 proyect_titulo: '',
                 proyect_nombre_en: '',
@@ -4995,6 +5066,8 @@ export default {
                 proyect_empr_spin: '',
                 difusion: [],
                 bibliografias: [],
+                proyect_archivo: null,
+                pdfurlarchivo: null,
             },
             anioSeleccionadoTab: 'Primer Año',
             showModalActividad: false,
@@ -5508,6 +5581,36 @@ export default {
             this.archivoBaja = file;
             this.archivoBajaName = file.name;
         },
+        handlepdfFileChange(event) {
+            //Obtener el archivo seleccionado por el usuario
+            const file = event.target.files[0];
+            //Validar que el archivo seleccionado sea un archivo PDF, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+            if (!file) return;
+            // validación básica: pdf y tamaño si quieres
+            if (file.type !== 'application/pdf') {
+                //Mostrar una alerta de advertencia si el archivo seleccionado no es un archivo PDF, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+                mostraralertas2('Solo se permiten archivos PDF', 'warning');
+                //Limpiar el archivo seleccionado
+                this.$refs.filePDF.value = null;
+                //Devolver sin hacer nada más
+                return;
+            }
+            //Validar que el tamaño del archivo no exceda el límite de 30 MB, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+            const maxMB = 30;
+            //Si el tamaño del archivo es mayor que el límite de 30 MB, se muestra una alerta y se limpia el archivo seleccionado
+            if (file.size > maxMB * 1024 * 1024) {
+                //Mostrar una alerta de advertencia si el tamaño del archivo es mayor que el límite de 10 MB, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+                mostraralertas2(`Archivo muy grande. Máx ${maxMB} MB`, 'warning');
+                //Limpiar el archivo seleccionado
+                this.$refs.filePDF.value = null;
+                //Devolver sin hacer nada más
+                return;
+            }
+            //Asignar el archivo seleccionado a la variable archivoSeleccionado
+            this.archivopdfSeleccionado = file;
+            //Asignar el nombre del archivo seleccionado a la variable archivoPreviewName
+            this.archivopdfPreviewName = file.name;
+        },
         async uploadarchivo(ci, oldFilename = null) {
             if (!this.archivoSeleccionado) return null; // nada que subir
             try {
@@ -5534,6 +5637,38 @@ export default {
                 }
             } catch (error) {
                 mostraralertas2('Error subiendo archivo', 'danger');
+                return null;
+            } finally {
+                this.uploading = false;
+            }
+        },
+        async uploadarpdfchivo(codPro, oldFilename = null) {
+            if (!this.archivopdfSeleccionado) return null; // nada que subir
+            try {
+                this.uploading = true;
+                const form = new FormData();
+                form.append('file', this.archivopdfSeleccionado);
+                form.append('codPro', codPro);
+                if (oldFilename) {
+                    form.append('old_filename', oldFilename); // Enviamos el nombre del archivo viejo
+                }
+
+                // Si tu backend exige otros campos (ej: tipo), añade aquí
+                const resp = await API.post(`${this.baseUrl}/subir_pdf_proyecto`, form, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                console.log(resp);
+                if (resp && resp.data && resp.data.filename) {
+                    this.archivopdfSeleccionado = null;
+                    this.archivopdfPreviewName = '';
+                    this.$refs.filePDF.value = null;
+                    return resp.data; // { filename, url }
+                } else {
+                    mostraralertas2('Error subiendo archivo', 'warning');
+                    return null;
+                }
+            } catch (error) {
+                mostraralertas2('Error subiendo archivo', 'warning');
                 return null;
             } finally {
                 this.uploading = false;
@@ -6306,7 +6441,13 @@ export default {
                 this.editForm.proyect_duracion_mes = 0;
             }
         },
-
+        cancelarNuevoPDF() {
+            this.archivopdfSeleccionado = null;
+            this.archivopdfPreviewName = '';
+            if (this.$refs.filePDF) {
+                this.$refs.filePDF.value = null;
+            }
+        },
         async abrirEdicion(id) {
             this.proyectoEditandoId = id;
             this.showEditModal = true;
@@ -6431,9 +6572,12 @@ export default {
                         };
                     });
                 }
+                const nombreArchivo = data.proyecto.proyect_archivo;
+                console.log(data.proyecto)
                 this.editForm = {
                     proyect_id: data.proyecto.proyect_id,
-                    proyect_nombre: data.proyecto.proyect_nombre || '',
+                    proyect_cod: data.proyecto.proyect_cod || '',
+                    proyect_nombre: data.proyecto.proyect_nombre,
                     proyect_titulo: data.proyecto.proyect_titulo || '',
                     proyect_nombre_en: data.proyecto.proyect_nombre_en || '',
                     proyect_titulo_en: data.proyecto.proyect_titulo_en || '',
@@ -6513,6 +6657,11 @@ export default {
                     proyect_empr_spin: data.proyecto.proyect_empr_spin || '',
                     difusion: difusionMapeada,
                     bibliografias: data.proyecto.invi_bibliografias ? [...data.proyecto.invi_bibliografias] : [],
+                    proyect_archivo: nombreArchivo || '',
+                    pdfurlarchivo: nombreArchivo
+                        ? `http://192.168.1.112:8082/Documentos/Vinculación/Evidencia_Proyect/${data.proyecto.proyect_cod}/${nombreArchivo}`
+                        : null
+
                 };
                 if (this.aniosProyecto.length > 0) {
                     this.anioSeleccionadoTab = this.aniosProyecto[0].id;
@@ -7368,7 +7517,26 @@ export default {
                     ...this.editForm,
                     empresas: this.empresasAgregadas.map(emp => emp.idempresa)
                 };
+                let uploadResp = null;
+                if (this.archivopdfSeleccionado){
+                    if(this.editForm.proyect_archivo){
 
+                        const archivoViejo = this.editForm.proyect_archivo;
+                        uploadResp = await this.uploadarpdfchivo(this.editForm.proyect_cod, archivoViejo);
+                        console.log(uploadResp);
+                        if (uploadResp && uploadResp.filename) {
+                                //Asignar el nombre del archivo a la variable certificado_matricula
+                            payload.proyect_archivo = uploadResp.filename;
+                        }
+                    }else{
+                        uploadResp = await this.uploadarpdfchivo(this.editForm.proyect_cod);
+                        console.log(uploadResp);
+                        if (uploadResp && uploadResp.filename) {
+                                //Asignar el nombre del archivo a la variable certificado_matricula
+                            payload.proyect_archivo = uploadResp.filename;
+                        }
+                    }
+                }
                 await API.put(`${this.baseUrl}/invi_proyectos/${this.proyectoEditandoId}`, payload);
 
                 mostraralertas2('Proyecto actualizado correctamente', 'success');
@@ -7390,6 +7558,7 @@ export default {
             this.asignaturasDisponibles = [];
             this.editForm = {
                 proyect_id: '',
+                proyect_cod: '',
                 proyect_nombre: '',
                 proyect_titulo: '',
                 proyect_nombre_en: '',
@@ -10484,7 +10653,7 @@ export default {
             }
         },
         async PDFAnexo1(id) {
-            this.botonCargando = 'anexo1_' + id;
+            this.botonCargando = 'anexo_1_' + id;
             try {
                 const idProyecto = id;
                 if (!idProyecto) {
@@ -10499,7 +10668,7 @@ export default {
                 const data = responseDatos.data;
                 const proy = data.proyecto || {};
 
-                // Limpiar caracteres extraños
+                // Helper para sanitizar caracteres especiales/corruptos
                 const sanitizarTexto = (str) => {
                     if (!str) return '';
                     return String(str)
@@ -10523,7 +10692,7 @@ export default {
                     return 6;
                 };
 
-                // Procesar Integrantes
+                // Autores / Integrantes
                 const integrantesRaw = data.integrantes_titulosactivos || data.integrantes_activos || [];
                 const integrantes = [...integrantesRaw].sort((a, b) => {
                     const funcA = a.funciones ? a.funciones.nombre_funcion : '';
@@ -10550,13 +10719,16 @@ export default {
                 }
                 directorProy = sanitizarTexto(directorProy);
 
-                // Variables de datos
+                // Mapeo de Facultades, Carreras y Líneas
                 const facultadTxt = sanitizarTexto(data.facultades_data?.map(f => f.facultad).join(', ') || 'N/A');
                 const carrerasTxt = sanitizarTexto(data.carreras_data?.map(c => c.NombCarr).join(', ') || 'N/A');
                 const lineaInvestigacion = sanitizarTexto(data.lineas_data?.map(l => l.nombre_lin).join(', ') || 'N/A');
+
+                // Títulos
                 const proyecttitulo = sanitizarTexto(proy.proyect_titulo || proy.proyect_nombre || 'N/A');
                 const proyectInvestigacion = sanitizarTexto(proy.proyect_investigacion || proy.proyecto_investigacion || 'Investigación Institucional');
 
+                // Autoridades
                 const directorCarrera = sanitizarTexto(
                     (data.carreras_data && data.carreras_data[0]?.director) 
                         ? data.carreras_data[0].director 
@@ -10590,7 +10762,7 @@ export default {
 
                 const fechaFormateada = formatearFecha(proy.proyect_fecha_pres) || `${new Date().getDate()} de septiembre de ${new Date().getFullYear()}`;
 
-                // === INICIO PDF ===
+                // Inicializar jsPDF
                 const doc = new jsPDF('p', 'mm', 'a4');
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
@@ -10608,80 +10780,74 @@ export default {
 
                 dibujarFondoBanner();
 
-                // Encabezados
+                // Títulos de Cabecera
                 let cursorY = 48;
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(11);
                 doc.text("ANEXO 1", pageWidth / 2, cursorY, { align: "center" });
                 cursorY += 6;
                 doc.text("CARTA DE AVAL DEL PROYECTO", pageWidth / 2, cursorY, { align: "center" });
-                cursorY += 12;
 
-                // Párrafos
+                // Construcción de los párrafos
                 const parrafo1 = `Como Director/Profesor(a) de la Facultad de ${facultadTxt} - ${carrerasTxt}, por medio de la presente, declaro conocer lo establecido en el Plan de Vinculación con la Sociedad 2020 - 2024 y Reglamento de Proyectos de Vinculación; desarrollado por la Dirección de Vinculación con la Sociedad de la UTLVTE en correspondencia con las exigencias de la Secretaría de Educación Superior, Ciencia, Tecnología e Innovación.`;
-                
+
                 const parrafo2 = `Así también, certifico que el proyecto de vinculación "${proyecttitulo}" de autoría de los ingenieros/docentes ${nombresAutores}, está sustentado en el proyecto de investigación "${proyectInvestigacion}" y la línea de investigación "${lineaInvestigacion}" y ha sido desarrollado bajo mi dirección y acompañamiento, y debidamente conciliado con los Decanos(as) y Directores(as) de Carrera Respectivos.`;
 
-                // ==========================================
-                // AUTO-TABLE PARA JUSTIFICADO PERFECTO
-                // ==========================================
-                autoTable({
-                    startY: cursorY,
-                    body: [
-                        [parrafo1],
-                        [parrafo2]
-                    ],
-                    theme: 'plain', // Sin bordes ni fondos
+                const despedida = `Saludo a Ud. atentamente,`;
+
+                // TABLA DE TEXTO JUSTIFICADO (Sin Bordes)
+                const tablaCuerpoCarta = [
+                    [{ content: parrafo1, styles: { halign: 'justify' } }],
+                    [{ content: parrafo2, styles: { halign: 'justify' } }],
+                    [{ content: despedida, styles: { halign: 'left' } }]
+                ];
+
+                autoTable(doc, {
+                    startY: cursorY + 8,
+                    margin: { left: 20, right: 20 },
+                    theme: 'plain', // Sin bordes
+                    body: tablaCuerpoCarta,
                     styles: {
-                        halign: 'justify', // El justificado mágico
-                        font: 'helvetica',
                         fontSize: 10,
-                        textColor: [0, 0, 0], // Texto negro
-                        cellPadding: { top: 3, right: 0, bottom: 4, left: 0 } // Separación entre los párrafos
-                    },
-                    margin: { left: 20, right: 20 }
+                        textColor: [0, 0, 0],
+                        font: 'helvetica',
+                        cellPadding: { top: 4, bottom: 4, left: 0, right: 0 }
+                    }
                 });
 
-                // Actualizar el cursor Y después de la tabla
-                cursorY = doc.lastAutoTable.finalY + 10;
+                // Posición actual dinámica después de la tabla de texto
+                let finalY = doc.lastAutoTable.finalY + 30;
 
-                // Despedida
-                doc.setFont("helvetica", "normal");
-                doc.text("Saludo a Ud. atentamente,", 20, cursorY);
-                cursorY += 25;
-
-                // ==========================================
-                // SECCIÓN DE FIRMAS
-                // ==========================================
+                // SECCIÓN DE FIRMAS Y PIE DE PÁGINA
                 doc.setFontSize(9.5);
 
                 // Firma Izquierda (Director de Proyecto)
                 doc.setFont("helvetica", "bold");
-                doc.text(directorProy, 55, cursorY, { align: "center" });
+                doc.text(directorProy, 55, finalY, { align: "center" });
                 doc.setFont("helvetica", "normal");
-                doc.text("Director(a) del Proyecto de Vinculación", 55, cursorY + 4, { align: "center" });
+                doc.text("Director(a) del Proyecto de Vinculación", 55, finalY + 4, { align: "center" });
 
                 // Firma Derecha (Director de Carrera)
                 doc.setFont("helvetica", "bold");
-                doc.text(directorCarrera, pageWidth - 55, cursorY, { align: "center" });
+                doc.text(directorCarrera, pageWidth - 55, finalY, { align: "center" });
                 doc.setFont("helvetica", "normal");
-                doc.text("Director(a) de la Carrera", pageWidth - 55, cursorY + 4, { align: "center" });
+                doc.text("Director(a) de la Carrera", pageWidth - 55, finalY + 4, { align: "center" });
 
-                cursorY += 25;
+                finalY += 30;
 
                 // Firma Inferior Central (Decano)
                 doc.setFont("helvetica", "bold");
-                doc.text(decanoFacultad, pageWidth / 2, cursorY, { align: "center" });
+                doc.text(decanoFacultad, pageWidth / 2, finalY, { align: "center" });
                 doc.setFont("helvetica", "normal");
-                doc.text("Decano(a) de la Facultad", pageWidth / 2, cursorY + 4, { align: "center" });
+                doc.text("Decano(a) de la Facultad", pageWidth / 2, finalY + 4, { align: "center" });
 
-                // Fecha final
-                cursorY += 15;
+                // Pie con Lugar y Fecha
+                finalY += 25;
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(10);
-                doc.text(`${provincia}, ${fechaFormateada}`, pageWidth / 2, cursorY, { align: "center" });
+                doc.text(`${provincia}, ${fechaFormateada}`, pageWidth / 2, finalY, { align: "center" });
 
-                // Guardar archivo
+                // Descargar PDF
                 const codigoProy = proy.proyect_cod || id;
                 doc.save(`Anexo_1_Carta_Aval_${codigoProy}.pdf`);
 
