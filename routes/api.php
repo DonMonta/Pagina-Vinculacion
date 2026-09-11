@@ -266,6 +266,7 @@ Route::prefix('vin')->group(function () {
          */
         // Registra de forma automática los endpoints CRUD para la API (index, store, show, update)
         Route::apiResource("invi_tipo_proyecto", Invi_tip_proyectController::class);
+        Route::post('subir_pdf_proyecto', [Invi_proyectosController::class, 'uploadPDFProyectArchivo']);
         Route::get('getDirectoresIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getDirectoresiNDProyectosVinculacion']);
         Route::get('getSubDirectoresIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getSubDireIndProyectosVinculacion']);
         Route::get('getDocentesIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getDocentesIndProyectosVinculacion']);

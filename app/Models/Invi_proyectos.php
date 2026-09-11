@@ -62,6 +62,7 @@ class Invi_proyectos extends Model
         'proyect_prototipos',
         'proyect_reg_propin',
         'proyect_empr_spin',
+        'proyect_archivo'
     ];
     public function invi_detalle_integrante()
     {

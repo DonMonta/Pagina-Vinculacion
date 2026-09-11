@@ -911,6 +911,7 @@ class Invi_proyectosController extends Controller
             $proyecto->proyect_prototipos = $request->proyect_prototipos;
             $proyecto->proyect_reg_propin = $request->proyect_reg_propin;
             $proyecto->proyect_empr_spin = $request->proyect_empr_spin;
+            $proyecto->proyect_archivo = $request->proyect_archivo;
 
             $proyecto->save();
 
@@ -3133,6 +3134,107 @@ class Invi_proyectosController extends Controller
                 'success' => false,
                 'error'   => 'Error al procesar los proyectos de vinculación.',
                 'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function uploadPDFProyectArchivo(Request $request)
+    {
+         $request->validate([
+            // 'mimetypes:application/pdf' obliga a que el CONTENIDO sea un PDF real
+            'file' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:51200',
+            'codPro'   => 'required|alpha_dash', // Solo letras, números, guiones
+            'old_filename' => 'nullable|string',
+        ]);
+
+        try {
+            // Sanitizar el código de proyecto para evitar que un hacker use "../" en el campo codPro
+            $codPro = basename($request->codPro);
+            $file = $request->file('file');
+
+            // 2. Verificar si el archivo es válido y no tiene errores de subida
+            if (!$file->isValid()) {
+                throw new \Exception("Archivo inválido o corrupto.");
+            }
+
+            // ELIMINAR ARCHIVO ANTERIOR (Solo si el nombre es válido)
+            if ($request->filled('old_filename')) {
+                $oldFilename = basename($request->old_filename); // Seguridad extra
+                $oldPath = public_path("Documentos/Vinculación/Evidencia_Proyect/{$codPro}/{$oldFilename}");
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
+            }
+
+
+            // Crear carpeta si no existe
+            $directory = public_path("Documentos/Vinculación/Evidencia_Proyect/{$codPro}");
+
+            if (!File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true, true);
+            }
+
+            $aleatorio = bin2hex(random_bytes(8));
+            $fechaHora = date("Ymd_His");
+            $extension = 'pdf'; // Forzamos la extensión fija
+
+            $filename = "{$codPro}_{$aleatorio}_{$fechaHora}.{$extension}";
+
+            // Guardar archivo
+            $file->move($directory, $filename);
+
+            // URL pública
+            $url = url("Documentos/Vinculación/Evidencia_Proyect/{$codPro}/{$filename}");
+
+            return response()->json([
+                'status'   => true,
+                'filename' => $filename,
+                'url'      => $url
+            ]);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status'  => false,
+                'message' => 'Seguridad: El archivo no pudo ser procesado.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function deletePDFProyectArchivo(Request $request)
+    {
+       // 1. Validar la entrada
+        $request->validate([ // Validar que los campos esten presentes
+            'filename' => 'required|string',
+            'codPro' => 'required|alpha_dash',
+        ]);
+        try {
+            // 2. Limpiar nombres para seguridad
+            $codPro = basename($request->codPro);
+            $filename = basename($request->filename);
+            // 3. Construir ruta absoluta
+            $filePath = public_path("Documentos/Vinculación/Evidencia_Proyect/{$codPro}/{$filename}");
+            // 4. Verificar y eliminar
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+                // Opcional: Eliminar la carpeta si queda vacía
+                $directory = dirname($filePath);
+                if (File::isDirectory($directory) && count(File::files($directory)) === 0) {
+                    File::deleteDirectory($directory);
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Archivo físico eliminado correctamente.'
+                ]);
+            }
+            return response()->json([
+                'status' => false,
+                'message' => 'El archivo no existe en el servidor.',
+                'path_debug' => $filePath // Opcional para debugear
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error al procesar la eliminación física.',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
