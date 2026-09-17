@@ -155,9 +155,25 @@
                 class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cerrar
               </button>
-              <button v-if="formIsValid" @click="registrar" type="button"
-                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Guardar Dominio Académico
+              <button v-if="formIsValid" @click="registrar" :disabled="uploading" type="button"
+                class="flex items-center gap-2 w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+
+                <!-- Span para el estado de carga (Spinner + Texto) -->
+                <span v-if="uploading" class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <span>Guardando...</span>
+                </span>
+
+                <!-- Span estado normal -->
+                <span v-else>
+                  Guardar
+                </span>
               </button>
             </div>
           </form>
@@ -208,9 +224,25 @@
                 class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cerrar
               </button>
-              <button v-if="formIsValidEdit" @click="Update" type="button"
-                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Guardar cambios
+              <button v-if="formIsValidEdit" @click="Update" :disabled="uploading" type="button"
+                class="flex items-center gap-2 w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+
+                <!-- Span para el estado de carga (Spinner + Texto) -->
+                <span v-if="uploading" class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <span>Actualizando...</span>
+                </span>
+
+                <!-- Span estado normal -->
+                <span v-else>
+                  Guardar cambios
+                </span>
               </button>
             </div>
           </form>
@@ -259,6 +291,7 @@ export default {
         id_dom_huma: 0,
         detalle_dom_huma: "",
       },
+      uploading: false,
       filteredarray: [],
       searchQuery: "",
       isProfileAddressModal: false,
@@ -353,8 +386,9 @@ export default {
     },
 
     async registrar() {
-
+      if (this.uploading) return;
       try {
+        this.uploading = true;
         const params = {
           detalle_dom_huma: this.objetoguardar.detalle_dom_huma
         };
@@ -369,10 +403,14 @@ export default {
         }
       } catch (error) {
         console.error("❌ Error al registrar DOMINIO ACADEMICO:", error.response?.data || error);
+      }finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
     async Update() {
+      if (this.uploading) return;
       try {
+        this.uploading = true;
         const params = {
           detalle_dom_huma: this.objetoeditar.detalle_dom_huma
         };
@@ -388,6 +426,8 @@ export default {
         }
       } catch (error) {
         console.error("❌ Error al registrar dom_huma:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
     limpiarFormulario() {

@@ -119,25 +119,47 @@
             <!-- Acciones de Edición y Eliminación -->
             <td class="py-3 text-right whitespace-nowrap">
               <div class="flex justify-end gap-2">
-                <button @click="abrirModalEdicion(post)"
+                <button @click="abrirModalEdicion(post)" :disabled="botonCargando === 'editar_' + post.id_pladne"
                   class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-if="botonCargando === 'editar_' + post.id_pladne" class="animate-spin h-5 w-5 text-amber-600"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
                 <button v-if="post.estado_plandne === 1 && post.objetivos_plandne_count > 0"
-                  @click="abrirModalPoliticas(post)"
+                  @click="abrirModalPoliticas(post)" :disabled="botonCargando === 'politicas_' + post.id_pladne"
                   class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors" title="Gestionar Políticas">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-if="botonCargando === 'politicas_' + post.id_pladne" class="animate-spin h-5 w-5 text-cyan-600"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10" />
                     <path d="M12 8l4 4-4 4M8 12h7" />
                   </svg>
                 </button>
-                <button v-if="post.estado_plandne === 1" @click="abrirModalObjPol(post)"
+                <button v-if="post.estado_plandne === 1" @click="abrirModalObjPol(post)" :disabled="botonCargando === 'objetivos_' + post.id_pladne"
                   class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                   title="Gestionar Objetivos">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-if="botonCargando === 'objetivos_' + post.id_pladne" class="animate-spin h-5 w-5 text-purple-600"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 3v18m9-9H3" />
                     <rect x="3" y="3" width="18" height="18" rx="2" />
                   </svg>
@@ -273,7 +295,8 @@
           </div>
 
           <div class="md:col-span-8 flex flex-col min-h-0">
-            <div class="overflow-y-auto border rounded-xl dark:border-gray-800 custom-scrollbar" style="max-height: 400px;">
+            <div class="overflow-y-auto border rounded-xl dark:border-gray-800 custom-scrollbar"
+              style="max-height: 400px;">
               <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                 <thead class="bg-gray-50 dark:bg-gray-800/50">
                   <tr>
@@ -501,9 +524,25 @@
                 class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cerrar
               </button>
-              <button v-if="formIsValid" @click="registrar" type="button"
-                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Guardar PLANDNE
+              <button v-if="formIsValid" @click="registrar" :disabled="uploading" type="button"
+                class="flex items-center gap-2 w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+
+                <!-- Span para el estado de carga (Spinner + Texto) -->
+                <span v-if="uploading" class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <span>Guardando...</span>
+                </span>
+
+                <!-- Span estado normal -->
+                <span v-else>
+                  Guardar
+                </span>
               </button>
             </div>
           </form>
@@ -600,9 +639,25 @@
                 class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cerrar
               </button>
-              <button v-if="formIsValidEdit" @click="Update" type="button"
-                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Guardar cambios
+              <button v-if="formIsValidEdit" @click="Update" :disabled="uploading" type="button"
+                class="flex items-center gap-2 w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+
+                <!-- Span para el estado de carga (Spinner + Texto) -->
+                <span v-if="uploading" class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <span>Actualizando...</span>
+                </span>
+
+                <!-- Span estado normal -->
+                <span v-else>
+                  Guardar cambios
+                </span>
               </button>
             </div>
           </form>
@@ -642,7 +697,7 @@ export default {
     return {
       idus: 0,
       baseUrl: "/vin",
-
+      botonCargando: null,
       usersarray: [],
       objetoguardar: {
         nombre_plandne: "",
@@ -731,16 +786,24 @@ export default {
   },
   methods: {
     async abrirModalPoliticas(pei) {
+      this.botonCargando = 'politicas_' + pei.id_pladne;
       this.selectedPLANDNE = pei;
-      this.cancelarEdicionPoliticas();
+      try{
+        this.cancelarEdicionPoliticas();
+  
+        // 1. Cargar subsistemas del PEI seleccionado para el Select
+        const respSub = await API.get(`${this.baseUrl}/obj_pol_plandne/${pei.id_pladne}`);
+        this.ListaObjetivosPol = respSub.data.data || [];
+  
+        // 2. Cargar objetivos (Tu backend debería filtrar objetivos por PEI a través de los subsistemas)
+        await this.getPoliticas();
+        this.isPoliticasModalOpen = true;
 
-      // 1. Cargar subsistemas del PEI seleccionado para el Select
-      const respSub = await API.get(`${this.baseUrl}/obj_pol_plandne/${pei.id_pladne}`);
-      this.ListaObjetivosPol = respSub.data.data || [];
-
-      // 2. Cargar objetivos (Tu backend debería filtrar objetivos por PEI a través de los subsistemas)
-      await this.getPoliticas();
-      this.isPoliticasModalOpen = true;
+      }catch(e){
+        console.log(e)
+      }finally{
+        this.botonCargando = null;
+      }
     },
 
     async guardarPoliticas() {
@@ -790,11 +853,19 @@ export default {
       }
     },
     async abrirModalObjPol(obj) {
-      this.selectedPLANDNE = obj;
-      this.ObjetivosPolForm.id_pladne = obj.id_pladne;
-      this.cancelarEdicionObjetivosPol(); // Limpia el form
-      await this.getObjPol();
-      this.isObjetivosPolModalOpen = true;
+      this.botonCargando = 'objetivos_' + obj.id_pladne;
+      try{
+        this.selectedPLANDNE = obj;
+        this.ObjetivosPolForm.id_pladne = obj.id_pladne;
+        this.cancelarEdicionObjetivosPol(); // Limpia el form
+        await this.getObjPol();
+        this.isObjetivosPolModalOpen = true;
+      }catch(e){
+        console.log(e)
+      }finally{
+        this.botonCargando = null;
+      }
+     
     },
     async getPoliticas() {
       try {
@@ -874,14 +945,21 @@ export default {
     },
     abrirModalEdicion(user) {
       // Clonamos el objeto para no modificar la tabla directamente antes de guardar
-      this.objetoeditar = {
-        id_pladne: user.id_pladne,
-        nombre_plandne: user.nombre_plandne,
-        anio_plandne: user.anio_plandne,
-        estado_plandne: user.estado_plandne,
-        link_plandne: user.link_plandne
-      };
-      this.$.setupState.isEditModalOpen = true;
+      this.botonCargando = 'editar_' + user.id_pei;
+      try {
+        this.objetoeditar = {
+          id_pladne: user.id_pladne,
+          nombre_plandne: user.nombre_plandne,
+          anio_plandne: user.anio_plandne,
+          estado_plandne: user.estado_plandne,
+          link_plandne: user.link_plandne
+        };
+        this.$.setupState.isEditModalOpen = true;
+      } catch (e) {
+        console.log(e)
+      } finally {
+        this.botonCargando = null;
+      }
     },
     async GetData(page = 1, searchQuery = "") {
       this.cargando = true;
@@ -931,8 +1009,9 @@ export default {
     },
 
     async registrar() {
-
+      if (this.uploading) return;
       try {
+        this.uploading = true;
         const params = {
           nombre_plandne: this.objetoguardar.nombre_plandne,
           anio_plandne: this.objetoguardar.anio_plandne,
@@ -950,10 +1029,14 @@ export default {
         }
       } catch (error) {
         console.error("❌ Error al registrar PLANDNE:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
     async Update() {
+      if (this.uploading) return;
       try {
+        this.uploading = true;
         const params = {
           nombre_plandne: this.objetoeditar.nombre_plandne,
           anio_plandne: this.objetoeditar.anio_plandne,
@@ -972,6 +1055,8 @@ export default {
         }
       } catch (error) {
         console.error("❌ Error al registrar plandne:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
     limpiarFormulario() {

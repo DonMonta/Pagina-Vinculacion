@@ -47,6 +47,9 @@
             <th class="py-5 px-4 text-left">
               <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Estado</p>
             </th>
+            <th class="py-5 px-4 text-center">
+              <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Evidencia</p>
+            </th>
             <th class="py-5 px-4 text-right">
               <p class="font-semibold text-gray-500 text-sm dark:text-gray-400">Acciones</p>
             </th>
@@ -73,7 +76,12 @@
                 <img :src="getPhotoUrl(post.ciinfper_doc)" alt="Foto"
                   class="w-10 h-10 rounded-full object-cover border border-gray-200"
                   @error="(e) => e.target.src = '/default-avatar.png'" />
-                <div>
+                <div v-if="post.ciinfper_doc === cedulalogin">
+                  <p class="font-bold text-gray-800 text-sm dark:text-white/90">
+                    Yo
+                  </p>
+                </div>
+                <div v-else>
                   <p class="font-bold text-gray-800 text-sm dark:text-white/90">
                     {{ post.NombInfPer }} {{ post.ApellInfPer }} {{ post.ApellMatInfPer }}
                   </p>
@@ -95,7 +103,21 @@
                 {{ post.estado_equipo_dep === 1 ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
-
+            <td class="p-3 text-center">
+              <div v-if="post.evidencia_arch" class="flex justify-center">
+                <a :href="`http://192.168.1.112:8082/Documentos/Vinculación/EquipoVincula/${post.ciinfper_doc}/${post.evidencia_arch}`"
+                  target="_blank"
+                  class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                  title="Ver documento PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    <path d="M9 15h6M9 11h6" />
+                  </svg>
+                </a>
+              </div>
+              <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
+            </td>
             <td class="py-4 text-right whitespace-nowrap align-top">
               <div class="flex justify-end gap-2">
                 <button @click="abrirModalDetalles(post)"
@@ -108,8 +130,17 @@
                   </svg>
                 </button>
                 <button @click="abrirModalEdicion(post)"
+                  :disabled="botonCargando === 'editar_' + post.id_equipo_depart"
                   class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-if="botonCargando === 'editar_' + post.id_equipo_depart" class="animate-spin h-5 w-5 text-blue-600"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
@@ -223,7 +254,7 @@
                 class="w-16 h-16 rounded-full border-2 border-white shadow-sm object-cover"
                 @error="(e) => e.target.src = '/default-avatar.png'" />
               <div>
-                <p class="text-xs text-brand-600 font-bold uppercase tracking-wide">Docente Seleccionado</p>
+                <p class="text-xs text-brand-600 font-bold uppercase tracking-wide">Personal Seleccionado</p>
                 <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ docenteEncontrado.NombInfPer }} {{
                   docenteEncontrado.ApellInfPer }} {{ docenteEncontrado.ApellMatInfPer }}</h4>
                 <p class="text-sm text-gray-500">C.I: {{ docenteEncontrado.CIInfPer }}</p>
@@ -253,7 +284,48 @@
                       </svg>
                     </div>
                   </div>
+                  
                 </label>
+              </div>
+              <div v-if="isEditModalOpen && !archivoSeleccionado" class="mt-4 col-span-1 lg:col-span-2">
+                <label class="block text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">Documento de respaldo
+                  Actual:</label>
+                <div
+                  class="w-full h-[400px] border border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden bg-gray-50">
+                  <iframe :src="objetoeditar.ad_archivo_url" class="w-full h-full border-0"></iframe>
+                </div>
+                <div class="mt-2 text-right">
+                  <a :href="objetoeditar.ad_archivo_url" target="_blank"
+                    class="text-sm text-brand-600 hover:underline">Abrir en nueva pestaña</a>
+                </div>
+              </div>
+              <label class="block text-[10px] font-bold mb-1">{{ isEditModalOpen ? 'Subir un nuevo documento para reemplazar el actual (PDF)' :
+                    'Documento de respaldo (PDF)' }}</label>
+              <div @click="$refs.fileFoto.click()"
+                class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
+                :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                  <svg v-if="!archivoPreviewName" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                    <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                  </svg>
+
+                  <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="font-semibold" v-if="!archivoPreviewName">Haga clic para
+                      cargar</span>
+                    <span class="font-semibold text-brand-600" v-else>{{ archivoPreviewName
+                    }}</span>
+                  </p>
+                  <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx. 10MB)</p>
+                </div>
+
+                <input type="file" ref="fileFoto" class="hidden" accept="application/pdf" @change="handleFileChange" />
               </div>
             </div>
 
@@ -261,9 +333,24 @@
               <button @click="cerrarModalGeneral" type="button"
                 class="w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto">Cancelar</button>
               <button v-if="docenteEncontrado && formularioRolesID" @click="isEditModalOpen ? Update() : registrar()"
-                type="button"
+                type="button" :disabled="uploading"
                 class="w-full rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-brand-700 sm:w-auto">
-                {{ isEditModalOpen ? 'Guardar Cambios' : 'Asignar Rol' }}
+                <span v-if="uploading" class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <span>{{ isEditModalOpen ? 'Actualizando....' : 'Guardando...' }}</span>
+                </span>
+
+                <!-- Span estado normal -->
+                <span v-else>
+                  {{ isEditModalOpen ? 'Guardar Cambios' : 'Asignar Rol' }}
+                </span>
+                
               </button>
             </div>
           </form>
@@ -298,13 +385,15 @@ import { useRoute } from "vue-router";
 import debounce from 'lodash.debounce';
 import Modal from '@/components/Modal/Modal.vue'
 import { mostraralertas2, enviarsolig, eliminacion, confimarhabi, elimnarpermanente } from '@/assets/js/function/funciones';
+import { useUsuario } from "@/composables/useUsuario";
+import { use } from 'apexcharts';
 
 export default {
   data() {
     return {
       idus: 0,
       baseUrl: "/vin",
-
+      botonCargando: null,
       usersarray: [],
       objetoguardar: {
         ciinfper_doc: "",
@@ -315,7 +404,8 @@ export default {
         id_equipo_depart: 0,
         ciinfper_doc: "",
         id_equipo_roles: "",
-        estado_equipo_dep: 0
+        estado_equipo_dep: 0,
+        ad_archivo_url: null
       },
       filteredarray: [],
       searchQuery: "",
@@ -336,6 +426,10 @@ export default {
       // Modal Nativo de Detalles
       showDetallesModal: false,
       rolDetalleSeleccionado: {},
+      cedulalogin: "",
+      archivoSeleccionado: null,
+      archivoPreviewName: '',
+      uploading: false,
     };
   },
   created() {
@@ -346,6 +440,9 @@ export default {
   },
   async mounted() {
     this.GetData(1, this.searchQuery);
+    const { idUsuario} = useUsuario();
+    
+    this.cedulalogin = idUsuario.value;
     this.cargarRoles();
 
   },
@@ -370,6 +467,67 @@ export default {
 
   },
   methods: {
+    handleFileChange(event) {
+      //Obtener el archivo seleccionado por el usuario
+      const file = event.target.files[0];
+      //Validar que el archivo seleccionado sea un archivo PDF, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+      if (!file) return;
+      // validación básica: pdf y tamaño si quieres
+      if (file.type !== 'application/pdf') {
+        //Mostrar una alerta de advertencia si el archivo seleccionado no es un archivo PDF, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+        mostraralertas2('Solo se permiten archivos PDF', 'warning');
+        //Limpiar el archivo seleccionado
+        this.$refs.fileFoto.value = null;
+        //Devolver sin hacer nada más
+        return;
+      }
+      //Validar que el tamaño del archivo no exceda el límite de 10 MB, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+      const maxMB = 10;
+      //Si el tamaño del archivo es mayor que el límite de 10 MB, se muestra una alerta y se limpia el archivo seleccionado
+      if (file.size > maxMB * 1024 * 1024) {
+        //Mostrar una alerta de advertencia si el tamaño del archivo es mayor que el límite de 10 MB, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+        mostraralertas2(`Archivo muy grande. Máx ${maxMB} MB`, 'warning');
+        //Limpiar el archivo seleccionado
+        this.$refs.fileFoto.value = null;
+        //Devolver sin hacer nada más
+        return;
+      }
+      //Asignar el archivo seleccionado a la variable archivoSeleccionado
+      this.archivoSeleccionado = file;
+      //Asignar el nombre del archivo seleccionado a la variable archivoPreviewName
+      this.archivoPreviewName = file.name;
+    },
+    async uploadarchivo(ci, oldFilename = null) {
+      if (!this.archivoSeleccionado) return null; // nada que subir
+      try {
+        this.uploading = true;
+        const form = new FormData();
+        form.append('file', this.archivoSeleccionado);
+        form.append('ci', ci);
+        if (oldFilename) {
+          form.append('old_filename', oldFilename); // Enviamos el nombre del archivo viejo
+        }
+
+        // Si tu backend exige otros campos (ej: tipo), añade aquí
+        const resp = await API.post(`${this.baseUrl}/subir_archivo_quipovincu`, form, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        if (resp && resp.data && resp.data.filename) {
+          this.archivoSeleccionado = null;
+          this.archivoPreviewName = '';
+          this.$refs.fileFoto.value = null;
+          return resp.data; // { filename, url }
+        } else {
+          mostraralertas2('Error subiendo archivo', 'danger');
+          return null;
+        }
+      } catch (error) {
+        mostraralertas2('Error subiendo archivo', 'danger');
+        return null;
+      } finally {
+        this.uploading = false;
+      }
+    },
     formatFunciones(texto) {
       if (!texto) return [];
       // Dividimos por salto de línea y limpiamos espacios o guiones iniciales
@@ -384,19 +542,30 @@ export default {
       this.cedulaFormulario = e.target.value.replace(/\D/g, '').slice(0, 10);
     },
     async abrirModalEdicion(user) {
-      this.limpiarFormulario();
-      this.idEquipoDepartEdit = user.id_equipo_depart; // Asignamos el ID
-      this.cedulaFormulario = user.ciinfper_doc;
+      this.botonCargando = 'editar_' + user.id_equipo_depart;
+      try{
+        this.limpiarFormulario();
+        this.idEquipoDepartEdit = user.id_equipo_depart; // Asignamos el ID
+        this.cedulaFormulario = user.ciinfper_doc;
+        this.objetoeditar = {
+          evidencia_arch: user.evidencia_arch,
+          ad_archivo_url: user.ad_archivo_url
+        };
+        // IMPORTANTE: Primero cargamos los roles con el ID a excluir
+        await this.cargarRoles();
+  
+        // Luego buscamos al docente
+        await this.buscarDocenteAPI();
+  
+        // Finalmente asignamos el rol
+        this.formularioRolesID = user.id_equipo_roles;
+        this.$.setupState.isEditModalOpen = true;
 
-      // IMPORTANTE: Primero cargamos los roles con el ID a excluir
-      await this.cargarRoles();
-
-      // Luego buscamos al docente
-      await this.buscarDocenteAPI();
-
-      // Finalmente asignamos el rol
-      this.formularioRolesID = user.id_equipo_roles;
-      this.$.setupState.isEditModalOpen = true;
+      }catch(e){
+        console.log(e)
+      }finally{
+        this.botonCargando = null;
+      }
     },
     cerrarModalGeneral() {
       this.$.setupState.isProfileAddressModal = false;
@@ -408,6 +577,21 @@ export default {
       this.docenteEncontrado = null;
       this.formularioRolesID = null;
       this.idEquipoDepartEdit = 0;
+      this.objetoguardar = {
+        nombre_pei: "",
+        anios_pei: "",
+        estado_pei: 0
+      };
+      this.objetoeditar = {
+        id_pei: 0,
+        nombre_pei: "",
+        anios_pei: "",
+        estado_pei: 0,
+        ad_archivo_url: null
+      };
+      this.archivoSeleccionado = null;
+      this.archivoPreviewName = '';
+      this.archivoActualNombre = '';
     },
     getPhotoUrl(ci) {
       // Si no hay CI, retornamos una imagen vacía o un placeholder
@@ -451,7 +635,15 @@ export default {
         const response = await API.get(`${this.baseUrl}/invi_equipo_depart`, { params });
 
         const data = response.data?.data || [];
-        this.filteredarray = data;
+         this.filteredarray = data.map(item => {
+          const cedula = item.ciinfper_doc.replace(/[/\\ ]/g, '_');
+          return {
+            ...item,
+            ad_archivo_url: item.evidencia_arch
+              ? `http://192.168.1.112:8082/Documentos/Vinculación/EquipoVincula/${cedula}/${item.evidencia_arch}`
+              : null
+          };
+        });
         const pagination = response.data?.pagination || {};
         this.currentPage = pagination.current_page || 1;
         this.lastPage = pagination.last_page || 1;
@@ -488,9 +680,23 @@ export default {
     },
 
     async registrar() {
-
+      if (this.uploading) return;
       try {
-        const params = { ciinfper_doc: this.cedulaFormulario, id_equipo_roles: this.formularioRolesID, estado_equipo_dep: 1 };
+        this.uploading = true;
+        let nombreArchivoSubido = null;
+        if (this.archivoSeleccionado) {
+          const resultadoSubida = await this.uploadarchivo(this.cedulaFormulario);
+
+          // Si falló el upload (mostró alerta internamente), cortamos el flujo para corregir
+          if (!resultadoSubida || !resultadoSubida.filename) {
+            return;
+          }
+
+          nombreArchivoSubido = resultadoSubida.filename;
+        }
+        const params = { ciinfper_doc: this.cedulaFormulario, id_equipo_roles: this.formularioRolesID, estado_equipo_dep: 1,
+          evidencia_arch: nombreArchivoSubido
+         };
         const exito = await enviarsolig('POST', params, `${this.baseUrl}/invi_equipo_depart`, 'Asignación registrada éxito');
         if (exito) {
           this.$.setupState.isProfileAddressModal = false;
@@ -502,11 +708,28 @@ export default {
         const mensajeError = error.response?.data?.mensaje || "No se pudo registrar el Rol al equipo de Vinculación";
         mostraralertas2(mensajeError, "error");
         console.error("❌ Error al registrar Rol:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
     async Update() {
+      if (this.uploading) return;
       try {
-        const params = { ciinfper_doc: this.cedulaFormulario, id_equipo_roles: this.formularioRolesID, estado_equipo_dep: 1 };
+        this.uploading = true;
+        let nombreArchivoSubido = this.archivoActualNombre;
+        if (this.archivoSeleccionado) {
+          // Pasamos la cédula y el nombre viejo para que Laravel limpie el disco público automáticamente
+          const resultadoSubida = await this.uploadarchivo(this.cedulaFormulario, this.archivoActualNombre);
+
+          if (!resultadoSubida || !resultadoSubida.filename) {
+            return;
+          }
+
+          nombreArchivoSubido = resultadoSubida.filename;
+        }
+        const params = { ciinfper_doc: this.cedulaFormulario, id_equipo_roles: this.formularioRolesID, estado_equipo_dep: 1,
+          evidencia_arch: nombreArchivoSubido
+         };
         const exito = await enviarsolig('PUT', params, `${this.baseUrl}/invi_equipo_depart/${this.idEquipoDepartEdit}`, 'Asignación actualizada con éxito');
         if (exito) {
           this.$.setupState.isEditModalOpen = false;
@@ -518,9 +741,10 @@ export default {
         const mensajeError = error.response?.data?.mensaje || "No se pudo editar el Rol al equipo de Vinculación";
         mostraralertas2(mensajeError, "error");
         console.error("❌ Error al editar Rol:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
-
     eliminar(id, nombre) {
       try {
         eliminacion(

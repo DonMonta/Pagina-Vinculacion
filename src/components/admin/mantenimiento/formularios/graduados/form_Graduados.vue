@@ -589,7 +589,7 @@
                     Nombre del Formulario
                   </label>
                   <input type="text" v-model="objetoguardar.NOMBRE"
-                    placeholder="Ej: Formulario de Inscripción a Ayudantes de Cátedra IS-2026"
+                    placeholder="Ej: Encuesta Graduados IS-2026"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
                   <p class="mt-1.5 text-xs text-gray-500">Use un nombre descriptivo y el periodo actual.</p>
                 </div>
@@ -604,9 +604,7 @@
                   <select v-model="objetoguardar.tipoencuesta"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90 truncate pr-10 cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
                     <option value="" selected>Seleccione...</option>
-                    <option value="Inscripción a Ayudantes de Cátedra">Inscripción a Ayudantes de Cátedra</option>
-                    <option value="Examen de Admisión a Ayudantes de Cátedra">Examen de Admisión a Ayudantes de Cátedra
-                    </option>
+                    <option value="Graduados">Graduados</option>
                   </select>
 
                   <span
@@ -666,7 +664,7 @@
                     Nombre del Formulario
                   </label>
                   <input type="text" v-model="objetoeditar.NOMBRE"
-                    placeholder="Ej: Formulario de Inscripción a Ayudantes de Cátedra IS-2026"
+                    placeholder="Ej: Encuesta Graduados IS-2026"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90" />
                   <p class="mt-1.5 text-xs text-gray-500">Use un nombre descriptivo y el periodo actual.</p>
                 </div>
@@ -678,9 +676,7 @@
                   <select v-model="objetoeditar.tipoencuesta"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90 truncate pr-10 cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
                     <option value="" selected>Seleccione...</option>
-                    <option value="Inscripción a Ayudantes de Cátedra">Inscripción a Ayudantes de Cátedra</option>
-                    <option value="Examen de Admisión a Ayudantes de Cátedra">Examen de Admisión a Ayudantes de Cátedra
-                    </option>
+                    <option value="Graduados">Graduados</option>
                   </select>
                   <span
                     class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400">
@@ -988,7 +984,6 @@ export default {
     async cargarListaDePeriodos() {
       try {
         const response = await API.get(`${this.baseUrl}/getPeriodosLectivos?all=true`);
-        console.log("Lista de periodos obtenida:", response)
         this.listaPeriodos = response.data.data;
       } catch (error) {
         console.error("Error recuperando catálogo de periodos", error);
@@ -1028,7 +1023,6 @@ export default {
     async abrirDetalleRespuestas(cedula) {
       try {
         const response = await API.get(`${this.baseUrl}/getDetalleRespuestasGraduados/${this.formularioSeleccionado.ID}/${cedula}`);
-        console.log("Detalle de respuestas del alumno:", response);
         this.detalleAlumno = response.data;
         // 1. Verificar de forma dinámica si esta tabla de respuestas contiene puntajes ("valor" !== null)
         this.esEvaluacionDetalle = this.detalleAlumno.respuestas.some(item => item.valor !== null);

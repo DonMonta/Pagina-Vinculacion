@@ -96,17 +96,32 @@
             </td>
             <td class="py-3 text-right whitespace-nowrap">
               <div class="flex justify-end gap-2">
-                <button @click="abrirModalEdicion(post)"
+                <button @click="abrirModalEdicion(post)" :disabled="botonCargando === 'editar_' + post.id_lin_investiga"
                   class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-if="botonCargando === 'editar_' + post.id_lin_investiga" class="animate-spin h-5 w-5 text-amber-600"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
                 <button v-if="post.estado_lin_investiga === 1 && post.facultades_count > 0"
-                  @click="abrirModalsubsistemas(post)"
+                  @click="abrirModalsublineas(post)" :disabled="botonCargando === 'sublineas_' + post.id_lin_investiga"
                   class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors" title="Gestionar Sub-lineas">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-if="botonCargando === 'sublineas_' + post.id_lin_investiga" class="animate-spin h-5 w-5 text-cyan-600"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10" />
                     <path d="M12 8l4 4-4 4M8 12h7" />
                   </svg>
@@ -353,7 +368,7 @@
             </p>
           </div>
           <form class="flex flex-col">
-            <div class="px-2 overflow-y-auto custom-scrollbar">
+            <div class="px-2 overflow-y-auto custom-scrollbar max-h-[60vh]">
               <div class="mt-5">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -426,9 +441,25 @@
                 class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cerrar
               </button>
-              <button v-if="formIsValid" @click="registrar" type="button"
-                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Guardar Linea de Investigación
+              <button v-if="formIsValid" @click="registrar" :disabled="uploading" type="button"
+                class="flex items-center gap-2 w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+
+                <!-- Span para el estado de carga (Spinner + Texto) -->
+                <span v-if="uploading" class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <span>Guardando...</span>
+                </span>
+
+                <!-- Span estado normal -->
+                <span v-else>
+                  Guardar
+                </span>
               </button>
             </div>
           </form>
@@ -460,7 +491,7 @@
             </p>
           </div>
           <form class="flex flex-col">
-            <div class="px-2 overflow-y-auto custom-scrollbar">
+            <div class="px-2 overflow-y-auto custom-scrollbar max-h-[60vh]">
               <div class="mt-5">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -534,9 +565,25 @@
                 class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cerrar
               </button>
-              <button v-if="formIsValidEdit" @click="Update" type="button"
-                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Guardar cambios
+              <button v-if="formIsValidEdit" @click="Update" :disabled="uploading" type="button"
+                class="flex items-center gap-2 w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+
+                <!-- Span para el estado de carga (Spinner + Texto) -->
+                <span v-if="uploading" class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <span>Actualizando...</span>
+                </span>
+
+                <!-- Span estado normal -->
+                <span v-else>
+                  Guardar cambios
+                </span>
               </button>
             </div>
           </form>
@@ -576,13 +623,14 @@ export default {
     return {
       idus: 0,
       baseUrl: "/vin",
-
+      botonCargando: null,
       usersarray: [],
       objetoguardar: {
         idfacultad: "",
         nombre_lin: "",
         estado_lin_investiga: 0,
       },
+      uploading: false,
       objetoeditar: {
         id_lin_investiga: 0,
         idfacultad: "",
@@ -676,22 +724,38 @@ export default {
     },
     abrirModalEdicion(user) {
       // Clonamos el objeto para no modificar la tabla directamente antes de guardar
-      this.objetoeditar = {
-        id_lin_investiga: user.id_lin_investiga,
-        idfacultad: user.idfacultad,
-        nombre_lin: user.nombre_lin,
-        estado_lin_investiga: user.estado_lin_investiga
-      };
-      this.$.setupState.isEditModalOpen = true;
+      this.botonCargando = 'editar_' + user.id_lin_investiga;
+      try{
+        this.objetoeditar = {
+          id_lin_investiga: user.id_lin_investiga,
+          idfacultad: user.idfacultad,
+          nombre_lin: user.nombre_lin,
+          estado_lin_investiga: user.estado_lin_investiga
+        };
+        this.$.setupState.isEditModalOpen = true;
+      }catch(e){
+        console.log(e)
+      }finally{
+        this.botonCargando = null;
+      }
+      
     },
-    async abrirModalsubsistemas(post) {
-      this.lineaSeleccionada = post;
-      this.cancelarEdicionSublinea(); // Limpia formulario
-      this.isSublineasModalOpen = true;
-      this.sublineasList = []; // Limpia sub-líneas anteriores
-      this.carrerasList = []; // Limpia carreras anteriores
-      await this.cargarCarrerasDeFacultad(post.idfacultad);
-      await this.cargarSublineas(post.id_lin_investiga);
+    async abrirModalsublineas(post) {
+      this.botonCargando = 'sublineas_' + post.id_lin_investiga;
+      try{
+        this.lineaSeleccionada = post;
+        this.cancelarEdicionSublinea(); // Limpia formulario
+        this.isSublineasModalOpen = true;
+        this.sublineasList = []; // Limpia sub-líneas anteriores
+        this.carrerasList = []; // Limpia carreras anteriores
+        await this.cargarCarrerasDeFacultad(post.idfacultad);
+        await this.cargarSublineas(post.id_lin_investiga);
+      }catch(e){
+        console.log(e)
+      }finally{
+        this.botonCargando = null;
+      }
+      
     },
     async GetData(page = 1, searchQuery = "") {
       this.cargando = true;
@@ -826,8 +890,9 @@ export default {
     },
 
     async registrar() {
-
+      if (this.uploading) return;
       try {
+        this.uploading = true;
         const params = {
           nombre_lin: this.objetoguardar.nombre_lin,
           idfacultad: this.objetoguardar.idfacultad,
@@ -844,10 +909,14 @@ export default {
         }
       } catch (error) {
         console.error("❌ Error al registrar Línea de Investigación:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
     async Update() {
+      if (this.uploading) return;
       try {
+        this.uploading = true;
         const params = {
           nombre_lin: this.objetoeditar.nombre_lin,
           idfacultad: this.objetoeditar.idfacultad,
@@ -865,6 +934,8 @@ export default {
         }
       } catch (error) {
         console.error("❌ Error al actualizar la Línea de Investigación:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
     limpiarFormulario() {

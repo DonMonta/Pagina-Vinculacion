@@ -101,7 +101,7 @@
             </td>
             <td class="p-3 text-center">
               <div v-if="post.evidencia_arch" class="flex justify-center">
-                <a :href="`http://vinculacionbackend.test/Documentos/Vinculación/AnexoResponsable/${post.ciinfper_doc}/${post.evidencia_arch}`"
+                <a :href="`http://192.168.1.112:8082/Documentos/Vinculación/AnexoResponsable/${post.ciinfper_doc}/${post.evidencia_arch}`"
                   target="_blank"
                   class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
                   title="Ver documento PDF">
@@ -118,8 +118,17 @@
             <td class="py-4 text-right whitespace-nowrap align-top">
               <div class="flex justify-end gap-2">
                 <button @click="abrirModalEdicion(post)"
+                  :disabled="botonCargando === 'editar_' + post.id_responsable"
                   class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-if="botonCargando === 'editar_' + post.id_responsable" class="animate-spin h-5 w-5 text-blue-600"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
@@ -241,7 +250,20 @@
                   </div>
                 </label>
               </div>
-              <label class="block text-[10px] font-bold mb-1">Documento Respaldo (PDF)</label>
+              <div v-if="isEditModalOpen && !archivoSeleccionado" class="mt-4 col-span-1 lg:col-span-2">
+                <label class="block text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">Documento de respaldo
+                  Actual:</label>
+                <div
+                  class="w-full h-[400px] border border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden bg-gray-50">
+                  <iframe :src="objetoeditar.ad_archivo_url" class="w-full h-full border-0"></iframe>
+                </div>
+                <div class="mt-2 text-right">
+                  <a :href="objetoeditar.ad_archivo_url" target="_blank"
+                    class="text-sm text-brand-600 hover:underline">Abrir en nueva pestaña</a>
+                </div>
+              </div>
+              <label class="block text-[10px] font-bold mb-1">{{ isEditModalOpen ? 'Subir un nuevo documento para reemplazar el actual (PDF)' :
+                    'Documento de respaldo (PDF)' }}</label>
               <div @click="$refs.fileFoto.click()"
                 class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
                 :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
@@ -275,9 +297,23 @@
               <button @click="cerrarModalGeneral" type="button"
                 class="w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto">Cancelar</button>
               <button v-if="docenteEncontrado && formularioFacultadesID"
-                @click="isEditModalOpen ? Update() : registrar()" type="button"
+                @click="isEditModalOpen ? Update() : registrar()" type="button" :disabled="uploading"
                 class="w-full rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-brand-700 sm:w-auto">
-                {{ isEditModalOpen ? 'Guardar Cambios' : 'Asignar Responsable' }}
+                <span v-if="uploading" class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <span>{{ isEditModalOpen ? 'Guardando....' : 'Actualizando...' }}</span>
+                </span>
+
+                <!-- Span estado normal -->
+                <span v-else>
+                  {{ isEditModalOpen ? 'Guardar Cambios' : 'Asignar Rol' }}
+                </span>
               </button>
             </div>
           </form>
@@ -329,7 +365,8 @@ export default {
         id_responsable: 0,
         ciinfper_doc: "",
         idfacultad: "",
-        estado_responsable: 0
+        estado_responsable: 0,
+        ad_archivo_url: null
       },
       filteredarray: [],
       searchQuery: "",
@@ -346,7 +383,7 @@ export default {
       facultadesDisponibles: [],
       formularioFacultadesID: null,
       idEquipoDepartEdit: 0,
-
+      botonCargando: null,
       // Modal Nativo de Detalles
       showDetallesModal: false,
       archivoSeleccionado: null,
@@ -457,19 +494,31 @@ export default {
       this.cedulaFormulario = e.target.value.replace(/\D/g, '').slice(0, 10);
     },
     async abrirModalEdicion(user) {
-      this.limpiarFormulario();
-      this.idEquipoDepartEdit = user.id_responsable; // Asignamos el ID
-      this.cedulaFormulario = user.ciinfper_doc;
+      this.botonCargando = 'editar_' + user.id_responsable;
+      try{
+        this.limpiarFormulario();
+        this.idEquipoDepartEdit = user.id_responsable; // Asignamos el ID
+        this.cedulaFormulario = user.ciinfper_doc;
+        this.objetoeditar = {
+          evidencia_arch: user.evidencia_arch,
+          ad_archivo_url: user.ad_archivo_url
+        };
 
-      // IMPORTANTE: Primero cargamos los roles con el ID a excluir
-      await this.cargarFacultades();
+        // IMPORTANTE: Primero cargamos los roles con el ID a excluir
+        await this.cargarFacultades();
 
-      // Luego buscamos al docente
-      await this.buscarDocenteAPI();
+        // Luego buscamos al docente
+        await this.buscarDocenteAPI();
 
-      // Finalmente asignamos el rol
-      this.formularioFacultadesID = user.idfacultad;
-      this.$.setupState.isEditModalOpen = true;
+        // Finalmente asignamos el rol
+        this.formularioFacultadesID = user.idfacultad;
+        this.$.setupState.isEditModalOpen = true;
+      }catch(e){
+        console.log(e)
+      }finally{
+        this.botonCargando = null;
+      }
+     
     },
     cerrarModalGeneral() {
       this.$.setupState.isProfileAddressModal = false;
@@ -481,6 +530,9 @@ export default {
       this.docenteEncontrado = null;
       this.formularioFacultadesID = null;
       this.idEquipoDepartEdit = 0;
+      this.archivoSeleccionado = null;
+      this.archivoPreviewName = '';
+      this.archivoActualNombre = '';
     },
     getPhotoUrl(ci) {
       // Si no hay CI, retornamos una imagen vacía o un placeholder
@@ -524,7 +576,15 @@ export default {
         const response = await API.get(`${this.baseUrl}/invi_responsable`, { params });
 
         const data = response.data?.data || [];
-        this.filteredarray = data;
+        this.filteredarray = data.map(item => {
+          const cedula = item.ciinfper_doc.replace(/[/\\ ]/g, '_');
+          return {
+            ...item,
+            ad_archivo_url: item.evidencia_arch
+              ? `http://192.168.1.112:8082/Documentos/Vinculación/AnexoResponsable/${cedula}/${item.evidencia_arch}`
+              : null
+          };
+        });
         const pagination = response.data?.pagination || {};
         this.currentPage = pagination.current_page || 1;
         this.lastPage = pagination.last_page || 1;
@@ -561,8 +621,9 @@ export default {
     },
 
     async registrar() {
-
+      if (this.uploading) return;
       try {
+         this.uploading = true;
         // 1. Inicializar la variable del anexo como vacía por defecto
         let nombreArchivoSubido = null;
 
@@ -595,10 +656,14 @@ export default {
         const mensajeError = error.response?.data?.mensaje || "No se pudo registrar el Rol al equipo de Vinculación";
         mostraralertas2(mensajeError, "error");
         console.error("❌ Error al registrar Rol:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
     async Update() {
+      if (this.uploading) return;
       try {
+        this.uploading = true;
         // 1. Mantener por defecto el archivo que ya tenía asignado el registro en edición
         let nombreArchivoSubido = this.archivoActualNombre;
 
@@ -631,6 +696,8 @@ export default {
         const mensajeError = error.response?.data?.mensaje || "No se pudo editar el Rol al equipo de Vinculación";
         mostraralertas2(mensajeError, "error");
         console.error("❌ Error al editar Rol:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
 
