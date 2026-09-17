@@ -130,7 +130,7 @@ class Agenda_ODSController extends Controller
         if (isset($res)) {
             $res->nombre_ag_ods = $request->nombre_ag_ods;
             $res->anio_ag_ods = $request->anio_ag_ods;
-            $res->link_ag_ods = $request->link_ag_ods;
+            $res->archivo_ag_ods = $request->archivo_ag_ods;
 
             // Lógica de validación de estado
             if ($request->estado_ag_ods == 1) {
@@ -229,5 +229,90 @@ class Agenda_ODSController extends Controller
                 'mensaje' => "La Agenda ODS con id: $id no existe o fue eliminada.",
             ], 404);
         }
+    }
+    public function uploadArchivo(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:20240',
+            'anio_ag_ods' => 'required|string', // Quitamos alpha_dash por si usas guiones como "2024-2030"
+            'old_filename' => 'nullable|string',
+            'old_anio' => 'nullable|string',
+        ]);
+
+        try {
+            $anio_folder = str_replace(['/', '\\', ' '], '_', $request->anio_ag_ods);
+            $file = $request->file('file');
+            if (!$file->isValid()) {
+                throw new \Exception("Archivo inválido o corrupto.");
+            }
+
+            // --- LÓGICA DE ELIMINACIÓN Y LIMPIEZA ---
+            if ($request->filled('old_filename')) {
+                $folder_to_clean = $request->filled('old_anio')
+                    ? str_replace(['/', '\\', ' '], '_', $request->old_anio)
+                    : $anio_folder;
+
+                $oldDirectory = public_path("Documentos/AGENDA_ODS/{$folder_to_clean}");
+                $oldPath = $oldDirectory . '/' . basename($request->old_filename);
+
+                // 1. Borrar el archivo
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
+
+                // 2. Limpiar carpeta si quedó vacía (y no es la misma carpeta donde vamos a guardar ahora)
+                // Solo intentamos borrarla si la carpeta existe y es distinta a la nueva o si queremos limpieza total
+                if (File::exists($oldDirectory) && count(File::files($oldDirectory)) === 0 && count(File::directories($oldDirectory)) === 0) {
+                    File::deleteDirectory($oldDirectory);
+                }
+            }
+
+            // --- LÓGICA DE GUARDADO ---
+            $basePath = "Documentos/AGENDA_ODS/{$anio_folder}";
+            $directory = public_path($basePath);
+
+            if (!File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+
+            // 5. Generar nombre único
+            $aleatorio = bin2hex(random_bytes(4));
+            $fechaHora = date("Ymd_His");
+            $extension = $file->getClientOriginalExtension();
+            // Nombre: agenda_ods_2024-2028_a1b2c3d4_20260422.pdf
+            $filename = "agenda_ods_{$anio_folder}_{$aleatorio}_{$fechaHora}.{$extension}";
+
+            // 6. Mover archivo
+            $file->move($directory, $filename);
+
+            return response()->json([
+                'status'   => true,
+                'filename' => $filename,
+                'url'      => url($basePath . '/' . $filename)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Error al procesar el archivo.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function deleteArchivo(Request $request)
+    {
+        $request->validate([
+            'filename' => 'required',
+            'anio_ag_ods' => 'required',
+        ]);
+
+        $filePath = public_path('Documentos/AGENDA_ODS/' . $request->anio_ag_ods . '/' . $request->filename);
+
+        if (File::exists($filePath)) {
+            File::delete($filePath);
+
+            return response()->json(['status' => true, 'message' => 'Archivo eliminado']);
+        }
+
+        return response()->json(['status' => false, 'message' => 'Archivo no encontrado'], 404);
     }
 }

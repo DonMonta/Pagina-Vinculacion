@@ -7,6 +7,8 @@ use App\Models\Invi_equipo_roles;
 use Illuminate\Http\JsonResponse;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File; // Importamos la clase Facultad
+use Illuminate\Support\Facades\Log; // Importamos la clase JsonResponse
 
 class Invi_equipo_departController extends Controller
 {
@@ -154,7 +156,8 @@ class Invi_equipo_departController extends Controller
             Invi_equipo_depart::create([
                 'ciinfper_doc' => $request->ciinfper_doc,
                 'id_equipo_roles' => $request->id_equipo_roles,
-                'estado_equipo_dep' => 1
+                'estado_equipo_dep' => 1,
+                'evidencia_arch' => $request->evidencia_arch
             ]);
 
             return response()->json(['mensaje' => 'Registrado con éxito']);
@@ -237,7 +240,8 @@ class Invi_equipo_departController extends Controller
             $asignacion->update([
                 'ciinfper_doc' => $request->ciinfper_doc,
                 'id_equipo_roles' => $request->id_equipo_roles,
-                'estado_equipo_dep' => $request->estado_equipo_dep ?? $asignacion->estado_equipo_dep
+                'estado_equipo_dep' => $request->estado_equipo_dep ?? $asignacion->estado_equipo_dep,
+                'evidencia_arch' => $request->evidencia_arch ?? $asignacion->evidencia_arch
             ]);
 
             return response()->json(['mensaje' => 'Actualizado con éxito']);
@@ -525,6 +529,81 @@ class Invi_equipo_departController extends Controller
             return response()->json([
                 'error' => 'Error al procesar la solicitud del equipo',
                 'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+    /**
+     * Función para subir un archivo
+     * Esta función recibe un Request con el archivo a subir
+     * La función devuelve un array de objetos que representan los resultados de la operación
+     * Se valida que el archivo exista y que el tamaño del archivo sea menor que 10MB
+     * Si el archivo es válido, se guarda el archivo en la carpeta Documentos/Vinculación/EquipoVincula
+     * Se devuelve un array con el mensaje de éxito
+     *
+     * @return array
+     */
+    public function uploadArchivo(Request $request)
+    {
+        if ($request->hasFile('file')) { // Si el archivo existe
+            Log::info('Archivo detectado: ' . $request->file('file')->getClientOriginalName()); // Se registra el nombre del archivo detectado
+            Log::info('Error de subida PHP: ' . $request->file('file')->getError()); // Se registra el error de subida PHP
+            Log::info('Tamaño recibido: ' . $request->file('file')->getSize()); // Se registra el tamaño del archivo recibido
+        } else {
+            // Se registra un error de subida si no se detectó ningún archivo en la petición
+            Log::warning('No se detectó ningún archivo en la petición.');
+        }
+        $request->validate([
+            'file' => 'required|max:10240', // 10MB
+            'ci' => 'required|alpha_dash',
+            'old_filename' => 'nullable|string',
+        ]); // Se validan los datos de la petición
+
+        try {
+            $ci = basename($request->ci); // Se obtiene el cédula del archivo
+            $file = $request->file('file'); // Se obtiene el archivo subido
+            if (! $file->isValid()) { // Si el archivo no es válido
+                throw new \Exception('Archivo inválido o corrupto.'); // Se lanza un error
+            }
+            if ($request->filled('old_filename')) { // Si se ha proporcionado un nombre de archivo antiguo
+                $oldFilename = basename($request->old_filename); // Seguridad extra
+                $oldPath = public_path("Documentos/Vinculación/EquipoVincula/{$ci}/{$oldFilename}"); // Se obtiene la ruta del archivo antiguo
+                if (File::exists($oldPath)) { // Si el archivo antiguo existe
+                    File::delete($oldPath); // Se elimina el archivo antiguo
+                }
+            }
+
+            // Crear carpeta publica si no existe
+            $directory = public_path("Documentos/Vinculación/EquipoVincula/{$ci}");
+
+            if (! File::isDirectory($directory)) { // Si la carpeta no existe
+                File::makeDirectory($directory, 0755, true, true); // Se crea la carpeta
+            }
+
+            // Generar nombre: CI + _ + aleatorio + _ + fecha (Ymd_His)
+            $aleatorio = bin2hex(random_bytes(8)); // 16 caracteres hex
+            $fechaHora = date('Ymd_His');          // Ej: 20251112_1741
+            $extension = $file->getClientOriginalExtension(); // pdf
+
+            $filename = "{$ci}_{$aleatorio}_{$fechaHora}.{$extension}"; // Se genera el nombre final del archivo
+
+            // Guardar archivo
+            $file->move($directory, $filename);
+
+            // URL pública, para acceder al archivo desde fuera de la aplicación
+            $url = url('Documentos/Vinculación/EquipoVincula/' . $ci . '/' . $filename);
+
+            // Se devuelve un array con el mensaje de éxito y el nombre del archivo y la URL pública
+            return response()->json([
+                'status' => true,
+                'filename' => $filename,
+                'url' => $url,
+            ]);
+        } catch (\Exception $e) {
+            // Se devuelve un array con el mensaje de error y el error generado
+            return response()->json([
+                'status' => false,
+                'message' => 'Seguridad: El archivo no pudo ser procesado.',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

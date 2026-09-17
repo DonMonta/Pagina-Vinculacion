@@ -95,6 +95,7 @@ Route::prefix('vin')->group(function () {
         Route::delete('habilitar_plandne/{id}', [PlandneController::class, 'habilitar']);
         //Definición de endpoint para deshabilitar un plandne
         Route::delete('inhabilitar_plandne/{id}', [PlandneController::class, 'destroy']);
+        
         //Definición de ruta endpoint para el recurso Obj_pol_plandne, perimitiendo operaciones CRUD
         Route::apiResource("obj_pol_plandne", Obj_pol_plandneController::class);
         //Definición de ruta endpoint para el recurso Politicas_plandne, perimitiendo operaciones CRUD
@@ -132,6 +133,9 @@ Route::prefix('vin')->group(function () {
         //Denificion de endpoint para habilitar e inhabilitar un Agenda ODS
         Route::delete('habilitar_agenda_ods/{id}', [Agenda_ODSController::class, 'habilitar']);
         Route::delete('inhabilitar_agenda_ods/{id}', [Agenda_ODSController::class, 'destroy']);
+         Route::post('subir_archivo_agenda_ods', [Agenda_ODSController::class, 'uploadArchivo']);
+        //Definición de la ruta endpoint para eliminar un archivo
+        Route::post('eliminar_archivo_agenda_ods', [Agenda_ODSController::class, 'deleteArchivo']);
         //Definición de endpoint para el recurso SeguiFormulario, perimitiendo operaciones CRUD
         Route::apiResource("seguiformulario", SeguiFormularioController::class);
         //Definición de endpoint para obtener los formularios de graduados
@@ -224,6 +228,8 @@ Route::prefix('vin')->group(function () {
         Route::get('getalldoce/{cedula}', [InformacionPersonal_DController::class, 'getAllDocente']);
         //Definición de endpoint para obtener los roles vinculacion
         Route::get('getRolesVinculacion', [Invi_equipo_departController::class, 'getRolesVinculacion']);
+        //Definición de endpoint para subir un archivo
+        Route::post('subir_archivo_quipovincu', [Invi_equipo_departController::class, 'uploadArchivo']);
         /**
          * Endpoints del controlador Invi_responsableController
          * Los endpoints aquí son de tipo: API Resource el cual permite la creación (post), 

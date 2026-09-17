@@ -17,6 +17,7 @@ class Invi_equipo_depart extends Model
         'ciinfper_doc',
         'id_equipo_roles',
         'estado_equipo_dep',
+        'evidencia_arch'
     ];
     public function equipo_roles()
     {

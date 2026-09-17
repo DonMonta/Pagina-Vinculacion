@@ -16,7 +16,7 @@ class Agenda_ODS extends Model
     protected $fillable = [
         'nombre_ag_ods',
         'anio_ag_ods',
-        'link_ag_ods',
+        'archivo_ag_ods',
         'estado_ag_ods'
     ];
     public function ods()
