@@ -1,9 +1,10 @@
 <template>
     <div
         class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
-        <div class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <form class="flex-grow" @submit.prevent>
+        <div class="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center w-full sm:w-auto">
+                <!-- Buscador por código -->
+                <form class="w-full sm:w-auto" @submit.prevent>
                     <div class="relative">
                         <button class="absolute -translate-y-1/2 left-4 top-1/2">
                             <svg class="fill-gray-500 dark:fill-gray-400" width="20" height="20" viewBox="0 0 20 20">
@@ -13,9 +14,20 @@
                         </button>
                         <input type="text" placeholder="Ingresa el código del proyecto a buscar..."
                             v-model="searchQuery" @input="debouncedFilter"
-                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 xl:w-[430px]" />
+                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 sm:w-[320px] xl:w-[380px]" />
                     </div>
                 </form>
+
+                <!-- Filtro por Convocatoria -->
+                <div class="w-full sm:w-auto">
+                    <select v-model="selectedConvocatoria" @change="filtrarPorConvocatoria"
+                        class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 dark:text-gray-300 dark:border-gray-800 sm:w-[260px]">
+                        <option value="">Todas las convocatorias</option>
+                        <option v-for="conv in listaConvocatorias" :key="conv.id_convocatoria" :value="conv.id_convocatoria">
+                            {{ conv.num_convocatoria ? conv.num_convocatoria + ' - ' : '' }}
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -5136,7 +5148,9 @@ export default {
                 anio: '',
                 titulo: '',
                 editorial_fuente: ''
-            }
+            },
+            selectedConvocatoria: '',
+            listaConvocatorias: [],
         };
     },
     watch: {
@@ -5245,6 +5259,7 @@ export default {
     },
     async mounted() {
         const ruta = useRoute();
+        this.obtenerConvocatorias();
         this.GetData(1, this.searchQuery);
         document.addEventListener('click', this.cerrarMenuContextual);
 
@@ -5502,6 +5517,14 @@ export default {
         }
     },
     methods: {
+        async obtenerConvocatorias() {
+            try {
+                const response = await API.get(`${this.baseUrl}/listar_convocatorias`);
+                this.listaConvocatorias = response.data?.data || [];
+            } catch (error) {
+                console.warn("⚠️ Error al cargar convocatorias:", error);
+            }
+        },
         formatDate(date) {
             if (!date) return '---';
 
@@ -5996,14 +6019,18 @@ export default {
                 this.enviando = false; // Liberamos el botón siempre, sea éxito o error
             }
         },
-
+        filtrarPorConvocatoria() {
+            // Reinicia a la página 1 cuando se cambia la convocatoria
+            this.GetData(1, this.searchQuery);
+        },
         async GetData(page = 1, searchQuery = "") {
             this.cargando = true;
 
             try {
                 const params = {
                     page: page,
-                    search_query: searchQuery // Parámetro para búsqueda
+                    search_query: searchQuery, // Parámetro para búsqueda
+                    id_convocatoria: this.selectedConvocatoria
                 };
                 const response = await API.get(`${this.baseUrl}/invi_proyectos`, { params });
 

@@ -161,7 +161,7 @@
 
             <td class="py-4 px-4 align-top whitespace-nowrap">
               <div v-if="post.archivo">
-                <a :href="`http://vinculacionbackend.test/Documentos/Vinculación/Convocatorias/${post.num_convocatoria}/${post.archivo}`"
+                <a :href="`http://192.168.1.112:8082/Documentos/Vinculación/Convocatorias/${post.num_convocatoria}/${post.archivo}`"
                   target="_blank"
                   class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 rounded-lg hover:bg-rose-100 transition-all border border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -176,10 +176,18 @@
 
             <td class="py-4 px-4 align-top text-right whitespace-nowrap">
               <div class="flex justify-end gap-1">
-                <button @click="abrirModalEdicion(post)"
-                  class="p-1.5 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10 rounded-lg transition-colors"
-                  title="Editar">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button @click="abrirModalEdicion(post)" :disabled="botonCargando === 'editar_' + post.id_convocatoria"
+                  class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                  <svg v-if="botonCargando === 'editar_' + post.id_convocatoria"
+                    class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
@@ -397,8 +405,21 @@
               </div>
             </div>
 
+            <div v-if="formulario.ad_archivo_url && !archivoSeleccionado" class="mt-4 col-span-1 lg:col-span-2">
+              <label class="block text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">Documento
+                Actual:</label>
+              <div
+                class="w-full h-[400px] border border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden bg-gray-50">
+                <iframe :src="formulario.ad_archivo_url" class="w-full h-full border-0"></iframe>
+              </div>
+              <div class="mt-2 text-right">
+                <a :href="formulario.ad_archivo_url" target="_blank"
+                  class="text-sm text-brand-600 hover:underline">Abrir en nueva pestaña</a>
+              </div>
+            </div>
             <div class="mt-2">
-              <label class="mb-1.5 block text-sm font-medium text-gray-700">Documento Convocatoria (PDF)</label>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700">{{ formulario.ad_archivo_url ? 'Subir un nuevo documento para reemplazar el actual (PDF)' :
+                    'Documento Convocatoria (PDF)' }}</label>
               <div @click="$refs.fileFoto.click()"
                 class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
                 :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50'">
@@ -424,11 +445,26 @@
             </div>
 
             <div class="flex items-center gap-3 mt-6 justify-end">
-              <button @click="cerrarModal" type="button"
+              <button @click="cerrarModal" :disabled="botonCargando === 'guardando'" type="button" 
                 class="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
               <button @click="registrar" type="button"
                 class="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600 shadow-lg transition-all">
-                {{ isEditMode ? 'Guardar Cambios' : 'Registrar Convocatoria' }}
+                
+                <span v-if="uploading" class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <span>{{ isEditMode ? 'Actualizando....' : 'Registrando....' }}</span>
+                </span>
+
+                <!-- Span estado normal -->
+                <span v-else>
+                  {{ isEditMode ? 'Guardar Cambios' : 'Registrar Convocatoria' }}
+                </span>
               </button>
             </div>
           </form>
@@ -460,6 +496,7 @@ export default {
     return {
       idus: 0,
       baseUrl: "/vin",
+      botonCargando: null,
       formulario: {
         id_convocatoria: null,
         num_convocatoria: "",
@@ -468,6 +505,8 @@ export default {
         fecha_fin: "",
         num_resolucion: "",
         estado: 1, // Por defecto activo
+        archivo: null,
+        ad_archivo_url: null
       },
       filteredarray: [],
       searchQuery: "",
@@ -564,37 +603,47 @@ export default {
     abrirModalEdicion(user) {
       this.isEditMode = true;
       this.limpiarFormulario();
+      this.botonCargando = 'editar_' + user.id_convocatoria;
+      try {
 
-      this.formulario = {
-        id_convocatoria: user.id_convocatoria,
-        num_convocatoria: user.num_convocatoria,
-        titulo_convocatoria: user.titulo_convocatoria,
-        fecha_inicio: user.fecha_inicio,
-        fecha_fin: user.fecha_fin,
-        num_resolucion: user.num_resolucion,
-        estado: user.estado
-      };
-      this.estadoBool = user.estado === 1;
+        this.formulario = {
+          id_convocatoria: user.id_convocatoria,
+          num_convocatoria: user.num_convocatoria,
+          titulo_convocatoria: user.titulo_convocatoria,
+          fecha_inicio: user.fecha_inicio,
+          fecha_fin: user.fecha_fin,
+          num_resolucion: user.num_resolucion,
+          estado: user.estado,
+          archivo: user.archivo,
+          ad_archivo_url: user.ad_archivo_url
 
-      // Función helper para procesar cómo viene el dato (Cédula 10 dígitos o Texto normal)
-      const parseCampo = (clave, valor) => {
-        if (!valor) return;
-        const esCedula = /^\d{10}$/.test(valor.trim());
-        if (esCedula) {
-          this.camposResponsables[clave].tipo = 'persona';
-          this.camposResponsables[clave].cedula = valor;
-          this.buscarDocente(this.camposResponsables[clave]); // Para cargar la data visual
-        } else {
-          this.camposResponsables[clave].tipo = 'departamento';
-          this.camposResponsables[clave].texto = valor;
-        }
-      };
+        };
+        this.estadoBool = user.estado === 1;
 
-      parseCampo('elaboracion', user.elaboracion);
-      parseCampo('revision', user.revision);
-      parseCampo('aprobacion', user.aprobacion);
+        // Función helper para procesar cómo viene el dato (Cédula 10 dígitos o Texto normal)
+        const parseCampo = (clave, valor) => {
+          if (!valor) return;
+          const esCedula = /^\d{10}$/.test(valor.trim());
+          if (esCedula) {
+            this.camposResponsables[clave].tipo = 'persona';
+            this.camposResponsables[clave].cedula = valor;
+            this.buscarDocente(this.camposResponsables[clave]); // Para cargar la data visual
+          } else {
+            this.camposResponsables[clave].tipo = 'departamento';
+            this.camposResponsables[clave].texto = valor;
+          }
+        };
 
-      this.$.setupState.isModalOpen = true;
+        parseCampo('elaboracion', user.elaboracion);
+        parseCampo('revision', user.revision);
+        parseCampo('aprobacion', user.aprobacion);
+
+        this.$.setupState.isModalOpen = true;
+      } catch (e) {
+        console.error("Error al abrir modal de edición:", e);
+      } finally {
+        this.botonCargando = null;
+      }
     },
     handleFileChange(event) {
       //Obtener el archivo seleccionado por el usuario
@@ -687,6 +736,9 @@ export default {
         // Mapeamos los datos iniciales agregando propiedades reactivas para el docente
         this.filteredarray = data.map(item => ({
           ...item,
+          ad_archivo_url: item.archivo
+            ? `http://192.168.1.112:8082/Documentos/Vinculación/Convocatorias/${item.num_convocatoria}/${item.archivo}`
+            : null,
           docente: null,
           cargandoDocente: false,
           errorDocente: ''
@@ -761,6 +813,7 @@ export default {
       };
 
       try {
+        this.botonCargando = 'guardando';
         if (this.archivoSeleccionado) {
           const uploadResp = await this.uploadArchivo(this.formulario.num_convocatoria);
           if (uploadResp && uploadResp.filename) params.archivo = uploadResp.filename;
@@ -781,6 +834,8 @@ export default {
         }
       } catch (error) {
         console.error("Error:", error);
+      } finally {
+        this.botonCargando = null;
       }
     },
 

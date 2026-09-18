@@ -1,3 +1,4 @@
+
 import { createStore } from 'vuex'
 
 export default createStore({
@@ -12,11 +13,22 @@ export default createStore({
     facultad: localStorage.getItem('facultad_vinc') || null,
     token: localStorage.getItem('token_vinc') || null,
     token_type: localStorage.getItem('token_type_vinc') || null,
+    proyectos_ids: JSON.parse(localStorage.getItem('proyectos_ids_vinc') || '[]'),
+    proyectos_detalles: JSON.parse(localStorage.getItem('proyectos_detalles_vinc') || '[]'),
   },
   getters: {
     getIdusu: state => state.idusu,
+    getEmail: state => state.email,
+    getName: state => state.name,
+    getCarrera: state => state.carrera,
+    getNivel: state => state.nivel,
+    getIdcarrera: state => state.idcarrera,
+    getFacultad: state => state.facultad,
+    getRole: state => state.role,
     isAuthenticated: state => !!state.token,
     getFullToken: state => `${state.token_type} ${state.token}`,
+    getProyectosIds: state => state.proyectos_ids,
+    getProyectosDetalles: state => state.proyectos_detalles,
   },
   mutations: {
     setRol_vinc(state, nuevoRol) {
@@ -59,6 +71,14 @@ export default createStore({
       state.facultad = facultad;
       localStorage.setItem('facultad_vinc', facultad);
     },
+    setProyectosIds_vinc(state, ids) {
+      state.proyectos_ids = ids || [];
+      localStorage.setItem('proyectos_ids_vinc', JSON.stringify(ids || []));
+    },
+    setProyectosDetalles_vinc(state, detalles) {
+      state.proyectos_detalles = detalles || [];
+      localStorage.setItem('proyectos_detalles_vinc', JSON.stringify(detalles || []));
+    },
     logout_vinc(state) {
       // Limpia el state y localStorage al cerrar sesión
       state.role = null;
@@ -67,7 +87,8 @@ export default createStore({
       state.name = null;
       state.token = null;
       state.token_type = null;
-
+      state.proyectos_ids = [];
+      state.proyectos_detalles = [];
       localStorage.removeItem('Rol_vinc');
       localStorage.removeItem('email_vinc');
       localStorage.removeItem('id_vinc');
@@ -75,6 +96,12 @@ export default createStore({
       localStorage.removeItem('token_vinc');
       localStorage.removeItem('token_type_vinc');
       localStorage.removeItem('user_vinc');
+      localStorage.removeItem('carrera_vinc');
+      localStorage.removeItem('nivel_vinc');
+      localStorage.removeItem('idcarrera_vinc');
+      localStorage.removeItem('facultad_vinc');
+      localStorage.removeItem('proyectos_ids_vinc');
+      localStorage.removeItem('proyectos_detalles_vinc');
     },
   },
   actions: {},

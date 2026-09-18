@@ -8,6 +8,7 @@ import Agenda_ODSAllView from '../views/Admin/Mantenimiento/Op_Agenda_ODS/Agenda
 import FormCatedraAllView from '../views/Admin/Formulario/Cátedra/Form_CatedraAllView.vue'
 import FormGraduadosAllView from '../views/Admin/Formulario/Graduados/Form_GraduadosAllView.vue'
 import PerfilAllView from '../views/Estudiante/Perfil/PerilAllView.vue'
+import DocPerfilAllView from '../views/Docente/Perfil/DocPerfilAllView.vue'
 import InscripcionCatedraAllView from '../views/Admin/Formulario/Cátedra/Inscripcion/Inscripcion_CatedraAllView.vue'
 import ExamenCatedraAllView from '../views/Admin/Formulario/Cátedra/Examen/Examen_CatedraAllView.vue'
 import DominioAcademicoAllView from '../views/Admin/Mantenimiento/Op_dominio_Aca/Dom_AcademicoAllView.vue'
@@ -67,6 +68,11 @@ const routes = [
     path: '/site-admin/perfil',
     name: 'perfil',
     component: PerfilAllView
+  },
+  {
+    path: '/site-admin/docperfil',
+    name: 'docperfil',
+    component: DocPerfilAllView
   },
   {
     path: '/site-admin/formulario_catedra/inscripcion',

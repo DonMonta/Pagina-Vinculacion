@@ -237,6 +237,13 @@ const menuData = [
       },
       {
         icon: UserCircleIcon,
+        name: "Docente",
+        subItems: [
+          { name: "Mi Perfil", path: "/site-admin/docperfil", pro: false },
+        ],
+      },
+      {
+        icon: UserCircleIcon,
         name: "Estudiante",
         subItems: [
           { name: "Mi Perfil", path: "/site-admin/perfil", pro: false },
@@ -271,7 +278,7 @@ const menuGroups = computed(() => {
   if (rol === 'sa' || rol === 'atics' || rol === 'avinc' || rol === 'sotics') {
     return menuData.map(group => ({
       ...group,
-      items: group.items.filter(item => item.name !== "Estudiante")
+      items: group.items.filter(item => item.name !== "Estudiante" && item.name !== "Docente")
     })).filter(group => group.items.length > 0);
   }
 
@@ -287,6 +294,10 @@ const menuGroups = computed(() => {
       if (rol === 'est') {
         // Solo permitimos el menú "Estudiante"
         return item.name === "Estudiante";
+      }
+      if (rol === 'D' || rol === 'A' || rol === 'TDO' || rol === 'T') {
+        // Solo permitimos el menú "Docente"
+        return item.name === "Docente";
       }
       
       return true;
