@@ -9,7 +9,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class informacionpersonal extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
+    use HasFactory; 
    
     protected $table = 'informacionpersonal';
     protected $primaryKey = 'CIInfPer';

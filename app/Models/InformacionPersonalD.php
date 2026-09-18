@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-class InformacionPersonalD extends Model
+use Illuminate\Foundation\Auth\User as Authenticatable; 
+use Tymon\JWTAuth\Contracts\JWTSubject;
+class InformacionPersonalD extends Authenticatable implements JWTSubject
 {
     protected $table = 'informacionpersonal_d';
 
@@ -99,5 +100,14 @@ class InformacionPersonalD extends Model
     public function titulos()
     {
         return $this->hasMany(AcademicoDocente::class, 'ciinfper', 'CIInfPer');
+    }
+     public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

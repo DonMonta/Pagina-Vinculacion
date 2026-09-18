@@ -69,7 +69,7 @@ Route::prefix('vin')->group(function () {
     Route::get('getProyectosVinculacionInfo', [Invi_proyectosController::class, 'getProyectosVinculacionInfo']);
 
     Route::post('login', [AuthController::class, 'login']);
-    Route::middleware('auth:api,estudiante')->group(function () {
+    Route::middleware('auth:api,docente,estudiante')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::get('logout', [AuthController::class, 'logout'])->name('logout');
@@ -263,6 +263,8 @@ Route::prefix('vin')->group(function () {
         Route::delete('inhabilitar_convocatoria/{id}', [Invi_convocatoriaController::class, 'destroy']);
         //Definición de endpoint para subir un archivo
         Route::post('subir_archivo_convocatoria', [Invi_convocatoriaController::class, 'uploadArchivo']);
+        //Definición de endpoint para listar convocatorias
+        Route::get('listar_convocatorias', [Invi_convocatoriaController::class, 'listconvocatoria']);
         /**
          * --------------------------------------------------------------------------
          * Rutas de Gestión de Tipos de Proyectos (Invi_tip_proyectController)

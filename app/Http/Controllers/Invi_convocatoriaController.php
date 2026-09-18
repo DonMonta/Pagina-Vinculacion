@@ -90,6 +90,21 @@ class Invi_convocatoriaController extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
+    /***
+     * Listar convocatorias: Devuelve un listado de todas las convocatorias
+     */
+    public function listconvocatoria()
+    {
+        try {
+            $convocatorias = Invi_convocatoria::select('id_convocatoria', 'num_convocatoria', 'titulo_convocatoria')
+                ->orderBy('id_convocatoria', 'desc')
+                ->get();
+
+            return response()->json(['data' => $convocatorias], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener convocatorias: ' . $e->getMessage()], 500);
+        }
+    }
 
     /**
      * Store: Almacena una nueva convocatoria en la base de datos.

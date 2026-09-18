@@ -85,6 +85,7 @@ class Invi_proyectosController extends Controller
     {
         try { // 1. Obtener parámetros de búsqueda y paginación
             $searchQuery = $request->input('search_query');
+            $idConvocatoria = $request->input('id_convocatoria');
             $query = Invi_proyectos::select(
                 'invi_proyectos.*'
             )->where('proyect_tipo', '=', 'VINCULACIÓN');
@@ -93,7 +94,9 @@ class Invi_proyectosController extends Controller
                     $q->where('invi_proyectos.proyect_cod', 'LIKE', "%{$searchQuery}%");
                 });
             }
-
+            if (! empty($idConvocatoria)) {
+                $query->where('invi_proyectos.id_convocatoria', '=', $idConvocatoria);
+            }
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
 
