@@ -88,8 +88,8 @@ class AuthController extends Controller
                 'Role' => $user->idperfil,
                 'cedula' => $user->ciinfper,
             ]);
-        }elseif($docente){
-            
+        } elseif ($docente) {
+
             if (md5($codigo_dactilar) !== $docente->ClaveUsu) {
                 return response()->json([
                     'error' => true,
@@ -111,8 +111,13 @@ class AuthController extends Controller
             }
             // --- BÚSQUEDA DE PROYECTOS Y FUNCIONES DEL DOCENTE ---
             // Traemos las relaciones 'invi_proyectos' y 'funciones' usando Eager Loading
-            $asignacionesProyectos = Invi_deta_inte::with(['invi_proyectos', 'funciones'])
+            $asignacionesProyectos = Invi_deta_inte::with(['invi_proyectos.invi_convocatoria', 'funciones'])
                 ->where('ciinfper_doc', $docente->CIInfPer)
+                ->whereHas('invi_proyectos', function ($query) {
+                    // IMPORTANTE: Cambia 'tipo_proyecto' por el nombre real de tu columna en la BD
+                    $query->where('proyect_tipo', 'VINCULACIÓN')
+                        ->orWhere('proyect_tipo', 'VINCULACION');
+                })
                 // ->where('estado', 1) // Opcional: Descomenta si necesitas filtrar solo integrantes activos
                 ->get();
             if ($asignacionesProyectos->isEmpty()) {
@@ -135,12 +140,16 @@ class AuthController extends Controller
             foreach ($asignacionesProyectos as $asignacion) {
                 if ($asignacion->invi_proyectos) {
                     $ids_proyectos[] = $asignacion->proyect_id;
-                    
+                    $habilitar_edicion = $asignacion->invi_proyectos->invi_convocatoria
+                        ? $asignacion->invi_proyectos->invi_convocatoria->habilitar_edicion
+                        : 0;
                     $detalles_proyectos[] = [
                         'proyect_id'     => $asignacion->proyect_id,
                         'proyect_cod'    => $asignacion->invi_proyectos->proyect_cod,
                         'proyect_titulo' => $asignacion->invi_proyectos->proyect_titulo,
                         'id_funcion'     => $asignacion->id_funcion,
+                        'id_convocatoria' => $asignacion->invi_proyectos->id_convocatoria,
+                        'habilitar_edicion' => $habilitar_edicion,
                         'funcion'        => $asignacion->funciones ? $asignacion->funciones->nombre_funcion : 'Sin función asignada'
                     ];
                 }
@@ -164,9 +173,7 @@ class AuthController extends Controller
                 'proyectos_ids'      => $ids_proyectos,          // Retorna array ej: [1, 5, 8]
                 'proyectos_detalles' => $detalles_proyectos      // Retorna array de objetos con nombre de proyecto y función
             ]);
-
-        } 
-        elseif ($estudiante) {
+        } elseif ($estudiante) {
             // Validamos la clave dactilar (asumo que se guarda sin MD5, si lleva md5 ajusta la comparación)
             if (md5($codigo_dactilar) !== $estudiante->codigo_dactilar) {
                 return response()->json([

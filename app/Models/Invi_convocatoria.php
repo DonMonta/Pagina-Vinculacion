@@ -24,6 +24,9 @@ class Invi_convocatoria extends Model
         'num_resolucion',
         'estado',
         'archivo',
+        'tipo_convocatoria',
+        'habilitar_edicion',
+
     ];
     public function invi_proyectos()
     {

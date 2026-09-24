@@ -97,6 +97,7 @@ class Invi_convocatoriaController extends Controller
     {
         try {
             $convocatorias = Invi_convocatoria::select('id_convocatoria', 'num_convocatoria', 'titulo_convocatoria')
+                ->where('tipo_convocatoria', 'VINCULACIÓN')
                 ->orderBy('id_convocatoria', 'desc')
                 ->get();
 
@@ -193,6 +194,8 @@ class Invi_convocatoriaController extends Controller
             $res->fecha_inicio = $request->fecha_inicio;
             $res->fecha_fin = $request->fecha_fin;
             $res->num_resolucion = $request->num_resolucion;
+            $res->tipo_convocatoria = 'VINCULACIÓN';
+            $res->habilitar_edicion = $request->habilitar_edicion;
 
             // --- Lógica de validación de estado por regla de negocio ---
             if ($request->estado == 1) {

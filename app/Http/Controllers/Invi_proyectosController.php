@@ -321,7 +321,7 @@ class Invi_proyectosController extends Controller
         // NUEVO: Extraer catálogo total de dominios humanísticos y los seleccionados por el proyecto
         $dominiosCatalogo = Invi_dom_huma::all();
         $dominiosSeleccionados = $proyecto->invi_detalle_dom_hum->pluck('id_dom_hum')->toArray();
-        $convocatoriasCatalogo = Invi_convocatoria::where('estado', 1)->get();
+        $convocatoriasCatalogo = Invi_convocatoria::where('estado', 1)->where('tipo_convocatoria', 'VINCULACIÓN')->get();
         $lineasCatalogo = Invi_linea_investigacion::where('estado_lin_investiga', 1)->get();
         $sublineasCatalogo = Invi_sub_linea_inves::all();
         // NUEVO: Sublíneas que el proyecto ya tiene guardadas
