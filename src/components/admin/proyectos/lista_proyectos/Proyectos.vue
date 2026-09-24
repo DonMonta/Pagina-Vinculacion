@@ -4655,202 +4655,197 @@
                 </div>
             </div>
             <div v-if="showModalActividad" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
-                    <div class="bg-white dark:bg-gray-850 rounded-xl shadow-xl max-w-3xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b pb-2">
-                            {{ indiceActividadEditando !== null ? 'Editar Actividad' : 'Registrar Actividad' }}
-                        </h3>
+                <div class="bg-white dark:bg-gray-850 rounded-xl shadow-xl max-w-3xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b pb-2">
+                        {{ indiceActividadEditando !== null ? 'Editar Actividad' : 'Registrar Actividad' }}
+                    </h3>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <!-- Objetivo Especifico Relacionado -->
-                            <div class="md:col-span-2">
-                                <label class="block font-bold mb-2 dark:text-white">Objetivo Específico Relacionado</label>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
-                                    <div 
-                                        v-for="obj in obtenerEspecificos()" 
-                                        :key="obj.id_obj_proy"
-                                        @click="modalActividad.id_obj_proy = obj.id_obj_proy"
-                                        :class="[
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <!-- Objetivo Especifico Relacionado -->
+                        <div class="md:col-span-2">
+                            <label class="block font-bold mb-2 dark:text-white">Objetivo Específico Relacionado</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                                <div 
+                                    v-for="obj in obtenerEspecificos()" 
+                                    :key="obj.id_obj_proy"
+                                    @click="modalActividad.id_obj_proy = obj.id_obj_proy"
+                                    :class="[
                                             'p-3 rounded-lg border-2 cursor-pointer transition-all flex items-start gap-3',
                                             modalActividad.id_obj_proy === obj.id_obj_proy 
                                                 ? 'bg-green-50 border-green-500 shadow-sm dark:bg-green-900/20' 
                                                 : 'bg-white border-gray-200 hover:border-green-300 dark:bg-gray-800 dark:border-gray-700'
                                         ]"
                                     >
-                                        <!-- Custom Radio Button -->
-                                        <div :class="['w-5 h-5 mt-0.5 rounded-full border-2 flex-shrink-0 flex items-center justify-center', 
+                                    <!-- Custom Radio Button -->
+                                    <div :class="['w-5 h-5 mt-0.5 rounded-full border-2 flex-shrink-0 flex items-center justify-center', 
                                             modalActividad.id_obj_proy === obj.id_obj_proy ? 'border-green-500' : 'border-gray-300 dark:border-gray-500']">
-                                            <div v-if="modalActividad.id_obj_proy === obj.id_obj_proy" class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
-                                        </div>
-                                        <span :class="['text-sm font-medium', modalActividad.id_obj_proy === obj.id_obj_proy ? 'text-green-800 dark:text-green-400' : 'text-gray-700 dark:text-gray-300']">
-                                            {{ obj.detalle_obj_proy }}
-                                        </span>
+                                        <div v-if="modalActividad.id_obj_proy === obj.id_obj_proy" class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
                                     </div>
+                                    <span :class="['text-sm font-medium', modalActividad.id_obj_proy === obj.id_obj_proy ? 'text-green-800 dark:text-green-400' : 'text-gray-700 dark:text-gray-300']">
+                                        {{ obj.detalle_obj_proy }}
+                                    </span>
                                 </div>
                             </div>
+                        </div>
 
                             <!-- Nombre de Actividad -->
-                            <div class="md:col-span-2">
-                                <label class="block font-bold mb-1">Nombre de la Actividad</label>
-                                <textarea v-model="modalActividad.nom_actividad"
+                        <div class="md:col-span-2">
+                            <label class="block font-bold mb-1">Nombre de la Actividad</label>
+                            <textarea v-model="modalActividad.nom_actividad"
                                 rows="1" 
                                 @input="ajustarAlturaTextarea" 
                                 type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" 
                                 placeholder="Ej: Talleres de Capacitación"></textarea>
-                            </div>
-
-                            <!-- Responsables -->
-                            <div>
-                                <label class="block font-bold mb-1">Responsables</label>
-                                <input v-model="modalActividad.responsables" type="text" class="w-full border rounded-lg p-2 dark:bg-gray-800">
-                            </div>
-
-                            <!-- Año del Cronograma -->
-                            <div>
-                                <label class="block font-bold mb-1">Año asignado</label>
-                                <select 
-                                    v-model="modalActividad.detalle_anio" 
-                                    @change="alCambiarAnioModal"
-                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                                    <option v-for="itemAnio in aniosProyecto" :key="itemAnio.id" :value="itemAnio.id">
-                                        {{ itemAnio.label }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Fechas y Horas -->
-                            <div>
-                                <label class="block font-bold mb-1 dark:text-white">Fecha Desde</label>
-                                <input 
-                                    v-model="modalActividad.fecha_desde" 
-                                    type="date" 
-                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
-                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
-                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                            </div>
-                            <div>
-                                <label class="block font-bold mb-1 dark:text-white">Fecha Hasta</label>
-                                <input 
-                                    v-model="modalActividad.fecha_hasta" 
-                                    type="date" 
-                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
-                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
-                                    class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                            </div>
-                            <div>
-                                <label class="block font-bold mb-1">Total de Horas</label>
-                                <input v-model.number="modalActividad.horas" type="number" min="1" max="240" class="w-full border rounded-lg p-2 dark:bg-gray-800">
-                            </div>
                         </div>
 
-                        <!-- SECCIÓN DE SUBACTIVIDADES -->
-                        <div class="border-t pt-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h4 class="font-bold text-sm">Subactividades</h4>
-                                <button @click="agregarItemActividad('invi_subactividad')" class="text-xs bg-blue-500 text-white px-2 py-1 rounded">+ Agregar Subactividad</button>
-                            </div>
-                            <div v-for="(sub, sIdx) in modalActividad.invi_subactividad" :key="sIdx" class="grid grid-cols-12 gap-2 mb-2 items-center">
-                                <textarea v-model="sub.nom_sub_actv"
-                                    rows="1" 
-                                    @input="ajustarAlturaTextarea"
-                                    type="text" placeholder="Nombre" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden"/>
-                                
-                                <input 
-                                    v-model="sub.fecha_desde" 
-                                    type="date" 
-                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
-                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
-                                    class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                                <input 
-                                    v-model="sub.fecha_hasta" 
-                                    type="date" 
-                                    :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
-                                    :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
-                                    class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                                >
-                                
-                                <input v-model.number="sub.horas" type="number" placeholder="Hrs" class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600">
-                                <button @click="eliminarItemActividad('invi_subactividad', sIdx)" class="col-span-1 text-red-500 hover:text-red-700 font-bold text-center transition">✕</button>
-                            </div>
+                        <!-- Responsables -->
+                        <div>
+                            <label class="block font-bold mb-1">Responsables</label>
+                            <input v-model="modalActividad.responsables" type="text" class="w-full border rounded-lg p-2 dark:bg-gray-800">
                         </div>
 
-                        <!-- COMPONENTES DINÁMICOS (Indicadores, Productos, Medios, Supuestos) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 text-xs">
-                            <!-- Indicadores -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="font-bold">Indicadores</span>
-                                    <button @click="agregarItemActividad('invi_actindicadores')" class="text-blue-500">+ Agregar</button>
-                                </div>
-                                <div v-for="(item, k) in modalActividad.invi_actindicadores" :key="k" class="flex gap-1 mb-1">
-                                    <textarea 
-                                        v-model="item.detalle_indicador" 
-                                        rows="1" 
-                                        @input="ajustarAlturaTextarea"
-                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
-                                    <button @click="eliminarItemActividad('invi_actindicadores', k)" class="text-red-500">✕</button>
-                                </div>
-                            </div>
-
-                            <!-- Productos Verificables -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="font-bold">Productos Verificables</span>
-                                    <button @click="agregarItemActividad('invi_actprod_verificables')" class="text-blue-500">+ Agregar</button>
-                                </div>
-                                <div v-for="(item, k) in modalActividad.invi_actprod_verificables" :key="k" class="flex gap-1 mb-1">
-                                    <textarea 
-                                        v-model="item.detalle_prod_verif" 
-                                        rows="1" 
-                                        @input="ajustarAlturaTextarea"
-                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
-                                    <button @click="eliminarItemActividad('invi_actprod_verificables', k)" class="text-red-500">✕</button>
-                                </div>
-                            </div>
-
-                            <!-- Medios de Verificación -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="font-bold">Medios de Verificación</span>
-                                    <button @click="agregarItemActividad('invi_actmedios_verificacion')" class="text-blue-500">+ Agregar</button>
-                                </div>
-                                <div v-for="(item, k) in modalActividad.invi_actmedios_verificacion" :key="k" class="flex gap-1 mb-1">
-                                    <textarea
-                                        v-model="item.detalle_medio_verifica"
-                                        rows="1" 
-                                        @input="ajustarAlturaTextarea" 
-                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
-                                    <button @click="eliminarItemActividad('invi_actmedios_verificacion', k)" class="text-red-500">✕</button>
-                                </div>
-                            </div>
-
-                            <!-- Supuestos -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="font-bold">Supuestos</span>
-                                    <button @click="agregarItemActividad('invi_actsupuestos')" class="text-blue-500">+ Agregar</button>
-                                </div>
-                                <div v-for="(item, k) in modalActividad.invi_actsupuestos" :key="k" class="flex gap-1 mb-1">
-                                    <textarea 
-                                        v-model="item.detalle_supuestos" 
-                                        rows="1" 
-                                        @input="ajustarAlturaTextarea"
-                                        type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
-                                    <button @click="eliminarItemActividad('invi_actsupuestos', k)" class="text-red-500">✕</button>
-                                </div>
-                            </div>
+                        <!-- Año del Cronograma -->
+                        <div>
+                            <label class="block font-bold mb-1">Año asignado</label>
+                            <select 
+                                v-model="modalActividad.detalle_anio" 
+                                @change="alCambiarAnioModal"
+                                class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600">
+                                <option v-for="itemAnio in aniosProyecto" :key="itemAnio.id" :value="itemAnio.id">
+                                    {{ itemAnio.label }}
+                                </option>
+                            </select>
                         </div>
 
-                        <!-- Botones de Acción del Modal -->
-                        <div class="flex justify-end gap-3 border-t pt-4">
-                            <button @click="showModalActividad = false" class="px-4 py-2 border rounded-lg text-gray-600">Cancelar</button>
-                            <button @click="guardarActividad" class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold">Guardar Actividad</button>
+                        <!-- Fechas y Horas -->
+                        <div>
+                            <label class="block font-bold mb-1 dark:text-white">Fecha Desde</label>
+                            <input 
+                                v-model="modalActividad.fecha_desde" 
+                                type="date" 
+                                :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1 dark:text-white">Fecha Hasta</label>
+                            <input 
+                                v-model="modalActividad.fecha_hasta" 
+                                type="date" 
+                                :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                class="w-full border rounded-lg p-2 dark:bg-gray-800 dark:text-white dark:border-gray-600">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">Total de Horas</label>
+                            <input v-model.number="modalActividad.horas" type="number" min="1" max="240" class="w-full border rounded-lg p-2 dark:bg-gray-800">
                         </div>
                     </div>
+
+                        <!-- SECCIÓN DE SUBACTIVIDADES -->
+                    <div class="border-t pt-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-sm">Subactividades</h4>
+                            <button @click="agregarItemActividad('invi_subactividad')" class="text-xs bg-blue-500 text-white px-2 py-1 rounded">+ Agregar Subactividad</button>
+                        </div>
+                        <div v-for="(sub, sIdx) in modalActividad.invi_subactividad" :key="sIdx" class="grid grid-cols-12 gap-2 mb-2 items-center">
+                            <textarea v-model="sub.nom_sub_actv"
+                                rows="1" 
+                                @input="ajustarAlturaTextarea"
+                                type="text" placeholder="Nombre" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden"/>
+                                
+                            <input 
+                                v-model="sub.fecha_desde" 
+                                type="date" 
+                                :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600">
+                            <input 
+                                v-model="sub.fecha_hasta" 
+                                type="date" 
+                                :min="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-01-01`"
+                                :max="`${obtenerAnioNumerico(modalActividad.detalle_anio)}-12-31`"
+                                class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600">
+                                
+                            <input v-model.number="sub.horas" type="number" placeholder="Hrs" class="col-span-2 border rounded p-1 text-xs dark:bg-gray-800 dark:text-white dark:border-gray-600">
+                            <button @click="eliminarItemActividad('invi_subactividad', sIdx)" class="col-span-1 text-red-500 hover:text-red-700 font-bold text-center transition">✕</button>
+                        </div>
+                    </div>
+
+                        <!-- COMPONENTES DINÁMICOS (Indicadores, Productos, Medios, Supuestos) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 text-xs">
+                        <!-- Indicadores -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-bold">Indicadores</span>
+                                <button @click="agregarItemActividad('invi_actindicadores')" class="text-blue-500">+ Agregar</button>
+                            </div>
+                            <div v-for="(item, k) in modalActividad.invi_actindicadores" :key="k" class="flex gap-1 mb-1">
+                                <textarea 
+                                    v-model="item.detalle_indicador" 
+                                    rows="1" 
+                                    @input="ajustarAlturaTextarea"
+                                    type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                <button @click="eliminarItemActividad('invi_actindicadores', k)" class="text-red-500">✕</button>
+                            </div>
+                        </div>
+
+                            <!-- Productos Verificables -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-bold">Productos Verificables</span>
+                                <button @click="agregarItemActividad('invi_actprod_verificables')" class="text-blue-500">+ Agregar</button>
+                            </div>
+                            <div v-for="(item, k) in modalActividad.invi_actprod_verificables" :key="k" class="flex gap-1 mb-1">
+                                <textarea 
+                                    v-model="item.detalle_prod_verif" 
+                                    rows="1" 
+                                    @input="ajustarAlturaTextarea"
+                                    type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                <button @click="eliminarItemActividad('invi_actprod_verificables', k)" class="text-red-500">✕</button>
+                            </div>
+                        </div>
+
+                            <!-- Medios de Verificación -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-bold">Medios de Verificación</span>
+                                <button @click="agregarItemActividad('invi_actmedios_verificacion')" class="text-blue-500">+ Agregar</button>
+                            </div>
+                            <div v-for="(item, k) in modalActividad.invi_actmedios_verificacion" :key="k" class="flex gap-1 mb-1">
+                                <textarea
+                                    v-model="item.detalle_medio_verifica"
+                                    rows="1" 
+                                    @input="ajustarAlturaTextarea" 
+                                    type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                <button @click="eliminarItemActividad('invi_actmedios_verificacion', k)" class="text-red-500">✕</button>
+                            </div>
+                        </div>
+
+                            <!-- Supuestos -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-bold">Supuestos</span>
+                                <button @click="agregarItemActividad('invi_actsupuestos')" class="text-blue-500">+ Agregar</button>
+                            </div>
+                            <div v-for="(item, k) in modalActividad.invi_actsupuestos" :key="k" class="flex gap-1 mb-1">
+                                <textarea 
+                                    v-model="item.detalle_supuestos" 
+                                    rows="1" 
+                                    @input="ajustarAlturaTextarea"
+                                    type="text" class="w-full p-2 text-xs border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden" />
+                                <button @click="eliminarItemActividad('invi_actsupuestos', k)" class="text-red-500">✕</button>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- Botones de Acción del Modal -->
+                    <div class="flex justify-end gap-3 border-t pt-4">
+                        <button @click="showModalActividad = false" class="px-4 py-2 border rounded-lg text-gray-600">Cancelar</button>
+                        <button @click="guardarActividad" class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold">Guardar Actividad</button>
+                    </div>
                 </div>
+            </div>
         </div>
     </div>
 </template>

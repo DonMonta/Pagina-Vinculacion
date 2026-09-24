@@ -53,6 +53,10 @@
               <p class="font-bold text-gray-500 text-xs tracking-wider uppercase dark:text-gray-400">Estado</p>
             </th>
             <th class="py-4 px-4 text-left w-32">
+              <p class="font-bold text-gray-500 text-xs tracking-wider uppercase dark:text-gray-400">Editar Proyect.</p>
+            </th>
+
+            <th class="py-4 px-4 text-left w-32">
               <p class="font-bold text-gray-500 text-xs tracking-wider uppercase dark:text-gray-400">Documento</p>
             </th>
             <th class="py-4 px-4 text-right w-36">
@@ -156,6 +160,17 @@
                 <span class="w-1.5 h-1.5 rounded-full"
                   :class="post.estado === 1 ? 'bg-emerald-500' : 'bg-amber-500'"></span>
                 {{ post.estado === 1 ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="py-4 px-4 align-top whitespace-nowrap">
+              <span :class="{
+                'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide uppercase': true,
+                'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400': post.habilitar_edicion === 1,
+                'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400': post.habilitar_edicion === 0
+              }">
+                <span class="w-1.5 h-1.5 rounded-full"
+                  :class="post.habilitar_edicion === 1 ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                {{ post.habilitar_edicion === 1 ? 'SI' : 'NO' }}
               </span>
             </td>
 
@@ -299,6 +314,18 @@
                   </span>
                 </label>
               </div>
+              <div class="flex flex-col justify-center">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700">Habilitar Edición de Proyectos</label>
+                <label class="relative inline-flex items-center cursor-pointer mt-2">
+                  <input type="checkbox" v-model="edicionBool" class="sr-only peer">
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500">
+                  </div>
+                  <span class="ml-3 text-sm font-medium text-gray-700">
+                    {{ edicionBool ? 'SI (Visible)' : 'NO (Cerrada)' }}
+                  </span>
+                </label>
+              </div>  
 
 
             </div>
@@ -506,6 +533,8 @@ export default {
         num_resolucion: "",
         estado: 1, // Por defecto activo
         archivo: null,
+        habilitar_edicion: 0, // Por defecto no habilitado
+        tipo_convocatoria: "VINCULACIÓN",
         ad_archivo_url: null
       },
       filteredarray: [],
@@ -521,6 +550,7 @@ export default {
       archivoPreviewName: '',
       uploading: false,
       estadoBool: true,
+      edicionBool: false,
       // Configuraciones dinámicas para Elaboración, Revisión y Aprobación
       camposResponsables: {
         elaboracion: { id: 'elaboracion', label: 'elaboración', tipo: 'departamento', cedula: '', texto: '', docente: null, error: '' },
@@ -533,6 +563,9 @@ export default {
   watch: {
     estadoBool(val) {
       this.formulario.estado = val ? 1 : 0;
+    },
+    edicionBool(val) {
+      this.formulario.habilitar_edicion = val ? 1 : 0;
     }
   },
   created() {
@@ -547,27 +580,6 @@ export default {
 
   },
   computed: {
-
-    formIsValid() {
-      const regexAnio = /^\d{4}-\d{4}$/;
-
-      return (
-        this.objetoguardar.num_convocatoria.trim() !== '' &&
-        regexAnio.test(this.objetoguardar.titulo_convocatoria) && // <--- Validación aquí
-        this.objetoguardar.estado !== null &&
-        this.archivoSeleccionado !== null // Si es obligatorio
-      );
-    },
-    formIsValidEdit() {
-      const regexAnio = /^\d{4}-\d{4}$/;
-
-      return (
-        this.objetoeditar.num_convocatoria.trim() !== '' &&
-        regexAnio.test(this.objetoeditar.titulo_convocatoria) && // <--- Validación aquí
-        this.objetoeditar.estado !== null
-        // En edición, el archivo no es obligatorio, así que no lo validamos aquí
-      );
-    },
 
 
   },
@@ -615,11 +627,12 @@ export default {
           num_resolucion: user.num_resolucion,
           estado: user.estado,
           archivo: user.archivo,
+          habilitar_edicion: user.habilitar_edicion,
           ad_archivo_url: user.ad_archivo_url
 
         };
         this.estadoBool = user.estado === 1;
-
+        this.edicionBool = user.habilitar_edicion === 1;
         // Función helper para procesar cómo viene el dato (Cédula 10 dígitos o Texto normal)
         const parseCampo = (clave, valor) => {
           if (!valor) return;
@@ -840,8 +853,9 @@ export default {
     },
 
     limpiarFormulario() {
-      this.formulario = { id_convocatoria: null, num_convocatoria: "", titulo_convocatoria: "", fecha_inicio: "", fecha_fin: "", num_resolucion: "", estado: 1 };
+      this.formulario = { id_convocatoria: null, num_convocatoria: "", titulo_convocatoria: "", fecha_inicio: "", fecha_fin: "", num_resolucion: "", estado: 1, habilitar_edicion: 0, tipo_convocatoria: "VINCULACIÓN" };
       this.estadoBool = true;
+      this.edicionBool = false;
       this.archivoSeleccionado = null;
       this.archivoPreviewName = '';
 

@@ -14,6 +14,6 @@ import { ref } from "vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 //import ComponentCard from "@/components/common/ComponentCard.vue";
-import ProfileCard from "@/components/estudiantes/perfil/ProfileCard.vue";
-const currentPageTitle = ref("Información Personal");
+import ProfileCard from "@/components/docentes/perfil/ProfileCard.vue";
+const currentPageTitle = ref("Perfil");
 </script>
