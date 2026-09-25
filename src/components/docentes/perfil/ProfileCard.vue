@@ -149,12 +149,615 @@
                       Editar Proyecto
                     </button>
                   </div>
+                  <div class="grid grid-cols-2 gap-2 mt-2 border-t border-gray-100 dark:border-gray-700 pt-3">
+                    
+                    <!-- 1. Proyecto PDF -->
+                    <button @click="PDFProyect(proyecto.proyect_id, 'proyecto')"
+                      :disabled="descargando[`${proyecto.proyect_id}_proyecto`]"
+                      class="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400 transition-all">
+                      <i v-if="descargando[`${proyecto.proyect_id}_proyecto`]" class="fas fa-spinner fa-spin"></i>
+                      <svg v-else class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9-3v8H3v-8h2v6h14v-6h2z"/></svg>
+                      Proyecto
+                    </button>
+
+                    <!-- 2. Anexo 2 PDF -->
+                    <button @click="generarPDFCronograma(proyecto.proyect_id, 'anexo2')"
+                      :disabled="descargando[`${proyecto.proyect_id}_anexo2`]"
+                      class="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400 transition-all">
+                      <i v-if="descargando[`${proyecto.proyect_id}_anexo2`]" class="fas fa-spinner fa-spin"></i>
+                      <svg v-else class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9-3v8H3v-8h2v6h14v-6h2z"/></svg>
+                      Anexo 2
+                    </button>
+
+                    <!-- 3. Anexo 3 PDF -->
+                    <button @click="abrirModalAreaTematica(proyecto.proyect_id, 'anexo3')"
+                      :disabled="descargando[`${proyecto.proyect_id}_anexo3`]"
+                      class="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400 transition-all">
+                      <i v-if="descargando[`${proyecto.proyect_id}_anexo3`]" class="fas fa-spinner fa-spin"></i>
+                      <svg v-else class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9-3v8H3v-8h2v6h14v-6h2z"/></svg>
+                      Anexo 3
+                    </button>
+
+                    <!-- 4. Carta Aval PDF -->
+                    <button @click="PDFAnexo1(proyecto.proyect_id, 'carta_aval')"
+                      :disabled="descargando[`${proyecto.proyect_id}_carta_aval`]"
+                      class="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400 transition-all">
+                      <i v-if="descargando[`${proyecto.proyect_id}_carta_aval`]" class="fas fa-spinner fa-spin"></i>
+                      <svg v-else class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9-3v8H3v-8h2v6h14v-6h2z"/></svg>
+                      Carta Aval
+                    </button>
+
+                  </div>
                 </div>
               </div>
             </div>
 
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+  <div v-if="showModalDetalles"
+    class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
+    <div
+      class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+
+      <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50">
+        <div class="max-w-[80%]">
+          <h2 class="text-xl font-bold text-gray-800 dark:text-white truncate">{{
+            proyectoSeleccionado.proyect_nombre }}</h2>
+          <p class="text-sm text-gray-500 italic">Título: {{ proyectoSeleccionado.proyect_titulo }}</p>
+        </div>
+        <button @click="cerraModal" class="p-2 hover:bg-gray-100 rounded-full transition-colors">✕</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-brand-50 border border-brand-100 dark:bg-brand-500/5">
+            <h4 class="text-[10px] font-bold uppercase text-brand-600 mb-1">Facultad Prioritaria</h4>
+            <p class="text-sm font-bold text-gray-800 dark:text-white">{{
+              proyectoSeleccionado.facultades_priori?.siglas }}</p>
+          </div>
+          <div class="p-4 rounded-xl bg-gray-50 border border-gray-100 dark:bg-gray-800">
+            <h4 class="text-[10px] font-bold uppercase text-gray-500 mb-1">Participantes</h4>
+            <div class="flex flex-wrap gap-2">
+              <span v-for="fac in proyectoSeleccionado.facultades" :key="fac.idfacultad"
+                class="px-2 py-0.5 bg-white dark:bg-gray-700 border rounded text-[11px] font-medium">
+                {{ fac.siglas }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="integranteEdit || modoNuevo"
+          class="p-6 border-2 border-blue-100 rounded-2xl bg-blue-50/20 animate-fadeIn">
+          <div class="flex justify-between items-start mb-4">
+            <h4 class="font-bold text-blue-800">
+              {{ modoNuevo ? 'Añadir Nuevo Integrante' : `Editando ${integranteEdit.funcion}:
+              ${integranteEdit.nombre} ${integranteEdit.apellido} ${integranteEdit.apellidomaterno}`
+              }}
+            </h4>
+            <button @click="cancelarEdicion" class="text-xs text-red-500 font-bold hover:underline">Cancelar</button>
+          </div>
+          <div class="flex flex-col md:flex-row gap-6">
+            <div class="flex flex-col items-center space-y-2">
+              <div
+                class="w-32 h-32 rounded-xl border-2 border-dashed border-blue-200 bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden shadow-sm">
+
+                <template v-if="nuevoIntegranteData || integranteEdit">
+                  <img :src="getPhotoUrl(nuevoIntegranteData?.cedula || integranteEdit?.cedula)"
+                    class="w-full h-full object-cover animate-fadeIn" alt="Foto de perfil" />
+                </template>
+
+                <template v-else>
+                  <span class="text-[10px] text-gray-400 text-center px-2">
+                    Esperando integrante...
+                  </span>
+                </template>
+
+              </div>
+              <p class="text-[10px] font-bold text-blue-500 uppercase">Perfil</p>
+            </div>
+            <div class="flex-1">
+              <div v-if="modoNuevo || (formInt.reemplazado == 1)"
+                class="mb-6 flex gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-blue-100 shadow-sm">
+                <div class="flex-1">
+                  <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Buscar
+                    por
+                    Cédula</label>
+                  <input type="text" v-model="cedulaBusqueda" placeholder="Ej: 08xxxxxxx"
+                    class="w-full border rounded-lg p-2 text-sm focus:ring-2 ring-blue-200 outline-none">
+                </div>
+                <button @click="buscarNuevoIntegrante"
+                  class="mt-5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold">
+                  Verificar
+                </button>
+              </div>
+              <div v-if="!modoNuevo || (modoNuevo && nuevoIntegranteData)"
+                class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div v-if="nuevoIntegranteData"
+                  class="md:col-span-3 p-3 bg-green-50 border border-green-100 rounded-lg text-sm text-green-700">
+                  Confirmado: <b>{{ nuevoIntegranteData.nombre_completo }}</b> ({{
+                    nuevoIntegranteData.tipo == 'doc' ? 'Docente' : 'Estudiante' }})
+                </div>
+
+                <div class="relative">
+                  <label class="block text-[10px] font-bold mb-1">Función</label>
+                  <select v-model="formInt.id_funcion" @change="calcularHoras"
+                    class="w-full border rounded-lg p-2 text-sm bg-white dark:bg-gray-800 max-w-full overflow-hidden truncate">
+                    <option :value="null">Seleccione Función</option>
+                    <option v-for="f in funciones" :key="f.id_funcion" :value="f.id_funcion">{{
+                      f.nombre_funcion }}</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[10px] font-bold mb-1">Horas (Automático)</label>
+                  <input type="number" v-model="formInt.horas" disabled
+                    class="w-full border rounded-lg p-2 text-sm bg-gray-100 dark:bg-gray-700 cursor-not-allowed font-bold text-blue-600">
+                </div>
+
+                <div class="relative">
+                  <label class="block text-[10px] font-bold mb-1">Carrera</label>
+                  <select v-model="formInt.idCarr"
+                    class="w-full border rounded-lg p-2 text-sm bg-white dark:bg-gray-800 max-w-full overflow-hidden truncate">
+                    <option v-for="c in carreras" :key="c.idCarr" :value="c.idCarr">{{
+                      c.NombCarr }}
+                    </option>
+                  </select>
+                </div>
+                <div class="md:col-span-3 mt-2 p-4 border rounded-xl bg-gray-50 dark:bg-gray-700/30"
+                  v-if="habilitarcompro">
+                  <label class="block text-[10px] font-bold mb-3 uppercase text-blue-600">
+                    Compromisos a entregar
+                  </label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <label v-for="comp in listaCompromisos" :key="comp"
+                      class="flex items-start gap-2 cursor-pointer group">
+                      <input type="checkbox" :value="comp" v-model="formInt.compromisos"
+                        class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                      <span
+                        class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">
+                        {{ comp }}
+                      </span>
+                    </label>
+                  </div>
+
+                  <!-- Input dinámico para "Otros" -->
+                  <div v-if="formInt.compromisos.includes('Otros')" class="mt-4 animate-fadeIn">
+                    <label class="block text-[10px] font-bold mb-1 uppercase text-gray-500">
+                      Especifique el otro compromiso
+                    </label>
+                    <input type="text" v-model="formInt.compromiso_otro"
+                      placeholder="Ej: Manual de usuario, Prototipo funcional..."
+                      class="w-full border rounded-lg p-2 text-sm focus:ring-2 ring-blue-200 outline-none bg-white dark:bg-gray-800">
+                  </div>
+                </div>
+
+                <div v-if="formInt.reemplazado == 1 || modoNuevo || formInt.anexo_integrante2 == null"
+                  class="md:col-span-2">
+                  <label class="block text-[10px] font-bold mb-1">Documento Respaldo (PDF)</label>
+                  <div @click="$refs.fileFoto.click()"
+                    class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
+                    :class="archivoPreviewName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg v-if="!archivoPreviewName" class="w-8 h-8 mb-3 text-gray-400" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                        <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                      </svg>
+
+                      <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                        <span class="font-semibold" v-if="!archivoPreviewName">Haga clic
+                          para
+                          cargar</span>
+                        <span class="font-semibold text-brand-600" v-else>{{
+                          archivoPreviewName
+                        }}</span>
+                      </p>
+                      <p class="text-xs text-gray-400" v-if="!archivoPreviewName">PDF (Máx.
+                        10MB)</p>
+                    </div>
+
+                    <input type="file" ref="fileFoto" class="hidden" accept="application/pdf"
+                      @change="handleFileChange" />
+                  </div>
+                </div>
+
+                <div v-if="!modoNuevo" class="flex items-center pt-4">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" v-model="formInt.reemplazado" :true-value="1" :false-value="0">
+                    <span class="text-sm font-bold text-red-600">Reemplazar Integrante</span>
+                  </label>
+                </div>
+                <div v-if="!modoNuevo && formInt.reemplazado == 1" class="md:col-span-3 space-y-4">
+
+                  <div class="flex items-center p-3 bg-blue-50 rounded-xl border border-blue-100">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" v-model="continuarEnProyecto" :true-value="true" :false-value="false"
+                        class="w-4 h-4 text-blue-600 rounded">
+                      <span class="text-sm font-bold text-gray-700">
+                        ¿El integrante al que estás reemplazando seguirá en el proyecto?
+                      </span>
+                    </label>
+                  </div>
+
+                  <div v-if="continuarEnProyecto"
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-xl bg-gray-50 animate-fadeIn">
+                    <div>
+                      <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
+                        Función para el integrante saliente</label>
+                      <select v-model="formInt.id_funcion_reemplazado" @change="calcularHorasReemplazo"
+                        class="w-full border rounded-lg p-2 text-sm bg-white">
+                        <option :value="null">Seleccione nueva función</option>
+                        <option v-for="f in funcionesFiltradasSinDireccion" :key="f.id_funcion" :value="f.id_funcion">
+                          {{ f.nombre_funcion }}
+                        </option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nuevas
+                        Horas</label>
+                      <input type="number" v-model="formInt.horas_reemplazado" disabled
+                        class="w-full border rounded-lg p-2 text-sm">
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-[10px] font-bold mb-1 uppercase text-blue-600">Nueva
+                        Carrera</label>
+                      <select v-model="formInt.idCarr_reemplazado"
+                        class="w-full border rounded-lg p-2 text-sm bg-white">
+                        <option v-for="c in carreras" :key="c.idCarr" :value="c.idCarr">{{
+                          c.NombCarr }}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-6 flex justify-end gap-3">
+                <button @click="guardarCambios" :disabled="enviando"
+                  class="bg-blue-700 text-white px-8 py-2 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                  <span v-if="enviando">
+                    Procesando...
+                  </span>
+                  <span v-else>
+                    {{ modoNuevo ? 'Registrar Integrante' : 'Guardar Cambios' }}
+                  </span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+            <h3 class="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+              Integrantes Activos
+              <span class="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full text-xs">{{
+                integrantesFiltrados.length }}</span>
+            </h3>
+            <div class="flex gap-2 w-full sm:w-auto">
+              <input type="text" v-model="filtroIntegrante" placeholder="Filtrar cédula..."
+                class="text-xs border rounded-xl px-4 py-2 flex-1 outline-none focus:border-blue-400">
+              <button @click="activarModoNuevo"
+                class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap">
+                + Añadir
+              </button>
+            </div>
+          </div>
+          <div class="flex justify-end mb-4">
+            <button @click="descargarTodosCompromisos()" :disabled="botonCargando === 'descarga_masiva'"
+              class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+
+              <!-- Spinner -->
+              <svg v-if="botonCargando === 'descarga_masiva'" class="animate-spin h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+              </svg>
+
+              <!-- Icono Descarga Multiple -->
+              <svg v-else width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Descarga Masiva de Anexos de Compromiso
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead class="bg-gray-50 dark:bg-gray-800 text-[11px] uppercase text-gray-400">
+                <tr>
+                  <th class="p-3 text-left">Cédula</th>
+                  <th class="p-3 text-left">Integrante</th>
+                  <th class="p-3 text-center">Horas</th>
+                  <th class="p-3 text-center">Reemplazado</th>
+                  <th class="p-3 text-left">Función / Carrera</th>
+                  <th class="p-3 text-left">Registro / Act.</th>
+                  <th class="p-3 text-center">Anexo Reemplazo</th>
+                  <th class="p-3 text-center">Anexo Original</th>
+                  <th class="p-3 text-center">Anexo Compromiso</th>
+                  <th class="p-3 text-center">Estado</th>
+                  <th class="p-3 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="text-sm divide-y divide-gray-100 dark:divide-gray-800">
+                <tr v-for="int in integrantesFiltrados" :key="int.id_deta_invi_proyect"
+                  class="hover:bg-gray-50/50 transition-colors">
+
+                  <td class="p-3 font-mono text-xs text-gray-500">
+                    {{ int.ciinfper_doc || int.ciinfper_est }}
+                  </td>
+
+                  <td class="p-3">
+                    <p class="font-bold text-gray-700 dark:text-gray-200">
+                      {{ (int.informacion_personal_d || int.informacionpersonal)?.NombInfPer
+                      }}
+                      {{ (int.informacion_personal_d || int.informacionpersonal)?.ApellInfPer
+                      }}
+                    </p>
+                  </td>
+
+                  <td class="p-3 text-center font-bold text-blue-600">
+                    {{ int.horas }}h
+                  </td>
+
+                  <td class="p-3 text-center">
+                    <span :class="int.reemplazado ? 'text-red-500 bg-red-50' : 'text-green-600 bg-green-50'"
+                      class="px-2 py-1 rounded-full text-[10px] font-bold uppercase">
+                      {{ int.reemplazado ? 'Si' : 'No' }}
+                    </span>
+                  </td>
+
+                  <td class="p-3">
+                    <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                      {{ int.funciones?.nombre_funcion || '---' }}
+                    </p>
+                    <p class="text-[10px] text-gray-400 truncate max-w-[150px]">
+                      {{ int.carreras?.NombCarr }}
+                    </p>
+                  </td>
+
+                  <td class="p-3 whitespace-nowrap">
+                    <div class="flex flex-col gap-1">
+                      <div class="flex items-center gap-1 text-[10px] text-gray-500">
+                        <span class="font-bold text-blue-500">CRE:</span>
+                        {{ formatDate(int.created_at) }}
+                      </div>
+                      <div class="flex items-center gap-1 text-[10px] text-gray-400">
+                        <span class="font-bold text-orange-400">ACT:</span>
+                        {{ formatDate(int.updated_at) }}
+                      </div>
+                    </div>
+                  </td>
+
+                  <td class="p-3 text-center" v-if="int.estado === 0">
+                    <div v-if="int.anexo_integrante" class="flex justify-center">
+                      <a :href="`http://vinculacion.test/Documentos/Vinculación/Bajas_Docentes/Anexo/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante}`"
+                        target="_blank"
+                        class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                        title="Ver documento PDF">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                          viewBox="0 0 24 24">
+                          <path
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          <path d="M9 15h6M9 11h6" />
+                        </svg>
+                      </a>
+                    </div>
+                    <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
+                  </td>
+                  <td class="p-3 text-center" v-else>
+                    <div v-if="int.anexo_integrante" class="flex justify-center">
+                      <a :href="`http://vinculacion.test/Documentos/Vinculación/AnexoIntegrante/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante}`"
+                        target="_blank"
+                        class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                        title="Ver documento PDF">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                          viewBox="0 0 24 24">
+                          <path
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          <path d="M9 15h6M9 11h6" />
+                        </svg>
+                      </a>
+                    </div>
+                    <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
+                  </td>
+                  <td class="p-3 text-center">
+                    <div v-if="int.anexo_integrante2" class="flex justify-center">
+                      <a :href="`http://vinculacion.test/Documentos/Vinculación/AnexoIntegrante/${int.ciinfper_doc || int.ciinfper_est}/${int.anexo_integrante2}`"
+                        target="_blank"
+                        class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                        title="Ver documento PDF">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                          viewBox="0 0 24 24">
+                          <path
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          <path d="M9 15h6M9 11h6" />
+                        </svg>
+                      </a>
+                    </div>
+                    <span v-else class="text-[10px] text-gray-300 italic">Sin anexo</span>
+                  </td>
+                  <td class="p-3 text-center">
+                    <div
+                      v-if="int.compromisos.length > 0 || int.funciones?.nombre_funcion == 'Estudiante integrante del proyecto de vinculación'"
+                      class="flex justify-center">
+                      <button @click="descargarcompromiso(int.ciinfper_doc || int.ciinfper_est)"
+                        :disabled="botonCargando === 'compromiso_' + (int.ciinfper_doc || int.ciinfper_est)"
+                        target="_blank"
+                        class="group relative flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Ver documento PDF">
+
+                        <!-- Spinner -->
+                        <svg v-if="botonCargando === 'compromiso_' + (int.ciinfper_doc || int.ciinfper_est)"
+                          class="animate-spin h-[18px] w-[18px]" xmlns="http://www.w3.org/2000/svg" fill="none"
+                          viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                          </circle>
+                          <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                          </path>
+                        </svg>
+
+                        <!-- Ícono de Documento PDF (se oculta si está cargando) -->
+                        <svg v-else width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                          viewBox="0 0 24 24">
+                          <path
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          <path d="M9 15h6M9 11h6" />
+                        </svg>
+                      </button>
+                    </div>
+                    <span v-else class="text-[10px] text-gray-300 italic">Sin anexo Compromiso</span>
+                  </td>
+                  <td class="p-3 text-center">
+                    <span :class="int.estado === 0 ? 'text-red-500 bg-red-50' : 'text-green-600 bg-green-50'"
+                      class="px-2 py-1 rounded-full text-[10px] font-bold uppercase">
+                      {{ int.estado === 0 ? 'Inac' : 'Act' }}
+                    </span>
+                  </td>
+
+                  <td class="p-3 text-right">
+                    <div class="flex justify-end gap-2" v-if="int.estado === 1">
+                      <button @click="seleccionarIntegrante(int)"
+                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                          viewBox="0 0 24 24">
+                          <path
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button @click="inhabilitarIntegrante(int)" v-if="int.estado === 1"
+                        class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                          viewBox="0 0 24 24">
+                          <path
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div v-if="showModalBaja"
+    class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
+    <div
+      class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div class="p-6 border-b dark:border-gray-800 flex justify-between items-center bg-red-50/50">
+        <h3 class="text-lg font-bold text-red-700">Confirmar Baja de Integrante</h3>
+        <button @click="showModalBaja = false" class="text-gray-400 hover:text-gray-600">✕</button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100">
+          <p class="text-xs text-gray-500 uppercase font-bold">Integrante seleccionado:</p>
+          <p class="text-sm font-bold text-gray-800 dark:text-white">
+            {{ (integranteBaja.informacion_personal_d || integranteBaja.informacionpersonal)?.NombInfPer
+            }}
+            {{ (integranteBaja.informacion_personal_d ||
+              integranteBaja.informacionpersonal)?.ApellInfPer }}
+          </p>
+          <p class="text-[10px] text-gray-400 font-mono">{{ integranteBaja.ciinfper_doc ||
+            integranteBaja.ciinfper_est }}</p>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold mb-1">Documento Respaldo (PDF)</label>
+          <div @click="$refs.fileInputBaja.click()"
+            class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all"
+            :class="archivoBajaName ? 'border-brand-500 bg-brand-50/20' : 'border-gray-300 hover:border-brand-400 bg-gray-50 dark:bg-gray-800/50'">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+              <svg v-if="!archivoBajaName" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              <svg v-else class="w-8 h-8 mb-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+              </svg>
+
+              <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                <span class="font-semibold" v-if="!archivoBajaName">Haga clic para
+                  cargar</span>
+                <span class="font-semibold text-brand-600" v-else>{{ archivoBajaName
+                }}</span>
+              </p>
+              <p class="text-xs text-gray-400" v-if="!archivoBajaName">PDF (Máx. 10MB)</p>
+            </div>
+
+            <input type="file" ref="fileInputBaja" class="hidden" accept="application/pdf"
+              @change="handleFileBajaChange" />
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-gray-50 dark:bg-gray-800 flex gap-2">
+        <button @click="showModalBaja = false"
+          class="flex-1 px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition-colors">
+          Cancelar
+        </button>
+        <button @click="confirmarInhabilitar" :disabled="!archivoBaja || cargandoBaja"
+          class="flex-1 px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg disabled:opacity-50 transition-all">
+          {{ cargandoBaja ? 'Procesando...' : 'Confirmar Baja' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <div v-if="showModalArea2Tematica"
+    class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 z-99999">
+    <div class="relative w-full max-w-md p-4 mx-auto bg-white rounded-xl shadow-lg dark:bg-gray-800">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-700">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+          Área Temática
+        </h3>
+        <button @click="cerrarModalAreaTematica" type="button"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+      <!-- Body -->
+      <div class="p-5 space-y-4">
+        <p class="text-sm text-gray-600 dark:text-gray-300">
+          Ingrese el Área Temática del proyecto para incluirla en el Anexo 3.
+        </p>
+        <div>
+          <input v-model="areaTematica2Input" @keyup.enter="generarPDFFinanciamiento" type="text"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+            placeholder="Ej: Educación y Ambiente" autofocus>
+        </div>
+      </div>
+      <!-- Footer -->
+      <div class="flex items-center justify-end p-4 border-t border-gray-200 rounded-b dark:border-gray-700 gap-3">
+        <button @click="cerrarModalAreaTematica" type="button"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white">
+          Cancelar
+        </button>
+        <button @click="generarPDFFinanciamiento" type="button"
+          class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          :disabled="!areaTematica2Input.trim() || isGeneratingPDFFinancia">
+          <i v-if="isGeneratingPDFFinancia" class="fas fa-spinner fa-spin"></i>
+          <i v-else class="fas fa-download"></i>
+          Generar y Descargar
+        </button>
       </div>
     </div>
   </div>
@@ -4574,7 +5177,10 @@ import API from "@/assets/js/services/axios";
 import debounce from 'lodash.debounce';
 import { getMe } from '@/store/auth';
 import { useUsuario } from "@/composables/useUsuario";
+import { mostraralertas2, enviarsolig } from '@/assets/js/function/funciones';
 import { mapGetters } from "vuex";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default {
   data() {
@@ -4582,10 +5188,57 @@ export default {
       isLoading: true, // Agregamos el estado de carga inicializado en true
       idus: 0,
       baseUrl: "/vin",
+      descargando: {},
       PersonalInfo: {},
       UsuarioInfo: {},
       showEditModal: false,
       habilitaredit: false,
+      showModalDetalles: false,
+      proyectoSeleccionado: { invi_detalle_fac_proy: [], invi_detalle_integrante: [] },
+      filtroIntegrante: '',
+      integranteEdit: null,
+      listaCompromisos: [
+        'Libros',
+        'Capítulos de libros',
+        'Artículos científicos',
+        'Informe de Avance cada tres meses',
+        'Otros'
+      ],
+      habilitarcompro: false,
+      formInt: {
+        id_deta_invi_proyect: null,
+        horas: 0,
+        id_funcion: null,
+        idCarr: null,
+        reemplazado: 0,
+        anexo_integrante: null,
+        anexo_integrante2: null,
+        id_funcion_reemplazado: null,
+        horas_reemplazado: 0,
+        idCarr_reemplazado: null,
+        compromisos: [],
+        compromiso_otro: ''
+      },
+      funciones: [],
+      carreras: [],
+      cedulaBusqueda: '',
+      nuevoIntegranteData: null,
+      modoNuevo: false,
+      archivoSeleccionado: null,
+      archivoPreviewName: '',
+      uploading: false,
+      //pdf proyect
+      archivopdfSeleccionado: null,
+      archivopdfPreviewName: '',
+      pdfuploading: false,
+      continuarEnProyecto: true,
+      showModalBaja: false,
+      integranteBaja: null,
+      archivoBaja: null,
+      archivoBajaName: '',
+      cargandoBaja: false,
+      enviando: false,
+      proyectos: [],
       activeTab: 'generales',
       cargandoEdicion: false,
       guardando: false,
@@ -4770,6 +5423,18 @@ export default {
     };
   },
   watch: {
+    getProyectosDetalles: {
+      handler(val) {
+        if (Array.isArray(val) && val.length > 0) {
+          this.cargarProyectos();
+        } else {
+          this.proyectos = [];
+          this.habilitaredit = false;
+        }
+      },
+      immediate: true,
+      deep: true
+    },
     'editForm.politicas': {
       handler(nuevosIdsSeleccionados) {
         this.actualizarObjetivosPoliticas(nuevosIdsSeleccionados);
@@ -4868,9 +5533,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getProyectosDetalles"]),
-    proyectos() {
-      return this.getProyectosDetalles || [];
+    getProyectosDetalles() {
+      return this.$store?.getters?.getProyectosDetalles || [];
+    },
+    integrantesFiltrados() {
+      if (!this.filtroIntegrante) return this.proyectoSeleccionado.invi_detalle_integrante;
+      return this.proyectoSeleccionado.invi_detalle_integrante.filter(i => {
+        const ced = i.ciinfper_doc || i.ciinfper_est;
+        return ced.includes(this.filtroIntegrante);
+      });
     },
     funcionesFiltradasSinDireccion() {
       return this.funciones.filter(f => {
@@ -5121,6 +5792,7 @@ export default {
       this.PersonalInfo = usuario;
       this.UsuarioInfo = useUsuario();
       document.addEventListener('click', this.cerrarMenuContextual);
+      
 
     } catch (error) {
       console.error("Error al cargar datos del usuario:", error);
@@ -5133,6 +5805,54 @@ export default {
     document.removeEventListener('click', this.cerrarMenuContextual);
   },
   methods: {
+    async cargarProyectos() {
+      const listaOriginal = this.getProyectosDetalles;
+      if (!listaOriginal || listaOriginal.length === 0) {
+        this.proyectos = [];
+        this.habilitaredit = false;
+        return;
+      }
+
+      this.cargando = true;
+
+      try {
+        // Promise.all procesa múltiples proyectos en paralelo
+        const proyectosProcesados = await Promise.all(
+          listaOriginal.map(async (proyecto) => {
+            if (!proyecto.id_convocatoria) {
+              return { ...proyecto, habilitar_edicion: 0 };
+            }
+
+            try {
+              const response = await API.get(`${this.baseUrl}/invi_convocatoria/${proyecto.id_convocatoria}`);
+              
+              // Tu respuesta backend viene en: { data: { habilitar_edicion: 1, ... } }
+              const convocatoria = response.data?.data;
+              const estadoEdicion = convocatoria ? convocatoria.habilitar_edicion : 0;
+
+              return {
+                ...proyecto,
+                habilitar_edicion: Number(estadoEdicion)
+              };
+            } catch (error) {
+              console.error(`Error consultando la convocatoria ${proyecto.id_convocatoria}:`, error);
+              return { ...proyecto, habilitar_edicion: 0 };
+            }
+          })
+        );
+
+        // Se asigna la lista procesada al estado reactivo 'proyectos'
+        this.proyectos = proyectosProcesados;
+
+        // 'habilitaredit' pasa a ser true si al menos una convocatoria tiene habilitar_edicion en 1
+        this.habilitaredit = proyectosProcesados.some(p => p.habilitar_edicion === 1);
+
+      } catch (error) {
+        console.error("Error al cargar la información de convocatorias:", error);
+      } finally {
+        this.cargando = false;
+      }
+    },
     getPhotoUrl(ci) {
       return `${API.defaults.baseURL}/vin/getFotoDocente/${ci}`;
     },
@@ -5140,14 +5860,6 @@ export default {
     esDirector(funcion) {
       if (!funcion) return false;
       return funcion.toLowerCase().includes('director');
-    },
-    verDetalleProyecto(id) {
-      // Tu lógica de redirección aquí
-      console.log("Ver detalle del proyecto:", id);
-    },
-    editarProyecto(id) {
-      // Tu lógica de redirección a edición aquí
-      console.log("Editar proyecto:", id);
     },
     handleFacultadPrioriChange() {
       if (this.editForm.proyect_multidis === 1 && this.editForm.id_facultad_priori) {
@@ -5576,6 +6288,3057 @@ export default {
         this.$refs.filePDF.value = null;
       }
     },
+    async PDFProyect(id, tipoDocumento) {
+      const clave = `${id}_${tipoDocumento}`;
+      this.descargando = { ...this.descargando, [clave]: true };
+      try {
+        const idProyecto = id;
+
+        if (!idProyecto) {
+          return mostraralertas2("Error: No se ha seleccionado un proyecto válido.", "warning");
+        }
+
+        const response = await API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`);
+        const data = response.data;
+        const proy = data.proyecto;
+
+        // 1. Inicializar jsPDF
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        // ==============================================================
+        // FASE 1: CREACIÓN DE LA PORTADA (PRIMERA HOJA)
+        // ==============================================================
+        const rutaPortada = '/fondoproy.png'; // <-- Nombre de tu imagen de portada en la carpeta public
+
+        // Dibujar el fondo de la portada
+        doc.addImage(rutaPortada, 'PNG', 0, 0, pageWidth, pageHeight);
+
+        // -- Añadir el Título del Proyecto --
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0); // Color oscuro (puedes cambiarlo a [0, 0, 0] para negro)
+
+        const nombreProyecto = proy.proyect_nombre || 'NOMBRE DEL PROYECTO NO DEFINIDO';
+
+        // Coordenada X desplazada un poco a la derecha (130 aprox) para esquivar la franja verde izquierda
+        const centroAreaBlancaX = 130;
+
+        doc.text(nombreProyecto, centroAreaBlancaX, 140, {
+          align: 'center',
+          maxWidth: 120 // Ancho máximo para que el texto haga salto de línea automático si es largo
+        });
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+
+        // Texto del Vicerrectorado (dividido en 2 líneas como en la imagen)
+        doc.text("Vicerrectorado Investigación, Vinculación", centroAreaBlancaX, 180, { align: 'center' });
+        doc.text("y Posgrado", centroAreaBlancaX, 187, { align: 'center' });
+
+        // Texto de la Dirección de Vinculación
+        doc.text("Dirección de Vinculación con la Sociedad", centroAreaBlancaX, 202, { align: 'center' });
+        // -- Extraer y formatear la fecha (Solo Mes y Año) --
+        let mesAnio = '';
+        if (proy.proyect_fecha_pres) {
+          const partes = proy.proyect_fecha_pres.split('-'); // Formato esperado: YYYY-MM-DD
+          if (partes.length >= 2) {
+            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const mesString = meses[parseInt(partes[1], 10) - 1];
+            const anioString = partes[0];
+            mesAnio = `${mesString} ${anioString}`;
+          }
+        } else {
+          mesAnio = 'Fecha no definida';
+        }
+
+        // -- Añadir la Fecha en la parte inferior --
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0); // Texto negro
+        doc.text(mesAnio, centroAreaBlancaX, 260, { align: 'center' }); // Ajusta el Y=260 según necesidad
+
+
+        // ==============================================================
+        // FASE 2: HOJAS SIGUIENTES Y CONTENIDO (FONDO NORMAL)
+        // ==============================================================
+        const rutaImagenFondo = '/fondo.png';
+
+        const dibujarFondoBanner = () => {
+          doc.addImage(rutaImagenFondo, 'PNG', 0, 0, pageWidth, pageHeight);
+        };
+
+        // Pasamos a la hoja 2
+        doc.addPage();
+
+        // Dibujamos el fondo normal en la hoja 2
+        dibujarFondoBanner();
+
+        // Interceptamos doc.addPage para asegurar que las futuras hojas (3, 4, 5...) lleven el fondo normal
+        const originalAddPage = doc.addPage.bind(doc);
+        doc.addPage = function () {
+          originalAddPage();
+          dibujarFondoBanner();
+        };
+        const limpiarTextoRespectandoSaltos = (texto) => {
+          if (!texto) return '';
+          return texto
+            .split('\n')
+            .map(linea => linea.replace(/[^\S\r\n]+/g, ' ').trim())
+            .join('\n');
+        };
+        // -------------------------------------------------------------
+        // CONTINÚA TU LÓGICA DE DATOS Y TABLAS (Hoja 2 en adelante)
+        // -------------------------------------------------------------
+        const facultadesTxt = data.facultades_data?.map(f => f.siglas || f.siglas || f.siglas).join('\n') || 'N/A';
+        const carrerasTxt = data.carreras_data?.map(c => c.NombCarr || c.NombCarr || c.NombCarr).join('\n') || 'N/A';
+        const dominiosTxt = data.dominios_data?.map(dom => dom.detalle_dom_huma).join('\n') || 'N/A';
+
+        const objetivosTxt = limpiarTextoRespectandoSaltos(
+          data.objetivos_pei_data?.map(o => `${o.cod_obj}. ${(o.detalle_obj || '').trim()}`).join('\n')
+        ) || 'N/A';
+
+        const politicasTxt = limpiarTextoRespectandoSaltos(
+          data.politicas_data?.map(p => `${p.cod_pol}. ${(p.detalle_pol || 'Política').trim()}`).join('\n')
+        ) || 'N/A';
+
+        const agendaTxt = limpiarTextoRespectandoSaltos(
+          data.agenda_ods_data?.map(a => `${a.cod_ods}. ${(a.detalle_ods || 'Agenda').trim()}`).join('\n')
+        ) || 'N/A';
+
+        const objplandeTxt = limpiarTextoRespectandoSaltos(proy.obj_plan_desarrollo || '');
+        const convocatoriaTxt = data.convocatoria_data?.map(c => c.num_convocatoria).join('\n') || 'N/A';
+        const lineaInvestigacion = data.lineas_data?.map(l => l.nombre_lin).join('\n') || 'N/A';
+        const sublineaInvestigacion = data.sublineas_data?.map(sl => sl.nombre_sublin).join('\n') || 'N/A';
+        const areaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área de conocimiento').map(item => item.sau_id + ' ' + item.sau_descripcion).join('\n') || 'N/A';
+        const subareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Subárea de conocimiento').map(item => item.sau_id + ' ' + item.sau_descripcion).join('\n') || 'N/A';
+        const especareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área específica de conocimiento').map(item => item.sau_id + ' ' + item.sau_descripcion).join('\n') || 'N/A';
+        const tipoproyectTxt = data.tipproyectos_data?.map(t => t.detalle_invi_proyect).join('\n') || 'N/A';
+
+        const coberturaSeleccionada = (proy.proyect_cobertura || '').toLowerCase();
+        const checkLocal = coberturaSeleccionada.includes('local') ? 'X' : '  ';
+        const checkRegional = coberturaSeleccionada.includes('regional') ? 'X' : '  ';
+        const checkNacional = coberturaSeleccionada.includes('nacional') ? 'X' : '  ';
+        const checkInternacional = coberturaSeleccionada.includes('internacional') ? 'X' : '  ';
+
+        // --- ESTILOS MAGISTRALES PARA SIMULAR UNA SOLA CELDA SIN LÍNEA DIVISORIA ---
+        const lblStyle = {
+          fontStyle: 'bold',
+          halign: 'left',
+          cellPadding: { top: 3, left: 3, right: 3, bottom: 0 },
+          lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 }
+        };
+        const valStyle = {
+          fontStyle: 'normal',
+          halign: 'left',
+          cellPadding: { top: 1, left: 3, right: 3, bottom: 3 },
+          lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 }
+        };
+
+        // 5. Dibujar Tabla 1: ÚNICAMENTE EL TÍTULO "1. DATOS GENERALES"
+        autoTable(doc, {
+          startY: 30, // Inicia en la segunda hoja a esta altura
+          margin: { left: 15, right: 15 },
+          theme: 'grid',
+          body: [
+            [{ content: '1. DATOS GENERALES', styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 } }]
+          ],
+          styles: { lineColor: [0, 0, 0], lineWidth: 0.3 }
+        });
+
+        // 6. Definir la estructura de la TABLA 2
+        const tablaDatosGenerales = [
+          [{ content: 'Nombre (Español):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_nombre || '', colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Título del proyecto (Español):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_titulo || '', colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Name (Inglés):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_nombre_en || '', colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Title of the project (Inglés):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_titulo_en || '', colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Objetivos del Plan Estratégico Institucional:', colSpan: 3, styles: lblStyle }],
+          [{ content: objetivosTxt, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
+
+          [{ content: 'Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+          [{ content: politicasTxt, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
+
+          [{ content: 'Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe:', colSpan: 3, styles: lblStyle }],
+          [{ content: agendaTxt, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
+
+          [{ content: 'Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+          [{ content: objplandeTxt, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
+
+          [
+            { content: 'Nombre de Facultad/es:', styles: lblStyle },
+            { content: 'Carrera/s:', styles: lblStyle },
+            { content: 'Dominios académicos:', styles: lblStyle }
+          ],
+          [
+            { content: facultadesTxt, styles: valStyle },
+            { content: carrerasTxt, styles: valStyle },
+            { content: dominiosTxt, styles: valStyle }
+          ],
+
+          [
+            { content: 'No. Convocatoria:', styles: lblStyle },
+            { content: 'Línea de Investigación:', styles: lblStyle },
+            { content: 'Sublínea de Investigación:', styles: lblStyle }
+          ],
+          [
+            { content: convocatoriaTxt, styles: valStyle },
+            { content: lineaInvestigacion, styles: valStyle },
+            { content: sublineaInvestigacion, styles: valStyle }
+          ],
+
+          [
+            { content: 'Área Conocimiento UNESCO:', styles: lblStyle },
+            { content: 'SubÁrea Conocimiento UNESCO:', styles: lblStyle },
+            { content: 'SubÁrea Específica Conocimiento UNESCO:', styles: lblStyle }
+          ],
+          [
+            { content: areaespecifica, styles: valStyle },
+            { content: subareaespecifica, styles: valStyle },
+            { content: especareaespecifica, styles: valStyle }
+          ],
+
+          [{ content: 'Tipo de proyecto de vinculación:', colSpan: 3, styles: lblStyle }],
+          [{ content: tipoproyectTxt, colSpan: 3, styles: valStyle }]
+        ];
+
+        // Dibujar Tabla 2 
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 4,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaDatosGenerales,
+          styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false, cellPadding: 3 }
+        });
+
+        // 7. Definir estructura de la TABLA 3 
+        const tablaCobertura = [
+          [{ content: 'COBERTURA Y LOCALIZACIÓN', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+          [
+            { content: `Local                [ ${checkLocal} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+            { content: `Regional          [ ${checkRegional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+            { content: `Nacional          [ ${checkNacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+            { content: `Internacional   [ ${checkInternacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } }
+          ]
+        ];
+
+        // 8. Dibujar Tabla 3
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaCobertura,
+          styles: { fontSize: 8, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0], fillColor: false }
+        });
+        let rawZona = data.zona_plan_data ? data.zona_plan_data.nombre_zona : '';
+        let zonaTxt = rawZona;
+        let regionTxt = '';
+
+        // Expresión regular para separar cuando encuentra " o Región" o simplemente "Región"
+        const regexRegion = /(?:\s+o\s+)?(regi[óo]n\s+.*)/i;
+        const matchRegion = rawZona.match(regexRegion);
+
+        if (matchRegion) {
+          // Remueve la parte de la región para dejar solo el texto de la Zona
+          zonaTxt = rawZona.replace(matchRegion[0], '').trim();
+          // Guarda el resto a partir de la palabra "Región"
+          regionTxt = matchRegion[1].trim();
+        }
+
+        // --- 2. OBTENER PROVINCIA SIN DUPLICADOS ---
+        let provincia = 'N/A';
+
+        if (Array.isArray(proy.invi_detalle_cobe)) {
+          const provinciasMapeadas = proy.invi_detalle_cobe
+            .map(cobe => cobe.provincias?.detalle || cobe.provincia?.detalle)
+            .filter(Boolean);
+
+          provincia = [...new Set(provinciasMapeadas)].join(', ') || 'N/A';
+
+        } else if (Array.isArray(proy.invi_detalle_cobe?.provincias)) {
+          const provinciasMapeadas = proy.invi_detalle_cobe.provincias
+            .map(p => p.detalle)
+            .filter(Boolean);
+
+          provincia = [...new Set(provinciasMapeadas)].join(', ') || 'N/A';
+
+        } else if (proy.invi_detalle_cobe?.provincias?.detalle) {
+          provincia = proy.invi_detalle_cobe.provincias.detalle;
+        }
+
+        // --- 3. OBTENER CANTONES SIN DUPLICADOS ---
+        let cantones = 'N/A';
+
+        if (Array.isArray(proy.invi_detalle_cobe)) {
+          const cantonesMapeadas = proy.invi_detalle_cobe
+            .map(cobe => cobe.cantones?.detalle || cobe.canton?.detalle)
+            .filter(Boolean);
+
+          cantones = [...new Set(cantonesMapeadas)].join(', ') || 'N/A';
+
+        } else if (Array.isArray(proy.invi_detalle_cobe?.cantones)) {
+          const cantonesMapeadas = proy.invi_detalle_cobe.cantones
+            .map(p => p.detalle)
+            .filter(Boolean);
+
+          cantones = [...new Set(cantonesMapeadas)].join(', ') || 'N/A';
+
+        } else if (proy.invi_detalle_cobe?.cantones?.detalle) {
+          cantones = proy.invi_detalle_cobe.cantones.detalle;
+        }
+
+        // --- 4. LÓGICA DE PARROQUIAS (> 6 SE AGRUPAN) ---
+        let parroquiaTxt = 'N/A';
+
+        if (Array.isArray(proy.invi_detalle_cobe)) {
+          const parroquiasMapeadas = proy.invi_detalle_cobe
+            .map(c => {
+              if (c.parroquias?.parroquia) {
+                let tipo = c.parroquias.tipoparroquia ? ` - ${c.parroquias.tipoparroquia}` : '';
+                return `${c.parroquias.parroquia}${tipo}`;
+              }
+              return null;
+            })
+            .filter(Boolean);
+
+          // Eliminamos duplicados por si acaso
+          const parroquiasUnicas = [...new Set(parroquiasMapeadas)];
+
+          if (parroquiasUnicas.length > 6) {
+            parroquiaTxt = `Urbanas y rurales de la Provincia de ${provincia}`;
+          } else if (parroquiasUnicas.length > 0) {
+            parroquiaTxt = parroquiasUnicas.join('\n');
+          }
+        }
+
+
+        // -------------------------------------------------------------
+        // 10. ESTRUCTURA Y DIBUJO DE LA TABLA 4 (ZONAS Y OBJETIVOS)
+        // -------------------------------------------------------------
+        const tablaUbicacion = [
+          // Fila 1: Cabeceras
+          [
+            { content: 'Zona de\nPlanificación', styles: lblStyle },
+            { content: 'Región', styles: lblStyle },
+            { content: 'Provincia', styles: lblStyle },
+            { content: 'Cantón', styles: lblStyle },
+            { content: 'Parroquia', styles: lblStyle }
+          ],
+          // Fila 2: Datos procesados
+          [
+            { content: zonaTxt, styles: valStyle },
+            { content: regionTxt, styles: valStyle },
+            { content: provincia, styles: valStyle },
+            { content: cantones, styles: valStyle },
+            { content: parroquiaTxt, styles: valStyle }
+          ],
+          // Fila 3: Celda combinada gris para Objetivos
+          [
+            {
+              content: 'OBJETIVOS DEL PROYECTO',
+              colSpan: 5,
+              styles: {
+                fontStyle: 'bold',
+                fillColor: [220, 220, 220], // Color gris referencial de la imagen
+                halign: 'left'
+              }
+            }
+          ]
+        ];
+
+        // Dibujar Tabla 4
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 10, // Inicia justo debajo de la Tabla de Cobertura sin espacio
+          margin: { left: 15, right: 15 },
+          theme: 'grid',
+          body: tablaUbicacion,
+          styles: {
+            fontSize: 8,
+            cellPadding: 3,
+            lineColor: [0, 0, 0],
+            lineWidth: 0.3,
+            textColor: [0, 0, 0],
+            fillColor: false
+          }
+        });
+        const objetivosGenerales = proy.invi_obj_proyectos?.filter(item => item.tipo_obj_proy === 'general') || [];
+        const objetivosFin = proy.invi_obj_proyectos?.filter(item => item.tipo_obj_proy === 'fin') || [];
+
+        // 2. Extraer Objetivo General y Fin
+        const objetivogeneral = objetivosGenerales.map(item => item.detalle_obj_proy).filter(Boolean).join('\n') || 'N/A';
+        const finproy = objetivosFin.map(item => item.detalle_obj_proy).filter(Boolean).join('\n') || 'N/A';
+
+        // 3. Función auxiliar para extraer relaciones (Medios, Metas, Indicadores) y poner viñetas
+        const extraerConVinetas = (objetivos, relacion, campoTexto) => {
+          let resultados = [];
+
+          objetivos.forEach(obj => {
+            const dataRelacion = obj[relacion];
+            if (Array.isArray(dataRelacion)) {
+              // Si viene como Array (Múltiples registros)
+              dataRelacion.forEach(item => {
+                if (item[campoTexto]) resultados.push(item[campoTexto]);
+              });
+            } else if (dataRelacion && dataRelacion[campoTexto]) {
+              // Si viene como Objeto único
+              resultados.push(dataRelacion[campoTexto]);
+            }
+          });
+
+          if (resultados.length === 0) return 'N/A';
+          if (resultados.length === 1) return resultados[0]; // Sin viñeta si es solo uno
+
+          // Si hay más de 1, agregamos viñetas
+          return resultados.map(r => `• ${r}`).join('\n');
+        };
+
+        // 4. Aplicar la función a las variables Objetivo General
+        const objgemediover = extraerConVinetas(objetivosGenerales, 'invi_medios_verificacion', 'detalle_medio_verifica');
+        const objgemeta = extraerConVinetas(objetivosGenerales, 'invi_metas', 'detalle_metas');
+        const objgindica = extraerConVinetas(objetivosGenerales, 'invi_indicadores', 'detalle_indicador');
+        const objgsupuestos = extraerConVinetas(objetivosGenerales, 'invi_supuestos', 'detalle_supuestos');
+
+        //Fin
+        const finmediover = extraerConVinetas(objetivosFin, 'invi_medios_verificacion', 'detalle_medio_verifica');
+        const finindica = extraerConVinetas(objetivosFin, 'invi_indicadores', 'detalle_indicador');
+        const finsupuestos = extraerConVinetas(objetivosFin, 'invi_supuestos', 'detalle_supuestos');
+        // 5. Estructurar la Tabla
+        const tablaObjetivos = [
+          [{ content: 'Objetivo General:', colSpan: 3, styles: lblStyle }],
+          [{ content: objetivogeneral, colSpan: 3, styles: { halign: 'justify' } }],
+
+          [{ content: 'Fin:', colSpan: 3, styles: lblStyle }],
+          [{ content: finproy, colSpan: 3, styles: { halign: 'justify' } }],
+
+          [{ content: 'Medio de Verificación:', colSpan: 3, styles: lblStyle }],
+          [{ content: objgemediover, colSpan: 3, styles: { halign: 'justify' } }],
+
+          [{ content: 'Meta:', colSpan: 3, styles: lblStyle }],
+          [{ content: objgemeta, colSpan: 3, styles: { halign: 'justify' } }],
+
+          [{ content: 'Indicador:', colSpan: 3, styles: lblStyle }],
+          [{ content: objgindica, colSpan: 3, styles: { halign: 'justify' } }]
+        ];
+
+        // 6. Dibujar Tabla de Objetivos
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaObjetivos,
+          styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false, cellPadding: 3 }
+        });
+        const formatearLista = (relacion, campo, etiqueta = '') => {
+          if (!relacion) return etiqueta ? `${etiqueta} N/A` : 'N/A';
+
+          const items = Array.isArray(relacion) ? relacion : [relacion];
+          const textos = items.map(item => item[campo] || item.detalle || '').filter(Boolean);
+
+          if (textos.length === 0) return etiqueta ? `${etiqueta} N/A` : 'N/A';
+
+          // Si es solo 1 elemento
+          if (textos.length === 1) {
+            return etiqueta ? `${etiqueta} ${textos[0]}` : textos[0];
+          }
+
+          // Si hay más de 1 elemento, se agregan viñetas a cada uno
+          const listaConVinetas = textos.map(t => `•  ${t}`).join('\n');
+          return etiqueta ? `${etiqueta}\n${listaConVinetas}` : listaConVinetas;
+        };
+
+        // -------------------------------------------------------------
+        // 2. FILTRAR OBJETIVOS ESPECÍFICOS Y CONSTRUIR FILAS DE LA TABLA
+        // -------------------------------------------------------------
+        const objetivosEspecificos = proy.invi_obj_proyectos?.filter(item => item.tipo_obj_proy === 'especifico') || [];
+
+        const bodyObjEspecificos = [
+          // Cabecera de la tabla
+          [
+            { content: 'OBJETIVOS ESPECÍFICOS', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: 'PRODUCTOS VERIFICABLES', styles: { fontStyle: 'bold', halign: 'center' } }
+          ]
+        ];
+
+        // Recorrer y numerar dinámicamente cada objetivo específico
+        objetivosEspecificos.forEach((obj, index) => {
+          const numero = index + 1;
+          const objTexto = `${numero}.  ${obj.detalle_obj_proy || ''}`;
+
+          // Si hay 1 meta/indicador muestra "Meta: Texto". Si hay varias, genera viñetas debajo de "Meta:"
+          const metaTexto = formatearLista(obj.invi_metas, 'detalle_metas', 'Meta:');
+          const indicadorTexto = formatearLista(obj.invi_indicadores, 'detalle_indicador', 'Indicador:');
+          const productosTexto = formatearLista(obj.invi_prod_verificables, 'detalle_prod_verif');
+
+          // Fila 1 del Objetivo (Texto del Objetivo + Productos Verificables combinados verticalmente)
+          bodyObjEspecificos.push([
+            { content: objTexto, styles: { halign: 'justify', fontStyle: 'bold' } },
+            { content: productosTexto, rowSpan: 3, styles: { halign: 'justify', valign: 'top' } }
+          ]);
+
+          // Fila 2 del Objetivo (Meta / Metas)
+          bodyObjEspecificos.push([
+            { content: metaTexto, styles: { halign: 'justify' } }
+          ]);
+
+          // Fila 3 del Objetivo (Indicador / Indicadores)
+          bodyObjEspecificos.push([
+            { content: indicadorTexto, styles: { halign: 'justify' } }
+          ]);
+        });
+
+        // -------------------------------------------------------------
+        // 3. DIBUJAR LA TABLA DE OBJETIVOS ESPECÍFICOS
+        // -------------------------------------------------------------
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: bodyObjEspecificos,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            lineWidth: 0.3,
+            textColor: [0, 0, 0],
+            fillColor: false,
+            cellPadding: 3
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto' }, // Columna de Objetivos Específicos
+            1: { cellWidth: 80 }     // Ancho fijo de la columna Productos Verificables
+          }
+        });
+        const tablaAntecedentesyJustif = [
+          [{ content: 'Antecedentes:', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'justify' } }],
+          [{ content: proy.proyect_antecedentes || '', colSpan: 3, styles: { halign: 'justify' } }],
+          [{ content: 'Justificación:', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'justify' } }],
+          [{ content: proy.proyect_justificacion || '', colSpan: 3, styles: { halign: 'justify' } }]
+        ];
+
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaAntecedentesyJustif,
+          styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false, cellPadding: 3 }
+        });
+        const tablainstituciones = [
+          [{ content: 'INSTITUCIONES INVOLUCRADAS QUE BRINDAN FINANCIAMIENTO INTERNO Y EXTERNO', colSpan: 6, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'center' } }],
+          [{ content: 'Datos de las Instituciones Ejecutoras', colSpan: 6, styles: { fontStyle: 'bold', halign: 'left' } }]
+        ];
+        proy.invi_detalle_inst_proy.sort((a, b) => {
+          const rucPrincipal = "0860000830001";
+          // Si 'a' tiene el RUC principal, lo movemos hacia arriba (-1)
+          if (a.praempresas.ruc === rucPrincipal) return -1;
+          // Si 'b' tiene el RUC principal, lo movemos hacia arriba (1)
+          if (b.praempresas.ruc === rucPrincipal) return 1;
+          // Para el resto, no cambiamos el orden (0)
+          return 0;
+        });
+        proy.invi_detalle_inst_proy.forEach((item) => {
+          // Accedemos al objeto praempresas donde están los datos
+          const emp = item.praempresas;
+
+          // Concatenar el título y nombre del representante si existen
+          const representanteStr = (emp.titulo ? emp.titulo + ' ' : '') + (emp.representante || '');
+
+          // Fila A: Nombre de la Institución (Ocupa las 6 columnas, centrado, cursiva/negrita)
+          tablainstituciones.push([
+            {
+              content: emp.empresacorta || emp.empresa || '',
+              colSpan: 6,
+              styles: { fontStyle: 'bolditalic', halign: 'center', fillColor: [245, 245, 245] }
+            }
+          ]);
+
+          // Fila B: Representante Legal y Cédula (2 cols - 2 cols - 1 col - 1 col)
+          tablainstituciones.push([
+            { content: 'Representante Legal', colSpan: 2 },
+            { content: representanteStr, colSpan: 2 },
+            { content: 'Cédula de Identidad', colSpan: 1 },
+            { content: emp.ci_representante || '', colSpan: 1 }
+          ]);
+
+          // Fila C: Teléfonos, Fax y Correo (1 col c/u = 6 columnas en total)
+          tablainstituciones.push([
+            { content: 'Teléfonos', colSpan: 1 },
+            { content: emp.telefono || '', colSpan: 1 },
+            { content: 'Fax', colSpan: 1 },
+            { content: '', colSpan: 1 }, // Lo dejamos vacío porque no viene en tu JSON
+            { content: 'Correo Electrónico', colSpan: 1 },
+            { content: emp.email || '', colSpan: 1, styles: { textColor: [0, 0, 255] } } // Texto azul simulando link
+          ]);
+
+          // Fila D: Dirección Institucional
+          tablainstituciones.push([
+            { content: 'Dirección Institucional', colSpan: 2 },
+            { content: emp.direccion || '', colSpan: 4 }
+          ]);
+
+          // Fila E: Página Web
+          tablainstituciones.push([
+            { content: 'Página Web Institucional', colSpan: 2 },
+            { content: emp.url || '', colSpan: 4, styles: { textColor: [0, 0, 255] } } // Texto azul
+          ]);
+
+          // Fila F: Órgano Ejecutor (Uso 'cargo' como placeholder, pero puedes cambiarlo por el campo que corresponda)
+          tablainstituciones.push([
+            { content: 'Órgano Ejecutor', colSpan: 2 },
+            { content: 'Dirección de Vinculación  UTLVTE', colSpan: 4 }
+          ]);
+        });
+
+        // 3. Dibujar la tabla en el PDF
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablainstituciones,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle' // Para que el texto quede centrado verticalmente en cada celda
+          },
+          // Definimos los anchos de columna para asegurar que la cuadrícula se distribuya bien
+          // Total de la página suele ser ~180 de ancho (210mm ancho total - 30mm de márgenes)
+          columnStyles: {
+            0: { cellWidth: 30 },
+            1: { cellWidth: 30 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 30 },
+            4: { cellWidth: 30 },
+            5: { cellWidth: 30 } // Se ajustarán automáticamente de forma proporcional
+          }
+        });
+        let totalPresupuesto = 0;
+
+        // 1. Obtenemos el arreglo principal (asegurándonos de que no sea undefined)
+        const detallesPresupuesto = proy?.invi_detalle_presu_proy || [];
+
+        // 2. Encabezados principales estáticos
+        const tablapresupuesto = [
+          [{ content: 'PRESUPUESTO', colSpan: 6, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+          [{ content: 'PROYECTO VINCULACIÓN', colSpan: 6, styles: { fontStyle: 'bold', halign: 'left' } }]
+        ];
+
+        // ---------------------------------------------------------
+        // 3. SECCIÓN UTLVTE
+        // Filtramos SOLO los registros que SÍ tienen aportes de la UTLVT
+        // ---------------------------------------------------------
+        const aportesUtlvt = detallesPresupuesto.filter(item => item.invi_aportesutlvt !== null);
+
+        if (aportesUtlvt.length > 0) {
+          tablapresupuesto.push([
+            { content: 'APORTES UNIVERSIDAD TÉCNICA "LUIS VARGAS TORRES" DE ESMERALDAS', colSpan: 6, styles: { fontStyle: 'bold', halign: 'center' } }
+          ]);
+          tablapresupuesto.push([
+            { content: 'Actividad', colSpan: 5, styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: 'Valor ($)', colSpan: 1, styles: { fontStyle: 'bold', halign: 'center' } }
+          ]);
+
+          aportesUtlvt.forEach(aporte => {
+            // Accedemos correctamente a los datos internos
+            const dataUTLVT = aporte.invi_aportesutlvt;
+            const valor = parseFloat(dataUTLVT.valor) || 0;
+            totalPresupuesto += valor;
+
+            tablapresupuesto.push([
+              { content: dataUTLVT.actividad || '', colSpan: 5, styles: { halign: 'left' } },
+              { content: valor.toString(), colSpan: 1, styles: { halign: 'center' } }
+            ]);
+          });
+        }
+
+        // ---------------------------------------------------------
+        // 4. SECCIÓN ENTIDADES COOPERANTES (Múltiples)
+        // Filtramos SOLO los registros que SÍ tienen aportes de instituciones
+        // ---------------------------------------------------------
+        const aportesInst = detallesPresupuesto.filter(item => item.invi_aportesinst !== null);
+
+        if (aportesInst.length > 0) {
+          // Como puede haber varias instituciones diferentes, las AGRUPAMOS por su nombre (empresacorta)
+          const institucionesAgrupadas = {};
+
+          aportesInst.forEach(aporte => {
+            const dataInst = aporte.invi_aportesinst;
+            // Obtenemos el nombre de la empresa para usarlo como llave del grupo
+            const nombreEmpresa = dataInst.praempresa?.empresacorta || dataInst.praempresa?.empresa || 'INSTITUCIÓN';
+
+            // Si el grupo no existe, lo creamos
+            if (!institucionesAgrupadas[nombreEmpresa]) {
+              institucionesAgrupadas[nombreEmpresa] = [];
+            }
+            // Guardamos el aporte dentro del grupo de su respectiva institución
+            institucionesAgrupadas[nombreEmpresa].push(dataInst);
+          });
+
+          // Ahora recorremos cada grupo (cada institución) para pintar su propia sección
+          for (const [nombreInstitucion, items] of Object.entries(institucionesAgrupadas)) {
+
+            // Título dinámico para la institución actual
+            tablapresupuesto.push([
+              { content: `APORTES ENTIDAD COOPERANTE - ${nombreInstitucion}`, colSpan: 6, styles: { fontStyle: 'bold', halign: 'center' } }
+            ]);
+
+            // Subtítulos de esta institución
+            tablapresupuesto.push([
+              { content: 'Concepto', colSpan: 5, styles: { fontStyle: 'bold', halign: 'center' } },
+              { content: 'Valor ($)', colSpan: 1, styles: { fontStyle: 'bold', halign: 'center' } }
+            ]);
+
+            // Recorremos los ítems de esta institución
+            items.forEach(data => {
+              const valor = parseFloat(data.valor) || 0;
+              totalPresupuesto += valor;
+
+              tablapresupuesto.push([
+                { content: data.actividad || '', colSpan: 5, styles: { halign: 'left' } },
+                { content: valor.toString(), colSpan: 1, styles: { halign: 'center' } }
+              ]);
+            });
+          }
+        }
+
+        // ---------------------------------------------------------
+        // 5. FILA FINAL DEL TOTAL
+        // ---------------------------------------------------------
+        tablapresupuesto.push([
+          { content: 'TOTAL, DEL PROYECTO ($):', colSpan: 5, styles: { fontStyle: 'bold', halign: 'center' } },
+          { content: totalPresupuesto.toString(), colSpan: 1, styles: { fontStyle: 'bold', halign: 'center' } }
+        ]);
+
+        // ---------------------------------------------------------
+        // 6. DIBUJAR LA TABLA EN EL DOCUMENTO PDF
+        // ---------------------------------------------------------
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablapresupuesto,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle'
+          },
+          // Le asignamos un ancho más pequeño fijo a la última columna para que se parezca más a tu imagen
+          columnStyles: {
+            5: { cellWidth: 35 } // Esto hace que la columna "Valor ($)" sea más estrecha y "Actividad" ocupe el resto.
+          }
+        });
+        // 1. Usar corchetes o paréntesis para las casillas, evitamos problemas de fuentes
+        const estadoBD = proy.proyect_estado;
+        const checkNuevo = (estadoBD === 'Nuevo' || estadoBD === 1) ? '[ X ]' : '[   ]';
+        const checkEjecucion = (estadoBD === 'En Ejecución' || estadoBD === 2) ? '[ X ]' : '[   ]';
+        const checkContinuacion = (estadoBD === 'Continuación' || estadoBD === 3) ? '[ X ]' : '[   ]';
+
+        // 2. Construimos el texto del estado con un salto de línea inicial para imitar el diseño
+        const estadoTexto = `Estado:\nNuevo: ${checkNuevo}    En Ejecución: ${checkEjecucion}    Continuación: ${checkContinuacion}`;
+
+        // 3. Definimos los estilos base si los tienes guardados en variables, o los aplicamos directamente.
+        // Si tienes una fuente específica cargada, debes asegurarte de que `valStyle` la incluya (ej. font: 'times')
+
+        const tablaplazoejecu = [
+          // Fila 1: Título
+          [
+            { content: 'PLAZO DE EJECUCIÓN', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }
+          ],
+          // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+          [
+            {
+              content: `Fecha de presentación\n(${proy.proyect_fecha_pres || ''})`,
+              // Usa tus variables de estilo si prefieres, pero asegúrate de que tengan `halign: 'left'`
+              styles: { fontStyle: 'bold', halign: 'left' }
+            },
+            {
+              content: `Fecha de inicio\n(${proy.fechainicio || ''})\nTras aprobación del CSU.`,
+              styles: { fontStyle: 'bold', halign: 'left' }
+            },
+            {
+              content: `Fecha de finalización\n(${proy.fechafin || ''})`,
+              styles: { fontStyle: 'bold', halign: 'left' }
+            }
+          ],
+          // Fila 3: Duración y Estado
+          [
+            // Columna 1 (Índice 0): Duración
+            {
+              content: `Duración en meses:\n${proy.proyect_duracion_mes || ''}`,
+              colSpan: 1,
+              styles: { halign: 'center', fontStyle: 'bold' }
+            },
+            // Columnas 2 y 3 fusionadas (Índices 1 y 2): Estado
+            {
+              content: estadoTexto,
+              colSpan: 2,
+              styles: { halign: 'left', fontStyle: 'normal' } // fontStyle normal para que no sea negrita todo
+            }
+          ]
+        ];
+
+        // 4. Renderizado
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaplazoejecu,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+          // Forzamos proporciones iguales (1/3 del ancho total cada una)
+          columnStyles: {
+            0: { cellWidth: '33%' },
+            1: { cellWidth: '33%' },
+            2: { cellWidth: '33%' }
+          }
+        });
+        const capitalizarNombres = (str) => {
+          if (!str) return '';
+          return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        };
+
+        // 2. Función auxiliar para obtener la prioridad según el texto del rol/función
+        const getPrioridadFuncion = (nombreFuncion = '') => {
+          const f = nombreFuncion.toLowerCase();
+
+          // Evaluamos 'subdirector' antes de 'director' para evitar coincidencias erróneas
+          if (f.includes('subdirector')) return 2;
+          if (f.includes('director')) return 1;
+          if (f.includes('técnico') || f.includes('tecnico')) return 4;
+          if (f.includes('docente')) return 3;
+          if (f.includes('administrativo') || f.includes('administrativa')) return 5;
+          if (f.includes('estudiante')) return 6;
+
+          return 7; // Cualquier otro rol no contemplado
+        };
+
+        // 3. Obtener e integrar la lista ordenada por función
+        const integrantesRaw = data.integrantes_titulosactivos || data.integrantes_activos || [];
+
+        const integrantes = [...integrantesRaw].sort((a, b) => {
+          const funcA = a.funciones ? a.funciones.nombre_funcion : '';
+          const funcB = b.funciones ? b.funciones.nombre_funcion : '';
+          return getPrioridadFuncion(funcA) - getPrioridadFuncion(funcB);
+        });
+
+        // 4. Mapear los datos para las filas de AutoTable
+        const filasPersonal = integrantes.map(integrante => {
+          const info = integrante.informacion_personal_d || integrante.informacionpersonal || {};
+
+          // Función (rol en el proyecto)
+          const funcion = integrante.funciones ? integrante.funciones.nombre_funcion : '';
+
+          // Cédula
+          const cedula = info.cedula_pasaporte || info.CIInfPer || '';
+
+          // Nombre formateado enviado desde el backend (PHP)
+          let nombreCompleto = integrante.nombre_completo_titulo;
+          if (!nombreCompleto) {
+            const nombresStr = `${info.NombInfPer || ''} ${info.ApellInfPer || ''} ${info.ApellMatInfPer || ''}`.trim();
+            nombreCompleto = capitalizarNombres(nombresStr);
+          }
+
+          // Carrera y Facultad
+          const idcarr = integrante.idCarr;
+          let carrera = '';
+          let facultad = '';
+
+          if (idcarr && integrante.carreras) {
+            carrera = integrante.carrera_formateada || '';
+            if (integrante.carreras.facultades && integrante.carreras.facultades.length > 0) {
+              facultad = integrante.carreras.facultades[0].siglas || '';
+            }
+          }
+
+          const fincarrera = (facultad && carrera) ? `${facultad} - ${carrera}` : (carrera || facultad || '');
+
+          // Correo
+          const correo = info.mailInst || info.mailPer || '';
+
+          return [
+            { content: funcion, styles: { halign: 'center' } },
+            { content: cedula, styles: { halign: 'center' } },
+            { content: nombreCompleto, styles: { halign: 'center' } },
+            { content: fincarrera, styles: { halign: 'center' } },
+            { content: correo, styles: { halign: 'center', textColor: [0, 85, 164] } },
+            { content: '', styles: { halign: 'center' } }
+          ];
+        });
+
+        // 5. Estructura general de la tabla "PERSONAL RESPONSABLE"
+        const tablaPersonal = [
+          [
+            {
+              content: 'PERSONAL RESPONSABLE DEL PROYECTO',
+              colSpan: 6,
+              styles: { fontStyle: 'bold', fillColor: [230, 230, 230], halign: 'left', cellPadding: { top: 3, left: 2, right: 2, bottom: 0 }, lineWidth: { top: 0.1, left: 0.1, right: 0.1, bottom: 0 } }
+            }
+          ],
+          [
+            {
+              content: 'Nota. De ser el caso que exista un docente que se desvincule del proyecto o de algunos/as de los/as integrantes se deberá informar mediante oficio a la Dirección de Vinculación con la Sociedad.',
+              colSpan: 6,
+              styles: { fontStyle: 'italic', fillColor: [230, 230, 230], halign: 'justify', fontSize: 7, cellPadding: { top: 1, left: 2, right: 2, bottom: 3 }, lineWidth: { top: 0, left: 0.1, right: 0.1, bottom: 0.1 } }
+            }
+          ],
+          [
+            { content: '', colSpan: 6, styles: { cellPadding: 2, fillColor: [255, 255, 255] } }
+          ],
+          [
+            { content: 'FUNCIÓN', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+            { content: 'CÉDULA DE IDENTIDAD', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+            { content: 'NOMBRE COMPLETO', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+            // EL TRUCO ESTÁ AQUÍ: Añadimos espacios antes y después de las barras "/"
+            { content: 'CARRERA / DIRECCIONES / INSTITUCIÓN A LA QUE PERTENECE', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+            { content: 'CORREO ELECTRÓNICO', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+            { content: 'FIRMAS', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } }
+          ],
+          ...filasPersonal
+        ];
+
+        // 6. Renderizado final de la tabla con anchos optimizados
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 10,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaPersonal,
+          styles: {
+            fontSize: 7.5,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            // Aseguramos que el texto largo se rompa hacia abajo y no empuje las celdas
+            overflow: 'linebreak'
+          },
+          // Suma exacta de 100% con anchos más realistas para que nada se trabe
+          columnStyles: {
+            0: { cellWidth: '10%' }, // Función
+            1: { cellWidth: '10%' }, // Cédula 
+            2: { cellWidth: '14%' }, // Nombre completo
+            3: { cellWidth: '13%' }, // Carrera / Facultad (Un 13% es el mínimo seguro)
+            4: { cellWidth: '18%' }, // Correo (Necesita este espacio para que los correos largos no rompan la tabla)
+            5: { cellWidth: '35%' }  // Firmas (Espacio amplio y garantizado)
+          }
+        });
+        const tablaplan1 = [
+          // Fila 1: Título
+          [
+            { content: 'CONSIDERACIONES DE CÁRACTER EQUITATIVO', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }
+          ],
+          // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+          [
+            { content: 'El proyecto debe estar redactado con perspectiva de género, lo que implica usar el femenino y masculino o sustantivo neutro. Asimismo, es recomendable dirigirse en estos términos a la comunidad beneficiaria con el objetivo de evitar la exclusión.', colSpan: 3, styles: { halign: 'justify' } }
+          ],
+          [
+            { content: 'ÉTICA', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }
+          ],
+          [
+            {
+              content: 'Las y los participantes del proyecto demostrarán un comportamiento absolutamente opuesto al fraude o deshonestidad académica, descritas en el artículo 68 del Reglamento de Régimen Académico emitido por el CES, como "toda acción que, inobservando el principio de transparencia académica, viola los derechos de autor o incumple las normas éticas establecidas por las IES o por el profesor, para los procesos de evaluación y/o presentación de resultados de aprendizaje, investigación o sistematización".',
+              colSpan: 3, styles: { halign: 'justify' }
+            }
+          ],
+          [
+            { content: '2. DIAGNÓSTICO Y PROBLEMA', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }
+          ],
+        ];
+
+        // 4. Renderizado
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaplan1,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            cellPadding: 3
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+        });
+        const tabladiagprom = [
+          [{ content: '2.1 Descripción de la situación actual para contribuir a la satisfacción de necesidades y la solución de problemáticas del entorno desde el ámbito académico e investigativo:', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_desc_situ_act, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
+
+          [{ content: '2.2 Identificación, descripción y diagnóstico del problema:', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_diag_probl, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }],
+          [
+            { content: '2.3 Articulación del proyecto de vinculación con el programa de la carrera', colSpan: 3, styles: { fontStyle: 'bold', halign: 'left' } }
+          ],
+        ];
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 4,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tabladiagprom,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            cellPadding: 3
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+        });
+        const asiognaturasTxt = data.asignaturas_data?.map(f => '* ' + f.NombAsig).join('\n') || 'N/A';
+        const tablaarticula = [
+          // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+          [
+            { content: 'Contribución a la sociedad', styles: { halign: 'left' } },
+            { content: 'Asignatura(s) que aportan al proyecto', styles: { fontStyle: 'bold', halign: 'left' } }
+          ],
+          [
+            { content: proy.proyect_contribucion_soci, styles: { halign: 'justify' } },
+            { content: asiognaturasTxt, styles: { halign: 'left' } }
+          ]
+        ];
+
+        // 4. Renderizado
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaarticula,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            cellPadding: 3
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto' }, // 
+            1: { cellWidth: 80 }     // 
+          }
+        });
+        const tablaidentific = [
+          [{ content: 'Identificación y caracterización de la población objetiva beneficiarios (as)', colSpan: 3, styles: lblStyle }],
+          [{ content: `${proy.proyec_ident_poblaobj} \n(Obtención de datos de página oficial del INEC censo 2022)`, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }]
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaidentific,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            cellPadding: 3
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+        });
+        const tablapersonas = [
+          // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+          [
+            { content: 'Número Directos Hombres:', styles: lblStyle },
+            { content: 'Número Directos Mujeres:', styles: lblStyle },
+            { content: 'Total, Número Directos:', styles: lblStyle },
+            { content: 'Total, Número Indirectos:', styles: lblStyle },
+            { content: 'Personas con diversidad funcional (capacidades especiales):', styles: lblStyle },
+          ],
+          [
+            { content: proy.proyect_num_direct_hombres, styles: valStyle },
+            { content: proy.proyect_num_direct_mujeres, styles: valStyle },
+            { content: proy.proyect_total_num_direct, styles: valStyle },
+            { content: proy.proyect_total_num_indirect, styles: valStyle },
+            { content: proy.proyect_num_personas_div_fun, styles: valStyle }
+          ]
+        ];
+
+        // 4. Renderizado
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablapersonas,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            cellPadding: 3
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto' }, // 
+            1: { cellWidth: 'auto' },
+            2: { cellWidth: 'auto' },
+            3: { cellWidth: 'auto' },
+            4: { cellWidth: 'auto' }
+          }
+        });
+        const tablatextpaln = [
+          [{ content: 'Identificación y caracterización de la población objetiva participante', colSpan: 3, styles: { fontStyle: 'bold', halign: 'left' } }],
+
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablatextpaln,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+        });
+        const tablanumdoc = [
+          // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+          [
+            { content: 'Número de docentes participantes:', styles: lblStyle },
+            { content: 'Docentes participantes hombres:', styles: lblStyle },
+            { content: 'Docentes participantes mujeres:', styles: lblStyle },
+          ],
+          [
+            { content: proy.proyect_num_doce_part, styles: valStyle },
+            { content: proy.proyect_num_doce_h, styles: valStyle },
+            { content: proy.proyect_num_doce_m, styles: valStyle },
+          ]
+        ];
+
+        // 4. Renderizado
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablanumdoc,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto' }, // 
+            1: { cellWidth: 'auto' },
+            2: { cellWidth: 'auto' },
+          }
+        });
+        const tablanumest = [
+          // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+          [
+            { content: 'Número de estudiantes participantes:', styles: lblStyle },
+            { content: 'Estudiantes participantes hombres:', styles: lblStyle },
+            { content: 'Estudiantes participantes mujeres:', styles: lblStyle },
+          ],
+          [
+            { content: proy.proyect_num_est_part, styles: valStyle },
+            { content: proy.proyect_num_est_h, styles: valStyle },
+            { content: proy.proyect_num_est_m, styles: valStyle },
+          ]
+        ];
+
+        // 4. Renderizado
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablanumest,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto' }, // 
+            1: { cellWidth: 'auto' },
+            2: { cellWidth: 'auto' },
+          }
+        });
+        const tablafactore = [
+          [{ content: 'Factores críticos de éxito:', colSpan: 3, styles: lblStyle }],
+          [{ content: `${proy.proyect_fact_exito}`, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }]
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablafactore,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            cellPadding: 3
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+        });
+        const tablarestric = [
+          [{ content: 'Restricciones/Supuestos:', colSpan: 3, styles: lblStyle }],
+          [{ content: `${proy.proyect_rest_supu}`, colSpan: 3, styles: { ...valStyle, halign: 'justify' } }]
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablarestric,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            cellPadding: 3
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+        });
+        const tablatextpaln2 = [
+          [{ content: '3. MARCO LÓGICO', colSpan: 3, styles: { fontStyle: 'bold', halign: 'left' } }],
+          [{ content: 'Las actividades que se registren en el cronograma del anexo 2 deben corresponder a las mismas actividades detalladas en la matriz de marco lógico.', colSpan: 3, styles: { halign: 'left' } }],
+
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablatextpaln2,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto' }, // 
+            1: { cellWidth: 'auto' },
+          }
+        });
+        const tablamarcologicT = [
+          // Fila 2: Fechas agrupadas (Título + Valor en la misma celda)
+          [
+            { content: 'Descripción', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: 'Indicadores verificables objetivamente', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: 'Medio de verificación', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: 'Supuestos', styles: { fontStyle: 'bold', halign: 'center' } },
+          ],
+          [
+            { content: `Fines (efectos): ${finproy}`, styles: { ...valStyle, halign: 'justify' } },
+            { content: finindica, styles: { ...valStyle, halign: 'justify' } },
+            { content: finmediover, styles: { ...valStyle, halign: 'justify' } },
+            { content: finsupuestos, styles: { ...valStyle, halign: 'justify' } },
+          ],
+          [
+            { content: `Propósito ( u objetivo general): ${objetivogeneral}`, styles: { ...valStyle, halign: 'justify' } },
+            { content: objgindica, styles: { ...valStyle, halign: 'justify' } },
+            { content: objgemediover, styles: { ...valStyle, halign: 'justify' } },
+            { content: objgsupuestos, styles: { ...valStyle, halign: 'justify' } },
+          ],
+
+        ];
+        tablamarcologicT.push([
+          {
+            content: 'Componentes (objetivos específicos):',
+            colSpan: 4,
+            styles: { fontStyle: 'bold', halign: 'left' }
+          }
+        ]);
+
+        // 5. Recorrer y añadir una fila por cada Objetivo Específico dinámicamente
+        if (objetivosEspecificos.length > 0) {
+          objetivosEspecificos.forEach((obj, index) => {
+            const numero = index + 1;
+            // Agregamos el prefijo "ObjE X:"
+            const descripcionObj = `ObjE ${numero}: ${obj.detalle_obj_proy || 'N/A'}`;
+
+            // Extraemos las relaciones 
+            const indicadoresTexto = formatearLista(obj.invi_indicadores, 'detalle_indicador', '');
+            const mediosVerificacionTexto = formatearLista(obj.invi_medios_verificacion, 'detalle_medio_verifica', '');
+            const supuestosTexto = formatearLista(obj.invi_supuestos, 'detalle_supuestos', '');
+
+            tablamarcologicT.push([
+              { content: descripcionObj, styles: { ...valStyle, halign: 'justify' } },
+              { content: indicadoresTexto, styles: { ...valStyle, halign: 'justify' } },
+              { content: mediosVerificacionTexto, styles: { ...valStyle, halign: 'justify' } },
+              { content: supuestosTexto, styles: { ...valStyle, halign: 'justify' } }
+            ]);
+          });
+        } else {
+          // Fila por defecto si no existen objetivos específicos registrados
+          tablamarcologicT.push([
+            { content: 'N/A', styles: valStyle },
+            { content: 'N/A', styles: valStyle },
+            { content: 'N/A', styles: valStyle },
+            { content: 'N/A', styles: valStyle }
+          ]);
+        }
+        tablamarcologicT.push([
+          {
+            content: 'Actividades:',
+            colSpan: 4,
+            styles: { fontStyle: 'bold', halign: 'left' }
+          }
+        ]);
+        let todasLasActividades = [];
+
+        if (objetivosEspecificos.length > 0) {
+          objetivosEspecificos.forEach((obj, index) => {
+            const numObj = index + 1; // ObjE 1, ObjE 2...
+            const actividadesObj = obj.invi_actividades || [];
+
+            actividadesObj.forEach((act, actIndex) => {
+              todasLasActividades.push({
+                ...act,
+                numObj: numObj,
+                // Generamos la numeración 1.1, 1.2, 2.1, etc.
+                numeracion: `${numObj}.${actIndex + 1}`
+              });
+            });
+          });
+        }
+
+        // ---------------------------------------------------------------------------
+        // 2. Agrupar por año y luego por Objetivo Específico
+        // ---------------------------------------------------------------------------
+        const actividadesPorAnio = {};
+
+        todasLasActividades.forEach(act => {
+          const anio = act.detalle_anio || 'Año no especificado';
+
+          if (!actividadesPorAnio[anio]) {
+            actividadesPorAnio[anio] = {};
+          }
+
+          // Dentro del año, agrupamos por el número de objetivo (1, 2, 3...)
+          if (!actividadesPorAnio[anio][act.numObj]) {
+            actividadesPorAnio[anio][act.numObj] = [];
+          }
+
+          actividadesPorAnio[anio][act.numObj].push(act);
+        });
+
+        // ---------------------------------------------------------------------------
+        // 3. Construir las filas dinámicamente en tablamarcologicT
+        // ---------------------------------------------------------------------------
+        const anios = Object.keys(actividadesPorAnio);
+
+        if (anios.length > 0) {
+          anios.forEach(anio => {
+            // A. Fila agrupadora del Año (Ej: "Primer Año")
+            tablamarcologicT.push([
+              {
+                content: anio,
+                colSpan: 4,
+                styles: { fontStyle: 'bold', halign: 'left', fillColor: [240, 240, 240] }
+              }
+            ]);
+
+            const gruposObj = actividadesPorAnio[anio];
+            // Ordenamos las llaves para que ObjE1 salga antes que ObjE2
+            const numsObj = Object.keys(gruposObj).sort((a, b) => parseInt(a) - parseInt(b));
+
+            numsObj.forEach(numObj => {
+              // B. Fila agrupadora del Objetivo (Ej: "*Actividades ObjE1:")
+              tablamarcologicT.push([
+                {
+                  content: `*Actividades ObjE${numObj}:`,
+                  colSpan: 4,
+                  styles: { fontStyle: 'italic', halign: 'left' }
+                }
+              ]);
+
+              // C. Filas individuales de las actividades
+              gruposObj[numObj].forEach(act => {
+                // Agregamos un par de espacios al inicio para crear sangría (indentación)
+                const descripcionAct = `  ${act.numeracion} ${act.nom_actividad || 'N/A'}`;
+
+                // Extraemos las listas usando los nombres exactos de tu JSON
+                const indTexto = formatearLista(act.invi_actindicadores, 'detalle_indicador', '');
+                const medTexto = formatearLista(act.invi_actmedios_verificacion, 'detalle_medio_verifica', '');
+                const supTexto = formatearLista(act.invi_actsupuestos, 'detalle_supuestos', '');
+
+                tablamarcologicT.push([
+                  { content: descripcionAct, styles: { ...valStyle, halign: 'justify' } },
+                  { content: indTexto, styles: { ...valStyle, halign: 'justify' } },
+                  { content: medTexto, styles: { ...valStyle, halign: 'justify' } },
+                  { content: supTexto, styles: { ...valStyle, halign: 'justify' } }
+                ]);
+              });
+            });
+          });
+        } else {
+          // Si no existen actividades registradas
+          tablamarcologicT.push([
+            { content: 'N/A', styles: valStyle },
+            { content: 'N/A', styles: valStyle },
+            { content: 'N/A', styles: valStyle },
+            { content: 'N/A', styles: valStyle }
+          ]);
+        }
+        // 4. Renderizado
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablamarcologicT,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            cellPadding: 3
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+          columnStyles: {
+            0: { cellWidth: 40 }, // 
+            1: { cellWidth: 40 },
+            2: { cellWidth: 'auto' },
+            3: { cellWidth: 40 },
+          }
+        });
+        const tablabien1 = [
+          [{ content: 'Detalles de bienes y servicios proporcionados por proyecto', colSpan: 3, styles: { fontStyle: 'bold', halign: 'center' } }],
+
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablabien1,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+        });
+
+
+        // 4. Armamos la tabla
+        const tablabiende = [
+          [
+            { content: 'Bienes', styles: { fontStyle: 'bold', halign: 'left' } },
+            { content: proy.proyect_bienes, styles: { ...valStyle, halign: 'justify' } }, // Asegúrate de tener valStyle definido
+          ],
+          [
+            { content: 'Servicios', styles: { fontStyle: 'bold', halign: 'left' } },
+            { content: proy.proyect_servicios, styles: { ...valStyle, halign: 'justify' } },
+          ],
+          [
+            { content: 'Bienes y servicios', styles: { fontStyle: 'bold', halign: 'left' } },
+            { content: proy.proyect_bienes_servicios, styles: { ...valStyle, halign: 'justify' } },
+          ],
+        ];
+
+        // 5. Renderizado
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY, // Le agregué un +6 para que respire con la tabla anterior
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablabiende,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            cellPadding: 3
+          },
+          columnStyles: {
+            0: { cellWidth: 40 }, // Ajusté la columna 0 a un ancho fijo para que la tabla se vea más uniforme
+            1: { cellWidth: 'auto' }, // La columna de texto toma el resto del espacio
+          }
+        });
+        const tablabiendeta = [
+          [{ content: 'Detalle de adquisiciones del proyecto', colSpan: 3, styles: { fontStyle: 'bold', halign: 'center' } }],
+
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablabiendeta,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+            // font: 'times' // Descomenta esto si tu documento general usa Times New Roman
+          },
+        });
+        const detallesAdqui = Array.isArray(proy.invi_detalle_adqui)
+          ? proy.invi_detalle_adqui
+          : (proy.invi_detalle_adqui ? [proy.invi_detalle_adqui] : []);
+
+        // 2. Extraemos todos los objetos "invi_adquisicion" descartando los nulos
+        const adquisiciones = detallesAdqui.map(item => item.invi_adquisicion).filter(Boolean);
+
+        // 3. Filtramos por tipo
+        const bienes = adquisiciones.filter(item => item.tipo_adqui === 'bien');
+        const servicios = adquisiciones.filter(item => item.tipo_adqui === 'servicio');
+        const bienesServicios = adquisiciones.filter(item => item.tipo_adqui === 'bienes y servicios');
+
+        // 4. Construimos la cabecera de la tabla
+        const tablabiendecont = [
+          [
+            { content: 'Descripción', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: '%\nNacional', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: '%\nImportado', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: 'Detalle insumo nacional', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: 'Detalle insumo importado', styles: { fontStyle: 'bold', halign: 'center' } },
+          ]
+        ];
+
+        // 5. Función auxiliar para dar formato a los números (Ej: 100.00 -> 100%)
+        const formatNum = (num) => {
+          if (num === null || num === undefined || num === '') return '0%';
+          return Number(num) + '%';
+        };
+
+        // 6. Función para añadir cada ítem como una fila independiente
+        const agregarFilasPorCategoria = (tituloCategoria, listaItems) => {
+          if (!listaItems || listaItems.length === 0) {
+            // Opcional: Mostrar la categoría vacía con N/A si no hay registros de ese tipo
+            tablabiendecont.push([
+              { content: tituloCategoria, styles: { fontStyle: 'bold', halign: 'center' } },
+              { content: 'N/A', styles: { halign: 'center' } },
+              { content: 'N/A', styles: { halign: 'center' } },
+              { content: 'N/A', styles: { halign: 'center' } },
+              { content: 'N/A', styles: { halign: 'center' } }
+            ]);
+            return;
+          }
+
+          listaItems.forEach((item, index) => {
+            // Si es el primer ítem, agregamos el título de la categoría con un salto de línea
+            const descripcionTexto = index === 0
+              ? `${tituloCategoria}\n${item.detalle || 'N/A'}`
+              : (item.detalle || 'N/A');
+
+            tablabiendecont.push([
+              { content: descripcionTexto, styles: { halign: 'center' } },
+              { content: formatNum(item.porcent_nacio), styles: { halign: 'center' } },
+              { content: formatNum(item.porcent_importado), styles: { halign: 'center' } },
+              { content: item.detalle_iinsu_nac || 'N/A', styles: { halign: 'center' } },
+              { content: item.detalle_insu_import || 'N/A', styles: { halign: 'center' } }
+            ]);
+          });
+        };
+
+        // 7. Agregamos las filas en el orden deseado
+        agregarFilasPorCategoria('Bienes', bienes);
+        agregarFilasPorCategoria('Servicios', servicios);
+        agregarFilasPorCategoria('Bienes y Servicios', bienesServicios);
+
+        // 8. Renderizado de AutoTable
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablabiendecont,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+          },
+          columnStyles: {
+            0: { cellWidth: 40 }, // Descripción
+            1: { cellWidth: 20 }, // % Nacional
+            2: { cellWidth: 20 }, // % Importado
+            3: { cellWidth: 'auto' }, // Detalle Insumo Nacional
+            4: { cellWidth: 'auto' }, // Detalle Insumo Importado
+          }
+        });
+        const categorizapro = proy.proyect_categorizacion;
+        const checkNece = (categorizapro === 'Necesario') ? `X ` : '';
+        const checkIndispensable = (categorizapro === 'Indispensable') ? `X ` : '';
+        const checkDeseable = (categorizapro === 'Deseable') ? `X ` : '';
+        const checkAdmisible = (categorizapro === 'Admisible') ? `X ` : '';
+        const tablacateg = [
+          [
+            {
+              content: 'Categorización del Proyecto',
+              colSpan: 4,
+              styles: { fontStyle: 'bold', halign: 'center' }
+            }
+          ],
+          [
+            { content: 'Necesario', styles: lblStyle },
+            { content: 'Indispensable', styles: lblStyle },
+            { content: 'Deseable', styles: lblStyle },
+            { content: 'Admisible', styles: lblStyle },
+          ],
+          [
+            { content: checkNece, styles: valStyle },
+            { content: checkIndispensable, styles: valStyle },
+            { content: checkDeseable, styles: valStyle },
+            { content: checkAdmisible, styles: valStyle },
+          ]
+        ];
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablacateg,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            valign: 'middle',
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto' }, // Descripción
+            1: { cellWidth: 'auto' }, // % Nacional
+            2: { cellWidth: 'auto' }, // % Importado
+            3: { cellWidth: 'auto' }, // Detalle Insumo Nacional
+          }
+        });
+        const tablametodología = [
+          [{ content: '4. METODOLOGÍA PARA LA VINCULACIÓN (Diseño del Estudio: Detallar diseño experimental, tipo de análisis estadístico, otros) ', colSpan: 6, styles: { fontStyle: 'bold', halign: 'left' } }],
+          [{ content: proy.proyect_metodologia || '', colSpan: 6, styles: { ...valStyle, halign: 'justify' } }],
+        ];
+
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablametodología,
+          styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false, cellPadding: 3 }
+        });
+
+        const tablafinantitu = [
+          [{ content: '5. FINANCIAMIENTO', colSpan: 6, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+          [{ content: '(Ingresar información en Anexo 3)', colSpan: 6, styles: valStyle }],
+
+        ];
+
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablafinantitu,
+          styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false }
+        });
+        const tablaviabilitiut = [
+          [{ content: '6. VIABILIDAD Y PLAN DE SOSTENIBILIDAD', colSpan: 6, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+
+
+        ];
+
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaviabilitiut,
+          styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false }
+        });
+        const detaimpacto = Array.isArray(proy.invi_det_impactos_esperados)
+          ? proy.invi_det_impactos_esperados
+          : (proy.invi_det_impactos_esperados ? [proy.invi_det_impactos_esperados] : []);
+
+        const getDescripcionImpacto = (nombreImpacto) => {
+          const items = detaimpacto.filter(
+            item => item.invi_impactos && item.invi_impactos.nombre_impacto === nombreImpacto
+          );
+
+          if (items.length === 0) return '';
+          if (items.length === 1) return items[0].descripcion_general || '';
+
+          return items
+            .map(item => `• ${item.descripcion_general || ''}`)
+            .join('\n');
+        };
+
+
+
+        // 2. Aplicamos la limpieza inteligente
+        const viabilidadLimpia = limpiarTextoRespectandoSaltos(proy.proyect_viabilidad_tec);
+        const equipamientoLimpio = limpiarTextoRespectandoSaltos(proy.proyect_equip_tec);
+        const noEjecutaLimpio = limpiarTextoRespectandoSaltos(proy.proyect_no_ejecuta);
+
+        const tablaviabiliconten = [
+          [{ content: 'Viabilidad Técnica:', colSpan: 2, styles: lblStyle }],
+          // Aplicamos la variable limpia y el justify
+          [{ content: viabilidadLimpia, colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+
+          [{ content: 'Equipamiento Tecnológico Disponible', colSpan: 2, styles: lblStyle }],
+          [{ content: equipamientoLimpio, colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+
+          [
+            { content: '¿Qué perdería la provincia si el proyecto no se ejecuta en este periodo?', styles: { fontStyle: 'bold', halign: 'left' } },
+            { content: noEjecutaLimpio, styles: valStyle } // Si quieres justificar este también, añádele { halign: 'justify' }
+          ],
+          [{ content: 'IMPACTOS ESPERADOS:', colSpan: 2, styles: { fontStyle: 'bold', halign: 'left' } }],
+          [
+            { content: 'Tipo', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: 'Descripción', styles: { fontStyle: 'bold', halign: 'center' } },
+          ],
+          [
+            { content: 'Impacto económico', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: getDescripcionImpacto('Impacto económico') || '', styles: { ...valStyle, halign: 'justify' } }
+          ],
+          [
+            { content: 'Impacto social', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: getDescripcionImpacto('Impacto social') || '', styles: { ...valStyle, halign: 'justify' } }
+          ],
+          [
+            { content: 'Impacto político', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: getDescripcionImpacto('Impacto político') || '', styles: { ...valStyle, halign: 'justify' } }
+          ],
+          [
+            { content: 'Impacto científico', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: getDescripcionImpacto('Impacto científico') || '', styles: { ...valStyle, halign: 'justify' } }
+          ],
+          [
+            { content: 'Impacto ambiental', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: getDescripcionImpacto('Impacto ambiental') || '', styles: { ...valStyle, halign: 'justify' } }
+          ],
+          [
+            { content: 'Otros impactos', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: getDescripcionImpacto('Otros impactos') || '', styles: { ...valStyle, halign: 'justify' } }
+          ],
+          [{ content: 'Sostenibilidad social: equidad, género, participación ciudadana:', colSpan: 2, styles: lblStyle }],
+          [{ content: proy.proyect_sostenibilidad_soc || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+          [{ content: 'Transferencia Tecnológica', colSpan: 2, styles: lblStyle }],
+          [{ content: proy.proyect_transf_tecn || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+          [{ content: 'Artículos Científicos: ', colSpan: 2, styles: lblStyle }],
+          [{ content: proy.proyect_art_cientificos || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+          [{ content: 'Prototipos:', colSpan: 2, styles: lblStyle }],
+          [{ content: proy.proyect_prototipos || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+          [{ content: 'Registro de Propiedad Intelectual:', colSpan: 2, styles: lblStyle }],
+          [{ content: proy.proyect_reg_propin || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+          [{ content: 'Empresas Spin OffS', colSpan: 2, styles: lblStyle }],
+          [{ content: proy.proyect_empr_spin || '', colSpan: 2, styles: { ...valStyle, halign: 'justify' } }],
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaviabiliconten,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false,
+            cellPadding: 3
+          },
+          columnStyles: {
+            0: { cellWidth: 80 },
+            1: { cellWidth: 'auto' },
+          }
+        });
+        const tablaestrategia = [
+          [{ content: '7. ESTRATEGIA DE EJECUCIÓN', colSpan: 6, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+          [{ content: 'Elaborar el cronograma de ejecución en el Anexo 2, considerando como periodo de ejecución', colSpan: 6, styles: valStyle }],
+
+        ];
+
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaestrategia,
+          styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0], fillColor: false, cellPadding: 3 }
+        });
+        const textomonito = `Mensualmente y semestralmente se deberá remitir a la dirección de Vinculación con la Sociedad el reporte de avances del proyecto, según las actividades establecidas en el cronograma.\n` +
+          `Al finalizar el proyecto debe presentar el informe final que contendrá las fichas de estudiantes y docentes, la encuesta a los beneficiarios y los resultados del proyecto (productos o entregables).\n` +
+          `La evaluación del proyecto y sus impactos, entraran dentro del informe semestral es decir al final del ciclo académico.\n` +
+          `• Anexo 8\n` +
+          `• Anexo 9\n` +
+          `• Anexo 10\n`;
+        const tablamonito = [
+          [{ content: '8. MONITOREO Y EVALUACIÓN', styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left', lineWidth: 0.1, lineColor: [0, 0, 0] } }],
+          [{ content: `${textomonito}`, styles: { halign: 'left', fillColor: false, textColor: [0, 0, 0] } }],
+
+        ];
+
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'plain', // El tema 'plain' elimina la cuadrícula general
+          body: tablamonito,
+          styles: {
+            fontSize: 8,
+            cellPadding: 3 // Un poco de espacio para que el texto respire respecto a los márgenes
+          }
+        });
+        const detalleDifusion = Array.isArray(proy.invi_detalle_difusion)
+          ? proy.invi_detalle_difusion
+          : (proy.invi_detalle_difusion ? [proy.invi_detalle_difusion] : []);
+
+        // 2. Extraemos las actividades y las unimos con un salto de línea
+        const actividadesText = detalleDifusion
+          .map(item => item.invi_difusion && item.invi_difusion.nombre_actividad ? item.invi_difusion.nombre_actividad : '')
+          .join('\n');
+
+        // 3. Extraemos los costos, parseando a entero (para quitar el .00 y que coincida con tu imagen) y los unimos
+        const costosText = detalleDifusion
+          .map(item => item.costo ? parseInt(item.costo).toString() : '')
+          .join('\n');
+
+        // 4. Construimos la tabla dinámica
+        const tabladifusi = [
+          // Fila 1: Título con fondo celeste
+          [{ content: '9. DIFUSIÓN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [210, 230, 245], halign: 'left' } }],
+
+          // Fila 2: Subtítulo con fondo gris
+          [{ content: 'Tipo de Evento', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+
+          // Fila 3: Cabeceras de las columnas (centradas)
+          [
+            { content: 'Actividad', styles: { fontStyle: 'bold', halign: 'center' } },
+            { content: 'Costo', styles: { fontStyle: 'bold', halign: 'center' } },
+          ],
+
+          // Fila 4: Los datos agrupados en una sola fila pero separados por saltos de línea
+          [
+            { content: actividadesText, styles: { halign: 'left', valign: 'top' } },
+            { content: costosText, styles: { halign: 'center', valign: 'top' } } // El costo va centrado
+          ]
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tabladifusi,
+          styles: {
+            fontSize: 8,
+            lineColor: [0, 0, 0],
+            textColor: [0, 0, 0],
+            fillColor: false
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto' }, // Toma el ancho disponible
+            1: { cellWidth: 50 }      // Limita la columna de costo para que la actividad tenga más espacio
+          }
+        });
+        const textbio = proy.invi_bibliografias?.map(bib => `- ${bib.autor} (${bib.anio}). ${bib.titulo}. ${bib.editorial_fuente}.`).join('\n') || 'N/A';
+        const tablabiblio = [
+          [{ content: '10. BIBLIOGRAFÍA Y OTRA PRODUCCIÓN CIENTÍFICA CITADA', styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left', lineWidth: 0.1, lineColor: [0, 0, 0] } }],
+          [{ content: `${textbio}`, styles: { halign: 'left', fillColor: false, textColor: [0, 0, 0] } }],
+
+        ];
+
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'plain',
+          body: tablabiblio,
+          styles: {
+            fontSize: 8,
+            cellPadding: 3 // Un poco de espacio para que el texto respire respecto a los márgenes
+          }
+        });
+        const textoAnexo = `En los formatos que se encuentran en la hoja electrónica que se acompaña se debe ingresar la información relacionada con:\n\n` +
+          `1.Carta aval del proyecto de Vinculación con la Sociedad responsable de Vinculación de la facultad\n(debidamente firmado y sellado)\n` +
+          `2. Cronograma del proyecto de Vinculación con la Sociedad (debidamente firmado)\n` +
+          `3. Programación Anual de inversiones (debidamente firmado)\n` +
+          `4. Hoja de vida\n` +
+          `5. Compromiso de participación docentes UTLVTE (debidamente firmado)\n` +
+          `6. Compromiso de participación estudiantes UTLVTE (debidamente firmado)\n` +
+          `7. Monitoreo y evaluación\n` +
+          `8. Monitoreo y evaluación\n` +
+          `9. Monitoreo y evaluación\n` +
+          `10. Impacto del proyecto\n` +
+          `11. Formatos para productos de eventos de capacitación. (Aplica solo a proyectos que justifican el desarrollo de capacitaciones como parte de sus objetivos)`;
+
+        const tablaanexo = [
+          // Fila 1: Encabezado. Le forzamos borde negro (lineWidth y lineColor)
+          [{
+            content: '11. ANEXO',
+            styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left', lineWidth: 0.1, lineColor: [0, 0, 0] }
+          }],
+
+          // Fila 2: Contenido. Al no ponerle lineWidth, tomará el borde 0 del tema 'plain'
+          [{
+            content: textoAnexo,
+            styles: { halign: 'left', fillColor: false, textColor: [0, 0, 0] }
+          }]
+        ];
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 6,
+          margin: { top: 30, left: 15, right: 15, bottom: 20 },
+          theme: 'plain', // El tema 'plain' elimina la cuadrícula general
+          body: tablaanexo,
+          styles: {
+            fontSize: 8,
+            cellPadding: 3 // Un poco de espacio para que el texto respire respecto a los márgenes
+          }
+        });
+        const nombreArchivo = `Proyecto-${proy.proyect_cod}.pdf`;
+        doc.save(nombreArchivo);
+
+
+      } catch (error) {
+        console.error(`Error al generar el PDF del Anexo:`, error);
+        mostraralertas2("Ocurrió un error al generar el PDF.", "error");
+      } finally {
+        // Apagamos el spinner pase lo que pase (éxito o error)
+        this.descargando = { ...this.descargando, [clave]: false };
+      }
+    },
+    async generarPDFCronograma(id, tipoDocumento) {
+      const clave = `${id}_${tipoDocumento}`;
+      this.descargando = { ...this.descargando, [clave]: true };
+      try {
+        const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
+        const data = response.data;
+        this.empresasAgregadas = data.empresas_seleccionadas || [];
+        this.empresasAgregadas2 = data.empresas_seleccionadas2 || [];
+        let mapeoObjetivos = data.proyecto.invi_obj_proyectos.map(obj => ({
+          id_obj_proy: obj.id_obj_proy,
+          tipo_obj_proy: obj.tipo_obj_proy,
+          detalle_obj_proy: obj.detalle_obj_proy,
+          // Aseguramos que siempre sean arrays (mapeando con las propiedades exactas de tu Base de Datos)
+          indicadores: obj.invi_indicadores || [],
+          metas: obj.invi_metas || [],
+          supuestos: obj.invi_supuestos || [],
+          medios_verificacion: obj.invi_medios_verificacion || [],
+          prod_verificables: obj.invi_prod_verificables || [],
+        }));
+        const calc = data.calculo_integrantes || {};
+        let actividadesExtraidas = [];
+        (data.proyecto.invi_obj_proyectos || []).forEach(obj => {
+          if (obj.invi_actividades && obj.invi_actividades.length > 0) {
+            obj.invi_actividades.forEach(act => {
+              actividadesExtraidas.push({
+                ...act,
+                invi_subactividad: act.invi_subactividad || [],
+                invi_actprod_verificables: act.invi_actprod_verificables || [],
+                invi_actmedios_verificacion: act.invi_actmedios_verificacion || [],
+                invi_actindicadores: act.invi_actindicadores || [],
+                invi_actsupuestos: act.invi_actsupuestos || []
+              });
+            });
+          }
+        });
+        let adquisicionesMapeadas = [];
+        if (data.proyecto.invi_detalle_adqui && data.proyecto.invi_detalle_adqui.length > 0) {
+          adquisicionesMapeadas = data.proyecto.invi_detalle_adqui.map(detalle => {
+            return {
+              id_adquisicion: detalle.invi_adquisicion.id_adquisicion,
+              tipo_adqui: detalle.invi_adquisicion.tipo_adqui || '',
+              detalle: detalle.invi_adquisicion.detalle || '',
+              porcent_nacio: detalle.invi_adquisicion.porcent_nacio || 0,
+              detalle_iinsu_nac: detalle.invi_adquisicion.detalle_iinsu_nac || '',
+              porcent_importado: detalle.invi_adquisicion.porcent_importado || 0,
+              detalle_insu_import: detalle.invi_adquisicion.detalle_insu_import || ''
+            };
+          });
+        }
+        let financiamientosMapeados = [];
+        if (data.proyecto.invi_detalle_financia && data.proyecto.invi_detalle_financia.length > 0) {
+          financiamientosMapeados = data.proyecto.invi_detalle_financia.map(det => {
+            return {
+              id_det_financia: det.id_det_financia,
+              id_rubro: det.id_rubro,
+              cantidad: det.cantidad || 0,
+              valor: det.valor || 0,
+              utlvte_anio1: det.utlvte_anio1 || 0,
+              utlvte_anio2: det.utlvte_anio2 || 0,
+              utlvte_anio3: det.utlvte_anio3 || 0,
+              utlvte_anio4: det.utlvte_anio4 || 0,
+              utlvte_anio5: det.utlvte_anio5 || 0,
+              otros_anio1: det.otros_anio1 || 0,
+              otros_anio2: det.otros_anio2 || 0,
+              otros_anio3: det.otros_anio3 || 0,
+              otros_anio4: det.otros_anio4 || 0,
+              otros_anio5: det.otros_anio5 || 0,
+              total_efectivo: det.total_efectivo || 0
+            };
+          });
+        }
+        this.listaImpactosDisponibles = data.impactos_catalogo || [];
+        let impactosMapeados = [];
+        if (data.proyecto.invi_det_impactos_esperados && data.proyecto.invi_det_impactos_esperados.length > 0) {
+          impactosMapeados = data.proyecto.invi_det_impactos_esperados.map(det => {
+            return {
+              id_det_impactos_esp: det.id_det_impactos_esp,
+              id_impactos: det.id_impactos,
+              descripcion_general: det.descripcion_general || ''
+            };
+          });
+        }
+        let difusionMapeada = [];
+        if (data.proyecto.invi_detalle_difusion && data.proyecto.invi_detalle_difusion.length > 0) {
+          difusionMapeada = data.proyecto.invi_detalle_difusion.map(det => {
+            return {
+              id_det_difusion: det.id_det_difusion,
+              id_difusion: det.id_difusion,
+              costo: det.costo,
+              nombre_actividad: det.invi_difusion ? det.invi_difusion.nombre_actividad : ''
+            };
+          });
+        }
+        this.editForm = {
+          proyect_id: data.proyecto.proyect_id,
+          proyect_nombre: data.proyecto.proyect_nombre || '',
+          proyect_titulo: data.proyecto.proyect_titulo || '',
+          proyect_nombre_en: data.proyecto.proyect_nombre_en || '',
+          proyect_titulo_en: data.proyecto.proyect_titulo_en || '',
+          proyect_multidis: data.proyecto.proyect_multidis,
+          //Objetivos del Plan Estratégico Institucional
+          objetivos: data.seleccionados || [],
+          //Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025
+          politicas: data.politicas_seleccionadas || [],
+          //Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe
+          ods: data.ods_seleccionadas || [],
+          //Nombre de Facultad/es: 
+          facultades: data.facultades_seleccionadas || [],
+          id_facultad_priori: data.id_facultad_priori || '',
+          //Carrera/s
+          carreras: data.carreras_seleccionadas || [],
+          id_carr_priori: data.id_carr_priori || '',
+          //Dominios académicos
+          dominios_humanisticos: data.dominios_seleccionados || [],
+          //No. Convocatoria
+          id_convocatoria: data.proyecto.id_convocatoria || '',
+          sublineas_investigacion: [],
+          unesco_areas: data.unesco_seleccionadas || [],
+          id_tip_invi_proy: data.proyecto.id_tip_invi_proy || '',
+          proyect_cobertura: data.proyecto.proyect_cobertura || '',
+          id_zona_plan: data.cobertura_guardada?.id_zona_plan || '',
+          provincias: data.cobertura_guardada?.provincias || [],
+          cantones: data.cobertura_guardada?.cantones || [],
+          parroquias: data.cobertura_guardada?.parroquias || [],
+          objetivos_marco_logico: mapeoObjetivos,
+          proyect_antecedentes: data.proyecto.proyect_antecedentes || '',
+          proyect_justificacion: data.proyecto.proyect_justificacion || '',
+          empresas: [...this.empresasAgregadas],
+          aportes_utlvt: data.aportes_utlvt || [],
+          aportes_inst: data.aportes_inst || [],
+          proyect_fecha_pres: data.proyecto.proyect_fecha_pres || '',
+          fechainicio: data.proyecto.fechainicio || '',
+          fechafin: data.proyecto.fechafin || '',
+          proyect_duracion_mes: data.proyecto.proyect_duracion_mes || '',
+          proyect_estado: data.proyecto.proyect_estado || '',
+          proyect_desc_situ_act: data.proyecto.proyect_desc_situ_act || '',
+          proyect_diag_probl: data.proyecto.proyect_diag_probl || '',
+          proyect_contribucion_soci: data.proyecto.proyect_contribucion_soci || '',
+          asignaturas: data.asignaturas_seleccionadas || [],
+          proyec_ident_poblaobj: data.proyecto.proyec_ident_poblaobj || '',
+          proyect_num_direct_hombres: data.proyecto.proyect_num_direct_hombres || '',
+          proyect_num_direct_mujeres: data.proyecto.proyect_num_direct_mujeres || '',
+          proyect_total_num_direct: data.proyecto.proyect_total_num_direct || '',
+          proyect_num_personas_div_fun: data.proyecto.proyect_num_personas_div_fun || '',
+          proyect_total_num_indirect: data.proyecto.proyect_total_num_indirect || '',
+          proyect_num_doce_h: data.proyecto.proyect_num_doce_h ?? calc.docentes_h ?? 0,
+          proyect_num_doce_m: data.proyecto.proyect_num_doce_m ?? calc.docentes_m ?? 0,
+          proyect_num_doce_part: data.proyecto.proyect_num_doce_part ?? calc.docentes_total ?? 0,
+
+          // Estudiantes (se usan los valores guardados en BD o se calculan automáticamente si están nulos)
+          proyect_num_est_h: data.proyecto.proyect_num_est_h ?? calc.estudiantes_h ?? 0,
+          proyect_num_est_m: data.proyecto.proyect_num_est_m ?? calc.estudiantes_m ?? 0,
+          proyect_num_est_part: data.proyecto.proyect_num_est_part ?? calc.estudiantes_total ?? 0,
+          proyect_fact_exito: data.proyecto.proyect_fact_exito || '',
+          proyect_rest_supu: data.proyecto.proyect_rest_supu || '',
+          actividades: actividadesExtraidas,
+          proyect_bienes: data.proyecto.proyect_bienes || '',
+          proyect_servicios: data.proyecto.proyect_servicios || '',
+          proyect_bienes_servicios: data.proyecto.proyect_bienes_servicios || '',
+          adquisiciones: adquisicionesMapeadas,
+          proyect_categorizacion: data.proyecto.proyect_categorizacion || '',
+          proyect_metodologia: data.proyecto.proyect_metodologia || '',
+          financiamientos: financiamientosMapeados,
+          proyect_viabilidad_tec: data.proyecto.proyect_viabilidad_tec || '',
+          proyect_equip_tec: data.proyecto.proyect_equip_tec || '',
+          proyect_no_ejecuta: data.proyecto.proyect_no_ejecuta || '',
+          impactos: impactosMapeados,
+          proyect_sostenibilidad_soc: data.proyecto.proyect_sostenibilidad_soc || '',
+          proyect_transf_tecn: data.proyecto.proyect_transf_tecn || '',
+          proyect_art_cientificos: data.proyecto.proyect_art_cientificos || '',
+          proyect_prototipos: data.proyecto.proyect_prototipos || '',
+          proyect_reg_propin: data.proyecto.proyect_reg_propin || '',
+          proyect_empr_spin: data.proyecto.proyect_empr_spin || '',
+          difusion: difusionMapeada,
+          bibliografias: data.proyecto.invi_bibliografias ? [...data.proyecto.invi_bibliografias] : [],
+        };
+        if (!this.editForm.actividades || this.editForm.actividades.length === 0) {
+          mostraralertas2("No hay actividades registradas para generar el cronograma.", "warning");
+          return;
+        }
+
+
+
+        // Inicializar documento en horizontal (landscape), milímetros, A4
+        const doc = new jsPDF('l', 'mm', 'a4');
+        let primeraPagina = true;
+
+        // Obtener los objetivos específicos usando tu función
+        const objetivosEspecificos = this.obtenerEspecificos();
+
+        // Obtener la lista de años únicos que tienen actividades
+        const añosPresentes = [...new Set(this.editForm.actividades.map(a => a.detalle_anio))];
+        const carrera = await this.ObtenerCarr(this.editForm.id_carr_priori);
+        const proyect_id = this.editForm.proyect_id;
+        const facultad_id = this.editForm.id_facultad_priori;
+        const resDocentes = await this.ObteneProDoc(proyect_id);
+        const resEstudiantes = await this.ObteneProEst(proyect_id);
+        const resDir = await this.ObteneProDir(proyect_id);
+        const resSubdir = await this.ObteneProSubDir(proyect_id);
+        const resResponsables = await this.ObteneRespVin(facultad_id);
+        const resDirectores = await this.ObteneDirVin(proyect_id);
+
+        añosPresentes.forEach((anioTexto, indexAnio) => {
+          // Filtrar actividades de este año
+          const actividadesAnio = this.editForm.actividades.filter(a => a.detalle_anio === anioTexto);
+          const directorProy = (resDir.data?.data && resDir.data.data.length > 0) ? resDir.data.data[0].nombre_con_titulo : '';
+          if (!primeraPagina) doc.addPage();
+          primeraPagina = false;
+
+          // Cargar Logos (Asegúrate de que las rutas relativas sean alcanzables desde tu vista)
+          doc.addImage('/images.png', 'PNG', 15, 10, 22, 22);
+          doc.addImage('/logovincusinfondo.png', 'PNG', 45, 10, 22, 22);
+
+          doc.setFontSize(12);
+          doc.setFont("helvetica", "bold");
+          doc.text('UNIVERSIDAD TÉCNICA "LUIS VARGAS TORRES" DE ESMERALDAS', 75, 23);
+
+          // Cuadro derecho "ANEXO 2"
+          doc.rect(225, 10, 57, 15);
+          doc.text('ANEXO 2', 245, 20);
+          //.setFontSize(11);
+          const textoAnio = anioTexto;
+          autoTable(doc, {
+            startY: 35,
+            margin: { left: 15, right: 15 }, // Márgenes fijos para igualar anchos
+            theme: 'grid',
+            styles: {
+              lineColor: [0, 0, 0],
+              lineWidth: 0.3,
+              textColor: [0, 0, 0],
+              fontSize: 9,
+              valign: 'middle',
+              fontStyle: 'bold'
+            },
+            columnStyles: {
+              0: { cellWidth: 180 }, // Izquierda
+              1: { cellWidth: 87, halign: 'center', fontSize: 11 } // Derecha (Año) -> Total = 267
+            },
+            body: [
+              [
+                { content: `CARRERA: ${carrera || ''}` },
+                { content: textoAnio, rowSpan: 2 } // Ocupa las dos primeras filas
+              ],
+              [
+                { content: `NOMBRE DEL PROYECTO: ${this.editForm.proyect_nombre || ''}` }
+              ],
+              [
+                { content: `NOMBRE DEL DIRECTOR DEL PROYECTO: ${directorProy || ''}`, colSpan: 2 }
+              ]
+            ]
+          });
+
+          // ==========================================
+          // CONSTRUCCIÓN DE FILAS DE LA TABLA (AGRUPADAS POR OBJETIVO)
+          // ==========================================
+
+          const rows = [];
+          let totalHorasGlobal = 0;
+          const colWidth2 = 272 / 5;
+          // Iterar sobre los objetivos específicos
+          objetivosEspecificos.forEach((obj, indexObj) => {
+            // 1. Agregar la fila del Objetivo
+            // Tomamos la descripción del objetivo (ajusta 'resumen_narrativo' al nombre real de tu campo)
+            const nombreObjetivo = obj.detalle_obj_proy || `Objetivo ${indexObj + 1}`;
+            rows.push([
+              `Objetivo ${indexObj + 1}. ${nombreObjetivo}`,
+              '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+            ]);
+
+            // 2. Filtrar las actividades que pertenecen a este objetivo
+            // NOTA: Cambia 'id_objetivo' por la propiedad real que relaciona la actividad con el objetivo en tu BD.
+            const actividadesDelObjetivo = actividadesAnio.filter(a => a.id_obj_proy === obj.id_obj_proy);
+
+            actividadesDelObjetivo.forEach((act, indexAct) => {
+              const productos = (act.invi_actprod_verificables || [])
+                .map(p => p.detalle_prod_verif)
+                .filter(Boolean)
+                .join(', ');
+
+              // Agregar la fila de la Actividad
+              rows.push([
+                `Actividad ${indexObj + 1}.${indexAct + 1} ${act.nom_actividad}`,
+                act.fecha_desde || '',
+                act.fecha_hasta || '',
+                act.horas || 0,
+                '', '', '', '', '', '', '', '', '', '', '', '', // 12 meses vacíos para colorear
+                productos,
+                act.responsables || ''
+              ]);
+
+              totalHorasGlobal += (parseFloat(act.horas) || 0);
+            });
+          });
+
+          // Fila Final de Totales
+          rows.push([
+            'TOTAL HORAS:',
+            '', '', totalHorasGlobal,
+            '', '', '', '', '', '', '', '', '', '', '', '',
+            '', ''
+          ]);
+
+          // ==========================================
+          // GENERACIÓN DE LA TABLA (GANTT)
+          // ==========================================
+
+          autoTable(doc, {
+            startY: doc.lastAutoTable.finalY + 2,
+            margin: { left: 15, right: 10 },
+            theme: 'grid',
+            headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.3, halign: 'center', fontSize: 7, fontStyle: 'bold' },
+            bodyStyles: { lineColor: [0, 0, 0], lineWidth: 0.3, fontSize: 7 },
+            head: [
+              [
+                { content: 'OBJETIVO/ ACTIVIDADES', rowSpan: 2 },
+                { content: 'TIEMPO ESTIMADO', colSpan: 3 },
+                { content: 'Primer semestre', colSpan: 6, styles: { fillColor: [0, 176, 80], textColor: [255, 255, 255] } },
+                { content: 'Segundo semestre', colSpan: 6, styles: { fillColor: [0, 176, 80], textColor: [255, 255, 255] } },
+                { content: 'PRODUCTOS / RESULTADOS, METAS CUANTIFICABLES', rowSpan: 2 },
+                { content: 'RESPONSABLE', rowSpan: 2 }
+              ],
+              ['DESDE', 'HASTA', '# HORAS', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+            ],
+            body: rows,
+            columnStyles: {
+              0: { cellWidth: colWidth2 }, // Actividad
+              1: { cellWidth: 16 }, // Desde
+              2: { cellWidth: 16 }, // Hasta
+              3: { cellWidth: 12, halign: 'center' }, // Horas
+              // Meses dinámicos
+              ...Array.from({ length: 12 }).reduce((acc, _, idx) => ({ ...acc, [idx + 4]: { cellWidth: 7 } }), {}),
+              16: { cellWidth: colWidth2 }, // Productos
+              17: { cellWidth: 30 }  // Responsable
+            },
+
+            // USAR didParseCell PARA PINTAR FONDOS (Asegura que jsPDF no lo sobrescriba al dibujar)
+            didParseCell: function (data) {
+              // 1. Dar estilo en negrita a las filas de los Objetivos y Totales
+              if (data.section === 'body') {
+                const textoCelda = data.row.raw[0] ? data.row.raw[0].toString() : '';
+                if (textoCelda.startsWith('Objetivo') || textoCelda.startsWith('TOTAL HORAS')) {
+                  data.cell.styles.fontStyle = 'bold';
+                }
+              }
+
+              // 2. Colorear las celdas de los meses (columnas de la 4 a la 15)
+              if (data.section === 'body' && data.column.index >= 4 && data.column.index <= 15) {
+                const rowData = data.row.raw;
+
+                const textoActividad = rowData[0] || '';
+                if (textoActividad.startsWith('Objetivo') || textoActividad.startsWith('TOTAL HORAS')) return;
+
+                const fechaDesde = rowData[1];
+                const fechaHasta = rowData[2];
+
+                if (fechaDesde && fechaHasta) {
+                  const partesDesde = fechaDesde.split('-');
+                  const partesHasta = fechaHasta.split('-');
+
+                  if (partesDesde.length >= 2 && partesHasta.length >= 2) {
+                    const mesInicio = parseInt(partesDesde[1], 10) - 1;
+                    const mesFin = parseInt(partesHasta[1], 10) - 1;
+                    const mesColumna = data.column.index - 4; // Columna 4 equivale al mes 0 (Enero)
+
+                    // Si el mes de la columna cae dentro del rango de la actividad
+                    if (mesColumna >= mesInicio && mesColumna <= mesFin) {
+                      data.cell.styles.fillColor = [112, 173, 71]; // Verde exacto
+                    }
+                  }
+                }
+              }
+            }
+          });
+
+
+          const docentes = resDocentes.data?.data || [];
+          const estudiantes = resEstudiantes.data?.data || [];
+
+          // Extraer strings puros de los arreglos/objetos
+
+          const subdirectorProy = (resSubdir.data?.data && resSubdir.data.data.length > 0) ? resSubdir.data.data[0].nombre_con_titulo : '';
+          const nombreCoordinador = resResponsables.data[0].nombre_completo || '';
+          const nombreDirectorGen = resDirectores.data?.nombre_completo || '';
+
+          const maxFilas = Math.max(docentes.length, estudiantes.length, 3);
+
+          // ==========================================
+          // GENERACIÓN DE LA TABLA DE RESPONSABLES
+          // ==========================================
+          let finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 1 : 150;
+
+          // Ancho total disponible en A4 Landscape = 297mm - 15(margen izq) - 10(margen der) = 272mm
+          // Dividido en 5 columnas iguales para alinear tablas = 54.4mm por columna
+          const colWidth = 272 / 5;
+
+          let bodyResponsables = [];
+
+          // 1. Fila 0: Subtítulos de Docentes/Estudiantes y las Celdas Combinadas de los responsables
+          bodyResponsables.push([
+            { content: 'NOMBRE DE DOCENTES\nTUTORES - PARTICIPANTES', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+            { content: 'NOMBRE DE ESTUDIANTES\nPARTICIPANTES', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+            { content: `${directorProy ? directorProy + '\n' : ''}Director/a de proyecto de vinculación\ncon la sociedad de la carrera`, rowSpan: maxFilas + 1, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+            { content: `${subdirectorProy ? subdirectorProy + '\n' : ''}Subdirector/a de proyecto de vinculación\ncon la sociedad de la carrera`, rowSpan: maxFilas + 1, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+            { content: `Docente integrante del\nproyecto`, rowSpan: maxFilas + 1, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } } // Queda genérico como solicitaste
+          ]);
+
+          // 2. Llenar filas restantes de Docentes y Estudiantes (Las celdas de la derecha son ignoradas por el rowSpan)
+          for (let i = 0; i < maxFilas; i++) {
+            let nombreDocente = docentes[i] ? docentes[i].nombre_con_titulo : '';
+            let nombreEstudiante = estudiantes[i] ? estudiantes[i].nombres_apellidos : '';
+
+            bodyResponsables.push([
+              { content: nombreDocente, styles: { halign: 'center' } },
+              { content: nombreEstudiante, styles: { halign: 'center' } }
+            ]);
+          }
+
+          // TABLA 1: RESPONSABLES Y PRESENTADO POR
+          autoTable(doc, {
+            startY: finalY,
+            margin: { left: 15, right: 10 },
+            theme: 'grid',
+            styles: {
+              fontSize: 7,
+              textColor: [0, 0, 0],
+              lineColor: [0, 0, 0],
+              lineWidth: 0.3
+            },
+            headStyles: {
+              fillColor: [255, 255, 255],
+              fontStyle: 'bold',
+              halign: 'center'
+            },
+            head: [
+              [
+                { content: 'RESPONSABLES', colSpan: 2 },
+                { content: 'PRESENTADO POR:', colSpan: 3 }
+              ]
+            ],
+            body: bodyResponsables,
+            columnStyles: {
+              0: { cellWidth: colWidth },
+              1: { cellWidth: colWidth },
+              2: { cellWidth: colWidth },
+              3: { cellWidth: colWidth },
+              4: { cellWidth: colWidth }
+            }
+          });
+
+          // TABLA 2: REVISADO POR E INFORME FAVORABLE 
+          // (Se dibuja como una tabla separada justo debajo para que, si hace salto de página, no repita el título "PRESENTADO POR:")
+          autoTable(doc, {
+            startY: doc.lastAutoTable.finalY,
+            margin: { left: 15, right: 10 },
+            theme: 'grid',
+            styles: {
+              fontSize: 7,
+              textColor: [0, 0, 0],
+              lineColor: [0, 0, 0],
+              lineWidth: 0.3
+            },
+            body: [
+              [
+                { content: '', colSpan: 2, styles: { lineWidth: 0, fillColor: [255, 255, 255] } }, // Espacio vacío sin bordes a la izquierda
+                { content: 'REVISADO POR:', colSpan: 2, styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } },
+                { content: 'INFORME FAVORABLE:', styles: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255] } }
+              ],
+              [
+                { content: '', colSpan: 2, styles: { lineWidth: 0, fillColor: [255, 255, 255] } },
+                {
+                  content: `${nombreCoordinador}\nResponsable de vinculación de la Facultad`,
+                  colSpan: 2,
+                  styles: { minCellHeight: 25, valign: 'bottom', halign: 'center', fillColor: [255, 255, 255], fontStyle: 'bold' }
+                },
+                {
+                  content: `${nombreDirectorGen}\nDirector(a) de vinculación`,
+                  styles: { minCellHeight: 25, valign: 'bottom', halign: 'center', fillColor: [255, 255, 255], fontStyle: 'bold' }
+                }
+              ]
+            ],
+            columnStyles: {
+              0: { cellWidth: colWidth },
+              1: { cellWidth: colWidth },
+              2: { cellWidth: colWidth },
+              3: { cellWidth: colWidth },
+              4: { cellWidth: colWidth }
+            }
+          });
+        });
+
+
+        // Descargar el archivo PDF
+        doc.save('Anexo_2_Cronograma.pdf');
+
+      } catch (error) {
+        // Es buena práctica manejar el error por si las peticiones fallan
+        console.error('Error al generar el PDF:', error);
+        // Aquí podrías mostrar una alerta de error (ej: SweetAlert)
+      } finally {
+        this.descargando = { ...this.descargando, [clave]: false };
+      }
+
+    },
+    async abrirModalAreaTematica(id, tipoDocumento) {
+      const clave = `${id}_${tipoDocumento}`;
+      this.descargando = { ...this.descargando, [clave]: true };
+      try {
+        const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
+        const data = response.data;
+        this.empresasAgregadas = data.empresas_seleccionadas || [];
+        this.empresasAgregadas2 = data.empresas_seleccionadas2 || [];
+        this.listaRubrosDisponibles = data.rubros_catalogo || [];
+        let mapeoObjetivos = data.proyecto.invi_obj_proyectos.map(obj => ({
+          id_obj_proy: obj.id_obj_proy,
+          tipo_obj_proy: obj.tipo_obj_proy,
+          detalle_obj_proy: obj.detalle_obj_proy,
+          // Aseguramos que siempre sean arrays (mapeando con las propiedades exactas de tu Base de Datos)
+          indicadores: obj.invi_indicadores || [],
+          metas: obj.invi_metas || [],
+          supuestos: obj.invi_supuestos || [],
+          medios_verificacion: obj.invi_medios_verificacion || [],
+          prod_verificables: obj.invi_prod_verificables || [],
+        }));
+        const calc = data.calculo_integrantes || {};
+        let actividadesExtraidas = [];
+        (data.proyecto.invi_obj_proyectos || []).forEach(obj => {
+          if (obj.invi_actividades && obj.invi_actividades.length > 0) {
+            obj.invi_actividades.forEach(act => {
+              actividadesExtraidas.push({
+                ...act,
+                invi_subactividad: act.invi_subactividad || [],
+                invi_actprod_verificables: act.invi_actprod_verificables || [],
+                invi_actmedios_verificacion: act.invi_actmedios_verificacion || [],
+                invi_actindicadores: act.invi_actindicadores || [],
+                invi_actsupuestos: act.invi_actsupuestos || []
+              });
+            });
+          }
+        });
+        let adquisicionesMapeadas = [];
+        if (data.proyecto.invi_detalle_adqui && data.proyecto.invi_detalle_adqui.length > 0) {
+          adquisicionesMapeadas = data.proyecto.invi_detalle_adqui.map(detalle => {
+            return {
+              id_adquisicion: detalle.invi_adquisicion.id_adquisicion,
+              tipo_adqui: detalle.invi_adquisicion.tipo_adqui || '',
+              detalle: detalle.invi_adquisicion.detalle || '',
+              porcent_nacio: detalle.invi_adquisicion.porcent_nacio || 0,
+              detalle_iinsu_nac: detalle.invi_adquisicion.detalle_iinsu_nac || '',
+              porcent_importado: detalle.invi_adquisicion.porcent_importado || 0,
+              detalle_insu_import: detalle.invi_adquisicion.detalle_insu_import || ''
+            };
+          });
+        }
+        let financiamientosMapeados = [];
+        if (data.proyecto.invi_detalle_financia && data.proyecto.invi_detalle_financia.length > 0) {
+          financiamientosMapeados = data.proyecto.invi_detalle_financia.map(det => {
+            return {
+              id_det_financia: det.id_det_financia,
+              id_rubro: det.id_rubro,
+              cantidad: det.cantidad || 0,
+              valor: det.valor || 0,
+              utlvte_anio1: det.utlvte_anio1 || 0,
+              utlvte_anio2: det.utlvte_anio2 || 0,
+              utlvte_anio3: det.utlvte_anio3 || 0,
+              utlvte_anio4: det.utlvte_anio4 || 0,
+              utlvte_anio5: det.utlvte_anio5 || 0,
+              otros_anio1: det.otros_anio1 || 0,
+              otros_anio2: det.otros_anio2 || 0,
+              otros_anio3: det.otros_anio3 || 0,
+              otros_anio4: det.otros_anio4 || 0,
+              otros_anio5: det.otros_anio5 || 0,
+              total_efectivo: det.total_efectivo || 0
+            };
+          });
+        }
+        this.listaImpactosDisponibles = data.impactos_catalogo || [];
+        let impactosMapeados = [];
+        if (data.proyecto.invi_det_impactos_esperados && data.proyecto.invi_det_impactos_esperados.length > 0) {
+          impactosMapeados = data.proyecto.invi_det_impactos_esperados.map(det => {
+            return {
+              id_det_impactos_esp: det.id_det_impactos_esp,
+              id_impactos: det.id_impactos,
+              descripcion_general: det.descripcion_general || ''
+            };
+          });
+        }
+        let difusionMapeada = [];
+        if (data.proyecto.invi_detalle_difusion && data.proyecto.invi_detalle_difusion.length > 0) {
+          difusionMapeada = data.proyecto.invi_detalle_difusion.map(det => {
+            return {
+              id_det_difusion: det.id_det_difusion,
+              id_difusion: det.id_difusion,
+              costo: det.costo,
+              nombre_actividad: det.invi_difusion ? det.invi_difusion.nombre_actividad : ''
+            };
+          });
+        }
+        this.editForm = {
+          proyect_id: data.proyecto.proyect_id,
+          proyect_nombre: data.proyecto.proyect_nombre || '',
+          proyect_titulo: data.proyecto.proyect_titulo || '',
+          proyect_nombre_en: data.proyecto.proyect_nombre_en || '',
+          proyect_titulo_en: data.proyecto.proyect_titulo_en || '',
+          proyect_multidis: data.proyecto.proyect_multidis,
+          //Objetivos del Plan Estratégico Institucional
+          objetivos: data.seleccionados || [],
+          //Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025
+          politicas: data.politicas_seleccionadas || [],
+          //Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe
+          ods: data.ods_seleccionadas || [],
+          //Nombre de Facultad/es: 
+          facultades: data.facultades_seleccionadas || [],
+          id_facultad_priori: data.id_facultad_priori || '',
+          //Carrera/s
+          carreras: data.carreras_seleccionadas || [],
+          id_carr_priori: data.id_carr_priori || '',
+          //Dominios académicos
+          dominios_humanisticos: data.dominios_seleccionados || [],
+          //No. Convocatoria
+          id_convocatoria: data.proyecto.id_convocatoria || '',
+          sublineas_investigacion: [],
+          unesco_areas: data.unesco_seleccionadas || [],
+          id_tip_invi_proy: data.proyecto.id_tip_invi_proy || '',
+          proyect_cobertura: data.proyecto.proyect_cobertura || '',
+          id_zona_plan: data.cobertura_guardada?.id_zona_plan || '',
+          provincias: data.cobertura_guardada?.provincias || [],
+          cantones: data.cobertura_guardada?.cantones || [],
+          parroquias: data.cobertura_guardada?.parroquias || [],
+          objetivos_marco_logico: mapeoObjetivos,
+          proyect_antecedentes: data.proyecto.proyect_antecedentes || '',
+          proyect_justificacion: data.proyecto.proyect_justificacion || '',
+          empresas: [...this.empresasAgregadas],
+          aportes_utlvt: data.aportes_utlvt || [],
+          aportes_inst: data.aportes_inst || [],
+          proyect_fecha_pres: data.proyecto.proyect_fecha_pres || '',
+          fechainicio: data.proyecto.fechainicio || '',
+          fechafin: data.proyecto.fechafin || '',
+          proyect_duracion_mes: data.proyecto.proyect_duracion_mes || '',
+          proyect_estado: data.proyecto.proyect_estado || '',
+          proyect_desc_situ_act: data.proyecto.proyect_desc_situ_act || '',
+          proyect_diag_probl: data.proyecto.proyect_diag_probl || '',
+          proyect_contribucion_soci: data.proyecto.proyect_contribucion_soci || '',
+          asignaturas: data.asignaturas_seleccionadas || [],
+          proyec_ident_poblaobj: data.proyecto.proyec_ident_poblaobj || '',
+          proyect_num_direct_hombres: data.proyecto.proyect_num_direct_hombres || '',
+          proyect_num_direct_mujeres: data.proyecto.proyect_num_direct_mujeres || '',
+          proyect_total_num_direct: data.proyecto.proyect_total_num_direct || '',
+          proyect_num_personas_div_fun: data.proyecto.proyect_num_personas_div_fun || '',
+          proyect_total_num_indirect: data.proyecto.proyect_total_num_indirect || '',
+          proyect_num_doce_h: data.proyecto.proyect_num_doce_h ?? calc.docentes_h ?? 0,
+          proyect_num_doce_m: data.proyecto.proyect_num_doce_m ?? calc.docentes_m ?? 0,
+          proyect_num_doce_part: data.proyecto.proyect_num_doce_part ?? calc.docentes_total ?? 0,
+
+          // Estudiantes (se usan los valores guardados en BD o se calculan automáticamente si están nulos)
+          proyect_num_est_h: data.proyecto.proyect_num_est_h ?? calc.estudiantes_h ?? 0,
+          proyect_num_est_m: data.proyecto.proyect_num_est_m ?? calc.estudiantes_m ?? 0,
+          proyect_num_est_part: data.proyecto.proyect_num_est_part ?? calc.estudiantes_total ?? 0,
+          proyect_fact_exito: data.proyecto.proyect_fact_exito || '',
+          proyect_rest_supu: data.proyecto.proyect_rest_supu || '',
+          actividades: actividadesExtraidas,
+          proyect_bienes: data.proyecto.proyect_bienes || '',
+          proyect_servicios: data.proyecto.proyect_servicios || '',
+          proyect_bienes_servicios: data.proyecto.proyect_bienes_servicios || '',
+          adquisiciones: adquisicionesMapeadas,
+          proyect_categorizacion: data.proyecto.proyect_categorizacion || '',
+          proyect_metodologia: data.proyecto.proyect_metodologia || '',
+          financiamientos: financiamientosMapeados,
+          proyect_viabilidad_tec: data.proyecto.proyect_viabilidad_tec || '',
+          proyect_equip_tec: data.proyecto.proyect_equip_tec || '',
+          proyect_no_ejecuta: data.proyecto.proyect_no_ejecuta || '',
+          impactos: impactosMapeados,
+          proyect_sostenibilidad_soc: data.proyecto.proyect_sostenibilidad_soc || '',
+          proyect_transf_tecn: data.proyecto.proyect_transf_tecn || '',
+          proyect_art_cientificos: data.proyecto.proyect_art_cientificos || '',
+          proyect_prototipos: data.proyecto.proyect_prototipos || '',
+          proyect_reg_propin: data.proyecto.proyect_reg_propin || '',
+          proyect_empr_spin: data.proyecto.proyect_empr_spin || '',
+          difusion: difusionMapeada,
+          bibliografias: data.proyecto.invi_bibliografias ? [...data.proyecto.invi_bibliografias] : [],
+        };
+        if (!this.editForm.financiamientos || this.editForm.financiamientos.length === 0) {
+          mostraralertas2("No hay rubros de financiamiento para generar el Anexo 3.", "warning");
+          return;
+        }
+        this.areaTematica2Input = ''; // Limpiar el input al abrir
+        this.showModalArea2Tematica = true;
+
+
+      } catch (error) {
+        console.error('Error al abrir el modal de Área Temática:', error);
+      } finally {
+        this.descargando = { ...this.descargando, [clave]: false };
+      }
+
+    },
+    cerrarModalAreaTematica() {
+      this.showModalAreaTematica = false;
+      this.showModalArea2Tematica = false;
+      this.areaTematicaInput = '';
+      this.areaTematica2Input = '';
+      this.botonCargando = null;
+    },
+    async PDFAnexo1(id, tipoDocumento) {
+      const clave = `${id}_${tipoDocumento}`;
+      this.descargando = { ...this.descargando, [clave]: true };
+      try {
+        const idProyecto = id;
+        if (!idProyecto) {
+          return mostraralertas2("Error: No se ha seleccionado un proyecto válido.", "warning");
+        }
+
+        const [responseDatos, resDir] = await Promise.all([
+          API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`),
+          this.ObteneProDir(idProyecto).catch(() => ({ data: { data: [] } }))
+        ]);
+
+        const data = responseDatos.data;
+        const proy = data.proyecto || {};
+
+        // Helper para sanitizar caracteres especiales/corruptos
+        const sanitizarTexto = (str) => {
+          if (!str) return '';
+          return String(str)
+            .replace(/’|'/g, "'")
+            .replace(/“|”/g, '"')
+            .replace(/ã'|ã/g, 'ñ');
+        };
+
+        const capitalizarNombres = (str) => {
+          if (!str) return '';
+          return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        };
+
+        const getPrioridadFuncion = (nombreFuncion = '') => {
+          const f = nombreFuncion.toLowerCase();
+          if (f.includes('subdirector')) return 2;
+          if (f.includes('director')) return 1;
+          if (f.includes('técnico') || f.includes('tecnico')) return 4;
+          if (f.includes('docente')) return 3;
+          if (f.includes('administrativo') || f.includes('administrativa')) return 5;
+          return 6;
+        };
+
+        // Autores / Integrantes
+        const integrantesRaw = data.integrantes_titulosactivos || data.integrantes_activos || [];
+        const integrantes = [...integrantesRaw].sort((a, b) => {
+          const funcA = a.funciones ? a.funciones.nombre_funcion : '';
+          const funcB = b.funciones ? b.funciones.nombre_funcion : '';
+          return getPrioridadFuncion(funcA) - getPrioridadFuncion(funcB);
+        });
+
+        const nombresAutores = sanitizarTexto(
+          integrantes.map(integrante => {
+            let nombreCompleto = integrante.nombre_completo_titulo;
+            if (!nombreCompleto) {
+              const info = integrante.informacion_personal_d || {};
+              const nombresStr = `${info.NombInfPer || ''} ${info.ApellInfPer || ''} ${info.ApellMatInfPer || ''}`.trim();
+              nombreCompleto = capitalizarNombres(nombresStr);
+            }
+            return nombreCompleto;
+          }).filter(Boolean).join(', ')
+        );
+
+        // Director del Proyecto
+        let directorProy = 'Director No Asignado';
+        if (resDir.data?.data && resDir.data.data.length > 0) {
+          directorProy = resDir.data.data[0].nombre_con_titulo || directorProy;
+        }
+        directorProy = sanitizarTexto(directorProy);
+
+        // Mapeo de Facultades, Carreras y Líneas
+        const facultadTxt = sanitizarTexto(data.facultades_data?.map(f => f.facultad).join(', ') || 'N/A');
+        const carrerasTxt = sanitizarTexto(data.carreras_data?.map(c => c.NombCarr).join(', ') || 'N/A');
+        const lineaInvestigacion = sanitizarTexto(data.lineas_data?.map(l => l.nombre_lin).join(', ') || 'N/A');
+
+        // Títulos
+        const proyecttitulo = sanitizarTexto(proy.proyect_titulo || proy.proyect_nombre || 'N/A');
+        const proyectInvestigacion = sanitizarTexto(proy.proyect_investigacion || proy.proyecto_investigacion || 'Investigación Institucional');
+
+        // Autoridades
+        const directorCarrera = sanitizarTexto(
+          (data.carreras_data && data.carreras_data[0]?.director)
+            ? data.carreras_data[0].director
+            : 'Director(a) de Carrera'
+        );
+
+        const decanoFacultad = sanitizarTexto(
+          (data.facultades_data && data.facultades_data[0]?.decano)
+            ? data.facultades_data[0].decano
+            : 'Decano(a) de la Facultad'
+        );
+
+        // Ubicación y Fecha
+        let provincia = 'Esmeraldas';
+        if (Array.isArray(proy.invi_detalle_cobe)) {
+          const provMap = proy.invi_detalle_cobe.map(c => c.provincias?.detalle || c.provincia?.detalle).filter(Boolean);
+          provincia = [...new Set(provMap)].join(', ') || 'Esmeraldas';
+        } else if (proy.invi_detalle_cobe?.provincias?.detalle) {
+          provincia = proy.invi_detalle_cobe.provincias.detalle;
+        }
+
+        const formatearFecha = (fechaStr) => {
+          if (!fechaStr) return '';
+          const partes = fechaStr.split('-');
+          if (partes.length === 3) {
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            return `${parseInt(partes[2], 10)} de ${meses[parseInt(partes[1], 10) - 1]} de ${partes[0]}`;
+          }
+          return fechaStr;
+        };
+
+        const fechaFormateada = formatearFecha(proy.proyect_fecha_pres) || `${new Date().getDate()} de septiembre de ${new Date().getFullYear()}`;
+
+        // Inicializar jsPDF
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const rutaImagenFondo = '/fondo2.png';
+
+        const dibujarFondoBanner = () => {
+          doc.addImage(rutaImagenFondo, 'PNG', 0, 0, pageWidth, pageHeight);
+        };
+
+        const originalAddPage = doc.addPage.bind(doc);
+        doc.addPage = function () {
+          originalAddPage();
+          dibujarFondoBanner();
+        };
+
+        dibujarFondoBanner();
+
+        // Títulos de Cabecera
+        let cursorY = 48;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text("ANEXO 1", pageWidth / 2, cursorY, { align: "center" });
+        cursorY += 6;
+        doc.text("CARTA DE AVAL DEL PROYECTO", pageWidth / 2, cursorY, { align: "center" });
+
+        // Construcción de los párrafos
+        const parrafo1 = `Como Director/Profesor(a) de la Facultad de ${facultadTxt} - ${carrerasTxt}, por medio de la presente, declaro conocer lo establecido en el Plan de Vinculación con la Sociedad 2020 - 2024 y Reglamento de Proyectos de Vinculación; desarrollado por la Dirección de Vinculación con la Sociedad de la UTLVTE en correspondencia con las exigencias de la Secretaría de Educación Superior, Ciencia, Tecnología e Innovación.`;
+
+        const parrafo2 = `Así también, certifico que el proyecto de vinculación "${proyecttitulo}" de autoría de los ingenieros/docentes ${nombresAutores}, está sustentado en el proyecto de investigación "${proyectInvestigacion}" y la línea de investigación "${lineaInvestigacion}" y ha sido desarrollado bajo mi dirección y acompañamiento, y debidamente conciliado con los Decanos(as) y Directores(as) de Carrera Respectivos.`;
+
+        const despedida = `Saludo a Ud. atentamente,`;
+
+        // TABLA DE TEXTO JUSTIFICADO (Sin Bordes)
+        const tablaCuerpoCarta = [
+          [{ content: parrafo1, styles: { halign: 'justify' } }],
+          [{ content: parrafo2, styles: { halign: 'justify' } }],
+          [{ content: despedida, styles: { halign: 'left' } }]
+        ];
+
+        autoTable(doc, {
+          startY: cursorY + 8,
+          margin: { left: 20, right: 20 },
+          theme: 'plain', // Sin bordes
+          body: tablaCuerpoCarta,
+          styles: {
+            fontSize: 10,
+            textColor: [0, 0, 0],
+            font: 'helvetica',
+            cellPadding: { top: 4, bottom: 4, left: 0, right: 0 }
+          }
+        });
+
+        // Posición actual dinámica después de la tabla de texto
+        let finalY = doc.lastAutoTable.finalY + 30;
+
+        // SECCIÓN DE FIRMAS Y PIE DE PÁGINA
+        doc.setFontSize(9.5);
+
+        // Firma Izquierda (Director de Proyecto)
+        doc.setFont("helvetica", "bold");
+        doc.text(directorProy, 55, finalY, { align: "center" });
+        doc.setFont("helvetica", "normal");
+        doc.text("Director(a) del Proyecto de Vinculación", 55, finalY + 4, { align: "center" });
+
+        // Firma Derecha (Director de Carrera)
+        doc.setFont("helvetica", "bold");
+        doc.text(directorCarrera, pageWidth - 55, finalY, { align: "center" });
+        doc.setFont("helvetica", "normal");
+        doc.text("Director(a) de la Carrera", pageWidth - 55, finalY + 4, { align: "center" });
+
+        finalY += 30;
+
+        // Firma Inferior Central (Decano)
+        doc.setFont("helvetica", "bold");
+        doc.text(decanoFacultad, pageWidth / 2, finalY, { align: "center" });
+        doc.setFont("helvetica", "normal");
+        doc.text("Decano(a) de la Facultad", pageWidth / 2, finalY + 4, { align: "center" });
+
+        // Pie con Lugar y Fecha
+        finalY += 25;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text(`${provincia}, ${fechaFormateada}`, pageWidth / 2, finalY, { align: "center" });
+
+        // Descargar PDF
+        const codigoProy = proy.proyect_cod || id;
+        doc.save(`Anexo_1_Carta_Aval_${codigoProy}.pdf`);
+
+      } catch (error) {
+        console.error(`Error al generar el PDF del Anexo 1 para el ID ${id}:`, error);
+        mostraralertas2("Ocurrió un error al generar el PDF del Anexo 1.", "error");
+      } finally {
+        this.descargando = { ...this.descargando, [clave]: false };
+      }
+    },
+    async generarPDFFinanciamiento() {
+      if (this.showEditModal) {
+
+        if (!this.areaTematicaInput.trim()) {
+          mostraralertas2("Debe ingresar un área temática válida.", "warning");
+          return;
+        }
+      } else {
+        if (!this.areaTematica2Input.trim()) {
+          mostraralertas2("Debe ingresar un área temática válida.", "warning");
+          return;
+        }
+      }
+
+      this.isGeneratingPDFFinancia = true;
+
+      try {
+        // 1. Inicializar documento en horizontal (landscape)
+        const doc = new jsPDF('l', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const maxTextWidth = pageWidth - 92 - 15; // Ancho máximo para los textos antes de saltar de línea
+
+        // 2. Obtener Nombre del Director
+        const proyect_id = this.editForm.proyect_id;
+        let directorProy = '';
+        try {
+          const resDir = await this.ObteneProDir(proyect_id);
+          if (resDir.data?.data && resDir.data.data.length > 0) {
+            directorProy = resDir.data.data[0].nombre_con_titulo;
+          }
+        } catch (e) { console.warn("No se pudo obtener director", e); }
+
+        // 3. Encabezados y Logos
+        doc.addImage('/ecuador.png', 'PNG', 15, 10, 22, 22);
+        doc.addImage('/images.png', 'PNG', pageWidth - 37, 10, 22, 22);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text('ANEXO 3', pageWidth / 2, 15, { align: 'center' });
+        doc.text('PROGRAMACIÓN ANUAL DE INVERSIONES', pageWidth / 2, 20, { align: 'center' });
+        doc.setFont("helvetica", "normal");
+        doc.text('Plan de trabajo presupuestario Convocatoria Fondos Concursables UTLVTE', pageWidth / 2, 28, { align: 'center' });
+
+        // 4. Datos de Información del Proyecto
+        doc.setFontSize(9);
+        let currentY = 40;
+
+        // --- Título del Proyecto ---
+        doc.text('Título del Proyecto de Vinculación con la sociedad:', 15, currentY);
+        doc.setFontSize(8);
+        const tituloTexto = this.editForm.proyect_titulo || 'N/A';
+        const splitTitulo = doc.splitTextToSize(tituloTexto, maxTextWidth);
+        doc.text(splitTitulo, 92, currentY);
+        let extraYTitulo = (splitTitulo.length - 1) * 4;
+        doc.line(90, currentY + extraYTitulo + 1, pageWidth - 15, currentY + extraYTitulo + 1);
+        currentY += extraYTitulo + 7;
+        doc.setFontSize(9);
+
+        // --- Nombre de la Institución ---
+        doc.text('Nombre de la Institución:', 15, currentY);
+        doc.text('UTLVTE', 92, currentY);
+        doc.line(90, currentY + 1, pageWidth - 15, currentY + 1);
+        currentY += 7;
+
+        // --- Instituciones Coejecutoras ---
+        doc.text('Nombre de Instituciones', 15, currentY);
+        doc.text('Coejecutoras', 15, currentY + 4);
+
+        let instY = currentY;
+        if (this.empresasAgregadas2 && this.empresasAgregadas2.length > 0) {
+          this.empresasAgregadas2.forEach((emp) => {
+            let prefijo = this.empresasAgregadas2.length > 1 ? '• ' : '';
+            let nombreEmpresa = prefijo + (emp.empresacorta || 'Empresa sin nombre');
+            let splitInst = doc.splitTextToSize(nombreEmpresa, maxTextWidth);
+            doc.text(splitInst, 92, instY);
+            instY += splitInst.length * 4;
+          });
+        } else {
+          doc.text('Ninguna', 92, instY);
+          instY += 4;
+        }
+        doc.line(90, instY - 2, pageWidth - 15, instY - 2);
+        currentY = Math.max(currentY + 8, instY + 3);
+
+        // --- Área Temática (Viene del Modal) ---
+        doc.text('Área temática:', 15, currentY);
+        // Protegemos el texto por si ingresan algo muy largo
+        let splitArea
+        if (this.showEditModal) {
+          splitArea = doc.splitTextToSize(this.areaTematicaInput.trim(), maxTextWidth);
+        } else {
+          splitArea = doc.splitTextToSize(this.areaTematica2Input.trim(), maxTextWidth);
+        }
+        doc.text(splitArea, 92, currentY);
+        let extraYArea = (splitArea.length - 1) * 4;
+        doc.line(90, currentY + extraYArea + 1, pageWidth - 15, currentY + extraYArea + 1);
+        currentY += extraYArea + 10; // Espacio final antes de la tabla
+
+        // 5. Preparar Datos de la Tabla
+        let filasTabla = [];
+        let totalesCols = { utlvte: [0, 0, 0, 0, 0], otros: [0, 0, 0, 0, 0], totalEfectivo: 0 };
+        const formatMoney = (val) => val > 0 ? `$ ${Number(val).toFixed(2)}` : '';
+        const formatMoneyZero = (val) => `$ ${Number(val || 0).toFixed(2)}`;
+
+        this.editForm.financiamientos.forEach(fin => {
+          let nombreRubro = '';
+          const rubroEncontrado = this.listaRubrosDisponibles.find(r => r.id_rubro === fin.id_rubro);
+          if (rubroEncontrado) nombreRubro = rubroEncontrado.nombre_rubro;
+          else nombreRubro = `Rubro ${fin.id_rubro}`;
+
+          let fila = [nombreRubro, fin.cantidad || 1, formatMoneyZero(fin.valor)];
+
+          for (let i = 1; i <= 5; i++) {
+            let val = Number(fin[`utlvte_anio${i}`] || 0);
+            totalesCols.utlvte[i - 1] += val;
+            fila.push(formatMoney(val));
+          }
+          for (let i = 1; i <= 5; i++) {
+            let val = Number(fin[`otros_anio${i}`] || 0);
+            totalesCols.otros[i - 1] += val;
+            fila.push(formatMoney(val));
+          }
+
+          let totalRow = Number(fin.total_efectivo || 0);
+          totalesCols.totalEfectivo += totalRow;
+          fila.push(formatMoneyZero(totalRow));
+          filasTabla.push(fila);
+        });
+
+        // Fila de Totales
+        let filaTotal = ['Total', '', ''];
+        totalesCols.utlvte.forEach(v => filaTotal.push(formatMoneyZero(v)));
+        totalesCols.otros.forEach(v => filaTotal.push(formatMoneyZero(v)));
+        filaTotal.push(formatMoneyZero(totalesCols.totalEfectivo));
+        filasTabla.push(filaTotal);
+
+        // Fila de Porcentajes
+        let filaPct = ['Porcentajes', '', ''];
+        const calcPct = (val) => totalesCols.totalEfectivo > 0 ? ((val / totalesCols.totalEfectivo) * 100).toFixed(2) + '%' : '0%';
+        totalesCols.utlvte.forEach(v => filaPct.push(calcPct(v)));
+        totalesCols.otros.forEach(v => filaPct.push(calcPct(v)));
+        filaPct.push('100%');
+        filasTabla.push(filaPct);
+
+        // 6. Generar Tabla con autoTable
+        const headerColor = [238, 236, 225];
+        autoTable(doc, {
+          startY: currentY,
+          margin: { left: 15, right: 15 },
+          theme: 'grid',
+          headStyles: {
+            fillColor: headerColor, textColor: [0, 0, 0], lineColor: [0, 0, 0],
+            lineWidth: 0.2, halign: 'center', valign: 'middle', fontSize: 8, fontStyle: 'bold'
+          },
+          bodyStyles: { lineColor: [0, 0, 0], lineWidth: 0.2, fontSize: 8, textColor: [0, 0, 0] },
+          head: [
+            [
+              { content: 'RUBROS', rowSpan: 3 }, { content: 'Cantidad', rowSpan: 3 }, { content: 'Valor', rowSpan: 3 },
+              { content: 'APORTES UTLVTE', colSpan: 5 }, { content: 'OTROS APORTES', colSpan: 5 }, { content: 'TOTAL', rowSpan: 1 }
+            ],
+            [
+              { content: 'EFECTIVO', colSpan: 5 }, { content: 'EFECTIVO', colSpan: 5 }, { content: 'EFECTIVO', rowSpan: 2 }
+            ],
+            ['Año 1', 'Año 2', 'Año 3', 'Año 4', 'Año 5', 'Año 1', 'Año 2', 'Año 3', 'Año 4', 'Año 5']
+          ],
+          body: filasTabla,
+          didParseCell: function (data) {
+            if (data.section === 'body' && (data.row.index === filasTabla.length - 1 || data.row.index === filasTabla.length - 2)) {
+              data.cell.styles.fontStyle = 'bold';
+              data.cell.styles.fillColor = headerColor;
+            }
+          },
+          columnStyles: {
+            0: { cellWidth: 50, halign: 'left' }, 1: { halign: 'center' }, 2: { halign: 'right' },
+            3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' },
+            8: { halign: 'right' }, 9: { halign: 'right' }, 10: { halign: 'right' }, 11: { halign: 'right' }, 12: { halign: 'right' },
+            13: { halign: 'right', fontStyle: 'bold' }
+          }
+        });
+
+        // 7. Pie de firma
+        let finalY = doc.lastAutoTable.finalY + 30;
+        if (finalY > doc.internal.pageSize.getHeight() - 20) {
+          doc.addPage();
+          finalY = 30;
+        }
+
+        doc.setFontSize(9);
+        doc.text(directorProy || '_________________________________________', 15, finalY);
+        doc.text('Director(a) Proyecto de Vinculación con la sociedad', 15, finalY + 5);
+
+        // 8. Descargar PDF
+        doc.save('Anexo_3_Financiamiento.pdf');
+
+        // Cerrar modal al terminar con éxito
+        this.cerrarModalAreaTematica();
+
+      } catch (error) {
+        console.error('Error al generar el PDF del Anexo 3:', error);
+      } finally {
+        this.isGeneratingPDFFinancia = false;
+      }
+    },
     async abrirEdicion(id, habiliedit) {
       console.log("Abriendo edición para proyecto ID:", id, "Habilitar edición:", habiliedit);
       this.habilitaredit = habiliedit;
@@ -5814,6 +9577,34 @@ export default {
         otros_anio1: 0, otros_anio2: 0, otros_anio3: 0, otros_anio4: 0, otros_anio5: 0,
         total_efectivo: 0
       };
+    },
+    async ObtenerCarr(id) {
+      const response = await API.get(`${this.baseUrl}/obtnercarreraindv/${id}`);
+      return response.data.nombre_carrera;
+    },
+    async ObteneProDoc(id) {
+      const response = await API.get(`${this.baseUrl}/getDocentesIndProyectosVinculacion/${id}`);
+      return response;
+    },
+    async ObteneProEst(id) {
+      const response = await API.get(`${this.baseUrl}/getEstudiantesIndProyectosVinculacion/${id}`);
+      return response;
+    },
+    async ObteneProDir(id) {
+      const response = await API.get(`${this.baseUrl}/getDirectoresIndProyectosVinculacion/${id}`);
+      return response;
+    },
+    async ObteneProSubDir(id) {
+      const response = await API.get(`${this.baseUrl}/getSubDirectoresIndProyectosVinculacion/${id}`);
+      return response;
+    },
+    async ObteneRespVin(id) {
+      const response = await API.get(`${this.baseUrl}/getResponsablesIndInfo/${id}`);
+      return response;
+    },
+    async ObteneDirVin(id) {
+      const response = await API.get(`${this.baseUrl}/getdirectvin`);
+      return response;
     },
     abrirModalFinancia() {
       this.indexFinanciaEditando = null;
@@ -6761,6 +10552,239 @@ export default {
         proyect_reg_propin: '',
         proyect_empr_spin: '',
       };
+    },
+
+    formatDate(date) {
+      if (!date) return '---';
+
+      const fecha = new Date(date);
+
+      // Formatear la fecha: "29 abr 2026"
+      const fechaLegible = fecha.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+
+      // Formatear la hora: "09:44 AM"
+      const horaLegible = fecha.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+
+      return `${fechaLegible} - ${horaLegible}`;
+    },
+    handleFileChange(event) {
+      //Obtener el archivo seleccionado por el usuario
+      const file = event.target.files[0];
+      //Validar que el archivo seleccionado sea un archivo PDF, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+      if (!file) return;
+      // validación básica: pdf y tamaño si quieres
+      if (file.type !== 'application/pdf') {
+        //Mostrar una alerta de advertencia si el archivo seleccionado no es un archivo PDF, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+        mostraralertas2('Solo se permiten archivos PDF', 'warning');
+        //Limpiar el archivo seleccionado
+        this.$refs.fileFoto.value = null;
+        //Devolver sin hacer nada más
+        return;
+      }
+      //Validar que el tamaño del archivo no exceda el límite de 10 MB, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+      const maxMB = 10;
+      //Si el tamaño del archivo es mayor que el límite de 10 MB, se muestra una alerta y se limpia el archivo seleccionado
+      if (file.size > maxMB * 1024 * 1024) {
+        //Mostrar una alerta de advertencia si el tamaño del archivo es mayor que el límite de 10 MB, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+        mostraralertas2(`Archivo muy grande. Máx ${maxMB} MB`, 'warning');
+        //Limpiar el archivo seleccionado
+        this.$refs.fileFoto.value = null;
+        //Devolver sin hacer nada más
+        return;
+      }
+      //Asignar el archivo seleccionado a la variable archivoSeleccionado
+      this.archivoSeleccionado = file;
+      //Asignar el nombre del archivo seleccionado a la variable archivoPreviewName
+      this.archivoPreviewName = file.name;
+    },
+    handleFileBajaChange(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.type !== 'application/pdf') {
+        mostraralertas2('Solo se permiten archivos PDF', 'warning');
+        this.$refs.fileInputBaja.value = null; // Ref corregido
+        return;
+      }
+
+      const maxMB = 10;
+      if (file.size > maxMB * 1024 * 1024) {
+        mostraralertas2(`Archivo muy grande. Máx ${maxMB} MB`, 'warning');
+        this.$refs.fileInputBaja.value = null; // Ref corregido
+        return;
+      }
+
+      this.archivoBaja = file;
+      this.archivoBajaName = file.name;
+    },
+    handlepdfFileChange(event) {
+      //Obtener el archivo seleccionado por el usuario
+      const file = event.target.files[0];
+      //Validar que el archivo seleccionado sea un archivo PDF, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+      if (!file) return;
+      // validación básica: pdf y tamaño si quieres
+      if (file.type !== 'application/pdf') {
+        //Mostrar una alerta de advertencia si el archivo seleccionado no es un archivo PDF, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+        mostraralertas2('Solo se permiten archivos PDF', 'warning');
+        //Limpiar el archivo seleccionado
+        this.$refs.filePDF.value = null;
+        //Devolver sin hacer nada más
+        return;
+      }
+      //Validar que el tamaño del archivo no exceda el límite de 30 MB, si no se cumple se muestra una alerta y se limpia el archivo seleccionado
+      const maxMB = 30;
+      //Si el tamaño del archivo es mayor que el límite de 30 MB, se muestra una alerta y se limpia el archivo seleccionado
+      if (file.size > maxMB * 1024 * 1024) {
+        //Mostrar una alerta de advertencia si el tamaño del archivo es mayor que el límite de 10 MB, se usa la función mostraralertas2 para mostrar un mensaje de advertencia
+        mostraralertas2(`Archivo muy grande. Máx ${maxMB} MB`, 'warning');
+        //Limpiar el archivo seleccionado
+        this.$refs.filePDF.value = null;
+        //Devolver sin hacer nada más
+        return;
+      }
+      //Asignar el archivo seleccionado a la variable archivoSeleccionado
+      this.archivopdfSeleccionado = file;
+      //Asignar el nombre del archivo seleccionado a la variable archivoPreviewName
+      this.archivopdfPreviewName = file.name;
+    },
+    async uploadarchivo(ci, oldFilename = null) {
+      if (!this.archivoSeleccionado) return null; // nada que subir
+      try {
+        this.uploading = true;
+        const form = new FormData();
+        form.append('file', this.archivoSeleccionado);
+        form.append('ci', ci);
+        if (oldFilename) {
+          form.append('old_filename', oldFilename); // Enviamos el nombre del archivo viejo
+        }
+
+        // Si tu backend exige otros campos (ej: tipo), añade aquí
+        const resp = await API.post(`${this.baseUrl}/subir_archivo_anexo`, form, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        if (resp && resp.data && resp.data.filename) {
+          this.archivoSeleccionado = null;
+          this.archivoPreviewName = '';
+          this.$refs.fileFoto.value = null;
+          return resp.data; // { filename, url }
+        } else {
+          mostraralertas2('Error subiendo archivo', 'danger');
+          return null;
+        }
+      } catch (error) {
+        mostraralertas2('Error subiendo archivo', 'danger');
+        return null;
+      } finally {
+        this.uploading = false;
+      }
+    },
+    async uploadarpdfchivo(codPro, oldFilename = null) {
+      if (!this.archivopdfSeleccionado) return null; // nada que subir
+      try {
+        this.uploading = true;
+        const form = new FormData();
+        form.append('file', this.archivopdfSeleccionado);
+        form.append('codPro', codPro);
+        if (oldFilename) {
+          form.append('old_filename', oldFilename); // Enviamos el nombre del archivo viejo
+        }
+
+        // Si tu backend exige otros campos (ej: tipo), añade aquí
+        const resp = await API.post(`${this.baseUrl}/subir_pdf_proyecto`, form, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        console.log(resp);
+        if (resp && resp.data && resp.data.filename) {
+          this.archivopdfSeleccionado = null;
+          this.archivopdfPreviewName = '';
+          this.$refs.filePDF.value = null;
+          return resp.data; // { filename, url }
+        } else {
+          mostraralertas2('Error subiendo archivo', 'warning');
+          return null;
+        }
+      } catch (error) {
+        mostraralertas2('Error subiendo archivo', 'warning');
+        return null;
+      } finally {
+        this.uploading = false;
+      }
+    },
+    async uploadarchivoBaja(ci, oldFilename = null) {
+      if (!this.archivoBaja) return null;
+      try {
+        this.cargandoBaja = true;
+        const form = new FormData();
+        form.append('file', this.archivoBaja);
+        form.append('ci', ci);
+
+        // Verifica que la URL del backend sea la correcta (que ya creaste en PHP)
+        const resp = await API.post(`${this.baseUrl}/subir_archivo_anexo_darbaja`, form, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        // IMPORTANTE: Verifica qué devuelve exactamente tu backend. 
+        // Si el backend devuelve { status: true, filename: "..." }, úsalo así:
+        if (resp && resp.data && resp.data.filename) {
+          const dataRetornada = resp.data;
+
+          // Limpiamos DESPUÉS de guardar el nombre en una constante
+          this.archivoBaja = null;
+          this.archivoBajaName = '';
+          if (this.$refs.fileInputBaja) this.$refs.fileInputBaja.value = null;
+
+          return dataRetornada;
+        } else {
+          console.error("Respuesta inesperada del servidor:", resp.data);
+          return null;
+        }
+      } catch (error) {
+        console.error("Error en petición Axios:", error);
+        return null;
+      } finally {
+        this.cargandoBaja = false;
+      }
+    },
+    async confirmarInhabilitar() {
+      if (!this.archivoBaja || this.cargandoBaja) return;
+
+      try {
+        const ciarchvi = this.integranteBaja.ciinfper_doc || this.integranteBaja.ciinfper_est;
+
+        // Esperamos la subida del archivo
+        const anexoData = await this.uploadarchivoBaja(ciarchvi);
+
+        if (!anexoData || !anexoData.filename) {
+          mostraralertas2("Error al subir el archivo de respaldo", "error");
+          return;
+        }
+
+        // 1. Preparar Payload según lo que espera tu función inhabilitar(Request $request)
+        const payload = {
+          id: this.integranteBaja.id_deta_invi_proyect, // Tu controlador usa $request->id
+          anexo_integrante: anexoData.filename
+        };
+
+        const resp = await API.post(`${this.baseUrl}/inhabilitar-integrante`, payload);
+
+        if (resp && resp.status === 200) {
+          this.showModalBaja = false;
+          await this.abrirDetallesProyecto(this.proyectoSeleccionado.proyect_id);
+          mostraralertas2("Integrante inhabilitado con éxito", "success");
+        }
+
+      } catch (error) {
+        console.error("❌ Error completo:", error.response?.data || error);
+        mostraralertas2("Error al procesar la baja", "danger");
+      }
     },
   },
 }

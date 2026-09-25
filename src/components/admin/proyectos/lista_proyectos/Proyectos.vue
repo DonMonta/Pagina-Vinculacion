@@ -8748,7 +8748,6 @@ export default {
 
                 const response = await API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`);
                 const data = response.data;
-                console.log("Datos obtenidos para PDF completo:", data);
                 const proy = data.proyecto;
 
                 // 1. Inicializar jsPDF
