@@ -140,16 +140,12 @@ class AuthController extends Controller
             foreach ($asignacionesProyectos as $asignacion) {
                 if ($asignacion->invi_proyectos) {
                     $ids_proyectos[] = $asignacion->proyect_id;
-                    $habilitar_edicion = $asignacion->invi_proyectos->invi_convocatoria
-                        ? $asignacion->invi_proyectos->invi_convocatoria->habilitar_edicion
-                        : 0;
                     $detalles_proyectos[] = [
                         'proyect_id'     => $asignacion->proyect_id,
                         'proyect_cod'    => $asignacion->invi_proyectos->proyect_cod,
                         'proyect_titulo' => $asignacion->invi_proyectos->proyect_titulo,
                         'id_funcion'     => $asignacion->id_funcion,
                         'id_convocatoria' => $asignacion->invi_proyectos->id_convocatoria,
-                        'habilitar_edicion' => $habilitar_edicion,
                         'funcion'        => $asignacion->funciones ? $asignacion->funciones->nombre_funcion : 'Sin función asignada'
                     ];
                 }

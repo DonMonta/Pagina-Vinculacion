@@ -94,7 +94,7 @@ class Invi_proyectos extends Model
     }
     public function invi_convocatoria()
     {
-        return $this->hasOne(Invi_convocatoria::class, 'id_convocatoria');
+        return $this->belongsTo(Invi_convocatoria::class, 'id_convocatoria');
     }
     public function invi_detalle_lin_inves()
     {
