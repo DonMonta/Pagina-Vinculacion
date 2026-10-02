@@ -10786,6 +10786,888 @@ export default {
         mostraralertas2("Error al procesar la baja", "danger");
       }
     },
+    async cerraModal() {
+      this.cancelarEdicion();
+      this.showModalDetalles = false;
+    },
+    calcularHoras() {
+      const funcionObj = this.funciones.find(f => f.id_funcion === this.formInt.id_funcion);
+      if (!funcionObj) return;
+
+      const nombre = funcionObj.nombre_funcion.toLowerCase();
+      if (nombre.includes('director') && !nombre.includes('sub')) {
+        this.formInt.horas = 8;
+        this.habilitarcompro = true;
+      } else if (nombre.includes('subdirector')) {
+        this.formInt.horas = 6;
+        this.habilitarcompro = true;
+      } else if (nombre.includes('estudiante')) {
+        this.formInt.horas = 0;
+        this.habilitarcompro = false;
+      }
+      else {
+        this.formInt.horas = 4;
+        this.habilitarcompro = true;
+      }
+    },
+    calcularHorasReemplazo() {
+      const funcionObj = this.funciones.find(f => f.id_funcion === this.formInt.id_funcion_reemplazado);
+      if (!funcionObj) return;
+
+      const nombre = funcionObj.nombre_funcion.toLowerCase();
+      if (nombre.includes('director') && !nombre.includes('sub')) {
+        this.formInt.horas_reemplazado = 8;
+        this.habilitarcompro = true;
+      } else if (nombre.includes('subdirector')) {
+        this.formInt.horas_reemplazado = 6;
+        this.habilitarcompro = true;
+      } else if (nombre.includes('estudiante')) {
+        this.formInt.horas_reemplazado = 0;
+        this.habilitarcompro = false;
+      } else {
+        this.formInt.horas_reemplazado = 4;
+        this.habilitarcompro = true;
+      }
+    },
+    async abrirDetallesProyecto(id) {
+      this.botonCargando = 'detalles_' + id;
+      try {
+        const [resProj, resCat] = await Promise.all([
+          API.get(`${this.baseUrl}/invi_proyectos/${id}`),
+          API.get(`${this.baseUrl}/catalogos-integrantes`)
+        ]);
+        this.proyectoSeleccionado = resProj.data;
+        this.funciones = resCat.data.funciones;
+        this.carreras = resCat.data.carreras;
+        this.showModalDetalles = true;
+        this.showEditModal = false;
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.botonCargando = null; // Detiene el spinner al terminar
+      }
+    },
+    seleccionarIntegrante(int) {
+      const compAsignados = (int.compromisos || []).map(c => c.detalle_compromiso);
+
+      let compromisosVModel = [];
+      let compromisoOtroVModel = '';
+
+      // 2. Evaluamos cada compromiso para saber si es estándar o es "Otro"
+      compAsignados.forEach(c => {
+        if (this.listaCompromisos.includes(c)) {
+          compromisosVModel.push(c);
+        } else {
+          // Si no está en la lista predefinida, significa que era "Otros"
+          compromisosVModel.push('Otros');
+          compromisoOtroVModel = c;
+        }
+      });
+      this.integranteEdit = {
+        id: int.id_deta_invi_proyect,
+        id_deta_invi_proyect: int.id_deta_invi_proyect,
+        nombre: (int.informacion_personal_d?.NombInfPer || int.informacionpersonal?.NombInfPer),
+        apellido: (int.informacion_personal_d?.ApellInfPer || int.informacionpersonal?.ApellInfPer),
+        apellidomaterno: (int.informacion_personal_d?.ApellMatInfPer || int.informacionpersonal?.ApellMatInfPer),
+        funcion: int.funciones?.nombre_funcion || 'N/A',
+        cedula: int.ciinfper_doc || int.ciinfper_est,
+      };
+      if (this.integranteEdit.funcion !== 'Estudiante integrante del proyecto de vinculación') {
+        this.habilitarcompro = true;
+      } else {
+        this.habilitarcompro = false;
+      }
+      this.formInt = {
+        id_deta_invi_proyect: int.id_deta_invi_proyect,
+        horas: int.horas,
+        id_funcion: int.id_funcion,
+        idCarr: int.idCarr,
+        reemplazado: 0,
+        anexo_integrante: int.anexo_integrante,
+        // Campos para el que se queda:
+        id_funcion_reemplazado: null,
+        horas_reemplazado: 0,
+        idCarr_reemplazado: int.idCarr,
+        anexo_integrante2: int.anexo_integrante2,
+        compromisos: compromisosVModel,
+        compromiso_otro: compromisoOtroVModel
+      };
+      this.nuevoIntegranteData = null;
+      this.cedulaBusqueda = '';
+    },
+    async buscarNuevoIntegrante() {
+      if (!this.cedulaBusqueda) return;
+
+      // Validación local: No reemplazarse a sí mismo
+      if (this.integranteEdit && this.cedulaBusqueda === this.integranteEdit.cedula) {
+        mostraralertas2("No puedes reemplazar a un integrante por sí mismo.", "warning");
+        return;
+      }
+      if (this.formInt.reemplazado == 1) {
+        this.formInt.compromisos = [];
+        this.formInt.compromiso_otro = '';
+
+      }
+
+      try {
+        const res = await API.get(`${this.baseUrl}/buscar-integrantes`, {
+          params: {
+            cedula: this.cedulaBusqueda,
+            proyect_id: this.proyectoSeleccionado.proyect_id,
+            // Si modoNuevo es falso y reemplazado es 1, entonces es un reemplazo real
+            es_reemplazo: (!this.modoNuevo && this.formInt.reemplazado == 1) ? 1 : 0
+          }
+        });
+
+        this.nuevoIntegranteData = res.data;
+      } catch (e) {
+        const mensajeError = e.response?.data?.message || "Error al buscar integrante.";
+        mostraralertas2(mensajeError, "warning");
+        this.nuevoIntegranteData = null;
+        this.cedulaBusqueda = '';
+      }
+    },
+    activarModoNuevo() {
+      this.cancelarEdicion();
+      this.modoNuevo = true;
+    },
+    cancelarEdicion() {
+      this.integranteEdit = null;
+      this.modoNuevo = false;
+      this.nuevoIntegranteData = null;
+      this.cedulaBusqueda = '';
+      this.pdfFile = null;
+      this.formInt = {
+        horas: 0, id_funcion: null, idCarr: null, reemplazado: 0, compromisos: [],        // <-- IMPORTANTE REINICIAR
+        compromiso_otro: ''
+      };
+    },
+    async inhabilitarIntegrante(int) {
+      this.integranteBaja = int;
+      this.archivoBaja = null;
+      this.archivoBajaName = '';
+      this.showModalBaja = true;
+    },
+    async guardarCambios() {
+      // 1. Validaciones Previas
+      if (!this.formInt.id_funcion || !this.formInt.idCarr) {
+        return mostraralertas2("Complete función y carrera.", "warning");
+      }
+      if (this.formInt.compromisos.includes('Otros') && !this.formInt.compromiso_otro.trim()) {
+        return mostraralertas2("Por favor, especifique el compromiso en el campo 'Otros'.", "warning");
+      }
+      // Si es nuevo o reemplazo, el archivo es obligatorio
+      if ((this.modoNuevo || this.formInt.reemplazado == 1) && !this.archivoSeleccionado && !this.formInt.anexo_integrante) {
+        return mostraralertas2("El documento de respaldo PDF es obligatorio.", "warning");
+      }
+
+      // 2. Bloqueo de doble clic
+      if (this.enviando) return;
+
+      // 2. Validación de Director/Subdirector 
+      const funcionSeleccionada = this.funciones.find(f => f.id_funcion === this.formInt.id_funcion);
+      const nombreFun = funcionSeleccionada?.nombre_funcion.toUpperCase() || '';
+
+      if (nombreFun.includes('DIRECTOR')) {
+        const existeYa = this.integrantesFiltrados.find(i =>
+          i.id_funcion === this.formInt.id_funcion &&
+          i.reemplazado == 0 &&
+          (!this.integranteEdit || i.id_deta_invi_proyect !== this.integranteEdit.id_deta_invi_proyect)
+        );
+
+        if (existeYa) {
+          return mostraralertas2(`Ya existe un ${funcionSeleccionada.nombre_funcion} activo en este proyecto.`, "warning");
+        }
+      }
+
+      try {
+        this.enviando = true;
+        let anexoData = null;
+        const ciABuscar = this.modoNuevo ? this.nuevoIntegranteData.cedula : (this.formInt.reemplazado == 1 ? this.nuevoIntegranteData.cedula : (this.integranteEdit.ciinfper_doc || this.integranteEdit.ciinfper_est));
+
+        // 3. Subir archivo si hay uno nuevo seleccionado
+        if (this.archivoSeleccionado) {
+          anexoData = await this.uploadarchivo(ciABuscar);
+          if (!anexoData) {
+            this.enviando = false;
+            return;
+          }
+        }
+        let compromisosParaBackend = [...this.formInt.compromisos];
+        if (compromisosParaBackend.includes('Otros')) {
+          compromisosParaBackend = compromisosParaBackend.filter(c => c !== 'Otros');
+          if (this.formInt.compromiso_otro.trim()) {
+            compromisosParaBackend.push(this.formInt.compromiso_otro.trim());
+          }
+        }
+
+        // 4. Preparar Payload
+        const payload = {
+          modo: this.modoNuevo ? 'nuevo' : 'editar',
+          proyect_id: this.proyectoSeleccionado.proyect_id,
+          id_deta_invi_proyect: this.integranteEdit?.id_deta_invi_proyect,
+          form: {
+            ...this.formInt,
+            cedula_nueva: this.nuevoIntegranteData?.cedula,
+            tipo_nuevo: this.nuevoIntegranteData?.tipo,
+            // Si es reemplazo, el archivo va a 'anexo_integrante' (el que entra)
+            anexo_integrante: (this.formInt.reemplazado == 1 && anexoData) ? anexoData.filename : this.formInt.anexo_integrante,
+            // Si es nuevo o edición simple, va a 'anexo_integrante2'
+            anexo_integrante2: (this.formInt.reemplazado == 0 && anexoData) ? anexoData.filename : this.formInt.anexo_integrante2,
+            compromisos: compromisosParaBackend
+          },
+          reemplazo_config: {
+            mantener_docente: this.continuarEnProyecto,
+            // Si el docente se queda, enviamos los datos del combo de edición que el usuario ajustó
+            nueva_funcion_reemplazado: this.formInt.id_funcion_reemplazado,
+            nuevas_horas_reemplazado: this.formInt.horas_reemplazado
+          }
+        };
+
+        const res = await API.post(`${this.baseUrl}/integrantes/guardar`, payload);
+
+        if (res.data.status) {
+          mostraralertas2("Cambios guardados correctamente", "success");
+          this.cancelarEdicion() // O recargar la lista
+          await this.abrirDetallesProyecto(this.proyectoSeleccionado.proyect_id);
+          // Aquí deberías refrescar la lista de integrantes del proyecto
+        }
+      } catch (error) {
+        mostraralertas2(error.response?.data?.message || "Error al procesar la solicitud", "danger");
+      } finally {
+        this.enviando = false; // Liberamos el botón siempre, sea éxito o error
+      }
+    },
+    async descargarcompromiso(cedula) {
+      this.botonCargando = 'compromiso_' + cedula;
+      try {
+        // 1. Buscar al integrante seleccionado
+        const integrante = this.integrantesFiltrados.find(
+          i => i.ciinfper_doc === cedula || i.ciinfper_est === cedula
+        );
+
+        if (!integrante) {
+          return mostraralertas2("No se encontró la información del integrante.", "warning");
+        }
+
+        // --- NUEVA LÓGICA: Validar si es estudiante o docente ---
+        const esEstudiante = integrante.ciinfper_est === cedula;
+
+        // Variables dinámicas según el tipo de integrante
+        const numAnexo = esEstudiante ? 'ANEXO 6' : 'ANEXO 5';
+        const tituloFormato = esEstudiante
+          ? 'FORMATO DE ESTUDIANTES QUE DESEAN PARTICIPAR EN PROYECTOS DE'
+          : 'FORMATO DE PROFESORES QUE DESEAN PARTICIPAR EN PROYECTOS DE';
+        const labelInvestigador = esEstudiante
+          ? 'Nombre del/la Estudiante Investigador:'
+          : 'Nombre del Docente Investigador:';
+        const participacionTexto = esEstudiante ? 'ESTUDIANTE' : 'DOCENTE';
+
+        // 2. Llamada directa a la API
+        const idProyecto = this.proyectoSeleccionado?.proyect_id;
+
+        if (!idProyecto) {
+          return mostraralertas2("Error: No se ha seleccionado un proyecto válido.", "warning");
+        }
+
+        const response = await API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`);
+        const data = response.data;
+        const proy = data.proyecto;
+
+        // 3. Inicializar jsPDF
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        const rutaImagenFondo = '/fondo2.png';
+
+        // SEPARAR EL DIBUJO: Solo el banner en hojas nuevas para evitar que se pise con los textos
+        const dibujarFondoBanner = () => {
+          doc.addImage(rutaImagenFondo, 'PNG', 0, 0, pageWidth, pageHeight);
+        };
+
+        const dibujarTextosEncabezado = () => {
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          doc.setTextColor(0, 0, 0);
+
+          let startY = 25;
+
+          // Textos dinámicos de acuerdo al rol
+          doc.text(numAnexo, pageWidth / 2, startY + 20, { align: 'center' });
+          doc.text(tituloFormato, pageWidth / 2, startY + 28, { align: 'center' });
+          doc.text('VINCULACIÓN CON LA SOCIEDAD', pageWidth / 2, startY + 33, { align: 'center' });
+        };
+
+        // Dibujar en la primera página
+        dibujarFondoBanner();
+        dibujarTextosEncabezado();
+
+        // Interceptar doc.addPage para asegurar que solo se repita el banner gráfico
+        const originalAddPage = doc.addPage.bind(doc);
+        doc.addPage = function () {
+          originalAddPage();
+          dibujarFondoBanner();
+        };
+
+        // 4. Mapear los datos desde las variables del backend para el PDF
+        const facultadesTxt = data.facultades_data?.map(f => f.siglas || f.siglas || f.siglas).join('\n') || 'N/A';
+        const carrerasTxt = data.carreras_data?.map(c => c.NombCarr || c.NombCarr || c.NombCarr).join('\n') || 'N/A';
+        const dominiosTxt = data.dominios_data?.map(dom => dom.detalle_dom_huma).join('\n') || 'N/A';
+
+        const objetivosTxt = data.objetivos_pei_data?.map(o => o.cod_obj + '. ' + o.detalle_obj).join('\n') || 'N/A';
+        const politicasTxt = data.politicas_data?.map(p => p.cod_pol + '. ' + p.detalle_pol || 'Política').join('\n') || 'N/A';
+        const agendaTxt = data.agenda_ods_data?.map(a => a.cod_ods + '. ' + a.detalle_ods || 'Agenda').join('\n') || 'N/A';
+        const objplandeTxt = data.objetivos_politicas_data?.map(a => a.cod_obj_pol + '. ' + a.detalle_obj_pol || 'Obj').join('\n') || 'N/A';
+        const convocatoriaTxt = data.convocatoria_data?.map(c => c.num_convocatoria).join('\n') || 'N/A';
+        const lineaInvestigacion = data.lineas_data?.map(l => l.nombre_lin).join('\n') || 'N/A';
+        const sublineaInvestigacion = data.sublineas_data?.map(sl => sl.nombre_sublin).join('\n') || 'N/A';
+        const areaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área de conocimiento').map(item => item.sau_id + ' ' + item.sau_descripcion).join('\n') || 'N/A';
+        const subareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Subárea de conocimiento').map(item => item.sau_id + ' ' + item.sau_descripcion).join('\n') || 'N/A';
+        const especareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área específica de conocimiento').map(item => item.sau_id + ' ' + item.sau_descripcion).join('\n') || 'N/A';
+        const tipoproyectTxt = data.tipproyectos_data?.map(t => t.detalle_invi_proyect).join('\n') || 'N/A';
+
+        const coberturaSeleccionada = (proy.proyect_cobertura || '').toLowerCase();
+        const checkLocal = coberturaSeleccionada.includes('local') ? 'X' : '  ';
+        const checkRegional = coberturaSeleccionada.includes('regional') ? 'X' : '  ';
+        const checkNacional = coberturaSeleccionada.includes('nacional') ? 'X' : '  ';
+        const checkInternacional = coberturaSeleccionada.includes('internacional') ? 'X' : '  ';
+
+        // --- ESTILOS MAGISTRALES PARA SIMULAR UNA SOLA CELDA SIN LÍNEA DIVISORIA ---
+        const lblStyle = {
+          fontStyle: 'bold',
+          halign: 'left',
+          cellPadding: { top: 3, left: 3, right: 3, bottom: 0 },
+          lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 }
+        };
+        const valStyle = {
+          fontStyle: 'normal',
+          halign: 'left',
+          cellPadding: { top: 1, left: 3, right: 3, bottom: 3 },
+          lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 }
+        };
+
+        // 5. Dibujar Tabla 1: ÚNICAMENTE EL TÍTULO "1. DATOS GENERALES"
+        autoTable(doc, {
+          startY: 65,
+          margin: { left: 15, right: 15 },
+          theme: 'grid',
+          body: [
+            [{ content: '1. DATOS GENERALES', styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 } }]
+          ],
+          styles: { lineColor: [0, 0, 0], lineWidth: 0.3 }
+        });
+
+        // 6. Definir la estructura de la TABLA 2
+        const tablaDatosGenerales = [
+          [{ content: 'Nombre (Español):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_nombre || '', colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Título del proyecto (Español):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_titulo || '', colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Name (Inglés):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_nombre_en || '', colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Title of the project (Inglés):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_titulo_en || '', colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Objetivos del Plan Estratégico Institucional:', colSpan: 3, styles: lblStyle }],
+          [{ content: objetivosTxt, colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+          [{ content: politicasTxt, colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe:', colSpan: 3, styles: lblStyle }],
+          [{ content: agendaTxt, colSpan: 3, styles: valStyle }],
+
+          [{ content: 'Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+          [{ content: objplandeTxt, colSpan: 3, styles: valStyle }],
+
+          [
+            { content: 'Nombre de Facultad/es:', styles: lblStyle },
+            { content: 'Carrera/s:', styles: lblStyle },
+            { content: 'Dominios académicos:', styles: lblStyle }
+          ],
+          [
+            { content: facultadesTxt, styles: valStyle },
+            { content: carrerasTxt, styles: valStyle },
+            { content: dominiosTxt, styles: valStyle }
+          ],
+
+          [
+            { content: 'No. Convocatoria:', styles: lblStyle },
+            { content: 'Línea de Investigación:', styles: lblStyle },
+            { content: 'Sublínea de Investigación:', styles: lblStyle }
+          ],
+          [
+            { content: convocatoriaTxt, styles: valStyle },
+            { content: lineaInvestigacion, styles: valStyle },
+            { content: sublineaInvestigacion, styles: valStyle }
+          ],
+
+          [
+            { content: 'Área Conocimiento UNESCO:', styles: lblStyle },
+            { content: 'SubÁrea Conocimiento UNESCO:', styles: lblStyle },
+            { content: 'SubÁrea Específica Conocimiento UNESCO:', styles: lblStyle }
+          ],
+          [
+            { content: areaespecifica, styles: valStyle },
+            { content: subareaespecifica, styles: valStyle },
+            { content: especareaespecifica, styles: valStyle }
+          ],
+
+          [{ content: 'Tipo de proyecto de vinculación:', colSpan: 3, styles: lblStyle }],
+          [{ content: tipoproyectTxt, colSpan: 3, styles: valStyle }]
+        ];
+
+        // Dibujar Tabla 2 
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 4,
+          margin: { top: 45, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaDatosGenerales,
+          styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0] }
+        });
+
+        // 7. Definir estructura de la TABLA 3 
+        const tablaCobertura = [
+          [{ content: 'COBERTURA Y LOCALIZACIÓN', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+          [
+            { content: `Local                [ ${checkLocal} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+            { content: `Regional          [ ${checkRegional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+            { content: `Nacional          [ ${checkNacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+            { content: `Internacional   [ ${checkInternacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } }
+          ]
+        ];
+
+        // 8. Dibujar Tabla 3
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY,
+          margin: { top: 45, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaCobertura,
+          styles: { fontSize: 8, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+        });
+
+        // 9. Calcular salto de página para la TABLA 4 (Firmas)
+        let finalY = doc.lastAutoTable.finalY + 10;
+
+        if (finalY > pageHeight - 90) {
+          doc.addPage();
+          finalY = 45;
+        }
+
+        let compromisosTexto = "Sin compromisos registrados.";
+        if (integrante.compromisos && integrante.compromisos.length > 0) {
+          compromisosTexto = integrante.compromisos.map(c => `• ${c.detalle_compromiso}`).join('\n');
+        }
+
+        let directorProy = '';
+        let ceduladirecto = '';
+        try {
+          const resDir = await this.ObteneProDir(proy.proyect_id);
+          if (resDir.data?.data && resDir.data.data.length > 0) {
+            directorProy = resDir.data.data[0].nombre_con_titulo;
+            ceduladirecto = resDir.data.data[0].cedula;
+          }
+        } catch (e) { console.warn("No se pudo obtener director", e); }
+        let nombreIntegrante = '';
+        if (esEstudiante) {
+          nombreIntegrante = integrante.informacionpersonal.NombInfPer + ' ' + integrante.informacionpersonal.ApellInfPer + ' ' + integrante.informacionpersonal.ApellMatInfPer;
+        } else {
+          nombreIntegrante = integrante.nombre_completo_titulo;
+        }
+        //const nombreDocente = integrante.nombre_completo_titulo || '_______________________';
+        const cedulaDocente = cedula;
+        const nombreDirector = directorProy || '_______________________';
+
+        const formatearFecha = (fechaStr) => {
+          if (!fechaStr) return '';
+          const partes = fechaStr.split('-');
+          if (partes.length === 3) {
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            const dia = parseInt(partes[2], 10);
+            const mes = meses[parseInt(partes[1], 10) - 1];
+            const anio = partes[0];
+            return `${dia} de ${mes} de ${anio}`;
+          }
+          return fechaStr;
+        };
+
+        const fechaFormateada = formatearFecha(proy.proyect_fecha_pres);
+
+        // --- 2. OBTENER PROVINCIA SIN DUPLICADOS ---
+        let provincia = 'N/A';
+
+        if (Array.isArray(proy.invi_detalle_cobe)) {
+          const provinciasMapeadas = proy.invi_detalle_cobe
+            .map(cobe => cobe.provincias?.detalle || cobe.provincia?.detalle)
+            .filter(Boolean);
+
+          provincia = [...new Set(provinciasMapeadas)].join(', ') || 'N/A';
+
+        } else if (Array.isArray(proy.invi_detalle_cobe?.provincias)) {
+          const provinciasMapeadas = proy.invi_detalle_cobe.provincias
+            .map(p => p.detalle)
+            .filter(Boolean);
+
+          provincia = [...new Set(provinciasMapeadas)].join(', ') || 'N/A';
+
+        } else if (proy.invi_detalle_cobe?.provincias?.detalle) {
+          provincia = proy.invi_detalle_cobe.provincias.detalle;
+        }
+
+        // 10. Definir estructura de la TABLA 4 (Firmas dinámica)
+        const tablaFirmas = [
+          // FILA 1: Título
+          [{ content: '2. FIRMAS DE RESPONSABILIDAD', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [220, 220, 220] } }],
+
+          // FILA 2: Fecha y Docente/Estudiante
+          [
+            { content: `\n\nCiudad y Fecha:\n\n${provincia}, ${fechaFormateada}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } },
+            { content: `DECLARO EL DESEO DE PARTICIPAR EN PROYECTOS DE VINCULACIÓN CON LA\nSOCIEDAD\n\n\n__________________________________\n${labelInvestigador} ${nombreIntegrante}\nC.I. ${cedulaDocente}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } }
+          ],
+
+          // FILA 3: Director (Se ajusta el borde según si hay o no compromisos más abajo)
+          [
+            {
+              content: `DECLARO QUE EL ${participacionTexto} PARTICIPARÁ EN PROYECTOS DE VINCULACIÓN CON LA SOCIEDAD\n\n\n__________________________________\n ${nombreDirector}\n Director(a) del Proyecto de Vinculación con la Sociedad\nC.I. ${ceduladirecto}`,
+              colSpan: 2,
+              styles: {
+                minCellHeight: 40,
+                valign: 'top',
+                halign: 'center',
+                // Si es estudiante (no lleva compromisos), el borde inferior debe cerrarse en 0.3. Si es docente, en 0 para unirse.
+                lineWidth: { top: 0.3, right: 0.3, bottom: esEstudiante ? 0.3 : 0, left: 0.3 }
+              }
+            }
+          ]
+        ];
+
+        // 10.1: Si NO es estudiante, agregamos la fila de compromisos
+        if (!esEstudiante) {
+          tablaFirmas.push(
+            // FILA 4: Compromisos (Se le quita el borde superior)
+            [
+              {
+                content: `NOTA: ME COMPROMETO AL FINAL DEL SEMESTRE A ENTREGAR:\n${compromisosTexto}`,
+                colSpan: 2,
+                styles: {
+                  minCellHeight: 15,
+                  valign: 'top',
+                  halign: 'left',
+                  cellPadding: 4,
+                  lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 }
+                }
+              }
+            ]
+          );
+        }
+
+        // 11. Dibujar Tabla Firmas
+        autoTable(doc, {
+          startY: finalY,
+          margin: { top: 45, left: 15, right: 15, bottom: 20 },
+          theme: 'grid',
+          body: tablaFirmas,
+          styles: { fontSize: 8, cellPadding: 4, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+        });
+
+        // 12. Descargar Documento (Nombre del archivo actualizado dinámicamente)
+        const nombreArchivo = `${numAnexo.replace(' ', '_')}_Compromiso_${cedula}.pdf`;
+        doc.save(nombreArchivo);
+
+      } catch (error) {
+        console.error(`Error al generar el PDF del Anexo:`, error);
+        mostraralertas2("Ocurrió un error al generar el PDF.", "error");
+      } finally {
+        // 2. Apagamos el spinner pase lo que pase (éxito o error)
+        this.botonCargando = null;
+      }
+    },
+    async descargarTodosCompromisos() {
+
+      try {
+        this.botonCargando = 'descarga_masiva';
+        const idProyecto = this.proyectoSeleccionado?.proyect_id;
+        if (!idProyecto) {
+          return mostraralertas2("Error: No se ha seleccionado un proyecto válido.", "warning");
+        }
+
+        // 1. Filtrar únicamente a los integrantes válidos (que tengan cédula y cumplan los requisitos)
+        const integrantesValidos = this.proyectoSeleccionado.invi_detalle_integrante.filter(int => {
+          const cedula = int.ciinfper_doc || int.ciinfper_est;
+          const tieneCompromisos = int.compromisos && int.compromisos.length > 0;
+          const esEstudianteRol = int.funciones?.nombre_funcion === 'Estudiante integrante del proyecto de vinculación';
+          return cedula && (tieneCompromisos || esEstudianteRol);
+        });
+
+        if (integrantesValidos.length === 0) {
+          return mostraralertas2("No hay integrantes válidos con anexos de compromiso en este proyecto.", "warning");
+        }
+
+        // 2. Llamada a la API UNA SOLA VEZ para todos
+        const [responseDatos, resDir] = await Promise.all([
+          API.get(`${this.baseUrl}/getEdicionDatos/${idProyecto}`),
+          this.ObteneProDir(idProyecto).catch(() => ({ data: { data: [] } }))
+        ]);
+
+        const data = responseDatos.data;
+        const proy = data.proyecto;
+
+        let directorProy = '';
+        let ceduladirecto = '';
+        if (resDir.data?.data && resDir.data.data.length > 0) {
+          directorProy = resDir.data.data[0].nombre_con_titulo;
+          ceduladirecto = resDir.data.data[0].cedula;
+        }
+
+        // 3. Mapear datos estáticos del proyecto (Fuera del bucle para optimizar rendimiento)
+        const facultadesTxt = data.facultades_data?.map(f => f.siglas || f.siglas || f.siglas).join('\n') || 'N/A';
+        const carrerasTxt = data.carreras_data?.map(c => c.NombCarr || c.NombCarr || c.NombCarr).join('\n') || 'N/A';
+        const dominiosTxt = data.dominios_data?.map(dom => dom.detalle_dom_huma).join('\n') || 'N/A';
+        const objetivosTxt = data.objetivos_pei_data?.map(o => o.cod_obj + '. ' + o.detalle_obj).join('\n') || 'N/A';
+        const politicasTxt = data.politicas_data?.map(p => p.cod_pol + '. ' + p.detalle_pol || 'Política').join('\n') || 'N/A';
+        const agendaTxt = data.agenda_ods_data?.map(a => a.cod_ods + '. ' + a.detalle_ods || 'Agenda').join('\n') || 'N/A';
+        const objplandeTxt = data.objetivos_politicas_data?.map(a => a.cod_obj_pol + '. ' + a.detalle_obj_pol || 'Obj').join('\n') || 'N/A';
+        const convocatoriaTxt = data.convocatoria_data?.map(c => c.num_convocatoria).join('\n') || 'N/A';
+        const lineaInvestigacion = data.lineas_data?.map(l => l.nombre_lin).join('\n') || 'N/A';
+        const sublineaInvestigacion = data.sublineas_data?.map(sl => sl.nombre_sublin).join('\n') || 'N/A';
+        const areaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área de conocimiento').map(item => item.sau_id + ' ' + item.sau_descripcion).join('\n') || 'N/A';
+        const subareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Subárea de conocimiento').map(item => item.sau_id + ' ' + item.sau_descripcion).join('\n') || 'N/A';
+        const especareaespecifica = data.unesco_data.filter(item => item.tipo_area === 'Área específica de conocimiento').map(item => item.sau_id + ' ' + item.sau_descripcion).join('\n') || 'N/A';
+        const tipoproyectTxt = data.tipproyectos_data?.map(t => t.detalle_invi_proyect).join('\n') || 'N/A';
+
+        const coberturaSeleccionada = (proy.proyect_cobertura || '').toLowerCase();
+        const checkLocal = coberturaSeleccionada.includes('local') ? 'X' : '  ';
+        const checkRegional = coberturaSeleccionada.includes('regional') ? 'X' : '  ';
+        const checkNacional = coberturaSeleccionada.includes('nacional') ? 'X' : '  ';
+        const checkInternacional = coberturaSeleccionada.includes('internacional') ? 'X' : '  ';
+
+        const formatearFecha = (fechaStr) => {
+          if (!fechaStr) return '';
+          const partes = fechaStr.split('-');
+          if (partes.length === 3) {
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            return `${parseInt(partes[2], 10)} de ${meses[parseInt(partes[1], 10) - 1]} de ${partes[0]}`;
+          }
+          return fechaStr;
+        };
+        const fechaFormateada = formatearFecha(proy.proyect_fecha_pres);
+
+        let provincia = 'N/A';
+        if (Array.isArray(proy.invi_detalle_cobe)) {
+          const provMap = proy.invi_detalle_cobe.map(c => c.provincias?.detalle || c.provincia?.detalle).filter(Boolean);
+          provincia = [...new Set(provMap)].join(', ') || 'N/A';
+        } else if (Array.isArray(proy.invi_detalle_cobe?.provincias)) {
+          const provMap = proy.invi_detalle_cobe.provincias.map(p => p.detalle).filter(Boolean);
+          provincia = [...new Set(provMap)].join(', ') || 'N/A';
+        } else if (proy.invi_detalle_cobe?.provincias?.detalle) {
+          provincia = proy.invi_detalle_cobe.provincias.detalle;
+        }
+
+        // Estilos y Tablas Generales (Se definen una vez)
+        const lblStyle = { fontStyle: 'bold', halign: 'left', cellPadding: { top: 3, left: 3, right: 3, bottom: 0 }, lineWidth: { top: 0.3, right: 0.3, bottom: 0, left: 0.3 } };
+        const valStyle = { fontStyle: 'normal', halign: 'left', cellPadding: { top: 1, left: 3, right: 3, bottom: 3 }, lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 } };
+
+        const tablaDatosGenerales = [
+          [{ content: 'Nombre (Español):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_nombre || '', colSpan: 3, styles: valStyle }],
+          [{ content: 'Título del proyecto (Español):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_titulo || '', colSpan: 3, styles: valStyle }],
+          [{ content: 'Name (Inglés):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_nombre_en || '', colSpan: 3, styles: valStyle }],
+          [{ content: 'Title of the project (Inglés):', colSpan: 3, styles: lblStyle }],
+          [{ content: proy.proyect_titulo_en || '', colSpan: 3, styles: valStyle }],
+          [{ content: 'Objetivos del Plan Estratégico Institucional:', colSpan: 3, styles: lblStyle }],
+          [{ content: objetivosTxt, colSpan: 3, styles: valStyle }],
+          [{ content: 'Políticas del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+          [{ content: politicasTxt, colSpan: 3, styles: valStyle }],
+          [{ content: 'Agenda 2030 y los Objetivos de desarrollo sostenible una oportunidad para América Latina y el Caribe:', colSpan: 3, styles: lblStyle }],
+          [{ content: agendaTxt, colSpan: 3, styles: valStyle }],
+          [{ content: 'Objetivos del Plan de Desarrollo para el Nuevo Ecuador 2024 • 2025:', colSpan: 3, styles: lblStyle }],
+          [{ content: objplandeTxt, colSpan: 3, styles: valStyle }],
+          [
+            { content: 'Nombre de Facultad/es:', styles: lblStyle },
+            { content: 'Carrera/s:', styles: lblStyle },
+            { content: 'Dominios académicos:', styles: lblStyle }
+          ],
+          [
+            { content: facultadesTxt, styles: valStyle },
+            { content: carrerasTxt, styles: valStyle },
+            { content: dominiosTxt, styles: valStyle }
+          ],
+          [
+            { content: 'No. Convocatoria:', styles: lblStyle },
+            { content: 'Línea de Investigación:', styles: lblStyle },
+            { content: 'Sublínea de Investigación:', styles: lblStyle }
+          ],
+          [
+            { content: convocatoriaTxt, styles: valStyle },
+            { content: lineaInvestigacion, styles: valStyle },
+            { content: sublineaInvestigacion, styles: valStyle }
+          ],
+          [
+            { content: 'Área Conocimiento UNESCO:', styles: lblStyle },
+            { content: 'SubÁrea Conocimiento UNESCO:', styles: lblStyle },
+            { content: 'SubÁrea Específica Conocimiento UNESCO:', styles: lblStyle }
+          ],
+          [
+            { content: areaespecifica, styles: valStyle },
+            { content: subareaespecifica, styles: valStyle },
+            { content: especareaespecifica, styles: valStyle }
+          ],
+          [{ content: 'Tipo de proyecto de vinculación:', colSpan: 3, styles: lblStyle }],
+          [{ content: tipoproyectTxt, colSpan: 3, styles: valStyle }]
+        ];
+
+        const tablaCobertura = [
+          [{ content: 'COBERTURA Y LOCALIZACIÓN', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [220, 220, 220], halign: 'left' } }],
+          [
+            { content: `Local                [ ${checkLocal} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+            { content: `Regional          [ ${checkRegional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+            { content: `Nacional          [ ${checkNacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } },
+            { content: `Internacional   [ ${checkInternacional} ]`, styles: { halign: 'center', fontStyle: 'normal' } }
+          ]
+        ];
+
+        // 4. Inicializar jsPDF
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const rutaImagenFondo = '/fondo2.png';
+
+        const dibujarFondoBanner = () => {
+          doc.addImage(rutaImagenFondo, 'PNG', 0, 0, pageWidth, pageHeight);
+        };
+
+        const originalAddPage = doc.addPage.bind(doc);
+        doc.addPage = function () {
+          originalAddPage();
+          dibujarFondoBanner();
+        };
+
+        // -----------------------------------------------------------
+        // 5. BUCLE PRINCIPAL (ITERAR POR CADA INTEGRANTE)
+        // -----------------------------------------------------------
+        for (let i = 0; i < integrantesValidos.length; i++) {
+          const integrante = integrantesValidos[i];
+
+          const cedula = integrante.ciinfper_doc || integrante.ciinfper_est;
+          const esEstudiante = integrante.ciinfper_est === cedula;
+
+          const numAnexo = esEstudiante ? 'ANEXO 6' : 'ANEXO 5';
+          const tituloFormato = esEstudiante
+            ? 'FORMATO DE ESTUDIANTES QUE DESEAN PARTICIPAR EN PROYECTOS DE'
+            : 'FORMATO DE PROFESORES QUE DESEAN PARTICIPAR EN PROYECTOS DE';
+          const labelInvestigador = esEstudiante ? 'Nombre del/la Estudiante Investigador:' : 'Nombre del Docente Investigador:';
+          const participacionTexto = esEstudiante ? 'ESTUDIANTE' : 'DOCENTE';
+
+          let nombreIntegrante = esEstudiante
+            ? `${integrante.informacionpersonal.NombInfPer} ${integrante.informacionpersonal.ApellInfPer} ${integrante.informacionpersonal.ApellMatInfPer}`
+            : integrante.nombre_completo_titulo;
+
+          let compromisosTexto = "Sin compromisos registrados.";
+          if (integrante.compromisos && integrante.compromisos.length > 0) {
+            compromisosTexto = integrante.compromisos.map(c => `• ${c.detalle_compromiso}`).join('\n');
+          }
+
+          // Si NO es el primero, añadimos una nueva página para separar el anexo del siguiente integrante
+          if (i === 0) {
+            dibujarFondoBanner();
+          } else {
+            doc.addPage();
+          }
+
+          // Dibujar Textos de Encabezado dinámicos
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          doc.setTextColor(0, 0, 0);
+          let startY = 25;
+          doc.text(numAnexo, pageWidth / 2, startY + 20, { align: 'center' });
+          doc.text(tituloFormato, pageWidth / 2, startY + 28, { align: 'center' });
+          doc.text('VINCULACIÓN CON LA SOCIEDAD', pageWidth / 2, startY + 33, { align: 'center' });
+
+          // Tabla 1: Titulo
+          autoTable(doc, {
+            startY: 65, margin: { left: 15, right: 15 }, theme: 'grid',
+            body: [[{ content: '1. DATOS GENERALES', styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 } }]],
+            styles: { lineColor: [0, 0, 0], lineWidth: 0.3 }
+          });
+
+          // Tabla 2: Datos (Reutilizamos la variable)
+          autoTable(doc, {
+            startY: doc.lastAutoTable.finalY + 4, margin: { top: 45, left: 15, right: 15, bottom: 20 }, theme: 'grid',
+            body: tablaDatosGenerales, styles: { fontSize: 8, lineColor: [0, 0, 0], textColor: [0, 0, 0] }
+          });
+
+          // Tabla 3: Cobertura (Reutilizamos la variable)
+          autoTable(doc, {
+            startY: doc.lastAutoTable.finalY, margin: { top: 45, left: 15, right: 15, bottom: 20 }, theme: 'grid',
+            body: tablaCobertura, styles: { fontSize: 8, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+          });
+
+          // Control de salto de página para Firmas
+          let finalY = doc.lastAutoTable.finalY + 10;
+          if (finalY > pageHeight - 90) {
+            doc.addPage();
+            finalY = 45;
+          }
+
+          // Tabla 4: Firmas Dinámicas
+          const nombreDirector = directorProy || '_______________________';
+
+          const tablaFirmas = [
+            [{ content: '2. FIRMAS DE RESPONSABILIDAD', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [220, 220, 220] } }],
+            [
+              { content: `\n\nCiudad y Fecha:\n\n${provincia}, ${fechaFormateada}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } },
+              { content: `DECLARO EL DESEO DE PARTICIPAR EN PROYECTOS DE VINCULACIÓN CON LA\nSOCIEDAD\n\n\n__________________________________\n${labelInvestigador} ${nombreIntegrante}\nC.I. ${cedula}`, styles: { minCellHeight: 30, valign: 'middle', halign: 'center' } }
+            ],
+            [
+              {
+                content: `DECLARO QUE EL ${participacionTexto} PARTICIPARÁ EN PROYECTOS DE VINCULACIÓN CON LA SOCIEDAD\n\n\n__________________________________\n ${nombreDirector}\n Director(a) del Proyecto de Vinculación con la Sociedad\nC.I. ${ceduladirecto}`,
+                colSpan: 2,
+                styles: {
+                  minCellHeight: 40, valign: 'top', halign: 'center',
+                  lineWidth: { top: 0.3, right: 0.3, bottom: esEstudiante ? 0.3 : 0, left: 0.3 }
+                }
+              }
+            ]
+          ];
+
+          // Condicional: Compromisos si no es estudiante
+          if (!esEstudiante) {
+            tablaFirmas.push([
+              {
+                content: `NOTA: ME COMPROMETO AL FINAL DEL SEMESTRE A ENTREGAR:\n${compromisosTexto}`,
+                colSpan: 2,
+                styles: {
+                  minCellHeight: 15, valign: 'top', halign: 'left', cellPadding: 4,
+                  lineWidth: { top: 0, right: 0.3, bottom: 0.3, left: 0.3 }
+                }
+              }
+            ]);
+          }
+
+          // Dibujar Tabla de firmas
+          autoTable(doc, {
+            startY: finalY, margin: { top: 45, left: 15, right: 15, bottom: 20 }, theme: 'grid',
+            body: tablaFirmas, styles: { fontSize: 8, cellPadding: 4, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: [0, 0, 0] }
+          });
+        }
+
+        // 6. Descargar el documento compilado final
+        const nombreArchivo = `Anexos5y6_Masivos_Compromisos_.pdf`;
+        doc.save(nombreArchivo);
+
+      } catch (error) {
+        console.error(`Error al generar el PDF masivo:`, error);
+        mostraralertas2("Ocurrió un error al generar la descarga masiva.", "error");
+      } finally {
+        this.botonCargando = null;
+      }
+    },
   },
 }
 </script>
