@@ -36,5 +36,17 @@ class Invi_informes extends Model
     {
         return $this->belongsTo(PeriodoLectivo::class, 'idper', 'idper');
     }
+    public function invi_informe_actividades_seguimiento()
+    {
+        return $this->hasMany(Invi_informe_actividades_seguimiento::class, 'informe_id', 'id_informes');
+    }
+    public function invi_informe_asistencia_estudiantes()
+    {
+        return $this->hasMany(Invi_informe_asistencia_estudiantes::class, 'informe_id', 'id_informes');
+    }
+    public function invi_informe_actividades_docentes()
+    {
+        return $this->hasMany(Invi_informe_actividades_docentes::class, 'informe_id', 'id_informes');
+    }
 
 }

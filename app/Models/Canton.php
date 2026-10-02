@@ -30,5 +30,9 @@ class Canton extends Model
     {
         return $this->hasMany(Parroquia::class, 'codigo');
     }
+    public function invi_informe_beneficiarios()
+    {
+        return $this->hasMany(Invi_informe_beneficiarios::class, 'id_canton');
+    }
 
 }

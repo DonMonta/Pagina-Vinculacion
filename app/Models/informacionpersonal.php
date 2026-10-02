@@ -101,6 +101,10 @@ class informacionpersonal extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(RegistroTitulos::class, 'ciinfper', 'ciinfper');
     }
+    public function invi_asistencia_estudiantes()
+    {
+        return $this->hasMany(Invi_informe_asistencia_estudiantes::class, 'CIInfPer', 'CIInfPer');
+    }
     public function getJWTIdentifier()
     {
         return $this->getKey();

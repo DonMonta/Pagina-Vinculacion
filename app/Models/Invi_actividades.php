@@ -51,5 +51,12 @@ class Invi_actividades extends Model
     {
         return $this->hasMany(Invi_actsupuestos::class, 'id_actividades');
     }
-
+    public function invi_informe_actividades_seguimiento()
+    {
+        return $this->hasMany(Invi_informe_actividades_seguimiento::class, 'id_actividades');
+    }
+    public function invi_informe_actividades_docentes()
+    {
+        return $this->hasMany(Invi_informe_actividades_docentes::class, 'id_actividades');
+    }
 }

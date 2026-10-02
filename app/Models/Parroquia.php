@@ -31,6 +31,10 @@ class Parroquia extends Model
     {
         return $this->hasMany(Invi_detalle_cobe::class, 'id_parroquia');
     }
+    public function invi_informe_beneficiarios()
+    {
+        return $this->hasMany(Invi_informe_beneficiarios::class, 'id_parroquia');
+    }
    
 
 }

@@ -24,4 +24,12 @@ class Invi_subactividad extends Model
     {
         return $this->belongsTo(Invi_actividades::class, 'id_actividades');
     }
+    public function invi_informe_actividades_seguimiento()
+    {
+        return $this->hasMany(Invi_informe_actividades_seguimiento::class, 'id_subactividad');
+    }
+    public function invi_informe_actividades_docentes()
+    {
+        return $this->hasMany(Invi_informe_actividades_docentes::class, 'id_subactividad');
+    }
 }
