@@ -60,5 +60,8 @@ class PeriodoLectivo extends Model
         'fechainibeca',
         'fechafinbeca',
     ];
-    
+    public function invi_informes()
+    {
+        return $this->hasMany(Invi_informes::class, 'idper', 'idper');
+    }
 }

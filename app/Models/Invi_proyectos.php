@@ -152,4 +152,16 @@ class Invi_proyectos extends Model
     {
         return $this->hasMany(Invi_bibliografias::class, 'proyect_id');
     }
+    public function invi_respuestas_manuales_formato()
+    {
+        return $this->hasMany(Invi_respuestas_manuales_formato::class, 'proyect_id');
+    }
+    public function invi_proyectos_formatos()
+    {
+        return $this->hasMany(Invi_proyectos_formatos::class, 'proyect_id');
+    }
+    public function invi_informes()
+    {
+        return $this->hasMany(Invi_informes::class, 'proyecto_id');
+    }
 }
