@@ -81,7 +81,7 @@ Route::prefix('vin')->group(function () {
         //Definición de la ruta endpoint para deshabilitar un pei
         Route::delete('inhabilitar_pei/{id}', [PeiController::class, 'destroy']);
         //Definición de la ruta endpoint para subir un archivo
-        Route::post('subir_archivo', [PeiController::class, 'uploadArchivo']);
+        Route::post('subir_archivo_pei', [PeiController::class, 'uploadArchivo']);
         //Definición de la ruta endpoint para eliminar un archivo
         Route::post('eliminar_archivo', [PeiController::class, 'deleteArchivo']);
         //Definición de la ruta endpoint para el recurso Subsistemas_pei, perimitiendo operaciones CRUD
