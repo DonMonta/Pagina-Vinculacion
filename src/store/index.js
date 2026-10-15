@@ -9,6 +9,7 @@ export default createStore({
     name: localStorage.getItem('name_vinc') || null,
     carrera: localStorage.getItem('carrera_vinc') || null,
     nivel: localStorage.getItem('nivel_vinc') || null,
+    departamento: localStorage.getItem('departamento_vinc') || null,
     idcarrera: localStorage.getItem('idcarrera_vinc') || null,
     facultad: localStorage.getItem('facultad_vinc') || null,
     token: localStorage.getItem('token_vinc') || null,
@@ -25,6 +26,7 @@ export default createStore({
     getIdcarrera: state => state.idcarrera,
     getFacultad: state => state.facultad,
     getRole: state => state.role,
+    getDepartamento: state => state.departamento,
     isAuthenticated: state => !!state.token,
     getFullToken: state => `${state.token_type} ${state.token}`,
     getProyectosIds: state => state.proyectos_ids,
@@ -79,6 +81,11 @@ export default createStore({
       state.proyectos_detalles = detalles || [];
       localStorage.setItem('proyectos_detalles_vinc', JSON.stringify(detalles || []));
     },
+    setDepartamento_vinc(state, departamento) {
+      state.departamento = departamento;
+      localStorage.setItem('departamento_vinc', departamento);
+    },
+
     logout_vinc(state) {
       // Limpia el state y localStorage al cerrar sesión
       state.role = null;
@@ -102,6 +109,7 @@ export default createStore({
       localStorage.removeItem('facultad_vinc');
       localStorage.removeItem('proyectos_ids_vinc');
       localStorage.removeItem('proyectos_detalles_vinc');
+      localStorage.removeItem('departamento_vinc');
     },
   },
   actions: {},

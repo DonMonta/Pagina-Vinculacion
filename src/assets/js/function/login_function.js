@@ -26,12 +26,14 @@ export async function enviarsolilogin(method, parametros, url, mensaje) {
         store.commit("setname_vinc", response.data.name);
         store.commit("setToken_vinc", response.data.token);
         store.commit("setTokenType_vinc", response.data.token_type || "Bearer");
+        store.commit("setDepartamento_vinc", response.data.IdDepeart);
         return {
           token: response.data.token,
           Rol: response.data.Role,
           id: response.data.cedula,
           name: response.data.name,
           email: response.data.email,
+          departamento: response.data.IdDepeart,
         };
       }else if(response.data.Role === "D" || response.data.Role === "A" || response.data.Role === "TDO" || response.data.Role === "T"){
         store.commit("setRol_vinc", response.data.Role);

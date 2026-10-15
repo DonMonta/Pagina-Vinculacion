@@ -90,13 +90,33 @@
               </div>
             </td>
             <td class="py-5 px-4 whitespace-nowrap">
-              <span :class="{
-                'rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-wider': true,
-                'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_plandne === 1,
-                'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_plandne === 0
-              }">
-                {{ post.estado_plandne === 1 ? 'Activo' : 'Inactivo' }}
-              </span>
+              <div class="flex flex-col gap-3">
+                <!-- Estado General -->
+                <div>
+                  <p class="text-[10px] text-gray-400 uppercase tracking-wider mb-1">General</p>
+                  <span :class="{
+                    'rounded-lg px-2 py-1 text-xs font-bold uppercase tracking-wider': true,
+                    'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_plandne === 1,
+                    'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_plandne === 0
+                  }">
+                    {{ post.estado_plandne === 1 ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>
+
+                <!-- Estado del Departamento (Solo si se filtró por departamento) -->
+                <div v-if="post.estado_departamento !== undefined">
+                  <p class="text-[10px] text-gray-400 uppercase tracking-wider mb-1 max-w-[150px] truncate" :title="post.nombre_departamento">
+                    En: {{ post.nombre_departamento }}
+                  </p>
+                  <span :class="{
+                    'rounded-lg px-2 py-1 text-xs font-bold uppercase tracking-wider': true,
+                    'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400': post.estado_departamento === 1,
+                    'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400': post.estado_departamento === 0
+                  }">
+                    {{ post.estado_departamento === 1 ? 'Habilitado' : 'Inhabilitado' }}
+                  </span>
+                </div>
+              </div>
             </td>
 
             <td class="py-5 px-4">
@@ -134,7 +154,7 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button v-if="post.estado_plandne === 1 && post.objetivos_plandne_count > 0"
+                <button v-if="post.estado_departamento === 1 && post.objetivos_plandne_count > 0"
                   @click="abrirModalPoliticas(post)" :disabled="botonCargando === 'politicas_' + post.id_pladne"
                   class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors" title="Gestionar Políticas">
                   <svg v-if="botonCargando === 'politicas_' + post.id_pladne" class="animate-spin h-5 w-5 text-cyan-600"
@@ -149,7 +169,7 @@
                     <path d="M12 8l4 4-4 4M8 12h7" />
                   </svg>
                 </button>
-                <button v-if="post.estado_plandne === 1" @click="abrirModalObjPol(post)" :disabled="botonCargando === 'objetivos_' + post.id_pladne"
+                <button v-if="post.estado_departamento === 1" @click="abrirModalObjPol(post)" :disabled="botonCargando === 'objetivos_' + post.id_pladne"
                   class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                   title="Gestionar Objetivos">
                   <svg v-if="botonCargando === 'objetivos_' + post.id_pladne" class="animate-spin h-5 w-5 text-purple-600"
@@ -164,14 +184,14 @@
                     <rect x="3" y="3" width="18" height="18" rx="2" />
                   </svg>
                 </button>
-                <button @click="eliminar(post.id_plandne, post.nombre_plandne)" v-if="post.estado_plandne === 1"
+                <button @click="eliminar(post.id_pladne, post.nombre_plandne)" v-if="(post.estado_departamento !== undefined ? post.estado_departamento : post.estado_pei) === 1"
                   class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
                 </button>
-                <button @click="habilitar(post.id_plandne, post.nombre_plandne)" v-if="post.estado_plandne === 0"
+                <button @click="habilitar(post.id_pladne, post.nombre_plandne)"v-if="(post.estado_departamento !== undefined ? post.estado_departamento : post.estado_pei) === 0"
                   class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:bg-white/10"
                   title="Refrescar lista">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -688,6 +708,7 @@ defineExpose({
 <script>
 import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
+import { useUsuario } from "@/composables/useUsuario";
 import debounce from 'lodash.debounce';
 import Modal from '@/components/Modal/Modal.vue'
 import { mostraralertas2, enviarsolig, eliminacion, confimarhabi, elimnarpermanente } from '@/assets/js/function/funciones';
@@ -698,6 +719,7 @@ export default {
       idus: 0,
       baseUrl: "/vin",
       botonCargando: null,
+      UsuarioInfo: {},
       usersarray: [],
       objetoguardar: {
         nombre_plandne: "",
@@ -754,7 +776,7 @@ export default {
     }, 900);
   },
   async mounted() {
-    const ruta = useRoute();
+    this.UsuarioInfo = useUsuario();
     this.GetData(1, this.searchQuery);
 
   },
@@ -800,7 +822,7 @@ export default {
         this.isPoliticasModalOpen = true;
 
       }catch(e){
-        console.log(e)
+        console.error("❌ Error:", error.e?.data || e);
       }finally{
         this.botonCargando = null;
       }
@@ -861,7 +883,7 @@ export default {
         await this.getObjPol();
         this.isObjetivosPolModalOpen = true;
       }catch(e){
-        console.log(e)
+        console.error("❌ Error:", error.e?.data || e);
       }finally{
         this.botonCargando = null;
       }
@@ -956,7 +978,7 @@ export default {
         };
         this.$.setupState.isEditModalOpen = true;
       } catch (e) {
-        console.log(e)
+        console.error("❌ Error:", error.e?.data || e);
       } finally {
         this.botonCargando = null;
       }
@@ -967,10 +989,10 @@ export default {
       try {
         const params = {
           page: page,
-          search_query: searchQuery // Parámetro para búsqueda
+          search_query: searchQuery, // Parámetro para búsqueda
+          id_departamento: this.UsuarioInfo.departamentoUsuario
         };
         const response = await API.get(`${this.baseUrl}/plandne`, { params });
-
         const data = response.data?.data || [];
         this.filteredarray = data;
         const pagination = response.data?.pagination || {};
@@ -1016,7 +1038,8 @@ export default {
           nombre_plandne: this.objetoguardar.nombre_plandne,
           anio_plandne: this.objetoguardar.anio_plandne,
           estado_plandne: this.objetoguardar.estado_plandne,
-          link_plandne: this.objetoguardar.link_plandne
+          link_plandne: this.objetoguardar.link_plandne,
+          id_departamento: this.UsuarioInfo.departamentoUsuario
         };
         const exito = await enviarsolig('POST', params, `${this.baseUrl}/plandne`, 'PLANDNE registrado con éxito');
         if (exito) {
@@ -1041,7 +1064,8 @@ export default {
           nombre_plandne: this.objetoeditar.nombre_plandne,
           anio_plandne: this.objetoeditar.anio_plandne,
           estado_plandne: this.objetoeditar.estado_plandne,
-          link_plandne: this.objetoeditar.link_plandne
+          link_plandne: this.objetoeditar.link_plandne,
+          id_departamento: this.UsuarioInfo.departamentoUsuario
         };
         const exito = await enviarsolig('PUT', params, `${this.baseUrl}/plandne/${this.objetoeditar.id_pladne}`, 'PLANDNE actualizado con éxito');
         if (exito) {
@@ -1081,7 +1105,7 @@ export default {
           id,
           'Deshabilitar registro',
           '¿Realmente desea deshabilitar el PLANDNE  ' + nombre + '?',
-          this.actualizar   // 👈 callback para refrescar la tabla al confirmar
+          this.actualizar, this.UsuarioInfo.departamentoUsuario   // 👈 callback para refrescar la tabla al confirmar
         );
       } catch (error) {
         console.error("Error al eliminar el PLANDNE:", error);
@@ -1097,7 +1121,7 @@ export default {
           id,
           'Habilitar registro',
           `¿Desea habilitar el PLANDNE "${nombre}"?`,
-          this.actualizar
+          this.actualizar, this.UsuarioInfo.departamentoUsuario
         );
       } catch (error) {
         // Este catch capturaría errores si confimarhabi hace un 'throw'
