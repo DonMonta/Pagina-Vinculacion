@@ -86,6 +86,7 @@ class AuthController extends Controller
                 'name' => $user->NombUsu,
                 'email' => $user->email,
                 'Role' => $user->idperfil,
+                'IdDepeart' => 25,
                 'cedula' => $user->ciinfper,
             ]);
         } elseif ($docente) {

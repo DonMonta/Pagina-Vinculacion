@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agenda_ODS;
+use App\Models\Departamento;
+use App\Models\AgendaODSEstadoDepartamento;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 
@@ -15,8 +17,26 @@ class Agenda_ODSController extends Controller
     {
         try {
             $searchQuery = $request->input('search_query');
+            $id_departamento = $request->input('id_departamento');
+            $nombre_departamento = 'Departamento seleccionado';
+            if ($id_departamento) {
+                $depto = Departamento::select('nombre_departamento')->where('id_departamento', $id_departamento)->first();
+                if ($depto) {
+                    // Ajusta 'nombre_departamento' al nombre real de tu columna en la base de datos
+                    $nombre_departamento = $depto->nombre_departamento ?? $depto->nombre;
+                }
+            }
             // Usamos withCount para obtener los totales de las relaciones
             $query = Agenda_ODS::withCount(['ods']);
+            if ($id_departamento) {
+                $query->whereHas('estadosDepartamentosAgendaODS', function ($q) use ($id_departamento) {
+                    $q->where('id_departamento', $id_departamento);
+                });
+
+                $query->with(['estadosDepartamentosAgendaODS' => function ($q) use ($id_departamento) {
+                    $q->where('id_departamento', $id_departamento);
+                }]);
+            }
             if ($searchQuery) {
                 $query->where(function ($q) use ($searchQuery) {
                     $q->where('nombre_ag_ods', 'LIKE', '%' . $searchQuery . '%')
@@ -24,24 +44,32 @@ class Agenda_ODSController extends Controller
                 });
             }
 
+           // --- FUNCION AUXILIAR PARA TRANSFORMAR LA DATA ---
+            $transformData = function ($item) use ($id_departamento, $nombre_departamento) {
+                $attributes = $item->toArray();
+
+                // Si consultamos por departamento, agregamos variables exclusivas para él
+                if ($id_departamento && $item->estadosDepartamentosAgendaODS->isNotEmpty()) {
+                    // YA NO sobreescribimos 'estado_pei' para conservar el estado general.
+                    // En su lugar, creamos estas dos nuevas llaves:
+                    $attributes['estado_departamento'] = $item->estadosDepartamentosAgendaODS->first()->estado;
+                    $attributes['nombre_departamento'] = $nombre_departamento;
+                }
+
+                foreach ($attributes as $key => $value) {
+                    if (is_string($value)) {
+                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+                return $attributes;
+            };
+
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
-
-                // Transformación para UTF-8 y manejo de atributos
-                $data->transform(function ($item) {
-                    $attributes = $item->toArray(); // Usamos toArray para incluir los campos _count
-                    foreach ($attributes as $key => $value) {
-                        if (is_string($value)) {
-                            $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-                        }
-                    }
-                    return $attributes;
-                });
-
+                $data->transform($transformData);
                 return response()->json(['data' => $data]);
             }
 
-            // Paginación por defecto
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
@@ -51,22 +79,16 @@ class Agenda_ODSController extends Controller
                 ], 200);
             }
 
-            $data->getCollection()->transform(function ($item) {
-                $attributes = $item->toArray(); 
-                foreach ($attributes as $key => $value) {
-                    if (is_string($value)) {
-                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-                    }
-                }
-                return $attributes;
-            });
+            $data->getCollection()->transform($transformData);
 
             return response()->json([
                 'data' => $data->items(),
-                'current_page' => $data->currentPage(),
-                'per_page' => $data->perPage(),
-                'total' => $data->total(),
-                'last_page' => $data->lastPage(),
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
@@ -79,19 +101,29 @@ class Agenda_ODSController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->all();
-
-        // Si el usuario intenta enviar el PEI como ACTIVO (1)
-        if ($request->estado_ag_ods == 1) {
-            // Verificamos si ya existe AL MENOS UNO activo en la base de datos
-            $existeActivo = Agenda_ODS::where('estado_ag_ods', 1)->exists();
-
+        $id_departamento = $request->input('id_departamento');
+        if (!$id_departamento) {
+            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
+        }
+        $estado_final = $request->estado_ag_ods ?? 1;
+        if ($estado_final == 1) {
+            // Verificamos si este DEPARTAMENTO ya tiene un Agenda ODS activo
+            $existeActivo = AgendaODSEstadoDepartamento::where('id_departamento', $id_departamento)
+                ->where('estado', 1)->exists();
             if ($existeActivo) {
-                // Si ya hay uno, forzamos este nuevo a ser INACTIVO (0)
-                $inputs['estado_ag_ods'] = 0;
+                $estado_final = 0;
             }
         }
+        $inputs['estado_ag_ods'] = $estado_final;
 
         $res = Agenda_ODS::create($inputs);
+
+        // Creamos la relación en la tabla pivote
+        AgendaODSEstadoDepartamento::create([
+            'id_ag_ods' => $res->id_ag_ods,
+            'id_departamento' => $id_departamento,
+            'estado' => $estado_final
+        ]);
 
         return response()->json([
             'data' => $res,
@@ -126,31 +158,41 @@ class Agenda_ODSController extends Controller
     public function update(Request $request, string $id)
     {
         $res = Agenda_ODS::find($id);
+        $id_departamento = $request->input('id_departamento');
+        if (!$id_departamento) {
+            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
+        }
+
 
         if (isset($res)) {
             $res->nombre_ag_ods = $request->nombre_ag_ods;
             $res->anio_ag_ods = $request->anio_ag_ods;
             $res->archivo_ag_ods = $request->archivo_ag_ods;
-
+            $pivot = AgendaODSEstadoDepartamento::firstOrNew([
+                'id_ag_ods' => $res->id_ag_ods,
+                'id_departamento' => $id_departamento
+            ]);
             // Lógica de validación de estado
             if ($request->estado_ag_ods == 1) {
-                // Buscamos si hay otro PEI activo que NO SEA el que estamos editando
-                $otroActivo = Agenda_ODS::where('estado_ag_ods', 1)
+                // Buscamos si hay otro Agenda ODS activo que NO SEA el que estamos editando
+                $otroActivo = AgendaODSEstadoDepartamento::where('id_departamento', $id_departamento)
+                    ->where('estado', 1)
                     ->where('id_ag_ods', '!=', $id)
                     ->exists();
+                
 
                 if ($otroActivo) {
-                    $res->estado_ag_ods = 0;
-                    $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque ya existe otra Agenda ODS activa.";
+                    $pivot->estado = 0;
+                    $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque su departamento ya tiene otra Agenda ODS activa.";
                 } else {
-                    $res->estado_ag_ods = 1;
+                     $pivot->estado = 1;
                     $mensajeFinal = "Actualizado con Éxito!!";
                 }
             } else {
-                $res->estado_ag_ods = 0;
+                $pivot->estado = 0;
                 $mensajeFinal = "Actualizado con Éxito!!";
             }
-
+            $pivot->save();
             if ($res->save()) {
                 return response()->json([
                     'data' => $res,
