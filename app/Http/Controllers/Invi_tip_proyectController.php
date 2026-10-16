@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Invi_tip_proyect;// Importando las clases necesarias para el controlador
 use Illuminate\Http\Request;// Importamos la la librería Request para manejar peticiones HTTP
+use App\Models\Bitacora;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Clase Invi_tip_proyectController
@@ -96,15 +101,36 @@ class Invi_tip_proyectController extends Controller
      */
     public function store(Request $request)
     {   
-        // Obtiene todos los datos enviados en la petición
-        $inputs = $request->all();
-        // Crea y persiste el registro en la base de datos con los inputs procesados
-        $res = Invi_tip_proyect::create($inputs);
-        // Retorna la respuesta HTTP indicando el éxito y notificando si el estado sufrió variaciones por regla de negocio
-        return response()->json([
-            'data' => $res,
-            'mensaje' => "Agregado con Éxito!!"
-        ]);
+        DB::beginTransaction();
+        try{
+            // Obtiene todos los datos enviados en la petición
+            $inputs = $request->all();
+            // Crea y persiste el registro en la base de datos con los inputs procesados
+            $res = Invi_tip_proyect::create($inputs);
+            // Retorna la respuesta HTTP indicando el éxito y notificando si el estado sufrió variaciones por regla de negocio
+            DB::commit();
+                // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario' => $user->NombUsu,
+                    'bt_fechahora' => Carbon::now(),
+                    'bt_accion' => 'Creación de un Tipo de Proyecto para el departamento - VINCULACIÓN',
+                    'bt_ippc' => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Creación de un Tipo de Proyecto con ID: {$res->id_tip_invi_proy} y detalle_tip_invi_proy: {$res->detalle_invi_proyect}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+            }
+            return response()->json([
+                'data' => $res,
+                'mensaje' => "Agregado con Éxito!!"
+            ]);
+
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -141,24 +167,45 @@ class Invi_tip_proyectController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Intenta localizar el registro de el tipo de proyecto por su ID
-        $res = Invi_tip_proyect::find($id);
-        // Verifica si el tipo de proyecto solicitada existe en el sistema
-        if (isset($res)) {
-            // Asignación manual de los atributos del modelo con base en los datos de la petición
-            $res->detalle_invi_proyect = $request->detalle_invi_proyect;
-            // Guarda y persiste los cambios en la base de datos
-            if ($res->save()) {
-                return response()->json([
-                    'data' => $res,
-                    'mensaje' => 'Actualizado con Éxito!!',
-                ]);
+        DB::beginTransaction();
+        try{
+            
+            // Intenta localizar el registro de el tipo de proyecto por su ID
+            $res = Invi_tip_proyect::find($id);
+            // Verifica si el tipo de proyecto solicitada existe en el sistema
+            if (isset($res)) {
+                // Asignación manual de los atributos del modelo con base en los datos de la petición
+                $res->detalle_invi_proyect = $request->detalle_invi_proyect;
+                // Guarda y persiste los cambios en la base de datos
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Actualización de un Tipo de Proyecto para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualización de un Tipo de Proyecto con ID: {$res->id_tip_invi_proy} y detalle_tip_invi_proy: {$res->detalle_invi_proyect}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $res,
+                        'mensaje' => 'Actualizado con Éxito!!',
+                    ]);
+                }
+                // Retorna una respuesta de error del servidor en caso de fallar el proceso de guardado
+                return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
             }
-            // Retorna una respuesta de error del servidor en caso de fallar el proceso de guardado
-            return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
+            // Retorna un error HTTP 404 si el recurso no fue localizado en la base de datos
+            return response()->json(['error' => true, 'mensaje' => "El pei con id: $id no Existe"], 404);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-        // Retorna un error HTTP 404 si el recurso no fue localizado en la base de datos
-        return response()->json(['error' => true, 'mensaje' => "El pei con id: $id no Existe"], 404);
     }
 
    

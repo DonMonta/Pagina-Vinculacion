@@ -6,6 +6,11 @@ use App\Models\ODS;
 use App\Models\Agenda_ODS;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use App\Models\Bitacora;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ODSController extends Controller
 {
@@ -73,26 +78,47 @@ class ODSController extends Controller
      */
     public function store(Request $request)
     {
-        // Validar si el ODS existe
-        $plan = Agenda_ODS::find($request->id_ag_ods);
-        if (!$plan) {
-            return response()->json(['error' => true, 'mensaje' => 'Agenda ODS no válida'], 404);
+        DB::beginTransaction();
+        try{
+
+            // Validar si el ODS existe
+            $plan = Agenda_ODS::find($request->id_ag_ods);
+            if (!$plan) {
+                return response()->json(['error' => true, 'mensaje' => 'Agenda ODS no válida'], 404);
+            }
+    
+            // Verificar duplicado en el mismo plan
+            $existe = ODS::where('cod_ods', $request->cod_ods)
+                ->where('id_ag_ods', $request->id_ag_ods)
+                ->exists();
+    
+            if ($existe) {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "El código {$request->cod_ods} ya está registrado en esta Agenda ODS."
+                ], 409);
+            }
+    
+            $res = ODS::create($request->all());
+            DB::commit();
+                // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario' => $user->NombUsu,
+                    'bt_fechahora' => Carbon::now(),
+                    'bt_accion' => 'Creación de un ODS para el departamento - VINCULACIÓN',
+                    'bt_ippc' => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Creación de un ODS con ID: {$res->id_ods} y cod_ods: {$res->cod_ods}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+            }
+            return response()->json(['data' => $res, 'mensaje' => 'Agregado con Éxito!!']);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-
-        // Verificar duplicado en el mismo plan
-        $existe = ODS::where('cod_ods', $request->cod_ods)
-            ->where('id_ag_ods', $request->id_ag_ods)
-            ->exists();
-
-        if ($existe) {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El código {$request->cod_ods} ya está registrado en esta Agenda ODS."
-            ], 409);
-        }
-
-        $res = ODS::create($request->all());
-        return response()->json(['data' => $res, 'mensaje' => 'Agregado con Éxito!!']);
     }
 
 
@@ -123,70 +149,111 @@ class ODSController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = ODS::find($id);
+        DB::beginTransaction();
+        try{
 
-        if (isset($res)) {
-            // 1. Obtener el id_ag_ods del request (o del registro actual si no viene en el request)
-            $id_ag_ods = $request->id_ag_ods ?? $res->id_ag_ods;
-
-            // 2. Validar código duplicado dentro del mismo Agenda ODS, excluyendo el ID actual
-            $existe = ODS::where('cod_ods', $request->cod_ods)
-                ->where('id_ods', '!=', $id) // Excluir el registro actual
-                ->where('id_ag_ods', $id_ag_ods)        // Filtrar por el mismo Agenda ODS
-                ->exists();
-
-            if ($existe) {
-                return response()->json([
-                    'error' => true,
-                    'mensaje' => "El código {$request->cod_ods} ya está registrado en esta Agenda ODS."
-                ], 409);
+            $res = ODS::find($id);
+    
+            if (isset($res)) {
+                // 1. Obtener el id_ag_ods del request (o del registro actual si no viene en el request)
+                $id_ag_ods = $request->id_ag_ods ?? $res->id_ag_ods;
+    
+                // 2. Validar código duplicado dentro del mismo Agenda ODS, excluyendo el ID actual
+                $existe = ODS::where('cod_ods', $request->cod_ods)
+                    ->where('id_ods', '!=', $id) // Excluir el registro actual
+                    ->where('id_ag_ods', $id_ag_ods)        // Filtrar por el mismo Agenda ODS
+                    ->exists();
+    
+                if ($existe) {
+                    return response()->json([
+                        'error' => true,
+                        'mensaje' => "El código {$request->cod_ods} ya está registrado en esta Agenda ODS."
+                    ], 409);
+                }
+    
+                // 3. Asignar valores
+                $res->id_ag_ods = $id_ag_ods;
+                $res->cod_ods = $request->cod_ods;
+                $res->detalle_ods = $request->detalle_ods;
+    
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Actualización de un ODS para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualización de un ODS con ID: {$res->id_ods} y cod_ods: {$res->cod_ods}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $res,
+                        'mensaje' => "Actualizado con Éxito!!",
+                    ]);
+                }
+    
+                return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
             }
-
-            // 3. Asignar valores
-            $res->id_ag_ods = $id_ag_ods;
-            $res->cod_ods = $request->cod_ods;
-            $res->detalle_ods = $request->detalle_ods;
-
-            if ($res->save()) {
-                return response()->json([
-                    'data' => $res,
-                    'mensaje' => "Actualizado con Éxito!!",
-                ]);
-            }
-
-            return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
+    
+            return response()->json(['error' => true, 'mensaje' => "El ods con id: $id no Existe"], 404);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-
-        return response()->json(['error' => true, 'mensaje' => "El ods con id: $id no Existe"], 404);
     }
 
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        $res = ODS::find($id);
-        if (isset($res)) {
-            $res->delete();
-            $data = $res->toArray();
-            if ($data) {
+        DB::beginTransaction();
+        try{
 
-                return response()->json([
-                    'data' => $data,
-                    'mensaje' => "Eliminado con Éxito!!",
-                ]);
+            $res = ODS::find($id);
+            if (isset($res)) {
+                $res->delete();
+                $data = $res->toArray();
+                if ($data) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Eliminación de un ODS para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Eliminación de un ODS con ID: {$res->id_ods} y cod_ods: {$res->cod_ods}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Eliminar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "Eliminado con Éxito!!",
+                    ]);
+                } else {
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "El ods no existe (puede que ya lo haya eliminado)",
+                    ]);
+                }
             } else {
                 return response()->json([
-                    'data' => $data,
-                    'mensaje' => "El ods no existe (puede que ya lo haya eliminado)",
+                    'error' => true,
+                    'mensaje' => "El ods con id: $id no Existe",
                 ]);
             }
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El ods con id: $id no Existe",
-            ]);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
 }

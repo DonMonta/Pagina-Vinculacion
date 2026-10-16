@@ -78,7 +78,7 @@ class SeguiTipoRespuestaController extends Controller
             ]);
             DB::commit();
             Bitacora::create([
-                'bt_usuario'     => $user->ciinfper,
+                'bt_usuario'     => $user->NombUsu,
                 'bt_fechahora'   => Carbon::now(),
                 'bt_accion'      => "Crear Tipo de Respuesta" . " - VINCULACIÓN",
                 'bt_ippc'        => $request->ip(),
@@ -154,7 +154,7 @@ class SeguiTipoRespuestaController extends Controller
             if ($res->save()) {
                 DB::commit();
                 Bitacora::create([
-                    'bt_usuario'     => $user->ciinfper,
+                    'bt_usuario'     => $user->NombUsu,
                     'bt_fechahora'   => Carbon::now(),
                     'bt_accion'      => "Actualizar Tipo de Respuesta" . " - VINCULACIÓN",
                     'bt_ippc'        => $request->ip(),
@@ -189,7 +189,7 @@ class SeguiTipoRespuestaController extends Controller
             $res->delete();
             $data = $res->toArray();
             Bitacora::create([
-                'bt_usuario'     => Auth::user()->ciinfper,
+                'bt_usuario'     => Auth::user()->NombUsu,
                 'bt_fechahora'   => Carbon::now(),
                 'bt_accion'      => "Eliminar Tipo de Respuesta" . " - VINCULACIÓN",
                 'bt_ippc'        => $request->ip(),

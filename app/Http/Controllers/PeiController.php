@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Departamento;
+use App\Models\Bitacora;
 use App\Models\Pei;
 use App\Models\PeiEstadoDepartamento;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PeiController extends Controller
 {
@@ -102,42 +109,61 @@ class PeiController extends Controller
      */
     public function store(Request $request)
     {
-        $inputs = $request->all();
-        $id_departamento = $request->input('id_departamento');
-
-        if (!$id_departamento) {
-            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
-        }
-
-        $estado_final = $request->estado_pei ?? 1;
-
-        if ($estado_final == 1) {
-            // Verificamos si este DEPARTAMENTO ya tiene un PEI activo
-            $existeActivo = PeiEstadoDepartamento::where('id_departamento', $id_departamento)
-                ->where('estado', 1)->exists();
-
-            if ($existeActivo) {
-                $estado_final = 0;
+        DB::beginTransaction();
+        try{
+            $inputs = $request->all();
+            $id_departamento = $request->input('id_departamento');
+    
+            if (!$id_departamento) {
+                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
             }
+    
+            $estado_final = $request->estado_pei ?? 1;
+    
+            if ($estado_final == 1) {
+                // Verificamos si este DEPARTAMENTO ya tiene un PEI activo
+                $existeActivo = PeiEstadoDepartamento::where('id_departamento', $id_departamento)
+                    ->where('estado', 1)->exists();
+    
+                if ($existeActivo) {
+                    $estado_final = 0;
+                }
+            }
+    
+            $inputs['estado_pei'] = $estado_final; // Guardamos el estado base también (opcional pero recomendado para mantener la tabla PEI coherente)
+    
+            $res = Pei::create($inputs);
+    
+            // Creamos la relación en la tabla pivote
+            PeiEstadoDepartamento::create([
+                'id_pei' => $res->id_pei,
+                'id_departamento' => $id_departamento,
+                'estado' => $estado_final
+            ]);
+            DB::commit();
+             // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario' => $user->NombUsu,
+                    'bt_fechahora' => Carbon::now(),
+                    'bt_accion' => 'Cración de un nuevo PEI para el departamento - VINCULACIÓN',
+                    'bt_ippc' => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Creación de un nuevo PEI con ID: {$res->id_pei} y nombre: {$res->nombre_pei}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+            }
+            return response()->json([
+                'data' => $res,
+                'mensaje' => ($estado_final == 0 && $request->estado_pei == 1)
+                    ? "Agregado, pero se guardó como Inactivo porque su departamento ya tiene un PEI activo."
+                    : "Agregado con Éxito!!",
+            ]);
+
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-
-        $inputs['estado_pei'] = $estado_final; // Guardamos el estado base también (opcional pero recomendado para mantener la tabla PEI coherente)
-
-        $res = Pei::create($inputs);
-
-        // Creamos la relación en la tabla pivote
-        PeiEstadoDepartamento::create([
-            'id_pei' => $res->id_pei,
-            'id_departamento' => $id_departamento,
-            'estado' => $estado_final
-        ]);
-
-        return response()->json([
-            'data' => $res,
-            'mensaje' => ($estado_final == 0 && $request->estado_pei == 1)
-                ? "Agregado, pero se guardó como Inactivo porque su departamento ya tiene un PEI activo."
-                : "Agregado con Éxito!!",
-        ]);
     }
 
     /**
@@ -164,62 +190,79 @@ class PeiController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = Pei::find($id);
-        $id_departamento = $request->input('id_departamento');
+        DB::beginTransaction();
+        try{
 
-        if (!$id_departamento) {
-            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
-        }
-
-        if (isset($res)) {
-            $res->nombre_pei = $request->nombre_pei;
-            $res->anios_pei = $request->anios_pei;
-
-            if ($request->has('archivo_pei')) {
-                $res->archivo_pei = $request->archivo_pei;
+            $res = Pei::find($id);
+            $id_departamento = $request->input('id_departamento');
+    
+            if (!$id_departamento) {
+                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
             }
-
-            // Buscar o crear la relación pivote
-            $pivot = PeiEstadoDepartamento::firstOrNew([
-                'id_pei' => $id,
-                'id_departamento' => $id_departamento
-            ]);
-
-            if ($request->estado_pei == 1) {
-                // Buscamos si ESTE DEPARTAMENTO tiene otro PEI activo que NO SEA el actual
-                $otroActivo = PeiEstadoDepartamento::where('id_departamento', $id_departamento)
-                    ->where('id_pei', '!=', $id)
-                    ->where('estado', 1)
-                    ->exists();
-
-                if ($otroActivo) {
-                    $pivot->estado = 0;
-                    $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque su departamento ya tiene otro PEI activo.";
+    
+            if (isset($res)) {
+                $res->nombre_pei = $request->nombre_pei;
+                $res->anios_pei = $request->anios_pei;
+    
+                if ($request->has('archivo_pei')) {
+                    $res->archivo_pei = $request->archivo_pei;
+                }
+    
+                // Buscar o crear la relación pivote
+                $pivot = PeiEstadoDepartamento::firstOrNew([
+                    'id_pei' => $id,
+                    'id_departamento' => $id_departamento
+                ]);
+    
+                if ($request->estado_pei == 1) {
+                    // Buscamos si ESTE DEPARTAMENTO tiene otro PEI activo que NO SEA el actual
+                    $otroActivo = PeiEstadoDepartamento::where('id_departamento', $id_departamento)
+                        ->where('id_pei', '!=', $id)
+                        ->where('estado', 1)
+                        ->exists();
+    
+                    if ($otroActivo) {
+                        $pivot->estado = 0;
+                        $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque su departamento ya tiene otro PEI activo.";
+                    } else {
+                        $pivot->estado = 1;
+                        $mensajeFinal = "Actualizado con Éxito!!";
+                    }
                 } else {
-                    $pivot->estado = 1;
+                    $pivot->estado = 0;
                     $mensajeFinal = "Actualizado con Éxito!!";
                 }
-            } else {
-                $pivot->estado = 0;
-                $mensajeFinal = "Actualizado con Éxito!!";
+    
+                $pivot->save();
+    
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Actualización de un PEI para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualización de un PEI con ID: {$res->id_pei} y nombre: {$res->nombre_pei}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $res,
+                        'mensaje' => $mensajeFinal,
+                    ]);
+                }
+    
+                return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
             }
-
-            $pivot->save();
-
-            // Opcional: Actualizar el estado global del PEI si este departamento lo editó.
-            //$res->estado_pei =$pivot->estado; 
-
-            if ($res->save()) {
-                return response()->json([
-                    'data' => $res,
-                    'mensaje' => $mensajeFinal,
-                ]);
-            }
-
-            return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
+    
+            return response()->json(['error' => true, 'mensaje' => "El pei con id: $id no Existe"], 404);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-
-        return response()->json(['error' => true, 'mensaje' => "El pei con id: $id no Existe"], 404);
     }
 
     /**
@@ -227,92 +270,131 @@ class PeiController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
-        $id_departamento = $request->input('id_departamento');
+        DB::beginTransaction();
+        try{
 
-        if (!$id_departamento) {
-            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
-        }
-
-        $res = Pei::find($id);
-
-        if (isset($res)) {
-            // Buscamos el estado en el departamento e inhabilitamos SOLO para ellos
-            $pivot = PeiEstadoDepartamento::where('id_pei', $id)
-                ->where('id_departamento', $id_departamento)
-                ->first();
-
-            if ($pivot) {
-                $pivot->estado = 0;
-                $pivot->save();
+            $id_departamento = $request->input('id_departamento');
+    
+            if (!$id_departamento) {
+                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
             }
-
-            // Opcional: inhabilitar globalmente en la tabla `pei` (dependiendo de tu requerimiento)
-            //$res->estado_pei = 0;
-            $res->save();
-
-            $data = $res->toArray();
-            return response()->json([
-                'data' => $data,
-                'mensaje' => "Inhabilitado con Éxito para su departamento!!",
-            ]);
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El pei con id: $id no Existe",
-            ]);
+    
+            $res = Pei::find($id);
+    
+            if (isset($res)) {
+                // Buscamos el estado en el departamento e inhabilitamos SOLO para ellos
+                $pivot = PeiEstadoDepartamento::where('id_pei', $id)
+                    ->where('id_departamento', $id_departamento)
+                    ->first();
+    
+                if ($pivot) {
+                    $pivot->estado = 0;
+                    $pivot->save();
+                }
+    
+                // Opcional: inhabilitar globalmente en la tabla `pei` (dependiendo de tu requerimiento)
+                //$res->estado_pei = 0;
+                $res->save();
+    
+                $data = $res->toArray();
+                DB::commit();
+                    // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario' => $user->NombUsu,
+                        'bt_fechahora' => Carbon::now(),
+                        'bt_accion' => 'Inhabilitación de un PEI para el departamento - VINCULACIÓN',
+                        'bt_ippc' => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Inhabilitación de un PEI con ID: {$res->id_pei} y nombre: {$res->nombre_pei}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Inhabilitar: ' . $ex->getMessage());
+                }
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "Inhabilitado con Éxito para su departamento!!",
+                ]);
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "El pei con id: $id no Existe",
+                ]);
+            }
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
     public function habilitar(Request $request, string $id)
     {
-        $id_departamento = $request->input('id_departamento');
+        DB::beginTransaction();
+        try{
 
-        if (!$id_departamento) {
-            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
-        }
-
-        // 1. Verificar si ESTE DEPARTAMENTO ya tiene algún PEI activo
-        $existeActivo = PeiEstadoDepartamento::where('id_departamento', $id_departamento)
-            ->where('estado', 1)->exists();
-
-        if ($existeActivo) {
-            return response()->json([
-                'status' => false,
-                'mensaje' => "No se puede habilitar: Su departamento ya tiene un PEI activo actualmente. Por favor, desactive el anterior primero."
-            ], 422);
-        }
-
-        // 2. Si no hay activos, procedemos a buscar y habilitar el pivote
-        $res = Pei::find($id);
-
-        if (isset($res)) {
-            $pivot = PeiEstadoDepartamento::firstOrCreate(
-                ['id_pei' => $id, 'id_departamento' => $id_departamento],
-                ['estado' => 1] // Lo crea en 1 si no existía el registro
-            );
-
-            $pivot->estado = 1;
-            $pivot->save();
-
-            // Sincronizamos globalmente si lo ves necesario
-            $res->estado_pei = 1;
-
-            if ($res->save()) {
+            $id_departamento = $request->input('id_departamento');
+    
+            if (!$id_departamento) {
+                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
+            }
+    
+            // 1. Verificar si ESTE DEPARTAMENTO ya tiene algún PEI activo
+            $existeActivo = PeiEstadoDepartamento::where('id_departamento', $id_departamento)
+                ->where('estado', 1)->exists();
+    
+            if ($existeActivo) {
                 return response()->json([
-                    'status' => true,
-                    'data' => $res,
-                    'mensaje' => "¡PEI Habilitado con Éxito para su departamento!",
-                ]);
+                    'status' => false,
+                    'mensaje' => "No se puede habilitar: Su departamento ya tiene un PEI activo actualmente. Por favor, desactive el anterior primero."
+                ], 422);
+            }
+    
+            // 2. Si no hay activos, procedemos a buscar y habilitar el pivote
+            $res = Pei::find($id);
+    
+            if (isset($res)) {
+                $pivot = PeiEstadoDepartamento::firstOrCreate(
+                    ['id_pei' => $id, 'id_departamento' => $id_departamento],
+                    ['estado' => 1] // Lo crea en 1 si no existía el registro
+                );
+    
+                $pivot->estado = 1;
+                $pivot->save();
+    
+                // Sincronizamos globalmente si lo ves necesario
+                $res->estado_pei = 1;
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Habilitación de un PEI para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Habilitación de un PEI con ID: {$res->id_pei} y nombre: {$res->nombre_pei}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Habilitar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'status' => true,
+                        'data' => $res,
+                        'mensaje' => "¡PEI Habilitado con Éxito para su departamento!",
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'mensaje' => "Error interno al intentar guardar los cambios.",
+                    ], 500);
+                }
             } else {
                 return response()->json([
                     'status' => false,
-                    'mensaje' => "Error interno al intentar guardar los cambios.",
-                ], 500);
+                    'mensaje' => "El PEI con id: $id no existe o fue eliminado.",
+                ], 404);
             }
-        } else {
-            return response()->json([
-                'status' => false,
-                'mensaje' => "El PEI con id: $id no existe o fue eliminado.",
-            ], 404);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
     public function uploadArchivo(Request $request)

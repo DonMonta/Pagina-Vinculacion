@@ -133,6 +133,7 @@ class AuthController extends Controller
                     'email'      => $docente->mailPer,
                     'cedula'     => $docente->CIInfPer,
                     'Role'       => $docente->TipoInfPer,
+                    'IdDepeart' => 25,
                 ]);
             }
             $ids_proyectos = [];
@@ -167,6 +168,7 @@ class AuthController extends Controller
                 'email'              => $docente->mailPer,
                 'cedula'             => $docente->CIInfPer,
                 'Role'               => $docente->TipoInfPer,
+                'IdDepeart'          => 25,
                 'proyectos_ids'      => $ids_proyectos,          // Retorna array ej: [1, 5, 8]
                 'proyectos_detalles' => $detalles_proyectos      // Retorna array de objetos con nombre de proyecto y función
             ]);
@@ -239,6 +241,7 @@ class AuthController extends Controller
                 'nivel'      => $matricula->nivel,
                 'IDCarrera'  => $matricula->idCarr,
                 'facultad'    => $matricula->siglas,
+                'IdDepeart'  => 25,
             ]);
         } else {
 

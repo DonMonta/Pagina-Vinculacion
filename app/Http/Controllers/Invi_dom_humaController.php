@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invi_dom_huma;;
-
+use App\Models\Invi_dom_huma;
 use Illuminate\Http\Request;
+use App\Models\Bitacora;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Invi_dom_humaController extends Controller
 {
@@ -77,13 +81,33 @@ class Invi_dom_humaController extends Controller
      */
     public function store(Request $request)
     {
-        $inputs = $request->all();
-        $res = Invi_dom_huma::create($inputs);
+        DB::beginTransaction();
+        try{
+            $inputs = $request->all();
+            $res = Invi_dom_huma::create($inputs);
+            DB::commit();
+                // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario' => $user->NombUsu,
+                    'bt_fechahora' => Carbon::now(),
+                    'bt_accion' => 'Creación de un Dominio Humano para el departamento - VINCULACIÓN',
+                    'bt_ippc' => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Creación de un Dominio Humano con ID: {$res->id_dom_huma} y detalle_dom_huma: {$res->detalle_dom_huma}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+            }
+            return response()->json([
+                'message' => 'Registro creado exitosamente',
+                'data' => $res
+            ], 201);
 
-        return response()->json([
-            'message' => 'Registro creado exitosamente',
-            'data' => $res
-        ], 201);
+        }catch(\Exception $e){
+            Log::error('Error al crear el registro: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al crear el registro: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -110,44 +134,86 @@ class Invi_dom_humaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = Invi_dom_huma::find($id);
-        if (isset($res)) {
-            $res->detalle_dom_huma = $request->detalle_dom_huma;
-            if ($res->save()) {
-                return response()->json([
-                    'data' => $res,
-                    'mensaje' => "Actualizado con Éxito!!",
-                ]);
+        DB::beginTransaction();
+        try{
+
+            $res = Invi_dom_huma::find($id);
+            if (isset($res)) {
+                $res->detalle_dom_huma = $request->detalle_dom_huma;
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Actualización de un Dominio Humano para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualización de un Dominio Humano con ID: {$res->id_dom_huma} y detalle_dom_huma: {$res->detalle_dom_huma}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $res,
+                        'mensaje' => "Actualizado con Éxito!!",
+                    ]);
+                } else {
+                    return response()->json([
+                        'error' => true,
+                        'mensaje' => "Error al Actualizar",
+                    ]);
+                }
             } else {
                 return response()->json([
                     'error' => true,
-                    'mensaje' => "Error al Actualizar",
+                    'mensaje' => "El Dominio Humano con id: $id no Existe",
                 ]);
             }
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El Dominio Humano con id: $id no Existe",
-            ]);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        $res = Invi_dom_huma::find($id);
-        if (isset($res)) {
-            $res->delete();
-            return response()->json([
-                'message' => "Eliminado con Éxito!!",
-            ]);
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El Dominio Humano con id: $id no Existe",
-            ]);
+        DB::beginTransaction();
+        try{
+            $res = Invi_dom_huma::find($id);
+            if (isset($res)) {
+                $res->delete();
+                DB::commit();
+                    // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario' => $user->NombUsu,
+                        'bt_fechahora' => Carbon::now(),
+                        'bt_accion' => 'Eliminación de un Dominio Humano para el departamento - VINCULACIÓN',
+                        'bt_ippc' => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Eliminación de un Dominio Humano con ID: {$res->id_dom_huma} y detalle_dom_huma: {$res->detalle_dom_huma}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Eliminar: ' . $ex->getMessage());
+                }
+                return response()->json([
+                    'message' => "Eliminado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "El Dominio Humano con id: $id no Existe",
+                ]);
+            }
+
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
 }

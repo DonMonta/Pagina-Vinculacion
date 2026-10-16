@@ -196,7 +196,7 @@ class Invi_proyectosController extends Controller
     /**
      * Obtiene los datos para llenar el modal de edición.
      */
-    public function getEdicionDatos(int $id)
+    public function getEdicionDatos(Request $request, int $id)
     {
         $proyecto = Invi_proyectos::with(
             'invi_detalle_obj_pro_pei',
@@ -234,9 +234,32 @@ class Invi_proyectosController extends Controller
             'invi_detalle_difusion.invi_difusion',
             'invi_bibliografias'
         )->findOrFail($id);
-
+        $id_departamento = $request->input('id_departamento');
+        $queryPei = Pei::query();
+        $queryPlandne = Plandne::query();
+        $queryAgenda_ods = Agenda_ODS::query();
+        if ($id_departamento) {
+            // Busca el PEI que esté activo específicamente para este departamento
+            $queryPei->whereHas('estadosDepartamentos', function ($query) use ($id_departamento) {
+                $query->where('id_departamento', $id_departamento)
+                    ->where('estado', 1); // 1 = Habilitado en la pivote
+            });
+            $queryPlandne->whereHas('estadosDepartamentosPlanDNE', function ($query) use ($id_departamento) {
+                $query->where('id_departamento', $id_departamento)
+                    ->where('estado', 1); // 1 = Habilitado en la pivote
+            });
+            $queryAgenda_ods->whereHas('estadosDepartamentosAgendaODS', function ($query) use ($id_departamento) {
+                $query->where('id_departamento', $id_departamento)
+                    ->where('estado', 1); // 1 = Habilitado en la pivote
+            });
+        } else {
+            // Fallback: Si por alguna razón no envían departamento, busca por el estado general
+            $queryPei->where('estado_pei', 1);
+            $queryPlandne->where('estado_plandne', 1);
+            $queryAgenda_ods->where('estado_ag_ods', 1);
+        }
         // 1. Obtener el PEI activo (Asumo que estado_pei = 1 o true significa activo)
-        $peiActivo = Pei::where('estado_pei', 1)->first();
+        $peiActivo = $queryPei->first();
 
         $objetivos = [];
         $preseleccionados = [];
@@ -266,8 +289,9 @@ class Invi_proyectosController extends Controller
                 }
             }
         }
+        
 
-        $plandneActivo = Plandne::where('estado_plandne', 1)->first();
+        $plandneActivo =  $queryPlandne->first();
         $politicas = [];
         $politicasSeleccionadas = $proyecto->invi_detalle_obj_pol_proyect->pluck('id_pol_pladne')->toArray();
         $objetivosPoliticasSeleccionadas = [];
@@ -289,7 +313,7 @@ class Invi_proyectosController extends Controller
                     ->values();
             }
         }
-        $agenda_odsactiva = Agenda_ODS::where('estado_ag_ods', 1)->first();
+        $agenda_odsactiva = $queryAgenda_ods->first();
         $ods = [];
         $odsSeleccionadas = $proyecto->invi_detalle_ods_proyect->pluck('id_ods')->toArray();
         if ($agenda_odsactiva) {
@@ -716,14 +740,7 @@ class Invi_proyectosController extends Controller
      */
     public function store(Request $request)
     {
-        $inputs = $request->input();
-
-        $res = Invi_proyectos::create($inputs);
-
-        return response()->json([
-            'data' => $res,
-            'mensaje' => 'Agregado con Éxito!!',
-        ]);
+       
     }
 
     /**
@@ -1781,7 +1798,7 @@ class Invi_proyectosController extends Controller
             try {
                 $user = Auth::user(); // Obtenemos el usuario autenticado
                 Bitacora::create([
-                    'bt_usuario' => $user->ciinfper,
+                    'bt_usuario' => $user->NombUsu,
                     'bt_fechahora' => Carbon::now(),
                     'bt_accion' => $accionBitacora . ' - VINCULACIÓN',
                     'bt_ippc' => $request->ip(),
@@ -1835,7 +1852,7 @@ class Invi_proyectosController extends Controller
         try {
             $user = Auth::user();
             Bitacora::create([
-                'bt_usuario' => $user->ciinfper,
+                'bt_usuario' => $user->NombUsu,
                 'bt_fechahora' => Carbon::now(),
                 'bt_accion' => 'INHABILITAR INTEGRANTE - VINCULACIÓN',
                 'bt_ippc' => $request->ip(),

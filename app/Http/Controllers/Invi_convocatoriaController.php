@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\File; // Importamos la clase Facultad
 use Illuminate\Support\Facades\Log; // Importamos la librería Log
 use Illuminate\Http\Request;// Importamos la la librería Request para manejar peticiones HTTP
 use Carbon\Carbon;// Importamos la librería Carbon para manejar fechas y horas
+use App\Models\Bitacora;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+                       
 
 /**
  * Clase Invi_convocatoriaController
@@ -117,29 +121,49 @@ class Invi_convocatoriaController extends Controller
      * @return \Illuminate\Http\JsonResponse Respuesta JSON con el modelo creado y un mensaje descriptivo del estado final.
      */
     public function store(Request $request)
-    {   
-        // Obtiene todos los datos enviados en la petición
-        $inputs = $request->all();
+    { 
+        DB::beginTransaction();
+        try{
 
-        // Evalúa si el usuario intenta guardar la nueva convocatoria con estado ACTIVO (1)
-        if ($request->estado == 1) {
-            // Verifica la existencia previa de al menos una convocatoria activa en la base de datos
-            $existeActivo = Invi_convocatoria::where('estado', 1)->exists();
-
-            if ($existeActivo) {
-                // Si existe conflicto de unicidad activa, se fuerza el estado del nuevo registro a INACTIVO (0)
-                $inputs['estado'] = 0;
+            // Obtiene todos los datos enviados en la petición
+            $inputs = $request->all();
+    
+            // Evalúa si el usuario intenta guardar la nueva convocatoria con estado ACTIVO (1)
+            if ($request->estado == 1) {
+                // Verifica la existencia previa de al menos una convocatoria activa en la base de datos
+                $existeActivo = Invi_convocatoria::where('estado', 1)->exists();
+    
+                if ($existeActivo) {
+                    // Si existe conflicto de unicidad activa, se fuerza el estado del nuevo registro a INACTIVO (0)
+                    $inputs['estado'] = 0;
+                }
             }
+            // Crea y persiste el registro en la base de datos con los inputs procesados
+            $res = Invi_convocatoria::create($inputs);
+            DB::commit();
+                // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario' => $user->NombUsu,
+                    'bt_fechahora' => Carbon::now(),
+                    'bt_accion' => 'Creación de una convocatoria para el departamento - VINCULACIÓN',
+                    'bt_ippc' => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Creación de una convocatoria con ID: {$res->id_convocatoria} y num_convocatoria: {$res->num_convocatoria}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+            }
+            // Retorna la respuesta HTTP indicando el éxito y notificando si el estado sufrió variaciones por regla de negocio
+            return response()->json([
+                'data' => $res,
+                'mensaje' => $res->estado == 0 && $request->estado == 1
+                    ? "Agregado, pero se guardó como Inactivo porque ya existe una convocatoria activa."
+                    : "Agregado con Éxito!!",
+            ]);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-        // Crea y persiste el registro en la base de datos con los inputs procesados
-        $res = Invi_convocatoria::create($inputs);
-        // Retorna la respuesta HTTP indicando el éxito y notificando si el estado sufrió variaciones por regla de negocio
-        return response()->json([
-            'data' => $res,
-            'mensaje' => $res->estado == 0 && $request->estado == 1
-                ? "Agregado, pero se guardó como Inactivo porque ya existe una convocatoria activa."
-                : "Agregado con Éxito!!",
-        ]);
     }
 
     /**
@@ -181,59 +205,80 @@ class Invi_convocatoriaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Intenta localizar el registro de la convocatoria por su ID
-        $res = Invi_convocatoria::find($id);
-        // Verifica si la convocatoria solicitada existe en el sistema
-        if (isset($res)) {
-            // Asignación manual de los atributos del modelo con base en los datos de la petición
-            $res->num_convocatoria = $request->num_convocatoria;
-            $res->titulo_convocatoria = $request->titulo_convocatoria;
-            $res->elaboracion = $request->elaboracion;
-            $res->revision = $request->revision;
-            $res->aprobacion = $request->aprobacion;
-            $res->fecha_inicio = $request->fecha_inicio;
-            $res->fecha_fin = $request->fecha_fin;
-            $res->num_resolucion = $request->num_resolucion;
-            $res->tipo_convocatoria = 'VINCULACIÓN';
-            $res->habilitar_edicion = $request->habilitar_edicion;
-
-            // --- Lógica de validación de estado por regla de negocio ---
-            if ($request->estado == 1) {
-                // Verifica si existe OTRA convocatoria activa que difiera de la que se está editando actualmente
-                $otroActivo = Invi_convocatoria::where('estado', 1)
-                    ->where('id_convocatoria', '!=', $id)
-                    ->exists();
-
-                if ($otroActivo) {
-                    // Si hay conflicto con otro registro activo, fuerza este a ser inactivo (0)
-                    $res->estado = 0;
-                    $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque ya existe otra convocatoria activa.";
+        DB::beginTransaction();
+        try{
+            
+            // Intenta localizar el registro de la convocatoria por su ID
+            $res = Invi_convocatoria::find($id);
+            // Verifica si la convocatoria solicitada existe en el sistema
+            if (isset($res)) {
+                // Asignación manual de los atributos del modelo con base en los datos de la petición
+                $res->num_convocatoria = $request->num_convocatoria;
+                $res->titulo_convocatoria = $request->titulo_convocatoria;
+                $res->elaboracion = $request->elaboracion;
+                $res->revision = $request->revision;
+                $res->aprobacion = $request->aprobacion;
+                $res->fecha_inicio = $request->fecha_inicio;
+                $res->fecha_fin = $request->fecha_fin;
+                $res->num_resolucion = $request->num_resolucion;
+                $res->tipo_convocatoria = 'VINCULACIÓN';
+                $res->habilitar_edicion = $request->habilitar_edicion;
+    
+                // --- Lógica de validación de estado por regla de negocio ---
+                if ($request->estado == 1) {
+                    // Verifica si existe OTRA convocatoria activa que difiera de la que se está editando actualmente
+                    $otroActivo = Invi_convocatoria::where('estado', 1)
+                        ->where('id_convocatoria', '!=', $id)
+                        ->where('tipo_convocatoria', 'VINCULACIÓN')
+                        ->exists();
+    
+                    if ($otroActivo) {
+                        // Si hay conflicto con otro registro activo, fuerza este a ser inactivo (0)
+                        $res->estado = 0;
+                        $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque ya existe otra convocatoria activa.";
+                    } else {
+                        // Si no hay conflictos, aprueba la activación del registro (1)
+                        $res->estado = 1;
+                        $mensajeFinal = "Actualizado con Éxito!!";
+                    }
                 } else {
-                    // Si no hay conflictos, aprueba la activación del registro (1)
-                    $res->estado = 1;
+                    // Si la petición define el estado como inactivo, se asigna directamente
+                    $res->estado = 0;
                     $mensajeFinal = "Actualizado con Éxito!!";
                 }
-            } else {
-                // Si la petición define el estado como inactivo, se asigna directamente
-                $res->estado = 0;
-                $mensajeFinal = "Actualizado con Éxito!!";
+                // Asigna el nuevo archivo adjunto únicamente si viene incluido en la petición
+                if ($request->has('archivo')) {
+                    $res->archivo = $request->archivo;
+                }
+                // Guarda y persiste los cambios en la base de datos
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Actualización de un Convocatoria para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualización de un Convocatoria con ID: {$res->id_convocatoria} y num_convocatoria: {$res->num_convocatoria}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $res,
+                        'mensaje' => $mensajeFinal,
+                    ]);
+                }
+                // Retorna una respuesta de error del servidor en caso de fallar el proceso de guardado
+                return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
             }
-            // Asigna el nuevo archivo adjunto únicamente si viene incluido en la petición
-            if ($request->has('archivo')) {
-                $res->archivo = $request->archivo;
-            }
-            // Guarda y persiste los cambios en la base de datos
-            if ($res->save()) {
-                return response()->json([
-                    'data' => $res,
-                    'mensaje' => $mensajeFinal,
-                ]);
-            }
-            // Retorna una respuesta de error del servidor en caso de fallar el proceso de guardado
-            return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
+            // Retorna un error HTTP 404 si el recurso no fue localizado en la base de datos
+            return response()->json(['error' => true, 'mensaje' => "El pei con id: $id no Existe"], 404);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-        // Retorna un error HTTP 404 si el recurso no fue localizado en la base de datos
-        return response()->json(['error' => true, 'mensaje' => "El pei con id: $id no Existe"], 404);
     }
 
     /**
@@ -245,37 +290,56 @@ class Invi_convocatoriaController extends Controller
      * @param  string  $id Identificador único de la convocatoria que se desea inhabilitar.
      * @return \Illuminate\Http\JsonResponse Respuesta JSON con los datos del registro afectado o mensaje de error.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request,string $id)
     {
-        // Busca el registro de la convocatoria mediante su identificador único
-        $res = Invi_convocatoria::find($id);
-        // Verifica si la convocatoria existe antes de proceder con la modificación
-        if (isset($res)) {
-            // Aplica el borrado lógico cambiando el estado a inactivo (0)
-            $res->estado = 0;
-            $res->save();
-            // Convierte la instancia del modelo afectado a una estructura de array para devolverla
-            $data = $res->toArray();
-            // Evalúa que la conversión de datos se haya realizado correctamente para estructurar la respuesta
-            if ($data) {
+        DB::beginTransaction();
+        try{
 
-                return response()->json([
-                    'data' => $data,
-                    'mensaje' => "Inhabilitado con Éxito!!",
-                ]);
+            // Busca el registro de la convocatoria mediante su identificador único
+            $res = Invi_convocatoria::find($id);
+            // Verifica si la convocatoria existe antes de proceder con la modificación
+            if (isset($res)) {
+                // Aplica el borrado lógico cambiando el estado a inactivo (0)
+                $res->estado = 0;
+                $res->save();
+                // Convierte la instancia del modelo afectado a una estructura de array para devolverla
+                $data = $res->toArray();
+                // Evalúa que la conversión de datos se haya realizado correctamente para estructurar la respuesta
+                if ($data) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Inhabilitación de una convocatoria para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Inhabilitación de una convocatoria con ID: {$res->id_convocatoria} y num_convocatoria: {$res->num_convocatoria}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Inhabilitar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "Inhabilitado con Éxito!!",
+                    ]);
+                } else {
+                    // Control alternativo en caso de inconsistencia con la existencia del recurso
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "La convocatoria no existe (puede que ya la haya eliminado)",
+                    ]);
+                }
             } else {
-                // Control alternativo en caso de inconsistencia con la existencia del recurso
+                // Retorna un mensaje indicando que el registro no fue localizado en el sistema
                 return response()->json([
-                    'data' => $data,
-                    'mensaje' => "La convocatoria no existe (puede que ya la haya eliminado)",
+                    'error' => true,
+                    'mensaje' => "La convocatoria con id: $id no Existe",
                 ]);
             }
-        } else {
-            // Retorna un mensaje indicando que el registro no fue localizado en el sistema
-            return response()->json([
-                'error' => true,
-                'mensaje' => "La convocatoria con id: $id no Existe",
-            ]);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
     /**
@@ -287,45 +351,66 @@ class Invi_convocatoriaController extends Controller
      * @param  string  $id Identificador único de la convocatoria que se desea habilitar.
      * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la operación, datos del modelo o códigos de error HTTP (422, 404, 500).
      */
-    public function habilitar(string $id)
+    public function habilitar(Request $request, string $id)
     {
-        // Validación de Regla de Negocio: Verificar si ya existe alguna convocatoria activa en el sistema
-        $existeActivo = Invi_convocatoria::where('estado', 1)->exists();
+        DB::beginTransaction();
+        try{
 
-        if ($existeActivo) {
-            // Retorna un código 422 (Unprocessable Entity) debido a un conflicto con las reglas del negocio
-            return response()->json([
-                'status' => false,
-                'mensaje' => "No se puede habilitar: Ya existe una convocatoria activa actualmente. Por favor, desactive el anterior primero."
-            ], 422); // Código 422: Entidad no procesable (error de validación de negocio)
-        }
-
-        // Proceso de Actualización: Si el sistema está libre de activos, localiza el recurso solicitado
-        $res = Invi_convocatoria::find($id);
-        // Valida la existencia física del registro en la base de datos
-        if (isset($res)) {
-            // Modifica el estado para activar la convocatoria
-            $res->estado = 1;
-            // Intenta persistir los cambios efectuados en el modelo
-            if ($res->save()) {
-                return response()->json([
-                    'status' => true,
-                    'data' => $res,
-                    'mensaje' => "¡Convocatoria Habilitada con Éxito!",
-                ]);
-            } else {
-                // Retorna un error de servidor (500) en caso de fallas imprevistas en la persistencia
+            // Validación de Regla de Negocio: Verificar si ya existe alguna convocatoria activa en el sistema
+            $existeActivo = Invi_convocatoria::where('estado', 1)->exists();
+    
+            if ($existeActivo) {
+                // Retorna un código 422 (Unprocessable Entity) debido a un conflicto con las reglas del negocio
                 return response()->json([
                     'status' => false,
-                    'mensaje' => "Error interno al intentar guardar los cambios.",
-                ], 500);
+                    'mensaje' => "No se puede habilitar: Ya existe una convocatoria activa actualmente. Por favor, desactive el anterior primero."
+                ], 422); // Código 422: Entidad no procesable (error de validación de negocio)
             }
-        } else {
-            // Retorna una respuesta 404 si el identificador no coincide con ningún registro en la base de datos
-            return response()->json([
-                'status' => false,
-                'mensaje' => "La Convocatoria con id: $id no existe o fue eliminado.",
-            ], 404);
+    
+            // Proceso de Actualización: Si el sistema está libre de activos, localiza el recurso solicitado
+            $res = Invi_convocatoria::find($id);
+            // Valida la existencia física del registro en la base de datos
+            if (isset($res)) {
+                // Modifica el estado para activar la convocatoria
+                $res->estado = 1;
+                // Intenta persistir los cambios efectuados en el modelo
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Habilitación de una convocatoria para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Habilitación de una convocatoria con ID: {$res->id_convocatoria} y num_convocatoria: {$res->num_convocatoria}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Habilitar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'status' => true,
+                        'data' => $res,
+                        'mensaje' => "¡Convocatoria Habilitada con Éxito!",
+                    ]);
+                } else {
+                    // Retorna un error de servidor (500) en caso de fallas imprevistas en la persistencia
+                    return response()->json([
+                        'status' => false,
+                        'mensaje' => "Error interno al intentar guardar los cambios.",
+                    ], 500);
+                }
+            } else {
+                // Retorna una respuesta 404 si el identificador no coincide con ningún registro en la base de datos
+                return response()->json([
+                    'status' => false,
+                    'mensaje' => "La Convocatoria con id: $id no existe o fue eliminado.",
+                ], 404);
+            }
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
     /**
@@ -417,6 +502,7 @@ class Invi_convocatoriaController extends Controller
         
         Invi_convocatoria::where('estado', 1)
             ->where('fecha_fin', '<', $hoy)
-            ->update(['estado' => 0]);
+            ->update(['estado' => 0,
+                'habilitar_edicion' => 0]);
     }
 }

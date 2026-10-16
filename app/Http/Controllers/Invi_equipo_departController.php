@@ -9,6 +9,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File; // Importamos la clase Facultad
 use Illuminate\Support\Facades\Log; // Importamos la clase JsonResponse
+use App\Models\Bitacora;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Invi_equipo_departController extends Controller
 {
@@ -137,32 +141,52 @@ class Invi_equipo_departController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'ciinfper_doc' => 'required|digits:10',
-            'id_equipo_roles' => 'required|integer',
-        ]);
+        DB::beginTransaction();
+        try{
 
-        try {
-            // Validamos por BD que no le estén inyectando un rol ocupado por un activo distinto a él
-            $existeOcupado = Invi_equipo_depart::where('id_equipo_roles', $request->id_equipo_roles)
-                ->where('estado_equipo_dep', 1)
-                ->where('ciinfper_doc', '!=', $request->ciinfper_doc)
-                ->first();
-
-            if ($existeOcupado) {
-                return response()->json(['mensaje' => 'Este rol ya se encuentra asignado a otra persona activa.'], 422);
-            }
-
-            Invi_equipo_depart::create([
-                'ciinfper_doc' => $request->ciinfper_doc,
-                'id_equipo_roles' => $request->id_equipo_roles,
-                'estado_equipo_dep' => 1,
-                'evidencia_arch' => $request->evidencia_arch
+            $request->validate([
+                'ciinfper_doc' => 'required|digits:10',
+                'id_equipo_roles' => 'required|integer',
             ]);
-
-            return response()->json(['mensaje' => 'Registrado con éxito']);
-        } catch (\Exception $e) {
-            return response()->json(['mensaje' => 'Error al guardar los datos'], 500);
+    
+            try {
+                // Validamos por BD que no le estén inyectando un rol ocupado por un activo distinto a él
+                $existeOcupado = Invi_equipo_depart::where('id_equipo_roles', $request->id_equipo_roles)
+                    ->where('estado_equipo_dep', 1)
+                    ->where('ciinfper_doc', '!=', $request->ciinfper_doc)
+                    ->first();
+    
+                if ($existeOcupado) {
+                    return response()->json(['mensaje' => 'Este rol ya se encuentra asignado a otra persona activa.'], 422);
+                }
+    
+                Invi_equipo_depart::create([
+                    'ciinfper_doc' => $request->ciinfper_doc,
+                    'id_equipo_roles' => $request->id_equipo_roles,
+                    'estado_equipo_dep' => 1,
+                    'evidencia_arch' => $request->evidencia_arch
+                ]);
+                DB::commit();
+                    // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario' => $user->NombUsu,
+                        'bt_fechahora' => Carbon::now(),
+                        'bt_accion' => 'Creación de un Equipo de Departamento para el departamento - VINCULACIÓN',
+                        'bt_ippc' => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Creación de un Equipo de Departamento con ID: y ciinfper_doc: {$request->ciinfper_doc}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+                }
+                return response()->json(['mensaje' => 'Registrado con éxito']);
+            } catch (\Exception $e) {
+                return response()->json(['mensaje' => 'Error al guardar los datos'], 500);
+            }
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
     public function getRolesVinculacion(Request $request)
@@ -219,90 +243,150 @@ class Invi_equipo_departController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'ciinfper_doc' => 'required|digits:10',
-            'id_equipo_roles' => 'required|integer',
-        ]);
+        DB::beginTransaction();
+        try{
 
-        try {
-            $asignacion = Invi_equipo_depart::findOrFail($id);
-
-            // Validamos que el rol no esté ocupado por OTRA persona
-            $existeOcupado = Invi_equipo_depart::where('id_equipo_roles', $request->id_equipo_roles)
-                ->where('estado_equipo_dep', 1)
-                ->where('id_equipo_depart', '!=', $id) // ignoramos el registro actual
-                ->first();
-
-            if ($existeOcupado) {
-                return response()->json(['mensaje' => 'Este rol ya se encuentra asignado a otra persona.'], 422);
-            }
-
-            $asignacion->update([
-                'ciinfper_doc' => $request->ciinfper_doc,
-                'id_equipo_roles' => $request->id_equipo_roles,
-                'estado_equipo_dep' => $request->estado_equipo_dep ?? $asignacion->estado_equipo_dep,
-                'evidencia_arch' => $request->evidencia_arch ?? $asignacion->evidencia_arch
+            $request->validate([
+                'ciinfper_doc' => 'required|digits:10',
+                'id_equipo_roles' => 'required|integer',
             ]);
-
-            return response()->json(['mensaje' => 'Actualizado con éxito']);
-        } catch (\Exception $e) {
-            return response()->json(['mensaje' => 'Error al actualizar'], 500);
+    
+            try {
+                $asignacion = Invi_equipo_depart::findOrFail($id);
+    
+                // Validamos que el rol no esté ocupado por OTRA persona
+                $existeOcupado = Invi_equipo_depart::where('id_equipo_roles', $request->id_equipo_roles)
+                    ->where('estado_equipo_dep', 1)
+                    ->where('id_equipo_depart', '!=', $id) // ignoramos el registro actual
+                    ->first();
+    
+                if ($existeOcupado) {
+                    return response()->json(['mensaje' => 'Este rol ya se encuentra asignado a otra persona.'], 422);
+                }
+    
+                $asignacion->update([
+                    'ciinfper_doc' => $request->ciinfper_doc,
+                    'id_equipo_roles' => $request->id_equipo_roles,
+                    'estado_equipo_dep' => $request->estado_equipo_dep ?? $asignacion->estado_equipo_dep,
+                    'evidencia_arch' => $request->evidencia_arch ?? $asignacion->evidencia_arch
+                ]);
+                DB::commit();
+                    // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario' => $user->NombUsu,
+                        'bt_fechahora' => Carbon::now(),
+                        'bt_accion' => 'Actualización de un Equipo de Roles para el departamento - VINCULACIÓN',
+                        'bt_ippc' => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualización de un Equipo de Roles con ID: {$asignacion->id_equipo_depart} y nombre: {$asignacion->equipo_roles->nombre_rol}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                }
+                return response()->json(['mensaje' => 'Actualizado con éxito']);
+            } catch (\Exception $e) {
+                return response()->json(['mensaje' => 'Error al actualizar'], 500);
+            }
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        $res = Invi_equipo_depart::find($id);
-        if (isset($res)) {
-            $res->estado_equipo_dep = 0;
-            $res->save();
-            $data = $res->toArray();
-            if ($data) {
+        DB::beginTransaction();
+        try{
 
-                return response()->json([
-                    'data' => $data,
-                    'mensaje' => "Inhabilitado con Éxito!!",
-                ]);
+            $res = Invi_equipo_depart::find($id);
+            if (isset($res)) {
+                $res->estado_equipo_dep = 0;
+                $res->save();
+                $data = $res->toArray();
+                if ($data) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Inhabilitación de un Equipo de Roles para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Inhabilitación de un Equipo de Roles con ID: {$res->id_equipo_depart} y nombre: {$res->equipo_roles->nombre_rol}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Inhabilitar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "Inhabilitado con Éxito!!",
+                    ]);
+                } else {
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "El Equipo de Roles no existe (puede que ya la haya eliminado)",
+                    ]);
+                }
             } else {
                 return response()->json([
-                    'data' => $data,
-                    'mensaje' => "El Equipo de Roles no existe (puede que ya la haya eliminado)",
+                    'error' => true,
+                    'mensaje' => "El Equipo de Roles con id: $id no Existe",
                 ]);
             }
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El Equipo de Roles con id: $id no Existe",
-            ]);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
-    public function habilitar(string $id)
+    public function habilitar(Request $request, string $id)
     {
-        $res = Invi_equipo_depart::find($id);
-        if (isset($res)) {
-            $res->estado_equipo_dep = 1;
-            $res->save();
-            $data = $res->toArray();
-            if ($data) {
+        try{
 
-                return response()->json([
-                    'data' => $data,
-                    'mensaje' => "Habilitado con Éxito!!",
-                ]);
+            $res = Invi_equipo_depart::find($id);
+            if (isset($res)) {
+                $res->estado_equipo_dep = 1;
+                $res->save();
+                $data = $res->toArray();
+                if ($data) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Habilitación de un Equipo de Roles para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Habilitación de un Equipo de Roles con ID: {$res->id_equipo_depart} y nombre: {$res->equipo_roles->nombre_rol}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Habilitar: ' . $ex->getMessage());
+                    }
+
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "Habilitado con Éxito!!",
+                    ]);
+                } else {
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "El Equipo no existe (puede que ya la haya eliminado)",
+                    ]);
+                }
             } else {
                 return response()->json([
-                    'data' => $data,
-                    'mensaje' => "El Equipo no existe (puede que ya la haya eliminado)",
+                    'error' => true,
+                    'mensaje' => "El Equipo con id: $id no Existe",
                 ]);
             }
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El Equipo con id: $id no Existe",
-            ]);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
     public function getDirectorInfo(): JsonResponse

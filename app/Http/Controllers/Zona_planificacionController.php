@@ -5,8 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Zona_planificacion;
 use App\Models\Provincia;
 use App\Models\Detalle_zona_planificacion;
+use App\Models\Bitacora;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Carbon\Carbon;
+
 
 class Zona_planificacionController extends Controller
 {
@@ -63,13 +69,34 @@ class Zona_planificacionController extends Controller
      */
     public function store(Request $request)
     {
-        $inputs = $request->input();
-       
-        $res = Zona_planificacion::create($inputs);
-        return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Agregado con Éxito!!",
-        ]);
+        DB::beginTransaction();
+        try{
+            $inputs = $request->input();
+           
+            $res = Zona_planificacion::create($inputs);
+            DB::commit();
+                // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario'     => $user->NombUsu,
+                    'bt_fechahora'   => Carbon::now(),
+                    'bt_accion'      => "Crear Zona de Planificación" . " - VINCULACIÓN",
+                    'bt_ippc'        => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Crear Zona de Planificación con ID: {$res->id_zona_plan} y nombre: {$res->nombre_zona}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+            }
+            return response()->json([
+                'data'=>$res,
+                'mensaje'=>"Agregado con Éxito!!",
+            ]);
+
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -96,40 +123,82 @@ class Zona_planificacionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = Zona_planificacion::find($id);
+        DB::beginTransaction();
+        try{
 
-        if (isset($res)) {
-            $res->nombre_zona = $request->nombre_zona;
-            $res->save();
-            return response()->json([
-                'data' => $res,
-                'mensaje' => "Actualizado con Éxito!!",
-            ]);
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "La Zona de Planificación con id: $id no Existe",
-            ]);
+            $res = Zona_planificacion::find($id);
+    
+            if (isset($res)) {
+                $res->nombre_zona = $request->nombre_zona;
+                $res->save();
+                DB::commit();
+                    // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario'     => $user->NombUsu,
+                        'bt_fechahora'   => Carbon::now(),
+                        'bt_accion'      => "Actualizar Zona de Planificación" . " - VINCULACIÓN",
+                        'bt_ippc'        => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualizar Zona de Planificación con ID: {$res->id_zona_plan} y nombre: {$res->nombre_zona}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                }
+                return response()->json([
+                    'data' => $res,
+                    'mensaje' => "Actualizado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "La Zona de Planificación con id: $id no Existe",
+                ]);
+            }
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        $res = Zona_planificacion::find($id);
+        DB::beginTransaction();
+        try{
 
-        if (isset($res)) {
-            $res->delete();
-            return response()->json([
-                'mensaje' => "Eliminado con Éxito!!",
-            ]);
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "La Zona de Planificación con id: $id no Existe",
-            ]);
+            $res = Zona_planificacion::find($id);
+    
+            if (isset($res)) {
+                $res->delete();
+                DB::commit();
+                    // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario'     => $user->NombUsu,
+                        'bt_fechahora'   => Carbon::now(),
+                        'bt_accion'      => "Eliminar Zona de Planificación" . " - VINCULACIÓN",
+                        'bt_ippc'        => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Eliminar Zona de Planificación con ID: {$res->id_zona_plan} y nombre: {$res->nombre_zona}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Eliminar: ' . $ex->getMessage());
+                }
+                return response()->json([
+                    'mensaje' => "Eliminado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "La Zona de Planificación con id: $id no Existe",
+                ]);
+            }
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
     public function getProvincias()
@@ -171,48 +240,68 @@ class Zona_planificacionController extends Controller
     }
     public function guardarProvincias(Request $request)
     {
-        $request->validate([
-            'id_zona_plan' => 'required',
-            'provincias'   => 'present|array' // 'present' permite mandar un arreglo vacío si desmarcan todas
-        ]);
-
-        try {
-            DB::beginTransaction();
-
-            $id_zona_plan = $request->input('id_zona_plan');
-            $provinciasSeleccionadas = $request->input('provincias', []);
-
-            // Ojo: Como en tu modelo pusiste `$incrementing = false`, significa que la base de datos
-            // no genera el ID automáticamente, o manejas un ID manual.
-            // Calculamos el último ID actual para simular el incremental de forma segura:
-            $ultimoId = Detalle_zona_planificacion::max('id_detalle_zona_plan') ?? 0;
-
-            // Paso A: Eliminamos todas las relaciones anteriores de ESTA zona (Simula un "sync")
-            Detalle_zona_planificacion::where('id_zona_plan', $id_zona_plan)->delete();
-
-            // Paso B: Insertamos las nuevas provincias seleccionadas
-            foreach ($provinciasSeleccionadas as $id_provincia) {
-                $ultimoId++;
-                
-                Detalle_zona_planificacion::create([
-                    'id_detalle_zona_plan' => $ultimoId, // Obligatorio por tu $incrementing = false
-                    'id_zona_plan'         => $id_zona_plan,
-                    'id_provincia'        => $id_provincia
-                ]);
+        DB::beginTransaction();
+        try{
+            
+            $request->validate([
+                'id_zona_plan' => 'required',
+                'provincias'   => 'present|array' // 'present' permite mandar un arreglo vacío si desmarcan todas
+            ]);
+    
+            try {
+                DB::beginTransaction();
+    
+                $id_zona_plan = $request->input('id_zona_plan');
+                $provinciasSeleccionadas = $request->input('provincias', []);
+    
+                // Ojo: Como en tu modelo pusiste `$incrementing = false`, significa que la base de datos
+                // no genera el ID automáticamente, o manejas un ID manual.
+                // Calculamos el último ID actual para simular el incremental de forma segura:
+                $ultimoId = Detalle_zona_planificacion::max('id_detalle_zona_plan') ?? 0;
+    
+                // Paso A: Eliminamos todas las relaciones anteriores de ESTA zona (Simula un "sync")
+                Detalle_zona_planificacion::where('id_zona_plan', $id_zona_plan)->delete();
+    
+                // Paso B: Insertamos las nuevas provincias seleccionadas
+                foreach ($provinciasSeleccionadas as $id_provincia) {
+                    $ultimoId++;
+                    
+                    Detalle_zona_planificacion::create([
+                        'id_detalle_zona_plan' => $ultimoId, // Obligatorio por tu $incrementing = false
+                        'id_zona_plan'         => $id_zona_plan,
+                        'id_provincia'        => $id_provincia
+                    ]);
+                }
+    
+                DB::commit();
+                // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario'     => $user->NombUsu,
+                        'bt_fechahora'   => Carbon::now(),
+                        'bt_accion'      => "Actualizar Zona de Planificación" . " - VINCULACIÓN",
+                        'bt_ippc'        => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualizar Zona de Planificación con ID: {$request->id_zona_plan} y nombre: {$request->nombre_zona}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                }
+                        
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Provincias sincronizadas con éxito'
+                ], 200);
+    
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json([
+                    'error' => 'Error al procesar la asignación: ' . $e->getMessage()
+                ], 500);
             }
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Provincias sincronizadas con éxito'
-            ], 200);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'error' => 'Error al procesar la asignación: ' . $e->getMessage()
-            ], 500);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
 

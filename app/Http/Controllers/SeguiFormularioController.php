@@ -239,7 +239,7 @@ class SeguiFormularioController extends Controller
             ]);
             DB::commit();
             Bitacora::create([
-                'bt_usuario'     => $user->ciinfper,
+                'bt_usuario'     => $user->NombUsu,
                 'bt_fechahora'   => Carbon::now(),
                 'bt_accion'      => "Crear Formulario" . " - VINCULACIÓN",
                 'bt_ippc'        => $request->ip(),
@@ -380,7 +380,7 @@ class SeguiFormularioController extends Controller
             $res->FDEL = now();
             $res->save();
             Bitacora::create([
-                'bt_usuario'     => Auth::user()->ciinfper,
+                'bt_usuario'     => Auth::user()->NombUsu,
                 'bt_fechahora'   => Carbon::now(),
                 'bt_accion'      => "Inhabilitar Formulario" . " - VINCULACIÓN",
                 'bt_ippc'        => $request->ip(),
@@ -406,7 +406,7 @@ class SeguiFormularioController extends Controller
             $res->ACTIVO = 1;
             $res->save();
             Bitacora::create([
-                'bt_usuario'     => Auth::user()->ciinfper,
+                'bt_usuario'     => Auth::user()->NombUsu,
                 'bt_fechahora'   => Carbon::now(),
                 'bt_accion'      => "Habilitar Formulario" . " - VINCULACIÓN",
                 'bt_ippc'        => $request->ip(),
@@ -531,7 +531,20 @@ class SeguiFormularioController extends Controller
             }
 
             DB::commit();
-
+            // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario'     => $user->NombUsu,
+                    'bt_fechahora'   => Carbon::now(),
+                    'bt_accion'      => "Crear Formulario" . " - VINCULACIÓN",
+                    'bt_ippc'        => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Crear Formulario de tipo {$request->tipoencuesta} CON NOMBRE: {$request->NOMBRE}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error("Error bitácora en Guardar: " . $ex->getMessage());
+            }
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Tu inscripción ha sido procesada y guardada con éxito.'
@@ -594,7 +607,19 @@ class SeguiFormularioController extends Controller
             }
 
             DB::commit();
-
+            // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario'     => $user->NombUsu,
+                    'bt_fechahora'   => Carbon::now(),
+                    'bt_accion'      => "Crear Formulario" . " - VINCULACIÓN",
+                    'bt_ippc'        => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Crear Formulario de tipo {$request->tipoencuesta} CON NOMBRE: {$request->NOMBRE}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error("Error bitácora en Guardar: " . $ex->getMessage());
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'Tu evaluación ha sido procesada y guardada con éxito.'

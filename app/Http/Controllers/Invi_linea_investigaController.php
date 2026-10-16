@@ -6,6 +6,11 @@ use App\Models\Invi_linea_investigacion;
 use App\Models\Facultad;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Models\Bitacora;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Invi_linea_investigaController extends Controller
 {
@@ -98,17 +103,35 @@ class Invi_linea_investigaController extends Controller
      */
     public function store(Request $request)
     {
-        $inputs = $request->all();
+        DB::beginTransaction();
+        try{
 
-        
-        $res = Invi_linea_investigacion::create($inputs);
-
-        return response()->json([
-            'data' => $res,
-            'mensaje' => $res->estado_lin_investiga == 0 && $request->estado_lin_investiga == 1
-                ? "Agregado, pero se guardó como Inactivo porque ya existe una Línea de Investigación activa."
-                : "Agregado con Éxito!!",
-        ]);
+            $inputs = $request->all();
+            $res = Invi_linea_investigacion::create($inputs);
+            DB::commit();
+                // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario' => $user->NombUsu,
+                    'bt_fechahora' => Carbon::now(),
+                    'bt_accion' => 'Creación de una Línea de Investigación para el departamento - VINCULACIÓN',
+                    'bt_ippc' => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Creación de una Línea de Investigación con ID: {$res->id_lin_investiga} y nombre: {$res->nombre_lin}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+            }
+            return response()->json([
+                'data' => $res,
+                'mensaje' => $res->estado_lin_investiga == 0 && $request->estado_lin_investiga == 1
+                    ? "Agregado, pero se guardó como Inactivo porque ya existe una Línea de Investigación activa."
+                    : "Agregado con Éxito!!",
+            ]);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -135,80 +158,141 @@ class Invi_linea_investigaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = Invi_linea_investigacion::find($id);
+        DB::beginTransaction();
+        try{
 
-        if (isset($res)) {
-            $res->idfacultad = $request->idfacultad;
-            $res->nombre_lin = $request->nombre_lin;
-            $res->estado_lin_investiga = $request->estado_lin_investiga;
-
-            if ($res->save()) {
-                return response()->json([
-                    'data' => $res,
-                    'mensaje' => 'Actualizado con Éxito!',
-                ]);
+            $res = Invi_linea_investigacion::find($id);
+    
+            if (isset($res)) {
+                $res->idfacultad = $request->idfacultad;
+                $res->nombre_lin = $request->nombre_lin;
+                $res->estado_lin_investiga = $request->estado_lin_investiga;
+    
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Actualización de una Línea de Investigación para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualización de una Línea de Investigación con ID: {$res->id_lin_investiga} y nombre: {$res->nombre_lin}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $res,
+                        'mensaje' => 'Actualizado con Éxito!',
+                    ]);
+                }
+    
+                return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
             }
-
-            return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
+    
+            return response()->json(['error' => true, 'mensaje' => "La Línea de Investigación con id: $id no Existe"], 404);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-
-        return response()->json(['error' => true, 'mensaje' => "La Línea de Investigación con id: $id no Existe"], 404);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        $res = Invi_linea_investigacion::find($id);
-        if (isset($res)) {
-            $res->estado_lin_investiga = 0;
-            $res->save();
-            $data = $res->toArray();
-            if ($data) {
+        DB::beginTransaction();
+        try{
 
-                return response()->json([
-                    'data' => $data,
-                    'mensaje' => "Inhabilitado con Éxito!!",
-                ]);
+            $res = Invi_linea_investigacion::find($id);
+            if (isset($res)) {
+                $res->estado_lin_investiga = 0;
+                $res->save();
+                $data = $res->toArray();
+                if ($data) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Inhabilitación de una Línea de Investigación para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Inhabilitación de una Línea de Investigación con ID: {$res->id_lin_investiga} y nombre: {$res->nombre_lin}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Inhabilitar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "Inhabilitado con Éxito!!",
+                    ]);
+                } else {
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => "La Línea de Investigación no existe (puede que ya la haya eliminado)",
+                    ]);
+                }
             } else {
                 return response()->json([
-                    'data' => $data,
-                    'mensaje' => "La Línea de Investigación no existe (puede que ya la haya eliminado)",
+                    'error' => true,
+                    'mensaje' => "La Línea de Investigación con id: $id no Existe",
                 ]);
             }
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "La Línea de Investigación con id: $id no Existe",
-            ]);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
-    public function habilitar(string $id)
+    public function habilitar(Request $request, string $id)
     {
-        
-        $res = Invi_linea_investigacion::find($id);
+        DB::beginTransaction();
+        try{
 
-        if (isset($res)) {
-            $res->estado_lin_investiga = 1;
-
-            if ($res->save()) {
-                return response()->json([
-                    'status' => true,
-                    'data' => $res,
-                    'mensaje' => "¡Línea de Investigación Habilitada con Éxito!",
-                ]);
+            $res = Invi_linea_investigacion::find($id);
+    
+            if (isset($res)) {
+                $res->estado_lin_investiga = 1;
+    
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Habilitación de una Línea de Investigación para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Habilitación de una Línea de Investigación con ID: {$res->id_lin_investiga} y nombre: {$res->nombre_lin}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Habilitar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'status' => true,
+                        'data' => $res,
+                        'mensaje' => "¡Línea de Investigación Habilitada con Éxito!",
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'mensaje' => "Error interno al intentar guardar los cambios.",
+                    ], 500);
+                }
             } else {
                 return response()->json([
                     'status' => false,
-                    'mensaje' => "Error interno al intentar guardar los cambios.",
-                ], 500);
+                    'mensaje' => "La Línea de Investigación con id: $id no existe o fue eliminada.",
+                ], 404);
             }
-        } else {
-            return response()->json([
-                'status' => false,
-                'mensaje' => "La Línea de Investigación con id: $id no existe o fue eliminada.",
-            ], 404);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
 }

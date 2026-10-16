@@ -12,6 +12,10 @@ use Illuminate\Http\Request; // Utilizado para registrar eventos en el sistema
 // Utilizado para realizar operaciones de autenticación
 use Illuminate\Support\Facades\File; // Importamos la clase Facultad
 use Illuminate\Support\Facades\Log; // Importamos la clase JsonResponse
+use App\Models\Bitacora;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 // Definición de la clase Invi_responsableController
 class Invi_responsableController extends Controller
@@ -107,6 +111,7 @@ class Invi_responsableController extends Controller
      */
     public function store(Request $request)
     {
+        DB::beginTransaction();
         try {
             $existeActivo = Invi_responsable::where('ciinfper_doc', $request->ciinfper_doc) // Se verifican si el registro ya existe
                 ->where('estado_responsable', 1) // Se filtran los registros que estén activos
@@ -119,7 +124,20 @@ class Invi_responsableController extends Controller
             }
             $inputs = $request->all(); // Se obtienen los datos del registro
             $res = Invi_responsable::create($inputs); // Se crea el registro
-
+            DB::commit();
+                // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario' => $user->NombUsu,
+                    'bt_fechahora' => Carbon::now(),
+                    'bt_accion' => 'Creación de un Responsable para el departamento - VINCULACIÓN',
+                    'bt_ippc' => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Creación de un Responsable con ID: {$res->id_responsable} y ci: {$res->ciinfper_doc}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+            }
             // Se devuelven los datos del registro creado
             return response()->json([
                 'message' => 'Registro creado exitosamente',
@@ -151,6 +169,7 @@ class Invi_responsableController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        DB::beginTransaction();
         try {
             // 1. Obtener el registro a actualizar
             $res = Invi_responsable::find($id);
@@ -182,6 +201,20 @@ class Invi_responsableController extends Controller
             $res->fill($request->all());
 
             if ($res->save()) {
+                DB::commit();
+                    // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario' => $user->NombUsu,
+                        'bt_fechahora' => Carbon::now(),
+                        'bt_accion' => 'Actualización de un Responsable para el departamento - VINCULACIÓN',
+                        'bt_ippc' => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualización de un Responsable con ID: {$res->id_responsable} y ci: {$res->ciinfper_doc}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                }
                 return response()->json([
                     'mensaje' => 'Actualizado con Éxito!!',
                     'data' => $res,
@@ -207,32 +240,53 @@ class Invi_responsableController extends Controller
      *
      * @return array
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        $res = Invi_responsable::find($id); // Obtenemos el registro a inhabilitar
-        if (isset($res)) { // Si el registro existe
-            $res->estado_responsable = 0; // Se inhabilita el registro
-            $res->save(); // Se guarda el registro
-            $data = $res->toArray(); // Se obtiene los datos del registro
-            if ($data) { // Si los datos del registro se obtienen correctamente
-                // Se devuelve un array con el registro inhabilitado
-                return response()->json([
-                    'data' => $data,
-                    'mensaje' => 'Inhabilitado con Éxito!!',
-                ]);
+        DB::beginTransaction();
+        try{
+
+            $res = Invi_responsable::find($id); // Obtenemos el registro a inhabilitar
+            if (isset($res)) { // Si el registro existe
+                $res->estado_responsable = 0; // Se inhabilita el registro
+                $res->save(); // Se guarda el registro
+                $data = $res->toArray(); // Se obtiene los datos del registro
+                if ($data) { // Si los datos del registro se obtienen correctamente
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Inhabilitación de un Responsable para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Inhabilitación de un Responsable con ID: {$res->id_responsable} y ci: {$res->ciinfper_doc}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Inhabilitar: ' . $ex->getMessage());
+                    }
+                    // Se devuelve un array con el registro inhabilitado
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => 'Inhabilitado con Éxito!!',
+                    ]);
+                } else {
+                    // Se devuelve un array con el mensaje de error
+                    return response()->json([
+                        'data' => $data,
+                        'mensaje' => 'El Responsable no existe (puede que ya la haya eliminado)',
+                    ]);
+                }
             } else {
                 // Se devuelve un array con el mensaje de error
                 return response()->json([
-                    'data' => $data,
-                    'mensaje' => 'El Responsable no existe (puede que ya la haya eliminado)',
+                    'error' => true,
+                    'mensaje' => "El Responsable con id: $id no Existe",
                 ]);
             }
-        } else {
-            // Se devuelve un array con el mensaje de error
-            return response()->json([
-                'error' => true,
-                'mensaje' => "El Responsable con id: $id no Existe",
-            ]);
+        }catch(\Exception $e){
+            Log::error('Error al procesar los datos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
 
@@ -245,8 +299,9 @@ class Invi_responsableController extends Controller
      *
      * @return array
      */
-    public function habilitar(string $id)
+    public function habilitar(Request $request, string $id)
     {
+        DB::beginTransaction();
         try {
             $res = Invi_responsable::find($id); // Obtenemos el registro a habilitar
 
@@ -273,6 +328,20 @@ class Invi_responsableController extends Controller
             $res->estado_responsable = 1;
 
             if ($res->save()) {
+                DB::commit();
+                    // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario' => $user->NombUsu,
+                        'bt_fechahora' => Carbon::now(),
+                        'bt_accion' => 'Habilitación de un Responsable para el departamento - VINCULACIÓN',
+                        'bt_ippc' => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Habilitación de un Responsable con ID: {$res->id_responsable} y ci: {$res->ciinfper_doc}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Habilitar: ' . $ex->getMessage());
+                }
                 return response()->json([
                     'mensaje' => 'Habilitado con Éxito!!',
                     'data' => $res->toArray(),

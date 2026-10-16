@@ -97,7 +97,7 @@ class SeguiPreguntasController extends Controller
             ]);
             DB::commit();
             Bitacora::create([
-                'bt_usuario'     => $user->ciinfper,
+                'bt_usuario'     => $user->NombUsu,
                 'bt_fechahora'   => Carbon::now(),
                 'bt_accion'      => "Crear Pregunta" . " - VINCULACIÓN",
                 'bt_ippc'        => $request->ip(),
@@ -149,7 +149,7 @@ class SeguiPreguntasController extends Controller
             if ($res->save()) {
                 DB::commit();
                 Bitacora::create([
-                    'bt_usuario'     => $user->ciinfper,
+                    'bt_usuario'     => $user->NombUsu,
                     'bt_fechahora'   => Carbon::now(),
                     'bt_accion'      => "Actualizar Pregunta" . " - VINCULACIÓN",
                     'bt_ippc'        => $request->ip(),
@@ -184,7 +184,7 @@ class SeguiPreguntasController extends Controller
             $data = $res->toArray();
             if ($data) {
                 Bitacora::create([
-                    'bt_usuario'     => Auth::user()->ciinfper,
+                    'bt_usuario'     => Auth::user()->NombUsu,
                     'bt_fechahora'   => Carbon::now(),
                     'bt_accion'      => "Eliminar Pregunta" . " - VINCULACIÓN",
                     'bt_ippc'        => $request->ip(),

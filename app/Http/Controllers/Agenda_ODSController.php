@@ -7,6 +7,12 @@ use App\Models\Departamento;
 use App\Models\AgendaODSEstadoDepartamento;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use App\Models\Bitacora;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class Agenda_ODSController extends Controller
 {
@@ -100,37 +106,56 @@ class Agenda_ODSController extends Controller
      */
     public function store(Request $request)
     {
-        $inputs = $request->all();
-        $id_departamento = $request->input('id_departamento');
-        if (!$id_departamento) {
-            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
-        }
-        $estado_final = $request->estado_ag_ods ?? 1;
-        if ($estado_final == 1) {
-            // Verificamos si este DEPARTAMENTO ya tiene un Agenda ODS activo
-            $existeActivo = AgendaODSEstadoDepartamento::where('id_departamento', $id_departamento)
-                ->where('estado', 1)->exists();
-            if ($existeActivo) {
-                $estado_final = 0;
+        DB::beginTransaction();
+        try{
+
+            $inputs = $request->all();
+            $id_departamento = $request->input('id_departamento');
+            if (!$id_departamento) {
+                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
             }
+            $estado_final = $request->estado_ag_ods ?? 1;
+            if ($estado_final == 1) {
+                // Verificamos si este DEPARTAMENTO ya tiene un Agenda ODS activo
+                $existeActivo = AgendaODSEstadoDepartamento::where('id_departamento', $id_departamento)
+                    ->where('estado', 1)->exists();
+                if ($existeActivo) {
+                    $estado_final = 0;
+                }
+            }
+            $inputs['estado_ag_ods'] = $estado_final;
+    
+            $res = Agenda_ODS::create($inputs);
+    
+            // Creamos la relación en la tabla pivote
+            AgendaODSEstadoDepartamento::create([
+                'id_ag_ods' => $res->id_ag_ods,
+                'id_departamento' => $id_departamento,
+                'estado' => $estado_final
+            ]);
+            DB::commit();
+                // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+            try {
+                $user = Auth::user(); // Obtenemos el usuario autenticado
+                Bitacora::create([
+                    'bt_usuario' => $user->NombUsu,
+                    'bt_fechahora' => Carbon::now(),
+                    'bt_accion' => 'Creación de una Agenda ODS para el departamento - VINCULACIÓN',
+                    'bt_ippc' => $request->ip(),
+                    'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Creación de una Agenda ODS con ID: {$res->id_ag_ods} y nombre: {$res->nombre_ag_ods}",
+                ]);
+            } catch (\Exception $ex) {
+                Log::error('Error bitácora en Guardar: ' . $ex->getMessage());
+            }
+            return response()->json([
+                'data' => $res,
+                'mensaje' => $res->estado_ag_ods == 0 && $request->estado_ag_ods == 1
+                    ? "Agregado, pero se guardó como Inactivo porque ya existe una Agenda ODS activo."
+                    : "Agregado con Éxito!!",
+            ]);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-        $inputs['estado_ag_ods'] = $estado_final;
-
-        $res = Agenda_ODS::create($inputs);
-
-        // Creamos la relación en la tabla pivote
-        AgendaODSEstadoDepartamento::create([
-            'id_ag_ods' => $res->id_ag_ods,
-            'id_departamento' => $id_departamento,
-            'estado' => $estado_final
-        ]);
-
-        return response()->json([
-            'data' => $res,
-            'mensaje' => $res->estado_ag_ods == 0 && $request->estado_ag_ods == 1
-                ? "Agregado, pero se guardó como Inactivo porque ya existe una Agenda ODS activo."
-                : "Agregado con Éxito!!",
-        ]);
     }
 
     /**
@@ -157,119 +182,199 @@ class Agenda_ODSController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = Agenda_ODS::find($id);
-        $id_departamento = $request->input('id_departamento');
-        if (!$id_departamento) {
-            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
-        }
+        DB::beginTransaction();
+        try{
 
-
-        if (isset($res)) {
-            $res->nombre_ag_ods = $request->nombre_ag_ods;
-            $res->anio_ag_ods = $request->anio_ag_ods;
-            $res->archivo_ag_ods = $request->archivo_ag_ods;
-            $pivot = AgendaODSEstadoDepartamento::firstOrNew([
-                'id_ag_ods' => $res->id_ag_ods,
-                'id_departamento' => $id_departamento
-            ]);
-            // Lógica de validación de estado
-            if ($request->estado_ag_ods == 1) {
-                // Buscamos si hay otro Agenda ODS activo que NO SEA el que estamos editando
-                $otroActivo = AgendaODSEstadoDepartamento::where('id_departamento', $id_departamento)
-                    ->where('estado', 1)
-                    ->where('id_ag_ods', '!=', $id)
-                    ->exists();
-                
-
-                if ($otroActivo) {
-                    $pivot->estado = 0;
-                    $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque su departamento ya tiene otra Agenda ODS activa.";
+            $res = Agenda_ODS::find($id);
+            $id_departamento = $request->input('id_departamento');
+            if (!$id_departamento) {
+                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
+            }
+    
+    
+            if (isset($res)) {
+                $res->nombre_ag_ods = $request->nombre_ag_ods;
+                $res->anio_ag_ods = $request->anio_ag_ods;
+                // Solo actualizamos el archivo si se proporciona uno nuevo
+                if($request->has('archivo_ag_ods')) {
+                    $res->archivo_ag_ods = $request->archivo_ag_ods;
+                }
+                $pivot = AgendaODSEstadoDepartamento::firstOrNew([
+                    'id_ag_ods' => $res->id_ag_ods,
+                    'id_departamento' => $id_departamento
+                ]);
+                // Lógica de validación de estado
+                if ($request->estado_ag_ods == 1) {
+                    // Buscamos si hay otro Agenda ODS activo que NO SEA el que estamos editando
+                    $otroActivo = AgendaODSEstadoDepartamento::where('id_departamento', $id_departamento)
+                        ->where('estado', 1)
+                        ->where('id_ag_ods', '!=', $id)
+                        ->exists();
+                    
+    
+                    if ($otroActivo) {
+                        $pivot->estado = 0;
+                        $mensajeFinal = "Actualizado, pero se cambió a Inactivo porque su departamento ya tiene otra Agenda ODS activa.";
+                    } else {
+                         $pivot->estado = 1;
+                        $mensajeFinal = "Actualizado con Éxito!!";
+                    }
                 } else {
-                     $pivot->estado = 1;
+                    $pivot->estado = 0;
                     $mensajeFinal = "Actualizado con Éxito!!";
                 }
-            } else {
-                $pivot->estado = 0;
-                $mensajeFinal = "Actualizado con Éxito!!";
+                $pivot->save();
+                
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Actualización de una Agenda ODS para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Actualización de una Agenda ODS con ID: {$res->id_ag_ods} y nombre: {$res->nombre_ag_ods}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Actualizar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'data' => $res,
+                        'mensaje' => $mensajeFinal,
+                    ]);
+                }
+    
+                return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
             }
-            $pivot->save();
-            if ($res->save()) {
-                return response()->json([
-                    'data' => $res,
-                    'mensaje' => $mensajeFinal,
-                ]);
-            }
-
-            return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
+    
+            return response()->json(['error' => true, 'mensaje' => "La Agenda ODS con id: $id no Existe"], 404);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
-
-        return response()->json(['error' => true, 'mensaje' => "La Agenda ODS con id: $id no Existe"], 404);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        $res = Agenda_ODS::find($id);
-        if (isset($res)) {
-            $res->estado_ag_ods = 0;
-            $res->save();
-            $data = $res->toArray();
-            if ($data) {
+        DB::beginTransaction();
+        try{
 
+            $id_departamento = $request->input('id_departamento');
+    
+            if (!$id_departamento) {
+                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
+            }
+            $res = Agenda_ODS::find($id);
+            if (isset($res)) {
+                $pivot = AgendaODSEstadoDepartamento::where('id_ag_ods', $id)
+                    ->where('id_departamento', $id_departamento)
+                    ->first();
+                if($pivot) {
+                    $pivot->estado = 0;
+                    $pivot->save();
+                }
+                $res->save();
+                $data = $res->toArray();
+                DB::commit();
+                    // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                try {
+                    $user = Auth::user(); // Obtenemos el usuario autenticado
+                    Bitacora::create([
+                        'bt_usuario' => $user->NombUsu,
+                        'bt_fechahora' => Carbon::now(),
+                        'bt_accion' => 'Inhabilitación de una Agenda ODS para el departamento - VINCULACIÓN',
+                        'bt_ippc' => $request->ip(),
+                        'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Inhabilitación de una Agenda ODS con ID: {$res->id_ag_ods} y nombre: {$res->nombre_ag_ods}",
+                    ]);
+                } catch (\Exception $ex) {
+                    Log::error('Error bitácora en Inhabilitar: ' . $ex->getMessage());
+                }
                 return response()->json([
                     'data' => $data,
-                    'mensaje' => "Inhabilitado con Éxito!!",
+                    'mensaje' => "Inhabilitado con Éxito para su departamento!!",
                 ]);
             } else {
                 return response()->json([
-                    'data' => $data,
-                    'mensaje' => "La Agenda ODS no existe (puede que ya la haya eliminado)",
+                    'error' => true,
+                    'mensaje' => "La Agenda ODS con id: $id no Existe",
                 ]);
             }
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => "La Agenda ODS con id: $id no Existe",
-            ]);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
-    public function habilitar(string $id)
+    public function habilitar(Request $request, string $id)
     {
-        // 1. Verificar si ya existe algún PlANDE activo
-        $existeActivo = Agenda_ODS::where('estado_ag_ods', 1)->exists();
+        DB::beginTransaction();
+        try{
 
-        if ($existeActivo) {
-            return response()->json([
-                'status' => false,
-                'mensaje' => "No se puede habilitar: Ya existe una Agenda ODS activa actualmente. Por favor, desactive la anterior primero."
-            ], 422); // Código 422: Entidad no procesable (error de validación de negocio)
-        }
-
-        // 2. Si no hay activos, procedemos a buscar y habilitar
-        $res = Agenda_ODS::find($id);
-
-        if (isset($res)) {
-            $res->estado_ag_ods = 1;
-
-            if ($res->save()) {
+            $id_departamento = $request->input('id_departamento');
+    
+            if (!$id_departamento) {
+                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
+            }
+            // 1. Verificar si ya existe algún PlANDE activo
+            $existeActivo = AgendaODSEstadoDepartamento::where('id_departamento', $id_departamento)
+                ->where('estado', 1)->exists();
+    
+            if ($existeActivo) {
                 return response()->json([
-                    'status' => true,
-                    'data' => $res,
-                    'mensaje' => "¡Agenda ODS Habilitada con Éxito!",
-                ]);
+                    'status' => false,
+                    'mensaje' => "No se puede habilitar: Ya existe una Agenda ODS activa actualmente para su departamento. Por favor, desactive la anterior primero."
+                ], 422); // Código 422: Entidad no procesable (error de validación de negocio)
+            }
+    
+            // 2. Si no hay activos, procedemos a buscar y habilitar
+            $res = Agenda_ODS::find($id);
+    
+            if (isset($res)) {
+                $pivot = AgendaODSEstadoDepartamento::firstOrCreate(
+                    ['id_ag_ods' => $res->id_ag_ods, 'id_departamento' => $id_departamento],
+                    ['estado' => 1] // Lo crea en 1 si no existía el registro
+                );
+    
+                $pivot->estado = 1;
+                $pivot->save();
+                $res->estado_ag_ods = 1;
+    
+                if ($res->save()) {
+                    DB::commit();
+                        // --- REGISTRO EN BITÁCORA (Post-Commit) ---
+                    try {
+                        $user = Auth::user(); // Obtenemos el usuario autenticado
+                        Bitacora::create([
+                            'bt_usuario' => $user->NombUsu,
+                            'bt_fechahora' => Carbon::now(),
+                            'bt_accion' => 'Habilitación de una Agenda ODS para el departamento - VINCULACIÓN',
+                            'bt_ippc' => $request->ip(),
+                            'bt_observacion' => "USUARIO: {$user->NombUsu} REALIZÓ: Habilitación de una Agenda ODS con ID: {$res->id_ag_ods} y nombre: {$res->nombre_ag_ods}",
+                        ]);
+                    } catch (\Exception $ex) {
+                        Log::error('Error bitácora en Habilitar: ' . $ex->getMessage());
+                    }
+                    return response()->json([
+                        'status' => true,
+                        'data' => $res,
+                        'mensaje' => "¡Agenda ODS Habilitada con Éxito!",
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'mensaje' => "Error interno al intentar guardar los cambios.",
+                    ], 500);
+                }
             } else {
                 return response()->json([
                     'status' => false,
-                    'mensaje' => "Error interno al intentar guardar los cambios.",
-                ], 500);
+                    'mensaje' => "La Agenda ODS con id: $id no existe o fue eliminada.",
+                ], 404);
             }
-        } else {
-            return response()->json([
-                'status' => false,
-                'mensaje' => "La Agenda ODS con id: $id no existe o fue eliminada.",
-            ], 404);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
     public function uploadArchivo(Request $request)
