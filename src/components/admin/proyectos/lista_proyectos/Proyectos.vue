@@ -4899,6 +4899,7 @@ defineExpose({
 import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
 import debounce from 'lodash.debounce';
+import { useUsuario } from "@/composables/useUsuario";
 import Modal from '@/components/Modal/Modal.vue'
 import { mostraralertas2, enviarsolig } from '@/assets/js/function/funciones';
 import jsPDF from 'jspdf';
@@ -4911,6 +4912,7 @@ export default {
             baseUrl: "/vin",
             filteredarray: [],
             botonCargando: null,
+            UsuarioInfo: {},
             searchQuery: "",
             isProfileAddressModal: false,
             cargando: false,
@@ -5253,7 +5255,7 @@ export default {
         }, 900);
     },
     async mounted() {
-        const ruta = useRoute();
+        this.UsuarioInfo = useUsuario();
         this.obtenerConvocatorias();
         this.GetData(1, this.searchQuery);
         document.addEventListener('click', this.cerrarMenuContextual);
@@ -6480,7 +6482,11 @@ export default {
 
             try {
                 // Asegúrate de crear esta ruta en tus routes/api.php de Laravel
-                const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
+                const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`, {
+                    params: {
+                        id_departamento: this.UsuarioInfo.departamentoUsuario
+                    }
+                });
                 const data = response.data;
                 
                 this.objetivosPeiDisponibles = data.objetivos_pei;

@@ -9351,7 +9351,11 @@ export default {
 
       try {
         // Asegúrate de crear esta ruta en tus routes/api.php de Laravel
-        const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`);
+        const response = await API.get(`${this.baseUrl}/getEdicionDatos/${id}`, {
+          params: {
+            id_departamento: this.UsuarioInfo.departamentoUsuario
+          }
+        });
         const data = response.data;
 
         this.objetivosPeiDisponibles = data.objetivos_pei;

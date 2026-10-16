@@ -87,13 +87,33 @@
               </div>
             </td>
             <td class="py-5 px-4 whitespace-nowrap">
-              <span :class="{
-                'rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-wider': true,
-                'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_ag_ods === 1,
-                'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_ag_ods === 0
-              }">
-                {{ post.estado_ag_ods === 1 ? 'Activo' : 'Inactivo' }}
-              </span>
+              <div class="flex flex-col gap-3">
+                <!-- Estado General -->
+                <div>
+                  <p class="text-[10px] text-gray-400 uppercase tracking-wider mb-1">General</p>
+                  <span :class="{
+                    'rounded-lg px-2 py-1 text-xs font-bold uppercase tracking-wider': true,
+                    'bg-green-100 text-green-700 dark:bg-success-500/15 dark:text-success-500': post.estado_ag_ods === 1,
+                    'bg-orange-100 text-orange-700 dark:bg-warning-500/15 dark:text-orange-400': post.estado_ag_ods === 0
+                  }">
+                    {{ post.estado_ag_ods === 1 ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>
+
+                <!-- Estado del Departamento (Solo si se filtró por departamento) -->
+                <div v-if="post.estado_departamento !== undefined">
+                  <p class="text-[10px] text-gray-400 uppercase tracking-wider mb-1 max-w-[150px] truncate" :title="post.nombre_departamento">
+                    En: {{ post.nombre_departamento }}
+                  </p>
+                  <span :class="{
+                    'rounded-lg px-2 py-1 text-xs font-bold uppercase tracking-wider': true,
+                    'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400': post.estado_departamento === 1,
+                    'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400': post.estado_departamento === 0
+                  }">
+                    {{ post.estado_departamento === 1 ? 'Habilitado' : 'Inhabilitado' }}
+                  </span>
+                </div>
+              </div>
             </td>
 
             <td class="py-5 px-4">
@@ -130,7 +150,7 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button v-if="post.estado_ag_ods === 1" @click="abriModalODS(post)" :disabled="botonCargando === 'objetivos_' + post.id_ag_ods"
+                <button v-if="post.estado_departamento === 1" @click="abriModalODS(post)" :disabled="botonCargando === 'objetivos_' + post.id_ag_ods"
                  class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                   title="Gestionar ODS">
                   <svg v-if="botonCargando === 'objetivos_' + post.id_ag_ods" class="animate-spin h-5 w-5 text-purple-600"
@@ -145,14 +165,14 @@
                     <rect x="3" y="3" width="18" height="18" rx="2" />
                   </svg>
                 </button>
-                <button @click="eliminar(post.id_ag_ods, post.nombre_ag_ods)" v-if="post.estado_ag_ods === 1"
+                <button @click="eliminar(post.id_ag_ods, post.nombre_ag_ods)" v-if="(post.estado_departamento !== undefined ? post.estado_departamento : post.estado_pei) === 1"
                   class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
                 </button>
-                <button @click="habilitar(post.id_ag_ods, post.nombre_ag_ods)" v-if="post.estado_ag_ods === 0"
+                <button @click="habilitar(post.id_ag_ods, post.nombre_ag_ods)" v-if="(post.estado_departamento !== undefined ? post.estado_departamento : post.estado_pei) === 0"
                   class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:bg-white/10"
                   title="Refrescar lista">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -596,6 +616,7 @@ defineExpose({
 import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
 import debounce from 'lodash.debounce';
+import { useUsuario } from "@/composables/useUsuario";
 import Modal from '@/components/Modal/Modal.vue'
 import { mostraralertas2, enviarsolig, eliminacion, confimarhabi, elimnarpermanente } from '@/assets/js/function/funciones';
 
@@ -604,6 +625,7 @@ export default {
     return {
       idus: 0,
       baseUrl: "/vin",
+      UsuarioInfo: {},
       objetoguardar: {
         nombre_ag_ods: "",
         anio_ag_ods: "",
@@ -652,7 +674,7 @@ export default {
     }, 900);
   },
   async mounted() {
-    const ruta = useRoute();
+    this.UsuarioInfo = useUsuario();
     this.GetData(1, this.searchQuery);
 
   },
@@ -690,7 +712,7 @@ export default {
         await this.getODS();
         this.isODSModalOpen = true;
       }catch(e){
-        console.log(e)
+        console.error(e)
       }finally{
         this.botonCargando = null;
       }
@@ -799,7 +821,7 @@ export default {
         };
         this.$.setupState.isEditModalOpen = true;
       }catch(e){
-        console.log(e)
+        console.error(e)
       }finally{
         this.botonCargando = null;
       }
@@ -852,17 +874,19 @@ export default {
       try {
         const params = {
           page: page,
-          search_query: searchQuery // Parámetro para búsqueda
+          search_query: searchQuery,
+          id_departamento: this.UsuarioInfo.departamentoUsuario
         };
         const response = await API.get(`${this.baseUrl}/agenda_ods`, { params });
         const data = response.data?.data || [];
+        const rootURL = (API.defaults.baseURL || '').replace(/\/api\/?$/, '');
         this.filteredarray = data.map(item => {
           // Limpiamos el año igual que en el backend para la URL
           const folderName = item.anio_ag_ods.replace(/[/\\ ]/g, '_');
           return {
             ...item,
             ad_archivo_url: item.archivo_ag_ods
-              ? `http://192.168.1.112:8082/Documentos/AGENDA_ODS/${folderName}/${item.archivo_ag_ods}`
+              ? `${rootURL}/Documentos/AGENDA_ODS/${folderName}/${item.archivo_ag_ods}`
               : null
           };
         });
@@ -909,7 +933,8 @@ export default {
         const params = {
           nombre_ag_ods: this.objetoguardar.nombre_ag_ods,
           anio_ag_ods: this.objetoguardar.anio_ag_ods,
-          estado_ag_ods: this.objetoguardar.estado_ag_ods
+          estado_ag_ods: this.objetoguardar.estado_ag_ods,
+          id_departamento: this.UsuarioInfo.departamentoUsuario
         };
         let uploadResp = null;
         if (this.archivoSeleccionado) {
@@ -940,7 +965,8 @@ export default {
         const params = {
           nombre_ag_ods: this.objetoeditar.nombre_ag_ods,
           anio_ag_ods: this.objetoeditar.anio_ag_ods,
-          estado_ag_ods: this.objetoeditar.estado_ag_ods
+          estado_ag_ods: this.objetoeditar.estado_ag_ods,
+          id_departamento: this.UsuarioInfo.departamentoUsuario
         };
         if (this.archivoSeleccionado) {
           // 1. Obtenemos el nombre del archivo y el año QUE YA ESTÁN en la DB (antes del cambio)
@@ -1000,7 +1026,7 @@ export default {
           id,
           'Deshabilitar registro',
           '¿Realmente desea deshabilitar la Agenda ODS  ' + nombre + '?',
-          this.actualizar   // 👈 callback para refrescar la tabla al confirmar
+          this.actualizar,this.UsuarioInfo.departamentoUsuario    // 👈 callback para refrescar la tabla al confirmar
         );
       } catch (error) {
         console.error("Error al eliminar la Agenda ODS:", error);
@@ -1016,7 +1042,7 @@ export default {
           id,
           'Habilitar registro',
           `¿Desea habilitar la Agenda ODS "${nombre}"?`,
-          this.actualizar
+          this.actualizar,this.UsuarioInfo.departamentoUsuario 
         );
       } catch (error) {
         // Este catch capturaría errores si confimarhabi hace un 'throw'

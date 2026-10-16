@@ -45,6 +45,7 @@ export async function enviarsolilogin(method, parametros, url, mensaje) {
         if(response.data.proyectos_ids){
           store.commit("setProyectosIds_vinc", response.data.proyectos_ids || []);
           store.commit("setProyectosDetalles_vinc", response.data.proyectos_detalles || []);
+          store.commit("setDepartamento_vinc", response.data.IdDepeart);
           return {
             token: response.data.token,
             Rol: response.data.Role,
@@ -53,6 +54,7 @@ export async function enviarsolilogin(method, parametros, url, mensaje) {
             email: response.data.email,
             proyectos_ids: response.data.proyectos_ids,
             proyectos_detalles: response.data.proyectos_detalles,
+            departamento: response.data.IdDepeart,
           };
         }
         return {
