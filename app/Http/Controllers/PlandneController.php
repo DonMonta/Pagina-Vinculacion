@@ -106,14 +106,27 @@ class PlandneController extends Controller
      */
     public function store(Request $request)
     {
+        $id_departamento = $request->input('id_departamento');
+        if (!$id_departamento) {
+            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
+        }
+        $existeDuplicado = Plandne::where('nombre_plandne', $request->nombre_plandne)
+            ->where('anio_plandne', $request->anio_plandne)
+            ->whereHas('estadosDepartamentosPlanDNE', function ($q) use ($id_departamento) {
+                $q->where('id_departamento', $id_departamento);
+            })
+            ->exists();
+
+        if ($existeDuplicado) {
+            return response()->json([
+                'status' => false,
+                'mensaje' => 'Ya existe un PlANDE habilitado con el mismo nombre y período de años para su departamento.'
+            ], 422);
+        }
         DB::beginTransaction();
         try{
 
             $inputs = $request->all();
-            $id_departamento = $request->input('id_departamento');
-            if (!$id_departamento) {
-                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
-            }
             $estado_final = $request->estado_plandne ?? 1;
             if ($estado_final == 1) {
                 // Verificamos si este DEPARTAMENTO ya tiene un Plandne activo
@@ -181,15 +194,29 @@ class PlandneController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $id_departamento = $request->input('id_departamento');
+
+        if (!$id_departamento) {
+            return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
+        }
+        $existeDuplicado = Plandne::where('id_pladne', $id)
+            ->where('nombre_plandne', $request->nombre_plandne)
+            ->where('anio_plandne', $request->anio_plandne)
+            ->whereHas('estadosDepartamentosPlanDNE', function ($q) use ($id_departamento) {
+                $q->where('id_departamento', $id_departamento);
+            })
+            ->exists();
+
+        if ($existeDuplicado) {
+            return response()->json([
+                'status' => false,
+                'mensaje' => 'Ya existe otro PlANDE habilitado con el mismo nombre y período de años en su departamento.'
+            ], 422);
+        }
         DB::beginTransaction();
         try{
 
             $res = Plandne::find($id);
-            $id_departamento = $request->input('id_departamento');
-    
-            if (!$id_departamento) {
-                return response()->json(['error' => true, 'mensaje' => 'El id_departamento es requerido.'], 400);
-            }
             if (isset($res)) {
                 $res->nombre_plandne = $request->nombre_plandne;
                 $res->anio_plandne = $request->anio_plandne;
@@ -240,12 +267,13 @@ class PlandneController extends Controller
                         'mensaje' => $mensajeFinal,
                     ]);
                 }
-    
+                DB::rollBack();
                 return response()->json(['error' => true, 'mensaje' => 'Error al Actualizar'], 500);
             }
     
             return response()->json(['error' => true, 'mensaje' => "El plandne con id: $id no Existe"], 404);
         }catch(\Exception $e){
+            DB::rollBack();
             return response()->json(['error' => 'Error al procesar los datos: ' . $e->getMessage()], 500);
         }
     }
