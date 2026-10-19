@@ -1171,78 +1171,93 @@ export default {
       if (this.uploading) return;
       try {
         this.uploading = true;
+
         const params = {
           nombre_pei: this.objetoguardar.nombre_pei,
           anios_pei: this.objetoguardar.anios_pei,
           estado_pei: this.objetoguardar.estado_pei,
           id_departamento: this.UsuarioInfo.departamentoUsuario
         };
-        let uploadResp = null;
-        if (this.archivoSeleccionado) {
-          uploadResp = await this.uploadArchivo(this.objetoguardar.anios_pei);
+
+        // 1. Guardar primero el registro en BD para validar duplicados
+        const res = await API.post(`${this.baseUrl}/pei`, params);
+
+        // 2. Si el registro se creó exitosamente, recién subimos el archivo si existe
+        if (res.data && res.data.data && this.archivoSeleccionado) {
+          const peiId = res.data.data.id_pei;
+          const uploadResp = await this.uploadArchivo(this.objetoguardar.anios_pei);
+
           if (uploadResp && uploadResp.filename) {
-            params.archivo_pei = uploadResp.filename; // Guardar archivo nuevo
+            // 3. Actualizamos el PEI con el nombre del archivo
+            await API.put(`${this.baseUrl}/pei/${peiId}`, {
+              ...params,
+              archivo_pei: uploadResp.filename
+            });
           }
         }
-        const exito = await enviarsolig('POST', params, `${this.baseUrl}/pei`, 'PEI registrado con éxito');
-        if (exito) {
-          this.$.setupState.isProfileAddressModal = false;
 
-          this.limpiarFormulario();
-          this.actualizar();
-        } else {
-          mostraralertas2("No se pudo registrar el PEI", "error");
-        }
+        mostraralertas2(res.data.mensaje || 'PEI registrado con éxito', 'success');
+        this.$.setupState.isProfileAddressModal = false;
+        this.limpiarFormulario();
+        this.actualizar();
+
       } catch (error) {
+        const msg = error.response?.data?.mensaje || "No se pudo registrar el PEI";
+        mostraralertas2(msg, "error");
         console.error("❌ Error al registrar PEI:", error.response?.data || error);
       } finally {
-        this.uploading = false; // Desactiva el loader al terminar
+        this.uploading = false;
       }
     },
     async Update() {
       if (this.uploading) return;
       try {
         this.uploading = true;
+
+        // 1. Preparamos los parámetros base SIN subir el archivo aún
         const params = {
           nombre_pei: this.objetoeditar.nombre_pei,
           anios_pei: this.objetoeditar.anios_pei,
           estado_pei: this.objetoeditar.estado_pei,
-          id_departamento: this.UsuarioInfo.departamentoUsuario
+          id_departamento: this.UsuarioInfo.departamentoUsuario, // Extraemos .value
+          archivo_pei: this.objetoeditar.archivo_pei // Mantenemos el actual por defecto
         };
-        if (this.archivoSeleccionado) {
-          // 1. Obtenemos el nombre del archivo y el año QUE YA ESTÁN en la DB (antes del cambio)
-          // Buscamos el registro original en el array para obtener el año previo real
+
+        // 2. Ejecutamos primero la actualización en el Backend para validar (duplicados, etc.)
+        const response = await API.put(`${this.baseUrl}/pei/${this.objetoeditar.id_pei}`, params);
+
+        // 3. Si la base de datos actualizó correctamente Y el usuario seleccionó un archivo nuevo
+        if (response.data && this.archivoSeleccionado) {
           const original = this.filteredarray.find(i => i.id_pei === this.objetoeditar.id_pei);
           const anioAnterior = original ? original.anios_pei : this.objetoeditar.anios_pei;
           const nombreArchivoAnterior = original ? original.archivo_pei : null;
 
-          // 2. Enviamos el año nuevo para la carpeta nueva, 
-          // y el nombre/año viejo para que el backend limpie la carpeta vieja
+          // Subimos el archivo físico y limpiamos el anterior
           const uploadResp = await this.uploadArchivo(
             this.objetoeditar.anios_pei,
             nombreArchivoAnterior,
-            anioAnterior // <-- Nuevo parámetro
+            anioAnterior
           );
 
           if (uploadResp && uploadResp.filename) {
-            params.archivo_pei = uploadResp.filename;
+            // Guardamos el nuevo nombre del archivo en la base de datos
+            await API.put(`${this.baseUrl}/pei/${this.objetoeditar.id_pei}`, {
+              ...params,
+              archivo_pei: uploadResp.filename
+            });
           }
-        } else {
-          // Si no subió archivo nuevo, mantenemos el nombre del archivo actual
-          params.archivo_pei = this.objetoeditar.archivo_pei;
         }
-        const exito = await enviarsolig('PUT', params, `${this.baseUrl}/pei/${this.objetoeditar.id_pei}`, 'PEI actualizado con éxito');
-        if (exito) {
-          this.$.setupState.isEditModalOpen = false;
 
-          this.limpiarFormulario();
-          this.actualizar();
-        } else {
-          this.$.setupState.isEditModalOpen = false;
-          mostraralertas2("No se pudo editar el PEI", "error");
-        }
+        // 4. Notificamos éxito y cerramos el modal
+        mostraralertas2(response.data.mensaje || 'PEI actualizado con éxito', 'success');
+        this.$.setupState.isEditModalOpen = false;
+        this.limpiarFormulario();
+        this.actualizar();
+
       } catch (error) {
-        console.error("❌ Error al registrar pei:", error.response?.data || error);
+        const msg = error.response?.data?.mensaje || "No se pudo editar el PEI";
+        mostraralertas2(msg, "error");
+        console.error("❌ Error al actualizar PEI:", error.response?.data || error);
       } finally {
         this.uploading = false; // Desactiva el loader al terminar
       }
@@ -1294,10 +1309,6 @@ export default {
         console.error("Error en el componente habilitar:", error);
       }
     },
-    generarUrl(aniopei, filename) {
-      const cacheBuster = new Date().getTime();
-      return `http://vinculacion.test/Documentos/Pei/${aniopei}/${filename}?t=${cacheBuster}`;
-    }
 
   },
 };

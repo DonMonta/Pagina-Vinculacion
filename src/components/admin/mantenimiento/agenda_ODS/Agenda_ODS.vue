@@ -936,22 +936,21 @@ export default {
           estado_ag_ods: this.objetoguardar.estado_ag_ods,
           id_departamento: this.UsuarioInfo.departamentoUsuario
         };
-        let uploadResp = null;
-        if (this.archivoSeleccionado) {
-          uploadResp = await this.uploadArchivo(this.objetoguardar.anio_ag_ods);
+        const res = await API.post(`${this.baseUrl}/agenda_ods`, params);
+        if (res.data && res.data.data && this.archivoSeleccionado) {
+          const agendaId = res.data.data.id_ag_ods;
+          const uploadResp = await this.uploadArchivo(this.objetoguardar.anio_ag_ods, null, agendaId);
           if (uploadResp && uploadResp.filename) {
-            params.archivo_ag_ods = uploadResp.filename; // Guardar archivo nuevo
-          }
+            await API.put(`${this.baseUrl}/agenda_ods/${agendaId}`, {
+              ...params,
+              archivo_ag_ods: uploadResp.filename
+            });
+          }  
         }
-        const exito = await enviarsolig('POST', params, `${this.baseUrl}/agenda_ods`, 'Agenda ODS registrado con éxito');
-        if (exito) {
-          this.$.setupState.isProfileAddressModal = false;
-
-          this.limpiarFormulario();
-          this.actualizar();
-        } else {
-          mostraralertas2("No se pudo registrar el ODS", "error");
-        }
+        mostraralertas2(res.data.mensaje || 'Agenda ODS registrado con éxito', 'success');
+        this.$.setupState.isProfileAddressModal = false;
+        this.limpiarFormulario();
+        this.actualizar();
       } catch (error) {
         console.error("❌ Error al registrar ODS:", error.response?.data || error);
       }finally {
@@ -968,40 +967,31 @@ export default {
           estado_ag_ods: this.objetoeditar.estado_ag_ods,
           id_departamento: this.UsuarioInfo.departamentoUsuario
         };
-        if (this.archivoSeleccionado) {
-          // 1. Obtenemos el nombre del archivo y el año QUE YA ESTÁN en la DB (antes del cambio)
-          // Buscamos el registro original en el array para obtener el año previo real
+        const response = await API.put(`${this.baseUrl}/agenda_ods/${this.objetoeditar.id_ag_ods}`, params);
+        if (response.data && this.archivoSeleccionado) {
           const original = this.filteredarray.find(i => i.id_ag_ods === this.objetoeditar.id_ag_ods);
           const anioAnterior = original ? original.anio_ag_ods : this.objetoeditar.anio_ag_ods;
           const nombreArchivoAnterior = original ? original.archivo_ag_ods : null;
-
-          // 2. Enviamos el año nuevo para la carpeta nueva, 
-          // y el nombre/año viejo para que el backend limpie la carpeta vieja
           const uploadResp = await this.uploadArchivo(
             this.objetoeditar.anio_ag_ods,
             nombreArchivoAnterior,
-            anioAnterior // <-- Nuevo parámetro
-          );
-
+            anioAnterior
+            );
           if (uploadResp && uploadResp.filename) {
-            params.archivo_ag_ods = uploadResp.filename;
-          }
-        } else {
-          // Si no subió archivo nuevo, mantenemos el nombre del archivo actual
-          params.archivo_ag_ods = this.objetoeditar.archivo_ag_ods;
-        }
-        const exito = await enviarsolig('PUT', params, `${this.baseUrl}/agenda_ods/${this.objetoeditar.id_ag_ods}`, 'Agenda ODS actualizado con éxito');
-        if (exito) {
-          this.$.setupState.isEditModalOpen = false;
-
-          this.limpiarFormulario();
-          this.actualizar();
-        } else {
-          this.$.setupState.isEditModalOpen = false;
-          mostraralertas2("No se pudo editar el ODS", "error");
-        }
+            await API.put(`${this.baseUrl}/agenda_ods/${this.objetoeditar.id_ag_ods}`, {
+              ...params,
+              archivo_ag_ods: uploadResp.filename
+            });
+          } 
+        }   
+        mostraralertas2(response.data.mensaje || 'Agenda ODS actualizado con éxito', 'success');
+        this.$.setupState.isEditModalOpen = false;
+        this.limpiarFormulario();
+        this.actualizar();
       } catch (error) {
         console.error("❌ Error al registrar ODS:", error.response?.data || error);
+      } finally {
+        this.uploading = false; // Desactiva el loader al terminar
       }
     },
     limpiarFormulario() {

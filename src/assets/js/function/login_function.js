@@ -8,7 +8,7 @@ export async function enviarsolilogin(method, parametros, url, mensaje) {
       url: url,
       data: parametros,
     });
-    console.log(response);
+    //console.log(response);
 
     if (response.data && response.data.token) {
       if (response.data.error) {
