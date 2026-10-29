@@ -21,6 +21,8 @@ import EquipoAllView from '../views/Admin/Equipo/EquipoAllView.vue'
 import ResponsableVinAllView from '../views/Admin/Equipo/ResponsableVinAllView.vue'
 import ConvocatoriaView from '../views/Admin/Proyectos/Convocatoria/ConvocatoriaView.vue'
 import TipoProyectoView from '../views/Admin/Proyectos/Tipos_Proyect_Vinc/Tipo_Proyect_VincView.vue'
+import NormativasView from '../views/Admin/Normativas/NormativasView.vue'
+import Det_DepartView from '../views/Admin/Detalle_Departamento/Det_DepartView.vue'
 
 
 const routes = [
@@ -133,6 +135,16 @@ const routes = [
     path: '/site-admin/proyectos/tipo_proyecto_vin', 
     name: 'site-admin-proyectos-tipo_proyecto_vin',  
     component: TipoProyectoView   
+  },
+  {
+    path: '/site-admin/normativas', 
+    name: 'site-admin-normativas',  
+    component: NormativasView   
+  },
+  {
+    path: '/site-admin/det_departamento', 
+    name: 'site-admin-det_departamento',  
+    component: Det_DepartView   
   },
 ]
 

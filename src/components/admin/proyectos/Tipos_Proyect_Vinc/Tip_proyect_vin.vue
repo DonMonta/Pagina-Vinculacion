@@ -246,10 +246,12 @@ export default {
       usersarray: [],
       objetoguardar: {
         detalle_invi_proyect: "",
+        tipo:"VINCULACIÓN",
       },
       objetoeditar: {
         id_tip_invi_proy: 0,
         detalle_invi_proyect: "",
+        tipo:"VINCULACIÓN",
       },
       filteredarray: [],
       searchQuery: "",
@@ -348,7 +350,8 @@ export default {
 
       try {
         const params = {
-          detalle_invi_proyect: this.objetoguardar.detalle_invi_proyect
+          detalle_invi_proyect: this.objetoguardar.detalle_invi_proyect,
+          tipo: "VINCULACIÓN"
         };
         const exito = await enviarsolig('POST', params, `${this.baseUrl}/invi_tipo_proyecto`, 'Registrado con éxito');
         if (exito) {

@@ -15,7 +15,7 @@
               </svg>
             </button>
             <!-- @input llama al debouncedFilter, que inicia la nueva consulta al backend -->
-            <input type="text" placeholder="Ingresa el nombre número de la convocatoria a buscar..."
+            <input type="text" placeholder="Ingresa el número de la convocatoria a buscar..."
               v-model="searchQuery" @input="debouncedFilter"
               class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]" />
           </div>
@@ -176,7 +176,7 @@
 
             <td class="py-4 px-4 align-top whitespace-nowrap">
               <div v-if="post.archivo">
-                <a :href="`http://192.168.1.112:8082/Documentos/Vinculación/Convocatorias/${post.num_convocatoria}/${post.archivo}`"
+                <a :href="getPdfUrl(post.num_convocatoria,post.archivo)"
                   target="_blank"
                   class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 rounded-lg hover:bg-rose-100 transition-all border border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -349,7 +349,7 @@
                     class="px-4 py-1.5 text-xs rounded-lg transition-all duration-200">
                     Persona
                   </button>
-                  <button type="button" @click="campo.tipo = 'departamento'"
+                  <button type="button" @click="cambiarTipoDepartamento(campo)"
                     :class="{ 'bg-white shadow-sm text-brand-600 font-bold dark:bg-gray-700 dark:text-brand-400': campo.tipo === 'departamento', 'text-gray-500 dark:text-gray-400': campo.tipo !== 'departamento' }"
                     class="px-4 py-1.5 text-xs rounded-lg transition-all duration-200">
                     Departamento
@@ -418,16 +418,59 @@
               </div>
 
               <div v-else class="animate-fadeIn">
-                <div class="relative flex items-center">
-                  <div
-                    class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400 dark:text-gray-500">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                    </svg>
+                <!-- Modo Selección (Lista desplegable) -->
+                <div v-if="campo.modoDepartamento !== 'manual'" class="relative">
+                  <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                    Seleccione el departamento de la lista
+                  </label>
+                  
+                  <div class="relative flex items-center">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400 dark:text-gray-500">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </div>
+                    
+                    <select v-model="campo.texto" @change="verificarOpcionOtro(campo)"
+                      class="w-full appearance-none rounded-xl border border-gray-300 bg-white pl-10 pr-10 py-3 text-sm outline-none transition-all focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:focus:border-brand-500 cursor-pointer">
+                      <option value="" disabled selected>-- Seleccione un departamento --</option>
+                      <!-- Iteramos los departamentos traídos de la API -->
+                      <option v-for="dep in departamentosApi" :key="dep.id_departamento" :value="dep.nombre_departamento || dep.nombre">
+                        {{ dep.nombre_departamento || dep.nombre }}
+                      </option>
+                      <!-- Opción comodín para escribir manualmente -->
+                      <option value="OTRO_MANUAL" class="font-bold text-brand-600 bg-brand-50">Otro (Escribir manualmente)</option>
+                    </select>
+
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-gray-400">
+                      <svg v-if="cargandoDepartamentos" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
                   </div>
-                  <input v-model="campo.texto" type="text"
-                    :placeholder="`Nombre del departamento encargado de la ${campo.label}...`"
-                    class="w-full rounded-xl border border-gray-300 bg-white pl-10 pr-4 py-3 text-sm outline-none transition-all focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:focus:border-brand-500" />
+                </div>
+
+                <!-- Modo Escritura Manual -->
+                <div v-else class="relative animate-fadeIn">
+                  <div class="flex justify-between items-end mb-2">
+                    <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Escriba el nombre manualmente
+                    </label>
+                    <button type="button" @click="volverAListaDepartamentos(campo)" 
+                      class="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline dark:text-brand-400">
+                      Volver a la lista
+                    </button>
+                  </div>
+                  
+                  <div class="relative flex items-center">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400 dark:text-gray-500">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                    </div>
+                    <input v-model="campo.texto" type="text"
+                      :placeholder="`Escriba el departamento encargado de la ${campo.label}...`"
+                      class="w-full rounded-xl border border-brand-300 bg-brand-50/30 pl-10 pr-4 py-3 text-sm outline-none transition-all focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-brand-700/50 dark:bg-brand-900/10 dark:text-white dark:focus:border-brand-500" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -553,10 +596,12 @@ export default {
       edicionBool: false,
       // Configuraciones dinámicas para Elaboración, Revisión y Aprobación
       camposResponsables: {
-        elaboracion: { id: 'elaboracion', label: 'elaboración', tipo: 'departamento', cedula: '', texto: '', docente: null, error: '' },
-        revision: { id: 'revision', label: 'revisión', tipo: 'departamento', cedula: '', texto: '', docente: null, error: '' },
-        aprobacion: { id: 'aprobacion', label: 'aprobación', tipo: 'departamento', cedula: '', texto: '', docente: null, error: '' }
-      }
+        elaboracion: { id: 'elaboracion', label: 'elaboración', tipo: 'persona', cedula: '', texto: '', docente: null, error: '' },
+        revision: { id: 'revision', label: 'revisión', tipo: 'persona', cedula: '', texto: '', docente: null, error: '' },
+        aprobacion: { id: 'aprobacion', label: 'aprobación', tipo: 'persona', cedula: '', texto: '', docente: null, error: '' }
+      },
+      departamentosApi: [],
+      cargandoDepartamentos: false,
 
     };
   },
@@ -584,8 +629,56 @@ export default {
 
   },
   methods: {
+    async fetchDepartamentos() {
+      // Evitar llamadas repetitivas si ya están cargados
+      if (this.departamentosApi.length > 0) return; 
+
+      try {
+        this.cargandoDepartamentos = true;
+        const res = await API.get(`${this.baseUrl}/listar_departamentos?all=true`);
+        console.log(res);
+        // Asegurarse de acceder a la data correcta según tu API response
+        this.departamentosApi = res.data.data; 
+      } catch (error) {
+        console.error("Error al cargar departamentos:", error);
+        mostraralertas2("No se pudo cargar la lista de departamentos", "warning");
+      } finally {
+        this.cargandoDepartamentos = false;
+      }
+    },
+    cambiarTipoDepartamento(campo) {
+      campo.tipo = 'departamento';
+      // Si no tiene el atributo modoDepartamento, se lo agregamos por defecto en 'select'
+      if (!campo.modoDepartamento) {
+        campo.modoDepartamento = 'select';
+      }
+      // Llamamos a la API (solo hará petición la primera vez)
+      this.fetchDepartamentos();
+    },
+    verificarOpcionOtro(campo) {
+      if (campo.texto === 'OTRO_MANUAL') {
+        campo.modoDepartamento = 'manual';
+        campo.texto = ''; // Limpiamos el texto para que pueda escribir desde cero
+      }
+    },
+    volverAListaDepartamentos(campo) {
+      campo.modoDepartamento = 'select';
+      campo.texto = ''; // Limpiamos para que vuelva a decir "-- Seleccione --"
+    },
     validarNumeros(campo) {
       campo.cedula = campo.cedula.replace(/\D/g, '');
+    },
+    getPdfUrl(num_convocatoria, pdfName) {
+      if (!pdfName || !num_convocatoria) return null;
+
+      // Si ya es una URL completa
+      if (pdfName.startsWith('http://') || pdfName.startsWith('https://')) {
+        return pdfName;
+      }
+
+      // Remueve '/api' o '/api/' al final de baseURL para ir a la raíz de public
+      const rootURL = (API.defaults.baseURL || '').replace(/\/api\/?$/, '');
+      return `${rootURL}/Documentos/VINCULACIÓN/Convocatorias/${num_convocatoria}/${pdfName}`;
     },
     async buscarDocente(campo) {
       if (campo.cedula.length !== 10) {
@@ -745,12 +838,12 @@ export default {
         const response = await API.get(`${this.baseUrl}/invi_convocatoria`, { params });
 
         const data = response.data?.data || [];
-
+        const rootURL = (API.defaults.baseURL || '').replace(/\/api\/?$/, '');
         // Mapeamos los datos iniciales agregando propiedades reactivas para el docente
         this.filteredarray = data.map(item => ({
           ...item,
           ad_archivo_url: item.archivo
-            ? `http://192.168.1.112:8082/Documentos/Vinculación/Convocatorias/${item.num_convocatoria}/${item.archivo}`
+            ? `${rootURL}/Documentos/VINCULACIÓN/Convocatorias/${item.num_convocatoria}/${item.archivo}`
             : null,
           docente: null,
           cargandoDocente: false,
@@ -861,7 +954,7 @@ export default {
 
       // Reiniciar configuraciones dinámicas
       Object.keys(this.camposResponsables).forEach(key => {
-        this.camposResponsables[key] = { ...this.camposResponsables[key], tipo: 'departamento', cedula: '', texto: '', docente: null, error: '' };
+        this.camposResponsables[key] = { ...this.camposResponsables[key], tipo: 'persona', cedula: '', texto: '', docente: null, error: '' };
       });
     },
     eliminar(id, nombre) {

@@ -252,11 +252,13 @@ const menuData = [
       },
       {
         icon: UserCircleIcon,
-        name: "Equipo",
+        name: "Departamento de Vinculación",
         subItems: [
-          { name: "Roles", path: "/site-admin/roles_equipo", pro: false },
-          { name: "Equipo", path: "/site-admin/equipo", pro: false },
-          { name: "Responsables", path: "/site-admin/responsables_vin", pro: false },
+          {name: "Normativas", path: "/site-admin/normativas", pro: false},
+          {name: "Detalle de Departamentos", path: "/site-admin/det_departamento", pro: false},
+          { name: "Roles del equipo de Vinculación", path: "/site-admin/roles_equipo", pro: false },
+          { name: "Equipo de Trabajo", path: "/site-admin/equipo", pro: false },
+          { name: "Responsables de Vinculación de Facultades", path: "/site-admin/responsables_vin", pro: false },
         ],
       },
 

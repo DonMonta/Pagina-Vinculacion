@@ -70,8 +70,11 @@
                                 <p class="font-bold text-gray-800 text-sm dark:text-white/90 leading-tight">
                                     {{ post.proyect_nombre }}
                                 </p>
-                                <p class="text-xs text-gray-500 mt-1 italic leading-relaxed">
+                                <p class="text-xs text-gray-500 mt-1 italic leading-relaxed" v-if="post.proyect_titulo">
                                     Título: {{ post.proyect_titulo }}
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1 italic leading-relaxed" v-else>
+                                    NO HAY TITULO DE PROYECTO REGISTRADO
                                 </p>
                             </div>
                         </td>
@@ -239,7 +242,9 @@
                     <div class="max-w-[80%]">
                         <h2 class="text-xl font-bold text-gray-800 dark:text-white truncate">{{
                             proyectoSeleccionado.proyect_nombre }}</h2>
-                        <p class="text-sm text-gray-500 italic">Título: {{ proyectoSeleccionado.proyect_titulo }}</p>
+                        <p class="text-sm text-gray-500 italic" v-if="proyectoSeleccionado.proyect_titulo">Título: {{
+                            proyectoSeleccionado.proyect_titulo }}</p>
+                        <p class="text-sm text-gray-500 italic" v-else>NO HAY TITULO DE PROYECTO REGISTRADO</p>
                     </div>
                     <button @click="cerraModal" class="p-2 hover:bg-gray-100 rounded-full transition-colors">✕</button>
                 </div>
