@@ -32,7 +32,7 @@ class Invi_tip_proyectController extends Controller
             // Inicializa la consulta base sobre la tabla de convocatorias
             $query = Invi_tip_proyect::select(
                 'invi_tip_proyect.*'
-            );
+            )->where('tipo', 'VINCULACIÓN');
             // Aplica filtro de búsqueda por coincidencia parcial si el parámetro existe
             if ($searchQuery) {
                 $query->where(function ($q) use ($searchQuery) {

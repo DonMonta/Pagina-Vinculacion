@@ -15,8 +15,6 @@ class Grupo extends Model
         'observacion',
     ];
 
-
-
     public function usuarios()
     {
         return $this->hasMany(Usuario::class, 'id', 'id_grupo');

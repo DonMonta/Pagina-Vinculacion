@@ -35,9 +35,8 @@ class Invi_convocatoriaController extends Controller
             // Extrae el término de búsqueda de la petición
             $searchQuery = $request->input('search_query');
             // Inicializa la consulta base sobre la tabla de convocatorias
-            $query = Invi_convocatoria::select(
-                'invi_convocatoria.*'
-            );
+            $query = Invi_convocatoria::withCount('invi_plantillas_formato')
+            ->where('tipo_convocatoria', 'VINCULACIÓN');
             // Aplica filtro de búsqueda por coincidencia parcial si el parámetro existe
             if ($searchQuery) {
                 $query->where(function ($q) use ($searchQuery) {

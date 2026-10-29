@@ -379,7 +379,7 @@ class Invi_proyectosController extends Controller
 
         // NUEVO: Extraer los ids que el proyecto ya tiene guardados en `invi_detalle_area_unesco`
         $unescoSeleccionadas = $proyecto->invi_detalle_area_unesco->pluck('id_subarea_unesco')->toArray();
-        $tip_proyectCatalogo = Invi_tip_proyect::all();
+        $tip_proyectCatalogo = Invi_tip_proyect::where('tipo', 'VINCULACIÓN')->get();
         $zonasCatalogo = Zona_planificacion::all();
         $detallesZonasCatalogo = Detalle_zona_planificacion::all();
         $provinciasCatalogo = Provincia::all();

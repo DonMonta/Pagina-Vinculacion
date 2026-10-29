@@ -32,6 +32,10 @@ class Invi_convocatoria extends Model
     {
         return $this->hasMany(Invi_proyectos::class, 'id_convocatoria');
     }
+    public function invi_plantillas_formato()
+    {
+        return $this->hasMany(Invi_plantilla_formato::class, 'id_convocatoria', 'id_convocatoria');
+    }
     
     
 

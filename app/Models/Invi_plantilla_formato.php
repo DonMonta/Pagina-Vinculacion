@@ -30,6 +30,10 @@ class Invi_plantilla_formato extends Model
     {
         return $this->belongsTo(Invi_convocatoria::class, 'id_convocatoria', 'id_convocatoria');
     } 
+    public function invi_campos_plantilla()
+    {
+        return $this->hasMany(Invi_campos_plantilla::class, 'id_plantilla', 'id_plantilla');
+    }
     public function invi_proyectos_formatos()
     {
         return $this->hasMany(Invi_proyectos_formatos::class, 'id_plantilla');

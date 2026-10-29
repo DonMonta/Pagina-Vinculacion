@@ -31,6 +31,10 @@ use App\Http\Controllers\Invi_equipo_rolesController;
 use App\Http\Controllers\Invi_responsableController;
 use App\Http\Controllers\Invi_convocatoriaController;
 use App\Http\Controllers\Invi_tip_proyectController;
+use App\Http\Controllers\Invi_tipos_normativasController;
+use App\Http\Controllers\Invi_normativasController;
+use App\Http\Controllers\DepartamentoController;
+use App\Http\Controllers\DepartamentoDetalleController;
 
 
 /*
@@ -95,7 +99,7 @@ Route::prefix('vin')->group(function () {
         Route::delete('habilitar_plandne/{id}', [PlandneController::class, 'habilitar']);
         //Definición de endpoint para deshabilitar un plandne
         Route::delete('inhabilitar_plandne/{id}', [PlandneController::class, 'destroy']);
-        
+
         //Definición de ruta endpoint para el recurso Obj_pol_plandne, perimitiendo operaciones CRUD
         Route::apiResource("obj_pol_plandne", Obj_pol_plandneController::class);
         //Definición de ruta endpoint para el recurso Politicas_plandne, perimitiendo operaciones CRUD
@@ -133,7 +137,7 @@ Route::prefix('vin')->group(function () {
         //Denificion de endpoint para habilitar e inhabilitar un Agenda ODS
         Route::delete('habilitar_agenda_ods/{id}', [Agenda_ODSController::class, 'habilitar']);
         Route::delete('inhabilitar_agenda_ods/{id}', [Agenda_ODSController::class, 'destroy']);
-         Route::post('subir_archivo_agenda_ods', [Agenda_ODSController::class, 'uploadArchivo']);
+        Route::post('subir_archivo_agenda_ods', [Agenda_ODSController::class, 'uploadArchivo']);
         //Definición de la ruta endpoint para eliminar un archivo
         Route::post('eliminar_archivo_agenda_ods', [Agenda_ODSController::class, 'deleteArchivo']);
         //Definición de endpoint para el recurso SeguiFormulario, perimitiendo operaciones CRUD
@@ -275,13 +279,63 @@ Route::prefix('vin')->group(function () {
         // Registra de forma automática los endpoints CRUD para la API (index, store, show, update)
         Route::apiResource("invi_tipo_proyecto", Invi_tip_proyectController::class);
         Route::post('subir_pdf_proyecto', [Invi_proyectosController::class, 'uploadPDFProyectArchivo']);
+        /**
+         * --------------------------------------------------------------------------
+         * Rutas de Gestión de Tipos de Normativas (Invi_tipos_normativasController)
+         * --------------------------------------------------------------------------
+         * Define los puntos de acceso (endpoints) para el ciclo de vida del recurso.
+         * Incluye operaciones CRUD estandarizadas..
+         */
+        // Registra de forma automática los endpoints CRUD para la API (index, store, show, update)
+        Route::apiResource("invi_tipos_normativas", Invi_tipos_normativasController::class);
+        //Endpoint para habilitar un tipo de normativa
+        Route::delete('habilitar_tipo_normativa/{id}', [Invi_tipos_normativasController::class, 'habilitar']);
+        //Endpoint para inhabilitar un tipo de normativa
+        Route::delete('inhabilitar_tipo_normativa/{id}', [Invi_tipos_normativasController::class, 'destroy']);
+
+        /**
+         * --------------------------------------------------------------------------
+         * Rutas de Gestión de Normativas (Invi_normativasController)
+         * --------------------------------------------------------------------------
+         * Define los puntos de acceso (endpoints) para el ciclo de vida del recurso.
+         * Incluye operaciones CRUD estandarizadas, un endpoint para habilitar, inhabilitar registros y subir archivos adjuntos.
+         */
+        // Registra de forma automática los endpoints CRUD para la API (index, store, show, update, destroy)
+        Route::apiResource("invi_normativas", Invi_normativasController::class);
+        //Endpoint para habilitar una normativa
+        Route::delete('habilitar_normativa/{id}', [Invi_normativasController::class, 'habilitar']);
+        //Endpoint para inhabilitar una normativa
+        Route::delete('inhabilitar_normativa/{id}', [Invi_normativasController::class, 'destroy']);
+        /**
+         * --------------------------------------------------------------------------
+         * Rutas de Gestión de Departamentos (DepartamentoController)
+         * --------------------------------------------------------------------------
+         * Define los puntos de acceso (endpoints) para el ciclo de vida del recurso.
+         * Incluye operaciones para obtener la lista de departamentos y para obtener
+         * la información de un departamento específico.
+         * 
+         */
+        //Definición de endpoint para obtener la lista de departamentos
+        Route::get('listar_departamentos', [DepartamentoController::class, 'index']);
+        /**
+         * * --------------------------------------------------------------------------
+         * Rutas de Gestión de Detalle de Departamentos (DepartamentoDetalleController)
+         * --------------------------------------------------------------------------
+         * Define los puntos de acceso (endpoints) para el ciclo de vida del recurso.
+         * Incluye operaciones para obtener la lista de detalle de departamentos específicos,
+         * Incluye creacion, actualizacion y eliminacion del detalle de un depatamento específico
+         */
+        // Registra de forma automática los endpoints CRUD para la API (index, store, show, update, destroy)
+        Route::apiResource("detalle_departamentos", DepartamentoDetalleController::class);
+        Route::delete('elimi_detalle_departamentos/{id}', [DepartamentoDetalleController::class, 'destroy']);
+        //Endpoint para subir un archivo
+        Route::post('subir_archivo_normativa', [Invi_normativasController::class, 'uploadArchivo']);
         Route::get('getDirectoresIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getDirectoresiNDProyectosVinculacion']);
         Route::get('getSubDirectoresIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getSubDireIndProyectosVinculacion']);
         Route::get('getDocentesIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getDocentesIndProyectosVinculacion']);
         Route::get('getEstudiantesIndProyectosVinculacion/{id}', [Invi_proyectosController::class, 'getEstIndvProyectosVinculacion']);
         Route::get('getResponsablesIndInfo/{id}', [Invi_responsableController::class, 'getResponsablesIndInfo']);
         Route::get('getdirectvin', [Invi_equipo_departController::class, 'getDirectorInfo']);
-        
     });
 }); 
 

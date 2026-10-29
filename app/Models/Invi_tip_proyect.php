@@ -14,7 +14,8 @@ class Invi_tip_proyect extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'detalle_invi_proyect'
+        'detalle_invi_proyect',
+        'tipo'
     ];
     public function invi_proyectos()
     {

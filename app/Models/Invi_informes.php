@@ -48,5 +48,13 @@ class Invi_informes extends Model
     {
         return $this->hasMany(Invi_informe_actividades_docentes::class, 'informe_id', 'id_informes');
     }
+    public function invi_informe_evaluaciones_rubrica()
+    {
+        return $this->hasMany(Invi_informe_evaluaciones_rubrica::class, 'informe_id', 'id_informes');
+    }
+    public function invi_informe_evidencias()
+    {
+        return $this->hasMany(Invi_informe_evidencias::class, 'informe_id', 'id_informes');
+    }
 
 }

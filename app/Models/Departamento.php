@@ -30,5 +30,9 @@ class Departamento extends Model
     {
         return $this->hasMany(AgendaODSEstadoDepartamento::class, 'id_departamento', 'id_departamento');
     }
-   
+    public function detalle_departamento()
+    {
+        return $this->hasOne(DepartamentoDetalle::class, 'id_departamento', 'id_departamento');
+    }
+
 }
