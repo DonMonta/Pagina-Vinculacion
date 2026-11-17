@@ -25,7 +25,7 @@ class Invi_equipo_depart extends Model
     }
     public function informacionpersonald()
     {
-        return $this->belongsTo(InformacionPersonald::class, 'ciinfper_doc', 'CIInfPer');
+        return $this->belongsTo(InformacionPersonalD::class, 'ciinfper_doc', 'CIInfPer');
     }
     
 
