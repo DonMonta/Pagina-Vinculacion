@@ -355,7 +355,7 @@ class Invi_proyectosController extends Controller
         $unescoCatalogo = $unescoCatalogoRaw->map(function ($item) {
             $id = trim($item->sau_id);
             $pdid = trim($item->sau_pdid ?? '');
-            $descripcion = mb_convert_encoding($item->sau_descripcion, 'ISO-8859-1', 'UTF-8');
+            $descripcion = mb_convert_encoding($item->sau_descripcion, 'UTF-8', 'UTF-8, ISO-8859-1, Windows-1252');
             $descripcion_limpia = preg_replace('/^' . preg_quote($id, '/') . '\s*/', '', $descripcion);
 
             $longitud_id = strlen($id);
