@@ -2863,12 +2863,14 @@ class Invi_proyectosController extends Controller
     public function getEstProyectosVinculacion(Request $request): JsonResponse
     {
         try {
-            // 1. Consulta base utilizando Eager Loading para optimizar el rendimiento e incluir los títulos académicos
-            $integrantes = Invi_deta_inte::with([
+            $resultado = [];
+
+            // 1. Consulta base utilizando Eager Loading para optimizar el rendimiento
+            Invi_deta_inte::with([
                 'invi_proyectos',
                 'funciones',
                 'carreras.facultades',
-                'informacionpersonal', // <-- Incluimos la relación anidada para evaluar los títulos
+                'informacionpersonal', // <-- Relación de estudiantes
             ])
                 // Integrantes en estado 1 (Activos)
                 ->where('estado', 1)
@@ -2878,7 +2880,7 @@ class Invi_proyectosController extends Controller
                     $query->where('proyect_tipo', 'VINCULACION');
                 })
 
-                // Filtramos de forma estricta para evitar "Subdirector"
+                // Filtramos de forma estricta para asegurar que sea "Estudiante"
                 ->whereHas('funciones', function ($query) {
                     $query->where('tipo_funcion', 'VINCULACIÓN')
                         ->where('nombre_funcion', 'LIKE', '%Estudiante%')
@@ -2886,64 +2888,64 @@ class Invi_proyectosController extends Controller
                         ->where('nombre_funcion', 'NOT LIKE', '%Director%')
                         ->where('nombre_funcion', 'NOT LIKE', '%Subdirector%'); // <-- Excluimos explícitamente Subdirector
                 })
-                ->get();
+                // Procesamiento por lotes de 200 en 200 para no agotar la RAM
+                ->chunk(200, function ($integrantesChunk) use (&$resultado) {
+                    foreach ($integrantesChunk as $integrante) {
+                        
+                        $persona = $integrante->informacionpersonal;
 
-            $resultado = $integrantes->map(function ($integrante) {
+                        // Formatear Nombres y Apellidos (Title Case)
+                        $nombresCompletos = 'Datos no registrados';
+                        if ($persona) {
+                            $nombreRaw = trim($persona->NombInfPer . ' ' . $persona->ApellInfPer . ' ' . $persona->ApellMatInfPer);
+                            // Convertimos todo a minúscula primero y luego a Title Case
+                            $nombresCompletos = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, "UTF-8");
+                        }
 
-                // Los directores generalmente son docentes (informacionPersonalD), 
-                // pero validamos ambas relaciones por seguridad.
-                $persona = $integrante->informacionpersonal;
+                        // 4. Obtener y formatear el Nombre de la Carrera
+                        $nombreCarrera = 'No asignada';
+                        if ($integrante->carreras) {
+                            $nombreCarreraRaw = trim($integrante->carreras->NombCarr);
+                            $nombreCarrera = mb_convert_case(mb_strtolower($nombreCarreraRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                        }
+                        $carreraLimpia = preg_replace('/\s*-\s*\d+.*$/', '', $nombreCarrera);
 
-                // Formatear Nombres y Apellidos (Title Case)
-                $nombresCompletos = 'Datos no registrados';
-                if ($persona) {
-                    $nombreRaw = trim($persona->NombInfPer . ' ' . $persona->ApellInfPer . ' ' . $persona->ApellMatInfPer);
-                    // Convertimos todo a minúscula primero y luego a Title Case
-                    $nombresCompletos = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, "UTF-8");
-                }
+                        // 2. Convertimos de "INGENIERIA QUIMICA" a "Ingeniería Química" (Title Case)
+                        $nombreCarreraFinal = mb_convert_case($carreraLimpia, MB_CASE_TITLE, "UTF-8");
+                        
+                        // 5. Obtener la Facultad y sus Siglas
+                        $nombreFacultad = 'No asignada';
+                        $siglasFacultad = 'No asignada';
+                        if ($integrante->carreras && $integrante->carreras->facultades->isNotEmpty()) {
+                            $facultadAsociada = $integrante->carreras->facultades->first();
+                            $nombreFacultad = mb_convert_case(mb_strtolower(trim($facultadAsociada->facultad), 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                            $siglasFacultad = trim($facultadAsociada->siglas);
+                        }
 
-                // 4. Obtener y formatear el Nombre de la Carrera
-                $nombreCarrera = 'No asignada';
-                if ($integrante->carreras) {
-                    $nombreCarreraRaw = trim($integrante->carreras->NombCarr);
-                    $nombreCarrera = mb_convert_case(mb_strtolower($nombreCarreraRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
-                }
-                $carreraLimpia = preg_replace('/\s*-\s*\d+.*$/', '', $nombreCarrera);
-
-                // 2. Convertimos de "INGENIERIA QUIMICA" a "Ingeniería Química" (Title Case)
-                $nombreCarreraFinal = mb_convert_case($carreraLimpia, MB_CASE_TITLE, "UTF-8");
-                // 5. Obtener la Facultad y sus Siglas
-                $nombreFacultad = 'No asignada';
-                $siglasFacultad = 'No asignada';
-                if ($integrante->carreras && $integrante->carreras->facultades->isNotEmpty()) {
-                    $facultadAsociada = $integrante->carreras->facultades->first();
-                    $nombreFacultad = mb_convert_case(mb_strtolower(trim($facultadAsociada->facultad), 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
-                    $siglasFacultad = trim($facultadAsociada->siglas);
-                }
-
-                // Retornamos el objeto estructurado
-                return [
-                    'nombres_apellidos' => $nombresCompletos,
-                    'funcion'           => $integrante->funciones->nombre_funcion ?? 'Desconocida',
-                    'carrera'           => $nombreCarreraFinal,
-                    'facultad'          => $nombreFacultad,
-                    'siglas'            => $siglasFacultad,
-                    // Agrego estos campos extra porque suelen ser muy útiles para el Frontend
-                    'proyecto_nombre'   => $integrante->invi_proyectos->proyect_nombre ?? 'No registrado',
-                    'cedula'            => $persona ? $persona->CIInfPer : null
-                ];
-            });
+                        // Retornamos el objeto estructurado
+                        $resultado[] = [
+                            'nombres_apellidos' => $nombresCompletos,
+                            'funcion'           => $integrante->funciones->nombre_funcion ?? 'Desconocida',
+                            'carrera'           => $nombreCarreraFinal,
+                            'facultad'          => $nombreFacultad,
+                            'siglas'            => $siglasFacultad,
+                            // Agrego estos campos extra porque suelen ser muy útiles para el Frontend
+                            'proyecto_nombre'   => $integrante->invi_proyectos->proyect_nombre ?? 'No registrado',
+                            'cedula'            => $persona ? $persona->CIInfPer : null
+                        ];
+                    }
+                });
 
             // 3. Retornar la respuesta JSON
             return response()->json([
                 'success' => true,
-                'total'   => $resultado->count(),
+                'total'   => count($resultado),
                 'data'    => $resultado
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Ocurrió un error al consultar los directores de proyectos.',
+                'error' => 'Ocurrió un error al consultar los estudiantes de proyectos.',
                 'details' => $e->getMessage(),
             ], 500);
         }
