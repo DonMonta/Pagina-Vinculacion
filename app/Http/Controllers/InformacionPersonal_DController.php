@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\InformacionPersonald;
+use App\Models\InformacionPersonalD;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -26,7 +26,7 @@ class InformacionPersonal_DController extends Controller
     public function show(string $id)
     {
         // Aplica paginación al resultado del filtro
-        $data = InformacionPersonald::select('informacionpersonal_d.*')
+        $data = InformacionPersonalD::select('informacionpersonal_d.*')
             ->where('informacionpersonal_d.CIInfPer', $id)
             ->paginate(20);
         if ($data->isEmpty()) {
@@ -192,7 +192,7 @@ class InformacionPersonal_DController extends Controller
     {
         try {
             // 1. Obtener SÓLO la columna 'fotografia' para el CI específico
-            $persona = InformacionPersonald::where('CIInfPer', $ci)
+            $persona = InformacionPersonalD::where('CIInfPer', $ci)
                 ->select('fotografia')
                 ->first();
 
@@ -233,7 +233,7 @@ class InformacionPersonal_DController extends Controller
     {
         try {
             // 1. Obtener SÓLO la columna 'fotografia' para el CI específico
-            $persona = InformacionPersonald::where('CIInfPer', $ci)
+            $persona = InformacionPersonalD::where('CIInfPer', $ci)
                 ->select('fotografia')
                 ->first();
 
@@ -274,7 +274,7 @@ class InformacionPersonal_DController extends Controller
     public function getSinfondoFotografia($ci)
     {
         try {
-            $persona = InformacionPersonald::where('CIInfPer', $ci)->select('fotografia')->first();
+            $persona = InformacionPersonalD::where('CIInfPer', $ci)->select('fotografia')->first();
 
             if (! $persona || empty($persona->fotografia)) {
                 return response()->json(['error' => 'Fotografía no encontrada.'], 404);
