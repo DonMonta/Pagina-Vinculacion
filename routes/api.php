@@ -251,6 +251,7 @@ Route::prefix('vin')->group(function () {
         Route::get('getFacultadesVinculacion', [Invi_responsableController::class, 'getFacultadesVinculacion']);
         Route::get('getCarrerasFacultad/{idfacultad}', [DirectorCarrerasController::class, 'ObtCarrerasFacultad']);
         Route::get('obtnercarreraindv/{id}', [DirectorCarrerasController::class, 'obtnercarreraindv']);
+        
         /**
          * --------------------------------------------------------------------------
          * Rutas de Gestión de Convocatorias (Invi_convocatoriaController)
