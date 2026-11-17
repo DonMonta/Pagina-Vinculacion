@@ -2571,8 +2571,10 @@ class Invi_proyectosController extends Controller
     public function getDocentesProyectosVinculacion(Request $request): JsonResponse
     {
         try {
+            $resultado = [];
+
             // 1. Consulta base utilizando Eager Loading para optimizar el rendimiento e incluir los títulos académicos
-            $integrantes = Invi_deta_inte::with([
+            Invi_deta_inte::with([
                 'invi_proyectos',
                 'funciones',
                 'carreras.facultades',
@@ -2593,111 +2595,111 @@ class Invi_proyectosController extends Controller
                         ->where('nombre_funcion', 'NOT LIKE', '%Director%')
                         ->where('nombre_funcion', 'NOT LIKE', '%Subdirector%'); // <-- Excluimos explícitamente Subdirector
                 })
-                ->get();
+                // Procesamiento por lotes de 200 en 200 para no agotar la RAM
+                ->chunk(200, function ($integrantesChunk) use (&$resultado) {
+                    foreach ($integrantesChunk as $integrante) {
+                        $persona = $integrante->informacionPersonalD;
 
-            $resultado = [];
+                        if (! $persona) {
+                            continue; // Si el integrante no tiene registro de información de personal, pasamos al siguiente
+                        }
 
-            foreach ($integrantes as $integrante) {
-                $persona = $integrante->informacionPersonalD;
+                        // 2. Lógica de Género para Nombres y Cargos
+                        $esMujer = strtoupper(trim($persona->GeneroPer)) === 'F';
+                        $cargoFormateado = $esMujer ? 'Docente' : 'Docente';
 
-                if (! $persona) {
-                    continue; // Si el integrante no tiene registro de información de personal, pasamos al siguiente
-                }
+                        // 3. Procesar títulos académicos filtrando por nv_numnivel (Eager Loaded)
+                        $tituloGrado = $persona->titulos->first(function ($titulo) {
+                            return optional($titulo->nivel)->nv_numnivel == 3; // TERCER NIVEL
+                        });
 
-                // 2. Lógica de Género para Nombres y Cargos
-                $esMujer = strtoupper(trim($persona->GeneroPer)) === 'F';
-                $cargoFormateado = $esMujer ? 'Docente' : 'Docente';
+                        $tituloPosgrado = $persona->titulos->first(function ($titulo) {
+                            return optional($titulo->nivel)->nv_numnivel == 4; // CUARTO NIVEL
+                        });
 
-                // 3. Procesar títulos académicos filtrando por nv_numnivel (Eager Loaded)
-                $tituloGrado = $persona->titulos->first(function ($titulo) {
-                    return optional($titulo->nivel)->nv_numnivel == 3; // TERCER NIVEL
-                });
+                        $prefijoNombre = '';
+                        $sufijoNombre = '';
 
-                $tituloPosgrado = $persona->titulos->first(function ($titulo) {
-                    return optional($titulo->nivel)->nv_numnivel == 4; // CUARTO NIVEL
-                });
+                        // A. Mapeo ampliado de PREFIJOS (3er Nivel)
+                        if ($tituloGrado) {
+                            $textoGrado = mb_strtolower($tituloGrado->ad_titulo);
 
-                $prefijoNombre = '';
-                $sufijoNombre = '';
+                            if (str_contains($textoGrado, 'licencia')) {
+                                $prefijoNombre = $esMujer ? 'Lcda.' : 'Lcdo.';
+                            } elseif (
+                                str_contains($textoGrado, 'ingenier') || str_contains($textoGrado, 'ing.') ||
+                                str_contains($textoGrado, 'ingeniería') || str_contains($textoGrado, 'tecnolog')
+                            ) {
+                                $prefijoNombre = 'Ing.';
+                            } elseif (str_contains($textoGrado, 'econom') || str_contains($textoGrado, 'econ.')) {
+                                $prefijoNombre = 'Econ.';
+                            } elseif (str_contains($textoGrado, 'abogad') || str_contains($textoGrado, 'abg.')) {
+                                $prefijoNombre = 'Abg.';
+                            } elseif (str_contains($textoGrado, 'arquitect') || str_contains($textoGrado, 'arq.')) {
+                                $prefijoNombre = 'Arq.';
+                            } else {
+                                $prefijoNombre = 'Prof.';
+                            }
+                        } else {
+                            $prefijoNombre = $esMujer ? 'Sra.' : 'Sr.';
+                        }
 
-                // A. Mapeo ampliado de PREFIJOS (3er Nivel)
-                if ($tituloGrado) {
-                    $textoGrado = mb_strtolower($tituloGrado->ad_titulo);
+                        // B. Definir el SUFIJO (4to Nivel)
+                        if ($tituloPosgrado) {
+                            $textoPosgrado = mb_strtolower($tituloPosgrado->ad_titulo);
 
-                    if (str_contains($textoGrado, 'licencia')) {
-                        $prefijoNombre = $esMujer ? 'Lcda.' : 'Lcdo.';
-                    } elseif (
-                        str_contains($textoGrado, 'ingenier') || str_contains($textoGrado, 'ing.') ||
-                        str_contains($textoGrado, 'ingeniería') || str_contains($textoGrado, 'tecnolog')
-                    ) {
-                        $prefijoNombre = 'Ing.';
-                    } elseif (str_contains($textoGrado, 'econom') || str_contains($textoGrado, 'econ.')) {
-                        $prefijoNombre = 'Econ.';
-                    } elseif (str_contains($textoGrado, 'abogad') || str_contains($textoGrado, 'abg.')) {
-                        $prefijoNombre = 'Abg.';
-                    } elseif (str_contains($textoGrado, 'arquitect') || str_contains($textoGrado, 'arq.')) {
-                        $prefijoNombre = 'Arq.';
-                    } else {
-                        $prefijoNombre = 'Prof.';
+                            if (str_contains($textoPosgrado, 'phd') || str_contains($textoPosgrado, 'doctorado') || str_contains($textoPosgrado, 'doctor')) {
+                                $sufijoNombre = ', PhD';
+                            } elseif (str_contains($textoPosgrado, 'msc') || str_contains($textoPosgrado, 'science') || str_contains($textoPosgrado, 'ciencias')) {
+                                $sufijoNombre = ', MSc.';
+                            } else {
+                                $sufijoNombre = ', Mgtr.';
+                            }
+                        }
+
+                        // Formatear Nombres y Apellidos en formato Title Case
+                        $nombreRaw = trim($persona->NombInfPer . ' ' . $persona->ApellInfPer . ' ' . $persona->ApellMatInfPer);
+                        $nombresFormateados = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+
+                        // Construcción del nombre con rango académico completo
+                        $nombreCompletoConTitulo = trim("{$prefijoNombre} {$nombresFormateados}{$sufijoNombre}");
+
+                        // 4. Obtener y formatear el Nombre de la Carrera
+                        $nombreCarrera = 'No asignada';
+                        if ($integrante->carreras) {
+                            $nombreCarreraRaw = trim($integrante->carreras->NombCarr);
+                            $nombreCarrera = mb_convert_case(mb_strtolower($nombreCarreraRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                        }
+                        $carreraLimpia = preg_replace('/\s*-\s*\d+.*$/', '', $nombreCarrera);
+
+                        // 2. Convertimos de "INGENIERIA QUIMICA" a "Ingeniería Química" (Title Case)
+                        $nombreCarreraFinal = mb_convert_case($carreraLimpia, MB_CASE_TITLE, "UTF-8");
+                        
+                        // 5. Obtener la Facultad y sus Siglas
+                        $nombreFacultad = 'No asignada';
+                        $siglasFacultad = 'No asignada';
+                        if ($integrante->carreras && $integrante->carreras->facultades->isNotEmpty()) {
+                            $facultadAsociada = $integrante->carreras->facultades->first();
+                            $nombreFacultad = mb_convert_case(mb_strtolower(trim($facultadAsociada->facultad), 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                            $siglasFacultad = trim($facultadAsociada->siglas);
+                        }
+
+                        // 6. Estructura del objeto individual
+                        $resultado[] = [
+                            'cedula' => $persona->CIInfPer,
+                            'nombres_apellidos' => $nombresFormateados,      // Solo nombres limpios
+                            'nombre_con_titulo' => $nombreCompletoConTitulo, // Formato "Ing. Juan Perez, MSc."
+                            'funcion' => $integrante->funciones->nombre_funcion ?? 'Desconocida',
+                            'cargo_genero' => $cargoFormateado,         // Regresa "Director" o "Directora"
+                            'carrera' => $nombreCarreraFinal,
+                            'facultad' => $nombreFacultad,
+                            'siglas' => $siglasFacultad,
+                            'proyecto_nombre' => $integrante->invi_proyectos->proyect_nombre ?? 'No registrado',
+                            'titulo_grado' => $tituloGrado ? $tituloGrado->ad_titulo : null,
+                            'titulo_posgrado' => $tituloPosgrado ? $tituloPosgrado->ad_titulo : null,
+                        ];
                     }
-                } else {
-                    $prefijoNombre = $esMujer ? 'Sra.' : 'Sr.';
-                }
-
-                // B. Definir el SUFIJO (4to Nivel)
-                if ($tituloPosgrado) {
-                    $textoPosgrado = mb_strtolower($tituloPosgrado->ad_titulo);
-
-                    if (str_contains($textoPosgrado, 'phd') || str_contains($textoPosgrado, 'doctorado') || str_contains($textoPosgrado, 'doctor')) {
-                        $sufijoNombre = ', PhD';
-                    } elseif (str_contains($textoPosgrado, 'msc') || str_contains($textoPosgrado, 'science') || str_contains($textoPosgrado, 'ciencias')) {
-                        $sufijoNombre = ', MSc.';
-                    } else {
-                        $sufijoNombre = ', Mgtr.';
-                    }
-                }
-
-                // Formatear Nombres y Apellidos en formato Title Case
-                $nombreRaw = trim($persona->NombInfPer . ' ' . $persona->ApellInfPer . ' ' . $persona->ApellMatInfPer);
-                $nombresFormateados = mb_convert_case(mb_strtolower($nombreRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
-
-                // Construcción del nombre con rango académico completo
-                $nombreCompletoConTitulo = trim("{$prefijoNombre} {$nombresFormateados}{$sufijoNombre}");
-
-                // 4. Obtener y formatear el Nombre de la Carrera
-                $nombreCarrera = 'No asignada';
-                if ($integrante->carreras) {
-                    $nombreCarreraRaw = trim($integrante->carreras->NombCarr);
-                    $nombreCarrera = mb_convert_case(mb_strtolower($nombreCarreraRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
-                }
-                $carreraLimpia = preg_replace('/\s*-\s*\d+.*$/', '', $nombreCarrera);
-
-                // 2. Convertimos de "INGENIERIA QUIMICA" a "Ingeniería Química" (Title Case)
-                $nombreCarreraFinal = mb_convert_case($carreraLimpia, MB_CASE_TITLE, "UTF-8");
-                // 5. Obtener la Facultad y sus Siglas
-                $nombreFacultad = 'No asignada';
-                $siglasFacultad = 'No asignada';
-                if ($integrante->carreras && $integrante->carreras->facultades->isNotEmpty()) {
-                    $facultadAsociada = $integrante->carreras->facultades->first();
-                    $nombreFacultad = mb_convert_case(mb_strtolower(trim($facultadAsociada->facultad), 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
-                    $siglasFacultad = trim($facultadAsociada->siglas);
-                }
-
-                // 6. Estructura del objeto individual
-                $resultado[] = [
-                    'cedula' => $persona->CIInfPer,
-                    'nombres_apellidos' => $nombresFormateados,      // Solo nombres limpios
-                    'nombre_con_titulo' => $nombreCompletoConTitulo, // Formato "Ing. Juan Perez, MSc."
-                    'funcion' => $integrante->funciones->nombre_funcion ?? 'Desconocida',
-                    'cargo_genero' => $cargoFormateado,         // Regresa "Director" o "Directora"
-                    'carrera' => $nombreCarreraFinal,
-                    'facultad' => $nombreFacultad,
-                    'siglas' => $siglasFacultad,
-                    'proyecto_nombre' => $integrante->invi_proyectos->proyect_nombre ?? 'No registrado',
-                    'titulo_grado' => $tituloGrado ? $tituloGrado->ad_titulo : null,
-                    'titulo_posgrado' => $tituloPosgrado ? $tituloPosgrado->ad_titulo : null,
-                ];
-            }
+                });
 
             // 7. Retornar la respuesta JSON
             return response()->json([
